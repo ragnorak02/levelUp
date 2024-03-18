@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>View Cards</title>
+    <style>
+
+        body {
+            margin-top: 10px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            flex-direction: column;
+            
+        }
+
+       .header {
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 10px;
+            border-radius: 10px;
+            border: 2px solid black;
+            font-size: 24px;
+            width: 90%;
+            margin: 5px auto;
+        }
+
+        .nav-menu {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-menu button {
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            height: 60px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .nav-menu button:hover {
+            background-color: #45a049;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .card.selected {
+            background-color: #ffe5cc;
+            /* Light orange background when selected */
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .content-section {
+            width: 48%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            /* Light grey background */
+            user-select: none;
+            /* Prevent text selection */
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            display: none;
+            /* Hide by default */
+        }
+
+        .button {
+            padding: 5px 10px;
+            cursor: pointer;
+            background-color: #66a3ff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            margin-top: 5px;
+        }
+
+        .button:hover {
+            background-color: #4d94ff;
+        }
+
+        .editable {
+            cursor: text;
+            /* Change cursor on hover */
+        }
+
+        .editable:hover {
+            background-color: #f9f9f9;
+            /* Light grey background on hover */
+        }
+
+        /* Styles for category headers */
+        .category-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-align: center;
+            text-transform: capitalize; /* Capitalize first letter of each word */
+        }
+
+        /* Styles for card container */
+        .card-category-container {
+            border: 1px solid #000;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #bfefff; /* Light blue background color */
+        }
+
+        /* Additional styles */
+        .info-container {
+            display: flex;
+            justify-content:space-evenly;
+            text-align: center;
+            margin: 10px;
+            padding: 5px;
+        }
+
+        .info-label {
+            font-weight: bold;
+        }
+
+        .checkmark {
+            float: right;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">View</div>
+    <div class="nav-menu">
+        <button onclick="window.location.href='./main.html'"><i class="fa fa-home"></i></button>
+        <button onclick="window.location.href = './studyHome.html';">Study</button>
+        <button onclick="window.location.href = './createcard.html';">Create New Cards</button>
+        <button onclick="window.location.href = './viewcards.html';">View All Cards</button>
+    </div>
+<div class="button-row">
+    <button onclick="setMemorized(false)">Reset All</button>
+    <button onclick="setMemorized(true)">Master All</button>
+    <button onclick="deleteAllCards()">Delete All</button>
+</div>
+    <!-- Fields for additional information -->
+    <div class="info-container">
+        <div class="total-cards">
+            <span class="info-label">Total Cards:</span>
+            <span id="total-cards-count">0</span>
+        </div>
+        <div class="learned-cards">
+            <span class="info-label">Learned:</span>
+            <span id="learned-cards-count">0</span>
+        </div>
+        <div class="categories-count">
+            <span class="info-label">Categories:</span>
+            <span id="categories-count">0</span>
+        </div>
+    </div>
+
+    <div id="container"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Retrieve data from local storage
+            let levelupdata = JSON.parse(localStorage.getItem('levelupFlashData')) || {
+                strength: 0,
+                wisdom: 0,
+                health: 0,
+                flashcards: [],
+                lifting: [],
+                recipes: []
+            };
+            
+            let storedData = levelupdata.flashcards;
+            
+            const container = document.getElementById('container');
+
+            // Update additional information fields
+            const totalCardsCount = document.getElementById('total-cards-count');
+            const learnedCardsCount = document.getElementById('learned-cards-count');
+            
+
+            totalCardsCount.textContent = storedData.length;
+            learnedCardsCount.textContent = storedData.filter(card => card.memorized).length;
+            
+            //categoriesCount.textContent = Object.keys(levelupdata).length - 3; // Excluding strength, wisdom, health
+            console.log(levelupdata);
+
+            // Check if there are cards to display
+            if (storedData.length === 0) {
+                const noCardsMessage = document.createElement('div');
+                noCardsMessage.classList.add('no-cards');
+                noCardsMessage.textContent = "No cards, please create a flashcard";
+
+                const createButton = document.createElement('button');
+                createButton.textContent = "Create New Flashcard";
+                createButton.addEventListener('click', () => {
+                    window.location.href = './createcard.html';
+                });
+
+                noCardsMessage.appendChild(createButton);
+                container.appendChild(noCardsMessage);
+            } else {
+                // Group flashcards by category
+                const flashcardsByCategory = groupFlashcardsByCategory(storedData);
+
+                // Iterate through each category
+                for (const category in flashcardsByCategory) {
+                    if (flashcardsByCategory.hasOwnProperty(category)) {
+                        // Create a div container for the category
+                        const categoryContainer = document.createElement('div');
+                        categoryContainer.classList.add('card-category-container');
+
+                        // Create a header for the category
+                        const categoryHeader = document.createElement('div');
+                        categoryHeader.classList.add('category-header');
+                        categoryHeader.textContent = category;
+                        categoryContainer.appendChild(categoryHeader);
+
+                        // Iterate through flashcards in the category
+                        flashcardsByCategory[category].forEach((flashcard, index) => {
+                            const cardDiv = createCard(flashcard.front, flashcard.back, index, flashcard.memorized);
+                            categoryContainer.appendChild(cardDiv);
+                        });
+
+                        // Append the category container to the main container
+                        container.appendChild(categoryContainer);
+                    }
+                }
+            }
+
+            //set categories count
+            document.getElementById('categories-count').textContent =  document.getElementsByClassName('card-category-container').length;
+            
+            // Function to group flashcards by category
+            function groupFlashcardsByCategory(flashcards) {
+                const groupedFlashcards = {};
+                flashcards.forEach(flashcard => {
+                    if (!groupedFlashcards[flashcard.category]) {
+                        groupedFlashcards[flashcard.category] = [];
+                    }
+                    groupedFlashcards[flashcard.category].push(flashcard);
+                });
+                return groupedFlashcards;
+            }
+
+            function createCard(frontContent, backContent, cardIndex, memorized) {
+                const card = document.createElement('div');
+                card.classList.add('card');
+
+                const frontInput = document.createElement('input');
+                frontInput.classList.add('content-section', 'editable');
+                frontInput.value = frontContent;
+                frontInput.readOnly = true;
+
+                const backInput = document.createElement('input');
+                backInput.classList.add('content-section', 'editable');
+                backInput.value = backContent;
+                backInput.readOnly = true;
+
+                const row1 = document.createElement('div');
+                row1.classList.add('row');
+                row1.appendChild(frontInput);
+                row1.appendChild(backInput);
+
+                if(memorized){                                    
+                    const checkmark = document.createElement('span');
+                    checkmark.classList.add('checkmark');
+                    checkmark.innerHTML = '&#10003;'; // Checkmark symbol
+                    row1.appendChild(checkmark);
+                 }
+
+                const buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('button-container');
+
+                const clearButton = document.createElement('button');
+                clearButton.textContent = 'Clear';
+                clearButton.classList.add('button');
+                clearButton.addEventListener('click', () => {
+                    frontInput.value = '';
+                    frontInput.focus(); // Keep cursor in the front text input field
+                    backInput.value = '';
+                });
+
+                const updateButton = document.createElement('button');
+                updateButton.textContent = 'Update';
+                updateButton.classList.add('button');
+                updateButton.addEventListener('click', () => {
+                    storedData[cardIndex].front = frontInput.value;
+                    storedData[cardIndex].back = backInput.value;
+                    localStorage.setItem('levelupFlashData', JSON.stringify(storedData));
+
+                    // Hide all buttons
+                    const buttons = buttonContainer.querySelectorAll('.button');
+                    buttons.forEach(button => {
+                        button.style.display = 'none';
+                    });
+
+                    // Make inputs readonly
+                    frontInput.readOnly = true;
+                    backInput.readOnly = true;
+                });
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.classList.add('button');
+                deleteButton.addEventListener('click', () => {
+                    storedData.splice(cardIndex, 1);
+                    localStorage.setItem('levelupFlashData', JSON.stringify(storedData));
+                    card.remove();
+                });
+
+                buttonContainer.appendChild(clearButton);
+                buttonContainer.appendChild(updateButton);
+                buttonContainer.appendChild(deleteButton);
+
+                card.appendChild(row1);
+                card.appendChild(buttonContainer);
+
+                
+
+                card.addEventListener('click', () => {
+                    // Toggle button container visibility for the clicked card
+                    buttonContainer.style.display = buttonContainer.style.display === 'none' ? 'flex' : 'none';
+
+                    // Toggle selected class for the clicked card
+                    card.classList.toggle('selected');
+
+                    // Make inputs editable only when selected
+                    if (card.classList.contains('selected')) {
+                        frontInput.readOnly = false;
+                        backInput.readOnly = false;
+                    } else {
+                        frontInput.readOnly = true;
+                        backInput.readOnly = true;
+                    }
+
+                    // Remove selected class from other cards and hide their button containers
+                    const allCards = document.querySelectorAll('.card');
+                    allCards.forEach(c => {
+                        if (c !== card) {
+                            c.classList.remove('selected');
+                            c.querySelector('.button-container').style.display = 'none';
+                        }
+                    });
+                });
+
+                return card;
+            }
+        });
+
+        function deleteAllCards() {
+            localStorage.removeItem('levelupFlashData');
+            document.getElementById('container').innerHTML = '';
+        }
+
+        function setMemorized(memorized) {
+            
+                // Retrieve data from local storage
+            let cardList = (JSON.parse(localStorage.getItem('levelupFlashData'))).flashcards || {
+                strength: 0,
+                wisdom: 0,
+                health: 0,
+                flashcards: [],
+                lifting: [],
+                recipes: []
+            };
+
+            // Loop through all cards and set memorized property to false
+            cardList.forEach(card => {
+                console.log(card.front + " is memorized = " + card.memorized);
+                card.memorized = memorized;
+            });
+
+            // Update the local storage with the modified data
+            localStorage.setItem('levelupFlashData', JSON.stringify(cardList));
+
+            // Optional: Display a message or perform any other actions after unlearning all cards
+            console.log('All cards have been unlearned.');
+        }
+
+    </script>
+</body>
+
+</html>

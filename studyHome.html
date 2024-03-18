@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Learn</title>
+    <style>
+        body {
+            margin-top: 10px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            flex-direction: column;
+            
+        }
+
+        .header {
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 10px;
+            border-radius: 10px;
+            border: 2px solid black;
+            font-size: 24px;
+            width: 90%;
+            margin: 5px auto;
+        }
+
+        .nav-menu {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-menu button {
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            height: 60px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .nav-menu button:hover {
+            background-color: #45a049;
+        }
+
+        .home-btn {
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-container {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .progress-bar {
+            background-color: #ddd;
+            border-radius: 5px;
+            padding: 3px;
+            position: relative;
+            /* Added for positioning */
+        }
+
+        .progress-bar-inner {
+            background-color: #4CAF50;
+            height: 20px;
+            border-radius: 5px;
+            width: 50%;
+            /* Change the width dynamically based on the number of cards stored in local storage */
+            transition: width 0.5s ease-in-out;
+            position: relative;
+        }
+
+        .progress-count {
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .progress-text {
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .library-div,
+        .learn-div {
+            text-align: center;
+            font-size: 28px;
+            padding: 80px;
+            background-color: orange;
+            cursor: pointer;
+            border: 2px solid black;
+            margin: 15px 0px 15px 0px;
+        }
+
+
+        #categoryDropdown {
+            width: 240px;
+            font-size: 18px; /* Adjust the font size as needed */
+            flex: .95;
+            text-align: center;
+            background-color: lightgray;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">Study</div>
+    <div class="nav-menu">
+        <button onclick="window.location.href='./main.html'"><i class="fa fa-home"></i></button>
+        <button onclick="window.location.href = './studyHome.html';">Study</button>
+        <button onclick="window.location.href = './createcard.html';">Create New Cards</button>
+        <button onclick="window.location.href = './viewcards.html';">View All Cards</button>
+    </div>
+    <div class="progress-bar-container">
+        <div class="progress-bar">
+            <div class="progress-bar-inner" id="progressBar">
+                <div class="progress-text" id="progressText"></div>
+            </div>
+        </div>
+        <div class="progress-count" id="progressCount">0 cards stored</div>
+    </div>
+  
+    <div class="learn-div" onclick="navigateToLearnPage(false)">
+    New
+    </div>
+    <div id="category-div">
+        <select id="categoryDropdown">
+            <!-- Dropdown options will be populated dynamically -->
+        </select>
+    </div>
+    <div class="library-div" onclick="navigateToLearnPage(true)">
+        Library
+    </div>
+
+    <!-- JavaScript to update the progress bar width and count -->
+    <script>        
+        
+        // Retrieve data from local storage
+        let data = JSON.parse(localStorage.getItem('levelupFlashData'))?.flashcards || [];
+        var cardCount = data.length;
+        var memorizedCount = data.filter(item => item.memorized === true).length;
+
+        // Update the progress bar width and count
+        var progressBar = document.getElementById('progressBar');
+        var progressCount = document.getElementById('progressCount');
+        var memorizedProgress = document.getElementById('memorizedCount');
+        var progressText = document.getElementById('progressText');
+
+        var percentage = (memorizedCount / cardCount * 100).toFixed(2); // Calculate percentage with 2 decimal places
+        progressBar.style.width = percentage + '%';
+        progressCount.textContent = memorizedCount + ' of ' + cardCount + " mastered";
+        progressText.textContent = percentage + '%'; // Display percentage inside progress bar
+
+        
+        const categoryDropdown = document.getElementById('categoryDropdown');
+        
+        // Get unique sorted categories
+            const uniqueCategories = [...new Set(data.map(item => item.category))].sort();
+
+            const allOption = document.createElement('option');
+                allOption.textContent = 'all';
+                allOption.value = 'all';
+                categoryDropdown.appendChild(allOption);
+                allOption.selected = true;
+
+            // Populate the dropdown with categories
+            uniqueCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.textContent = category;
+                option.value = category;
+                categoryDropdown.appendChild(option);
+            });
+
+        // Function to navigate to learn page with allCards variable
+        function navigateToLearnPage(learnEverything) {
+            if (learnEverything) {
+                window.location.href = 'learn.html?category=' + 'library';
+            }
+            let selectedCategory = categoryDropdown.value;
+             window.location.href = 'learn.html?category=' + selectedCategory;
+        }
+
+        // Function to get URL parameter by name
+            function getParameterByName(name, url) {
+                if (!url) url = window.location.href;
+                name = name.replace(/[\[\]]/g, "\\$&");
+                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, " "));
+            }
+
+            // Get the category from the URL
+            var category = getParameterByName('category');
+
+            // Now you can use this category to filter content accordingly
+            console.log('Category:', category);
+
+    </script>
+</body>
+
+</html>
