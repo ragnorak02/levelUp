@@ -474,8 +474,19 @@
 
         function saveAndExit() {
             // Save any data if needed and then redirect the user to the home page or any other page
-            localStorage.setItem('levelupFlashData', JSON.stringify(levelupdata));
-            window.location.href = './studyHome.html'; // Change the URL as needed
+            // Put the modified objects back into the original array by overwriting objects with the same 'front' field
+            // Iterate over each card in flashcards
+            flashcards.forEach(card => {
+                // Find the corresponding card in flashcardsDB
+                const index = flashcardsDB.findIndex(dbCard => dbCard.id === card.id);
+                // If the card is found in flashcardsDB, update its properties
+                if (index !== -1) {
+                    flashcardsDB[index] = { ...flashcardsDB[index], ...card };
+                }
+            });
+
+            localStorage.setItem('levelupFlashData', JSON.stringify(flashcards));
+            window.location.href = 'studyHome.html'; // Change the URL as needed
         }
 
         function resetMemorized(array) {
@@ -502,26 +513,10 @@
                 utterance.lang = lang;
                 speechSynthesis.speak(utterance);
             }
-        /*
+        
 
-        // Put the modified objects back into the original array by overwriting objects with the same 'front' field
-            newArray.forEach(newObj => {
-                let index = originalArray.findIndex(obj => obj.front === newObj.front);
-                if (index !== -1) {
-                    originalArray[index] = newObj;
-                }
-            });
-
-        // Iterate over each card in flashcards
-        flashcards.forEach(card => {
-            // Find the corresponding card in flashcardsDB
-            const index = flashcardsDB.findIndex(dbCard => dbCard.id === card.id);
-            // If the card is found in flashcardsDB, update its properties
-            if (index !== -1) {
-                flashcardsDB[index] = { ...flashcardsDB[index], ...card };
-            }
-        });
-        */
+       
+        
     </script>
 
 </body>

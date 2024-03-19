@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>View Cards</title>
     <style>
-
         body {
             margin-top: 10px;
             margin: 0;
@@ -17,10 +16,10 @@
             align-items: center;
             background-color: #f0f0f0;
             flex-direction: column;
-            
+
         }
 
-       .header {
+        .header {
             text-align: center;
             background-color: #4CAF50;
             color: white;
@@ -122,7 +121,8 @@
             margin-top: 20px;
             margin-bottom: 10px;
             text-align: center;
-            text-transform: capitalize; /* Capitalize first letter of each word */
+            text-transform: capitalize;
+            /* Capitalize first letter of each word */
         }
 
         /* Styles for card container */
@@ -131,13 +131,14 @@
             border-radius: 5px;
             padding: 10px;
             margin-bottom: 20px;
-            background-color: #bfefff; /* Light blue background color */
+            background-color: #bfefff;
+            /* Light blue background color */
         }
 
         /* Additional styles */
         .info-container {
             display: flex;
-            justify-content:space-evenly;
+            justify-content: space-evenly;
             text-align: center;
             margin: 10px;
             padding: 5px;
@@ -157,17 +158,17 @@
 <body>
 
     <div class="header">View</div>
-<div class="nav-menu">
-    <button onclick="window.location.href='main.html'"><i class="fa fa-home"></i></button>
-    <button onclick="window.location.href = 'studyHome.html';">Study</button>
-    <button onclick="window.location.href = 'createCard.html';">Create New Cards</button>
-    <button onclick="window.location.href = 'viewCards.html';">View All Cards</button>
-</div>
-<div class="button-row">
-    <button onclick="setMemorized(false)">Reset All</button>
-    <button onclick="setMemorized(true)">Master All</button>
-    <button onclick="deleteAllCards()">Delete All</button>
-</div>
+    <div class="nav-menu">
+        <button onclick="window.location.href='main.html'"><i class="fa fa-home"></i></button>
+        <button onclick="window.location.href = 'studyHome.html';">Study</button>
+        <button onclick="window.location.href = 'createCard.html';">Create New Cards</button>
+        <button onclick="window.location.href = 'viewCards.html';">View All Cards</button>
+    </div>
+    <div class="button-row">
+        <button onclick="setMemorized(false)">Reset All</button>
+        <button onclick="setMemorized(true)">Master All</button>
+        <button onclick="deleteAllCards()">Delete All</button>
+    </div>
     <!-- Fields for additional information -->
     <div class="info-container">
         <div class="total-cards">
@@ -190,26 +191,21 @@
         document.addEventListener("DOMContentLoaded", function () {
             // Retrieve data from local storage
             let levelupdata = JSON.parse(localStorage.getItem('levelupFlashData')) || {
-                strength: 0,
-                wisdom: 0,
-                health: 0,
-                flashcards: [],
-                lifting: [],
-                recipes: []
+                flashcards: []
             };
-            
+
             let storedData = levelupdata.flashcards;
-            
+
             const container = document.getElementById('container');
 
             // Update additional information fields
             const totalCardsCount = document.getElementById('total-cards-count');
             const learnedCardsCount = document.getElementById('learned-cards-count');
-            
+
 
             totalCardsCount.textContent = storedData.length;
             learnedCardsCount.textContent = storedData.filter(card => card.memorized).length;
-            
+
             //categoriesCount.textContent = Object.keys(levelupdata).length - 3; // Excluding strength, wisdom, health
             console.log(levelupdata);
 
@@ -257,8 +253,8 @@
             }
 
             //set categories count
-            document.getElementById('categories-count').textContent =  document.getElementsByClassName('card-category-container').length;
-            
+            document.getElementById('categories-count').textContent = document.getElementsByClassName('card-category-container').length;
+
             // Function to group flashcards by category
             function groupFlashcardsByCategory(flashcards) {
                 const groupedFlashcards = {};
@@ -275,6 +271,10 @@
                 const card = document.createElement('div');
                 card.classList.add('card');
 
+                if (memorized) {
+                    card.style.backgroundColor = '#ffffcc'; // Light yellow background color
+                }
+
                 const frontInput = document.createElement('input');
                 frontInput.classList.add('content-section', 'editable');
                 frontInput.value = frontContent;
@@ -290,13 +290,23 @@
                 row1.appendChild(frontInput);
                 row1.appendChild(backInput);
 
-                if(memorized){                                    
-                    const checkmark = document.createElement('span');
-                    checkmark.classList.add('checkmark');
-                    checkmark.innerHTML = '&#10003;'; // Checkmark symbol
-                    row1.appendChild(checkmark);
-                 }
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
 
+                if (memorized) {
+                    checkbox.checked = true; 
+
+                    // var checkbox = document.createElement('input');
+                    // checkbox.type = 'checkbox';
+
+                    // //label.appendChild(checkbox);
+
+                    // const checkmark = document.createElement('span');
+                    // checkmark.classList.add('checkmark');
+                    // checkmark.innerHTML = '&#10003;'; // Checkmark symbol
+                    
+                }
+                row1.appendChild(checkbox);
                 const buttonContainer = document.createElement('div');
                 buttonContainer.classList.add('button-container');
 
@@ -344,7 +354,7 @@
                 card.appendChild(row1);
                 card.appendChild(buttonContainer);
 
-                
+
 
                 card.addEventListener('click', () => {
                     // Toggle button container visibility for the clicked card
@@ -382,15 +392,10 @@
         }
 
         function setMemorized(memorized) {
-            
-                // Retrieve data from local storage
+
+            // Retrieve data from local storage
             let cardList = (JSON.parse(localStorage.getItem('levelupFlashData'))).flashcards || {
-                strength: 0,
-                wisdom: 0,
-                health: 0,
-                flashcards: [],
-                lifting: [],
-                recipes: []
+                flashcards: []
             };
 
             // Loop through all cards and set memorized property to false
