@@ -281,11 +281,11 @@
 
         <div class="btn-container">
             <div class="btn-container">
-                <!-- First button
+                 <!-- First button
                 <button class="btn" onclick="clickLeft()">No</button>
             
                 Second button
-                <button class="btn" onclick="clickRight()">Yes</button> -->
+                <button class="btn" onclick="clickRight()">Yes</button>  -->
 
             <!-- Third button -->
             <button class="btn" onclick="reset()">Reset</button>
@@ -315,10 +315,9 @@
         // Retrieve the category of cards selected value from the URL
         const urlParams = new URLSearchParams(window.location.search);
         const deckCategory = urlParams.get('category');
-        console.log("category selected: " + deckCategory);
 
         // Retrieve the 'levelupdata' flashcards and assign it to the variable flashcardsDB
-        const flashcardsDB = JSON.parse(localStorage.getItem('levelupFlashData'))?.flashcards || [];
+        let flashcardsDB = JSON.parse(localStorage.getItem('levelupFlashData'))?.flashcards || [];
         
         // Retrieve flashcards from local storage based on 'allCards' value
         if (deckCategory === 'library') {
@@ -398,7 +397,6 @@
         }
 
         function slideOutCard(animationClass) {
-            console.log("cards learned: " + cardsLearned + " and flashcards.length: " + flashcardsOriginal.length);
             if (cardsLearned < flashcardsOriginal.length) {
                 // Slide out the card
                 flashcard.classList.add(animationClass);
@@ -448,7 +446,6 @@
         }
 
         function updateCardContent() {
-            console.log("length: " +  flashcards.length);
             flashcard.classList.remove('flip');
             if (flashcards.length) {                
                 const currentCard = flashcards[0];
@@ -473,21 +470,19 @@
         }
 
         function saveAndExit() {
-            // Save any data if needed and then redirect the user to the home page or any other page
-            // Put the modified objects back into the original array by overwriting objects with the same 'front' field
-            // Iterate over each card in flashcards
-            flashcards.forEach(card => {
-                // Find the corresponding card in flashcardsDB
-                const index = flashcardsDB.findIndex(dbCard => dbCard.id === card.id);
-                // If the card is found in flashcardsDB, update its properties
-                if (index !== -1) {
-                    flashcardsDB[index] = { ...flashcardsDB[index], ...card };
-                }
-            });
+                // Save any data if needed and then redirect the user to the home page or any other page
+                var flashcardsJSON = {
+                    "flashcards": flashcardsDB
+                };
+                localStorage.setItem('levelupFlashData', JSON.stringify(flashcardsJSON));
 
-            localStorage.setItem('levelupFlashData', JSON.stringify(flashcards));
-            window.location.href = 'studyHome.html'; // Change the URL as needed
-        }
+                // Get the current URL and extract the query parameters
+                const currentURL = new URL(window.location.href);
+                const deckCategory = currentURL.searchParams.get('category');
+
+                // Redirect to the study home page with the same deckCategory value
+                window.location.href = `learn.html?category=${deckCategory}`;
+            }
 
         function resetMemorized(array) {
                 array.forEach(card => {

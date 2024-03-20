@@ -165,7 +165,7 @@
     <script>
 
          //this is to set the temporary data. will need to update this once i work on lifting + recipes datasets
-        /*let levelupdataTemp = {
+        let levelupdataTemp = {
             flashcards: [
                 { front: 'korea', back: 'hanguk', memorized: true, category: 'country' },
                 { front: 'america', back: 'miguk', memorized: false, category: 'country' },
@@ -174,17 +174,19 @@
                 { front: 'eat', back: ' mokda', memorized: false, category: 'verb' }
             ]
         };
+        //console.log(levelupdataTemp);
+        console.log(JSON.stringify(levelupdataTemp));
         localStorage.setItem('levelupFlashData', JSON.stringify(levelupdataTemp));
-        */
+        
 
         // Load flashcards from localStorage
         let levelupdata = JSON.parse(localStorage.getItem('levelupFlashData')) || {
             flashcards: []
         };
 
-        console.log("start of object");
-        console.log("levelup: " + JSON.stringify(levelupdata));
-        console.log("end of object");
+        // console.log("start of object");
+        // console.log("levelup: " + JSON.stringify(levelupdata));
+        // console.log("end of object");
         JSON.stringify(levelupdata);
 
         function addCard() {

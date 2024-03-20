@@ -44,16 +44,21 @@
     }
 
     .yellow-box {
-      width: 300px;
-      /* Widened yellow box */
-      height: 175px;
-      background-color: lightgray;
-      border-radius: 10px;
-      margin-right: 20px;
-      /* Adjusted margin */
-      border: 1px solid #000;
-      /* Black border */
-    }
+  width: 300px; /* Widened yellow box */
+  height: 180px; /* Increased height */
+  border-radius: 10px;
+  margin-right: 20px; /* Adjusted margin */
+  border: 1px solid #000; /* Black border */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Hide any overflow */
+}
+
+.yellow-box img {
+  width: auto; /* Let the image adjust its width according to its aspect ratio */
+  height: 100%; /* Set the height of the image to 100% */
+}
 
     .progress-bars {
       display: flex;
@@ -240,7 +245,9 @@
   <div class="container">
     <div class="banner">LEVEL UP!</div>
     <div class="row">
-      <div class="yellow-box"></div>
+      <div class="yellow-box">
+        <img src="https://giffiles.alphacoders.com/220/220162.gif" alt="Goku SSJ GIF">
+      </div>
       <div class="progress-bars">
         <div class="progress-bar-container">
           <div class="progress-bar">

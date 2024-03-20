@@ -194,18 +194,28 @@
                 flashcards: []
             };
 
-            let storedData = levelupdata.flashcards;
+            var storedData = levelupdata.flashcards;
 
             const container = document.getElementById('container');
 
             // Update additional information fields
             const totalCardsCount = document.getElementById('total-cards-count');
             const learnedCardsCount = document.getElementById('learned-cards-count');
+            //let testFlashcards = JSON.stringify(levelupdata);
 
+            var testFlashcards = {
+                "flashcards": levelupdata
+            };
 
-            totalCardsCount.textContent = storedData.length;
-            learnedCardsCount.textContent = storedData.filter(card => card.memorized).length;
-
+            console.log('test');
+            console.log(levelupdata);
+            console.log(JSON.stringify(testFlashcards));
+            if(totalCardsCount){
+                totalCardsCount.textContent = storedData.length;
+            }
+            if(learnedCardsCount){
+                learnedCardsCount.textContent = storedData.filter(card => card.memorized).length;
+            }
             //categoriesCount.textContent = Object.keys(levelupdata).length - 3; // Excluding strength, wisdom, health
             console.log(levelupdata);
 
@@ -393,10 +403,9 @@
 
         function setMemorized(memorized) {
 
-            // Retrieve data from local storage
-            let cardList = (JSON.parse(localStorage.getItem('levelupFlashData'))).flashcards || {
-                flashcards: []
-            };
+            //Retrieve data from local storage
+            let levelupdata = JSON.parse(localStorage.getItem('levelupFlashData')) || { flashcards: [] };
+            let cardList = levelupdata.flashcards;
 
             // Loop through all cards and set memorized property to false
             cardList.forEach(card => {
@@ -405,10 +414,11 @@
             });
 
             // Update the local storage with the modified data
-            localStorage.setItem('levelupFlashData', JSON.stringify(cardList));
+            localStorage.setItem('levelupFlashData', JSON.stringify(levelupdata));
 
             // Optional: Display a message or perform any other actions after unlearning all cards
             console.log('All cards have been unlearned.');
+            window.location.href = 'viewCards.html';
         }
 
     </script>
