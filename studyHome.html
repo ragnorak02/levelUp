@@ -142,8 +142,7 @@
     </div>
 
     <!-- JavaScript to update the progress bar width and count -->
-    <script>        
-        
+    <script>
         // Retrieve data from local storage
         let data = JSON.parse(localStorage.getItem('levelupFlashData'))?.flashcards || [];
         var cardCount = data.length;
@@ -152,59 +151,72 @@
         // Update the progress bar width and count
         var progressBar = document.getElementById('progressBar');
         var progressCount = document.getElementById('progressCount');
-        var memorizedProgress = document.getElementById('memorizedCount');
         var progressText = document.getElementById('progressText');
 
-        var percentage = (memorizedCount / cardCount * 100).toFixed(2); // Calculate percentage with 2 decimal places
+        var percentage = (memorizedCount / cardCount * 100).toFixed(2);
         progressBar.style.width = percentage + '%';
         progressCount.textContent = memorizedCount + ' of ' + cardCount + " mastered";
-        progressText.textContent = percentage + '%'; // Display percentage inside progress bar
+        progressText.textContent = percentage + '%';
 
-        
         const categoryDropdown = document.getElementById('categoryDropdown');
-        
-        // Get unique sorted categories
-            const uniqueCategories = [...new Set(data.map(item => item.category))].sort();
 
-            const allOption = document.createElement('option');
-                allOption.textContent = 'all';
-                allOption.value = 'all';
-                categoryDropdown.appendChild(allOption);
-                allOption.selected = true;
+        const uniqueCategories = [...new Set(data.map(item => item.category))].sort();
 
-            // Populate the dropdown with categories
-            uniqueCategories.forEach(category => {
-                const option = document.createElement('option');
-                option.textContent = category;
-                option.value = category;
-                categoryDropdown.appendChild(option);
-            });
+        const allOption = document.createElement('option');
+        allOption.textContent = 'all';
+        allOption.value = 'all';
+        categoryDropdown.appendChild(allOption);
+        allOption.selected = true;
 
-        // Function to navigate to learn page with allCards variable
+        uniqueCategories.forEach(category => {
+            const option = document.createElement('option');
+            option.textContent = category;
+            option.value = category;
+            categoryDropdown.appendChild(option);
+        });
+
         function navigateToLearnPage(learnEverything) {
             if (learnEverything) {
                 window.location.href = 'learn.html?category=' + 'library';
             }
             let selectedCategory = categoryDropdown.value;
-             window.location.href = 'learn.html?category=' + selectedCategory;
+            window.location.href = 'learn.html?category=' + selectedCategory;
         }
 
-        // Function to get URL parameter by name
-            function getParameterByName(name, url) {
-                if (!url) url = window.location.href;
-                name = name.replace(/[\[\]]/g, "\\$&");
-                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-                    results = regex.exec(url);
-                if (!results) return null;
-                if (!results[2]) return '';
-                return decodeURIComponent(results[2].replace(/\+/g, " "));
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+
+        var category = getParameterByName('category');
+        console.log('Category:', category);
+
+        // Function to shuffle an array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
             }
+            return array;
+        }
 
-            // Get the category from the URL
-            var category = getParameterByName('category');
-
-            // Now you can use this category to filter content accordingly
-            console.log('Category:', category);
+        // Function to shuffle and update the deck
+        function reshuffleDeck() {
+            data = shuffleArray(data); // Shuffle the array
+            localStorage.setItem('levelupFlashData', JSON.stringify({ flashcards: data })); // Update local storage
+            // Update progress bar, count, etc. as needed
+            cardCount = data.length;
+            memorizedCount = data.filter(item => item.memorized === true).length;
+            percentage = (memorizedCount / cardCount * 100).toFixed(2);
+            progressBar.style.width = percentage + '%';
+            progressCount.textContent = memorizedCount + ' of ' + cardCount + " mastered";
+            progressText.textContent = percentage + '%';
+        }
 
     </script>
 </body>
