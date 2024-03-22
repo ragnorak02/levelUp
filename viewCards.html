@@ -5,7 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/main.css">
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            var currentUrl = window.location.href;
+
+            if (currentUrl.startsWith('https://ragnorak02')) {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'https://github.com/ragnorak02/levelUp/blob/main/main.css';
+                document.head.appendChild(link);
+            } else {
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = '/main.css';
+                document.head.appendChild(link);
+            }
+        });
+    </script>
     <title>View Cards</title>
     <style>
 
