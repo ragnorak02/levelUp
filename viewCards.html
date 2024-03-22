@@ -5,25 +5,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script>
-        window.addEventListener('DOMContentLoaded', (event) => {
-            var currentUrl = window.location.href;
-
-            if (currentUrl.startsWith('https://ragnorak02')) {
-                var link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = 'https://github.com/ragnorak02/levelUp/blob/main/main.css';
-                document.head.appendChild(link);
-            } else {
-                var link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = '/main.css';
-                document.head.appendChild(link);
-            }
-        });
-    </script>
     <title>View Cards</title>
     <style>
+        body {
+            margin-top: 10px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #EADFB4;
+            flex-direction: column;
+
+        }
+
+        .header {
+            text-align: center;
+            background-color: #9BB0C1;
+            color: white;
+            padding: 10px 10px;
+            border-radius: 10px;
+            border: 2px solid black;
+            font-size: 24px;
+            width: 90%;
+            margin: 5px auto;
+        }
+
+        .nav-menu {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-menu button {
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            height: 60px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .nav-menu button:hover {
+            background-color: #45a049;
+        }
 
         .card {
             display: flex;
@@ -183,8 +208,6 @@
             var testFlashcards = {
                 "flashcards": levelupdata
             };
-
-            console.log(totalCardsCount);
 
             if(totalCardsCount){
                 totalCardsCount.textContent = storedData.length;
