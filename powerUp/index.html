@@ -4,325 +4,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Power Up!</title>
     <style>
-        body,
-        html {
+        
+        html, body {
+            height: 100%; /* Make sure the html and body fill the entire screen height */
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            display: flex; /* Use Flexbox */
+            flex-direction: column; /* Stack children vertically */
         }
-
+    
         header {
-            background-color: #4CAF50;
-            color: white;
-            text-align: center;
-            padding: 0px;
-            font-size: 12px;
-        }
-
-        .header-content {
             display: flex;
             align-items: center;
-            justify-content: center;
-            position: relative;
+            background-color: #4CAF50;
+            color: white;
+            padding: 0px;
+            font-size: 10px;
+            position: relative; /* Ensures that absolutely positioned elements are relative to the header */
         }
 
         .home-icon {
-            position: absolute;
-            left: 10px;
-            font-size: 32px;
+            font-size: 20px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
         }
 
-        .date-navigator {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 30px;
-            font-size: 18px;
+        .header-content h1 {
+            position: absolute; /* Position the title absolutely to center it */
+            left: 50%; /* Start at the halfway point of the header */
+            top: 50%; /* Align the top at the halfway point vertically */
+            transform: translate(-50%, -50%); /* Shift the title back by half its width and height to center */
+            margin: 0; /* Remove default margins */
+            width: auto; /* Allow the width to grow as needed */
+        }
 
+        /* Additional container for the home icon and potential future elements */
+        .left-align-container {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Ensures the h1 is centered even with the button on the left */
+        .header-content h1 {
+            flex-grow: 1;
+            text-align: center;
+        }
+    
+        .information-div {
+            margin: 5px;
+            padding: 5px;
+            flex-grow: 1; /* Make information-div take up the remaining space */
+            overflow: auto; /* In case the content is too much, enable scrolling */
         }
 
         .main {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            margin: 0px;
+            padding: 0px;
+            align-self: flex-end; /* Snap the main div to the bottom */
+            width: 100%; /* Ensure it takes full width */
         }
-
-        .workout-log {
-            text-align: center;
-            margin-top: 10px;
-            font-size: 8px;
-            display: flex;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .totals {
-            margin-right: 50px;
-            background-color: #f9f9f9;
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        .start-new-workout {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 30px;
-            font-size: 18px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .start-new-workout:hover {
-            background-color: #45a049;
-        }
-
-        .arrow {
-            cursor: pointer;
-        }
-
-        /* Popup styles */
-        .popup {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            align-items: center;
-            justify-content: center;
-        }
-
-        .popup-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-        }
-
-        .close {
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            cursor: pointer;
-        }
-
-        .exercise-list {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .exercise-list li {
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-
-        .exercise-list li:hover {
-            color: blue;
-        }
-
-        /* Custom styles for exercise and set divs */
         .exercise {
             border: 1px solid #ccc;
             border-radius: 5px;
-            padding: 10px;
-            margin-top: 10px;
-        }
-
-        .set {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin-top: 5px;
-            display: flex;
-            align-items: center;
-        }
-
-        .set input[type="text"] {
-            width: 100px;
-            margin-right: 10px;
             padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            margin: 0 2px 0 2px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            flex: 1;
+            max-width: 45%;
+            /* Adjusted for two divs to fit side by side */
+            font-size: 11px;
+            /* Smaller font size for better fit on small screens */
         }
-
-        .add-set-button {
-            padding: 5px 10px;
+    
+        .exercise-pair {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+    
+        .workout-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    
+        button {
+            padding: 10px 30px;
+            font-size: 18px;
+            margin: 0 10px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-
-        .add-set-button:hover {
+    
+        button:hover {
             background-color: #45a049;
         }
+    
+    
+        h2 {
+            margin: 0 0 0px 0;
+        }
+
+        p {
+            
+        }
+    
+        @media (max-width: 600px) {
+            .exercise-pair {
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+            }
+    
+            .exercise {
+                display: flex;
+                align-items: center; 
+                flex-wrap: wrap; 
+            }
+
+            .exercise div {
+                margin-bottom: 5px;
+            }
+
+            .exercise p {
+                margin: 0; /* Removes default paragraph margin for a tighter layout */
+                font-size: 0.9em; /* Adjusts the font size to be slightly smaller */
+            }
+
+            .exercise h2 + div {
+                font-size: 0.8em; /* Makes the "last worked out" text smaller */
+            }
+
+            .lastWorkedOut {
+                font-size: 0.8em; 
+                padding-left: 20px; 
+                white-space: nowrap; 
+            }
+        }
+
+        .personalRecord {
+            margin-left: auto;
+            color: gold;
+            font-size: 24px; /* Adjust size as needed */
+        }
+
+        /* Example using FontAwesome for the star */
+        .personalRecord:before {
+            content: '\2605'; /* Unicode character for a star */
+            display: none; /* Hide by default */
+        }
+        
     </style>
 </head>
 
 <body>
     <header>
-        <div class="header-content">
-            <span class="home-icon">&#8962;</span>
-            <h1>Power Up!</h1>
+        <div class="left-align-container">
+            <button onclick="window.location.href='../main.html'" class="home-icon"><i class="fa fa-home"></i></button>
         </div>
-        <div class="date-navigator">
-            <span class="arrow left-arrow">&#8592;</span>
-            <span class="date">Today<span id="currentDate"></span></span>
-            <span class="arrow right-arrow">&#8594;</span>
-        </div>
+        <h1>Power Up!</h1>
+        <!-- The empty div is no longer needed due to absolute positioning of the h1 -->
     </header>
-    <main>
-        <div class="workout-log">
-            <div class="totals">
-                <h2>Totals</h2>
-                <p>Total Weight Lifted: <span id="totalWeight"></span> lbs</p>
-                <p>Total Reps: <span id="totalReps"></span></p>
-                <h3>Body Part Totals</h3>
-                <ul id="bodyPartTotals">
-                    <!-- Display body part totals dynamically here -->
-                </ul>
+    <div class="information-div">
+        <!-- Aggregate information will go here -->
+    </div>
+    <main class="main">
+        <div class="exercise-pair">
+            <div id="chest" class="exercise">
+                <h2>Chest</h2>
+                <div class="lastWorkedOut">3 days ago</div><div class="personalRecord"></div>
+                <div>
+                    <strong>Bench Press</strong>
+                    <p>Weight: <span class="weight">100kg</span> Reps: <span class="reps">10</span></p>
+                </div>
             </div>
-            <div id="exerciseLog">
-                <!-- Exercise logs will be dynamically added here -->
-            </div>
-        </div>
-
-        <button class="start-new-workout">Start New Workout</button>
-
-        <!-- Body Part Popup -->
-        <div id="popupBodyPart" class="popup">
-            <div class="popup-content">
-                <span class="close">&#10006;</span>
-                <h2>Select Body Part</h2>
-                <ul class="exercise-list">
-                    <li data-bodypart="Chest">Chest</li>
-                    <li data-bodypart="Back">Back</li>
-                    <li data-bodypart="Biceps">Biceps</li>
-                    <li data-bodypart="Triceps">Triceps</li>
-                    <li data-bodypart="Shoulders">Shoulders</li>
-                    <li data-bodypart="Lats">Lats</li>
-                </ul>
+            <div id="triceps" class="exercise">
+                <h2>Triceps</h2>
+                <div class="lastWorkedOut">3 days ago</div><div class="personalRecord"></div>
+                <div>
+                    <strong>Skull crushers</strong>
+                    <p>Weight: <span class="weight">45 lbs</span> Reps: <span class="reps">10</span></p>
+                </div>
             </div>
         </div>
-
-        <!-- Exercise Popup -->
-        <div id="popupExercise" class="popup">
-            <div class="popup-content">
-                <span class="close">&#10006;</span>
-                <h2>Select Exercise</h2>
-                <ul class="exercise-list" id="exerciseList">
-                    <!-- Exercise options dynamically populated here -->
-                </ul>
+        <div class="exercise-pair">
+            <div id="back" class="exercise">
+                <h2>Back</h2>
+                <div class="lastWorkedOut">3 days ago</div><div class="personalRecord"></div>
+                <div>
+                    <strong>Seated Cable Rows</strong>
+                    <p>Weight: <span class="weight">20 lbs</span> Reps: <span class="reps">12</span></p>
+                </div>
             </div>
+            <div id="biceps" class="exercise">
+                <h2>Biceps</h2>
+                <div class="lastWorkedOut">3 days ago</div><div class="personalRecord"></div>
+                <div>
+                    <strong>Curl</strong>
+                    <p>Weight: <span class="weight">20kg</span> Reps: <span class="reps">12</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="exercise-pair">
+            <div id="Shoulders" class="exercise">
+                <h2>Shoulders</h2>
+                <div class="lastWorkedOut">3 days ago</div><div class="personalRecord"></div>
+                <div>
+                    <strong>Pull Ups</strong>
+                    <p>Weight: <span class="weight">Bodyweight</span> Reps: <span class="reps">12</span></p>
+                </div>
+            </div>
+            <div id="Traps" class="exercise">
+                <h2>Traps</h2>
+                <div class="lastWorkedOut">3 days ago</div><div class="personalRecord"></div>
+                <div>
+                    <strong>Shrugs</strong> 
+                    <p>Weight: <span class="weight">20kg</span> Reps: <span class="reps">12</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="exercise-pair">
+            <div id="Legs" class="exercise">
+                <h2>Legs</h2>
+                <div class="lastWorkedOut">3 days ago</div><div class="personalRecord"></div>
+                <div>
+                    <strong>Squats</strong>
+                    <p>Weight: <span class="weight">200 lbs</span> Reps: <span class="reps">12</span></p>
+                </div>
+            </div>
+            <div id="Calves" class="exercise">
+                <h2>Calves</h2>
+                <div class="lastWorkedOut">3 days ago</div><div class="personalRecord"></div>
+                <div>
+                    <strong>Calf Raises</strong> 
+                    <p>Weight: <span class="weight">20kg</span> Reps: <span class="reps">12</span></p>
+                </div>
+            </div>
+        </div>
+        <!-- Repeat for other pairs as needed -->
+
+        <div class="workout-controls">
+            <button id="new-workout">New Workout</button>
+            <button id="copy-workout">Copy Workout</button>
         </div>
     </main>
     <script>
-        // Body Part Popup
-        const popupBodyPart = document.getElementById('popupBodyPart');
-        const bodyPartList = popupBodyPart.querySelector('.exercise-list');
+        document.addEventListener('DOMContentLoaded', function () {
+            const testDaysAgo = {
+                chest: 3,
+                back: 5,
+                triceps: 4,
+                biceps: 6,
+                shoulders: 2,
+                lats: 7,
+                legs: 4,
+            };
 
-        // Exercise Popup
-        const popupExercise = document.getElementById('popupExercise');
-        const exerciseList = popupExercise.querySelector('#exerciseList');
+            Object.keys(testDaysAgo).forEach(function (bodyPart) {
+                const daysAgoElement = document.querySelector('#' + bodyPart + ' .days-ago');
+                if (daysAgoElement) {
+                    daysAgoElement.textContent = testDaysAgo[bodyPart];
+                }
+            });
 
-        // Start New Workout Button
-        const startNewWorkoutBtn = document.querySelector('.start-new-workout');
+            document.getElementById('new-workout').addEventListener('click', function () {
+                window.location.href = 'workout.html';
+            });
 
-        // Exercise Log
-        const exerciseLog = document.getElementById('exerciseLog');
-
-        // Close Popup Function
-        function closePopup(popup) {
-            popup.style.display = 'none';
-        }
-
-        // Display Body Part Popup
-        startNewWorkoutBtn.addEventListener('click', () => {
-            popupBodyPart.style.display = 'flex';
+            document.getElementById('copy-workout').addEventListener('click', function () {
+                alert('Workout copied! (functionality to be implemented)');
+            });
         });
-
-        // Close Popup Event Listeners
-        popupBodyPart.querySelector('.close').addEventListener('click', () => {
-            closePopup(popupBodyPart);
-        });
-
-        popupExercise.querySelector('.close').addEventListener('click', () => {
-            closePopup(popupExercise);
-        });
-
-        // Exercise options for each body part
-        const exerciseOptions = {
-            'Chest': ['Bench Press', 'Incline Bench Press', 'Cable Crossover', 'Cable Flyes', 'Incline Bench Press', 'Dumbbell Pullover', 'Incline Dumbbell Press', 'Dumbbell Flyes', 'Dumbbell Press', 'Chest Dips'],
-            'Back': ['Deadlift', 'Bent Over Rows', 'Incline dumbbell rows', 'Cable Close grip pull down', 'Seated Cable Rows', 'Seated one-arm cable row', 'Dumbbell Rows'],
-            'Biceps': ['Barbell Curl', 'Dumbbell Curl', 'Hammer Curl', 'Concentration Curl', 'Cable Curl', 'Incline Dumbbell Curl', 'Spider Curl'],
-            'Triceps': ['Tricep Dips', 'Close Grip Bench Press', 'Tricep Pushdowns', 'Skull Crushers', 'Overhead Tricep Extension', 'Tricep Kickbacks', 'Bench Dips'],
-            'Shoulders': ['Overhead Press (Barbell or Dumbbell)', 'Lateral Raises', 'Front Raises', 'Rear Delt Flyes', 'Arnold Press', 'Upright Rows', 'Shrugs', 'Cable Lateral Raises'],
-            'Lats': ['Pull-Ups', 'Lat Pulldowns', 'Bent Over Rows', 'T-Bar Rows', 'Seated Cable Rows', 'Dumbbell Rows', 'Chin-Ups', 'Close Grip Pulldowns', 'Machine Pullovers', 'Barbell Rows']
-        };
-
-        // Display Exercise Popup
-        bodyPartList.addEventListener('click', (e) => {
-            const bodyPart = e.target.dataset.bodypart;
-            if (exerciseOptions.hasOwnProperty(bodyPart)) {
-                exerciseList.innerHTML = ''; // Clear previous options
-                exerciseOptions[bodyPart].forEach(exercise => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = exercise;
-                    listItem.addEventListener('click', () => {
-                        // Create exercise div
-                        const exerciseDiv = document.createElement('div');
-                        exerciseDiv.classList.add('exercise');
-                        exerciseDiv.innerHTML = `<h3>${exercise}</h3>`;
-                        exerciseLog.appendChild(exerciseDiv);
-                        closePopup(popupExercise);
-                        closePopup(popupBodyPart); // Close body part popup after selecting exercise
-
-                        // Create set div
-                        const setDiv = document.createElement('div');
-                        setDiv.classList.add('set');
-                        setDiv.innerHTML = `
-                            <label>Weight:</label>
-                            <input type="text" name="weight" placeholder="Enter weight">
-                            <label>Reps:</label>
-                            <input type="text" name="reps" placeholder="Enter reps">
-                            <button class="add-set-button">+</button>
-                        `;
-                        exerciseDiv.appendChild(setDiv);
-
-                        // Add event listener to add set button
-                        const addSetButton = setDiv.querySelector('.add-set-button');
-                        addSetButton.addEventListener('click', () => {
-                            const newSetDiv = document.createElement('div');
-                            newSetDiv.classList.add('set');
-                            newSetDiv.innerHTML = `
-                            <label>Weight:</label>
-                            <input type="text" name="weight" placeholder="Enter weight">
-                            <label>Reps:</label>
-                            <input type="text" name="reps" placeholder="Enter reps">
-                        `;
-                            // Instead of inserting before addSetButton, just append the new set div
-                            exerciseDiv.appendChild(newSetDiv);
-                        });
-                    });
-                    exerciseList.appendChild(listItem);
-                });
-                popupExercise.style.display = 'flex';
-            }
-        });
-
-        // Date
-        const currentDate = new Date();
-        document.getElementById('currentDate').textContent = currentDate.toLocaleDateString();
     </script>
 </body>
 

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Up!</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 0px;
+            font-size: 12px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .home-icon {
+            position: absolute;
+            left: 10px;
+            font-size: 32px;
+        }
+
+        .date-navigator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+            font-size: 18px;
+
+        }
+
+        .main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .workout-log {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .totals {
+            margin-right: 50px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .start-new-workout {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 30px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .start-new-workout:hover {
+            background-color: #45a049;
+        }
+
+        .arrow {
+            cursor: pointer;
+        }
+
+        /* Popup styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .close {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        .exercise-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .exercise-list li {
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .exercise-list li:hover {
+            color: blue;
+        }
+
+        .body-group-div {
+    border: 1px solid #ccc;
+    margin: 5px;
+    padding: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Drop shadow */
+}
+
+.exercise {
+    border: 1px solid #ddd; /* Slightly lighter border for inner divs */
+    margin: 5px;
+    padding: 5px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15); /* Slightly subtler drop shadow */
+    background-color: #f9f9f9; /* Optional: Adds a background color for better visibility */
+}
+
+        .set {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .set input[type="text"] {
+            width: 100px;
+            margin-right: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .add-set-button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-set-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <span class="home-icon"onclick="window.location='../main.html'">&#8962;</span>            
+            <h1>Power Up!</h1>
+        </div>
+        <div class="date-navigator">
+            <span class="arrow left-arrow">&#8592;</span>
+            <span class="date">Today<span id="currentDate"></span></span>
+            <span class="arrow right-arrow">&#8594;</span>
+        </div>
+    </header>
+    <main>
+        <div class="workout-log">
+            <div class="totals">
+                <h2>Totals</h2>
+                <p>Total Weight Lifted: <span id="totalWeight"></span> lbs</p>
+                <p>Total Reps: <span id="totalReps"></span></p>
+                <h3>Body Part Totals</h3>
+                <ul id="bodyPartTotals">
+                    <!-- Display body part totals dynamically here -->
+                </ul>
+            </div>
+            <div id="exerciseLog">
+                <!-- Exercise logs will be dynamically added here -->
+            </div>
+        </div>
+
+        <button class="start-new-workout">Start New Workout</button>
+
+        <!-- Body Part Popup -->
+        <div id="popupBodyPart" class="popup">
+            <div class="popup-content">
+                <span class="close">&#10006;</span>
+                <h2>Select Body Part</h2>
+                <ul class="exercise-list">
+                    <li data-bodypart="Chest">Chest</li>
+                    <li data-bodypart="Back">Back</li>
+                    <li data-bodypart="Biceps">Biceps</li>
+                    <li data-bodypart="Triceps">Triceps</li>
+                    <li data-bodypart="Shoulders">Shoulders</li>
+                    <li data-bodypart="Lats">Lats</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Exercise Popup -->
+        <div id="popupExercise" class="popup">
+            <div class="popup-content">
+                <span class="close">&#10006;</span>
+                <h2>Select Exercise</h2>
+                <ul class="exercise-list" id="exerciseList">
+                    <!-- Exercise options dynamically populated here -->
+                </ul>
+            </div>
+        </div>
+    </main>
+    <script>
+        // Body Part Popup
+        const popupBodyPart = document.getElementById('popupBodyPart');
+        const bodyPartList = popupBodyPart.querySelector('.exercise-list');
+
+        // Exercise Popup
+        const popupExercise = document.getElementById('popupExercise');
+        const exerciseList = popupExercise.querySelector('#exerciseList');
+
+        // Start New Workout Button
+        const startNewWorkoutBtn = document.querySelector('.start-new-workout');
+
+        // Exercise Log
+        const exerciseLog = document.getElementById('exerciseLog');
+
+        // Close Popup Function
+        function closePopup(popup) {
+            popup.style.display = 'none';
+        }
+
+        // Display Body Part Popup
+        startNewWorkoutBtn.addEventListener('click', () => {
+            popupBodyPart.style.display = 'flex';
+        });
+
+        // Close Popup Event Listeners
+        popupBodyPart.querySelector('.close').addEventListener('click', () => {
+            closePopup(popupBodyPart);
+        });
+
+        popupExercise.querySelector('.close').addEventListener('click', () => {
+            closePopup(popupExercise);
+        });
+
+        // Exercise options for each body part
+        const exerciseOptions = {
+            'Chest': ['Bench Press', 'Incline Bench Press', 'Cable Crossover', 'Cable Flyes', 'Incline Bench Press', 'Dumbbell Pullover', 'Incline Dumbbell Press', 'Dumbbell Flyes', 'Dumbbell Press', 'Chest Dips'],
+            'Back': ['Deadlift', 'Bent Over Rows', 'Incline dumbbell rows', 'Cable Close grip pull down', 'Seated Cable Rows', 'Seated one-arm cable row', 'Dumbbell Rows'],
+            'Biceps': ['Barbell Curl', 'Dumbbell Curl', 'Hammer Curl', 'Concentration Curl', 'Cable Curl', 'Incline Dumbbell Curl', 'Spider Curl'],
+            'Triceps': ['Tricep Dips', 'Close Grip Bench Press', 'Tricep Pushdowns', 'Skull Crushers', 'Overhead Tricep Extension', 'Tricep Kickbacks', 'Bench Dips'],
+            'Shoulders': ['Overhead Press (Barbell or Dumbbell)', 'Lateral Raises', 'Front Raises', 'Rear Delt Flyes', 'Arnold Press', 'Upright Rows', 'Shrugs', 'Cable Lateral Raises'],
+            'Lats': ['Pull-Ups', 'Lat Pulldowns', 'Bent Over Rows', 'T-Bar Rows', 'Seated Cable Rows', 'Dumbbell Rows', 'Chin-Ups', 'Close Grip Pulldowns', 'Machine Pullovers', 'Barbell Rows']
+        };
+
+       // Display Exercise Popup
+        bodyPartList.addEventListener('click', (e) => {
+            const bodyPart = e.target.dataset.bodypart;
+            if (exerciseOptions.hasOwnProperty(bodyPart)) {
+                exerciseList.innerHTML = ''; // Clear previous options
+                exerciseOptions[bodyPart].forEach(exercise => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = exercise;
+                    listItem.addEventListener('click', () => {
+                        // Check if this body part already has a div
+                        let bodyGroupDiv = document.querySelector(`.body-group-div[data-bodypart="${bodyPart}"]`);
+                        if (!bodyGroupDiv) {
+                            // Create new body-group-div if it does not exist
+                            bodyGroupDiv = document.createElement('div');
+                            bodyGroupDiv.classList.add('body-group-div');
+                            bodyGroupDiv.setAttribute('data-bodypart', bodyPart); // Set a data attribute to identify the body part
+                            const bodyPartLabel = document.createElement('h3');
+                            bodyPartLabel.textContent = bodyPart;
+                            bodyGroupDiv.appendChild(bodyPartLabel);
+                            exerciseLog.appendChild(bodyGroupDiv);
+                        }
+
+                        // Create exercise div
+                        const exerciseDiv = document.createElement('div');
+                        exerciseDiv.classList.add('exercise');
+                        exerciseDiv.innerHTML = `
+                    <strong>${exercise}</strong>
+                    <div>
+                        <label>Weight:</label>
+                        <input type="text" name="weight" placeholder="Enter weight">
+                        <label>Reps:</label>
+                        <input type="text" name="reps" placeholder="Enter reps">
+                        <button class="add-set-button">+</button>
+                    </div>
+                `;
+                        bodyGroupDiv.appendChild(exerciseDiv); // Append the exercise to the body-group-div
+
+                        closePopup(popupExercise);
+                        closePopup(popupBodyPart); // Close body part popup after selecting exercise
+                    });
+                    exerciseList.appendChild(listItem);
+                });
+                popupExercise.style.display = 'flex';
+            }
+        });
+
+
+        // Date
+        const currentDate = new Date();
+        document.getElementById('currentDate').textContent = currentDate.toLocaleDateString();
+    </script>
+</body>
+
+</html>
