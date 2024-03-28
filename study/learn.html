@@ -311,7 +311,7 @@
             <button class="btn" onclick="reset()">Reset</button>
 
             <!-- Fourth button -->
-            <button class="btn" onclick="saveAndExit()">Save and Exit</button>
+            <button class="btn" onclick="saveAndExit()">Save and reload</button>
         </div>
     </div>
 
@@ -352,20 +352,47 @@
         // Retrieve the category of cards selected value from the URL
         const urlParams = new URLSearchParams(window.location.search);
         const deckCategory = urlParams.get('category');
+        const studyCount = urlParams.get('studyCount');
 
         // Retrieve the 'levelupdata' flashcards and assign it to the variable flashcardsDB
         let flashcardsDB = JSON.parse(localStorage.getItem('levelupFlashData'))?.flashcards || [];
-        
-        // Retrieve flashcards from local storage based on 'allCards' value
-        if (deckCategory === 'library') {
-            flashcards = flashcardsDB;
-        }
-        else if (deckCategory === 'all') {
-            flashcards = flashcardsDB.filter(card => !card.memorized);
 
-        } else {
-             flashcards = flashcardsDB.filter(card => card.category === deckCategory && !card.memorized);
-        }
+        // Function to limit the number of flashcards based on studyCount
+        const limitFlashcards = (cards) => {
+            // Check if studyCount is numeric and limit the number of cards accordingly
+            if (!isNaN(studyCount)) {
+                console.log("if studycount:" + studyCount);
+                return cards.slice(0, parseInt(studyCount));
+            } else if (studyCount === 'All') {
+                // If studyCount is 'all', do not limit the number of cards
+                console.log(" else if studycount:" + studyCount);
+                return cards;
+            } else {
+                // Default case, potentially for invalid studyCount values
+                console.log("else studycount:" + studyCount);
+                return cards.slice(0, 10); // You can adjust the default number as needed
+            }
+            };
+
+            // Retrieve flashcards from local storage based on 'deckCategory' value
+            if (deckCategory === 'library') {
+                flashcards = limitFlashcards(flashcardsDB);
+            }
+            else if (deckCategory === 'all') {
+                flashcards = limitFlashcards(flashcardsDB.filter(card => !card.memorized));
+            } else {
+                flashcards = limitFlashcards(flashcardsDB.filter(card => card.category === deckCategory && !card.memorized));
+            }
+        // Retrieve flashcards from local storage based on 'allCards' value
+        // if (deckCategory === 'library') {
+        //     flashcards = flashcardsDB;
+        // }
+        // else if (deckCategory === 'all') {
+        //     flashcards = flashcardsDB.filter(card => !card.memorized);
+
+        // } else {
+        //      flashcards = flashcardsDB.filter(card => card.category === deckCategory && !card.memorized);
+        // }
 
         let flashcardsOriginal = [...flashcards];
         const deckLength = flashcardsOriginal.length;
@@ -522,9 +549,12 @@
                 // Get the current URL and extract the query parameters
                 const currentURL = new URL(window.location.href);
                 const deckCategory = currentURL.searchParams.get('category');
-
+                
                 // Redirect to the study home page with the same deckCategory value
-                window.location.href = `learn.html?category=${deckCategory}`;
+                const url = `learn.html?category=${deckCategory}&studyCount=${studyCount}`;
+                console.log(studyCount);
+                console.log("url: " + url);
+                window.location.href = url;
             }
 
         function resetMemorized(array) {

@@ -272,7 +272,7 @@
         learnButton.textContent = 'Learn';
         learnButton.className = 'category-button';
         learnButton.onclick = function () {
-            navigateToLearnPage('all'); 
+            navigateToLearnPage('all', 'all'); 
         };
 
         // Review Button Creation
@@ -280,7 +280,7 @@
         reviewButton.textContent = 'Review';
         reviewButton.className = 'category-button';
         reviewButton.onclick = function () {
-            navigateToLearnPage('library');
+            navigateToLearnPage('library', 'all');
         };
 
         // Adding buttons to the DOM
@@ -304,7 +304,7 @@
 
         document.getElementById('studyCountButton').addEventListener('click', function () {
                 const button = this; // Reference to the button
-                const values = ['All', '5', '10', '15', '20']; // Values to cycle through
+                const values = ['all', '5', '10', '15', '20']; // Values to cycle through
                 let currentIndex = values.indexOf(button.textContent); // Get current index
 
                 // Increment index to cycle to the next value, reset to 'All' after '20'
