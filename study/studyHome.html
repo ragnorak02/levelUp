@@ -88,27 +88,27 @@
         }
 
         .category-button {
-    margin: 5px 5px;
-    padding: 35px; /* Adjust padding if necessary to match the desired size */
-    font-size: 16px;
-    background-color: #F1FADA;
-    color: black;
-    border: 2px solid black;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    white-space: nowrap;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); /* Drop shadow effect */
-}
+                margin: 5px 5px;
+                padding: 35px; /* Adjust padding if necessary to match the desired size */
+                font-size: 16px;
+                background-color: #F1FADA;
+                color: black;
+                border: 2px solid black;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                white-space: nowrap;
+                box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); /* Drop shadow effect */
+            }
 
-.category-button:hover {
-    background-color: #45a049;
-    border-color: #45a049;
-    color: #FFFFFF;
-    box-shadow: 0 6px 12px 0 rgba(0,0,0,0.3); /* Slightly more pronounced shadow on hover */
-}
+            .category-button:hover {
+                background-color: #45a049;
+                border-color: #45a049;
+                color: #FFFFFF;
+                box-shadow: 0 6px 12px 0 rgba(0,0,0,0.3); /* Slightly more pronounced shadow on hover */
+            }
 
         .button-row-container {
             max-width: 350px;
@@ -121,6 +121,57 @@
 
         #buttonRow {
             display: inline-block;
+        }
+
+        .study-count-button {
+            border-radius: 50%; /* Make the button round */
+            width: 60px; /* Adjust size as necessary */
+            height: 60px;
+            background-color: #387ADF; /* Example color */
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .study-count-button:hover {
+            background-color: #45a049;
+        }
+
+        .study-count-label {
+            color: #FFF; /* Light text color for visibility */
+            background-color: #387ADF; /* A distinct background color */
+            padding: 5px 15px; /* Padding around the text */
+            border-radius: 20px; /* Rounded corners for a pill shape */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+            font-family: Arial, sans-serif; /* Consistent font family */
+            font-size: 18px; /* Larger font size for emphasis */
+            margin-bottom: 10px; /* Spacing above the button for visual separation */
+            display: inline-block; /* Ensure the background only wraps the text */
+        }
+
+        /* Adjusting the round button to ensure it's centered and styled distinctly */
+        #studyCountButton {
+            border-radius: 50%; /* Maintain the round shape */
+            width: 60px; /* Specific width */
+            height: 60px; /* Matching height for a perfect circle */
+            margin: 0 auto; /* Centering the button */
+            display: block; /* Allow margin auto to center the button */
+            font-size: 16px; /* Font size for the number inside the button */
+            background-color: #4CAF50; /* Distinct background color */
+            color: white; /* Text color */
+            border: 2px solid white; /* Border to make the button stand out */
+            cursor: pointer; /* Cursor to indicate it's clickable */
+            outline: none; /* Remove the outline to keep the design clean */
+        }
+        #study-count-row {
+            text-align: center; /* Center the contents */
+            position: fixed; /* Fix position to the bottom */
+            bottom: 10px; /* 10px from the bottom of the viewport */
+            left: 0;
+            width: 100%; /* Full width to help center the content */
+            box-sizing: border-box; /* Ensure padding does not add to the width */
         }
     </style>
 </head>
@@ -153,6 +204,10 @@
         <div class="button-row-container" id="studyButtonRow">
             <!-- New and Review buttons will be dynamically added here -->
         </div>
+    </div>
+    <div class="action-row" id="study-count-row">
+        <div class="row-header">Study Count</div>
+        <button id="studyCountButton" class="study-count-button">All</button>
     </div>
     <script>
 
@@ -239,8 +294,28 @@
 
         // Function to navigate to learn page with the selected category
         function navigateToLearnPage(selectedCategory) {
-            window.location.href = 'learn.html?category=' + selectedCategory
+            const studyCountButton = document.getElementById('studyCountButton');
+            const studyCount = studyCountButton.textContent; // Get the current text from the study count button
+
+            // Construct the URL with both the selected category and study count
+            const url = `learn.html?category=${selectedCategory}&studyCount=${studyCount}`;
+            window.location.href = url;
         }
+
+        document.getElementById('studyCountButton').addEventListener('click', function () {
+                const button = this; // Reference to the button
+                const values = ['All', '5', '10', '15', '20']; // Values to cycle through
+                let currentIndex = values.indexOf(button.textContent); // Get current index
+
+                // Increment index to cycle to the next value, reset to 'All' after '20'
+                currentIndex = currentIndex + 1 < values.length ? currentIndex + 1 : 0;
+
+                // Update button text
+                button.textContent = values[currentIndex];
+
+                // Optionally, implement any additional logic you need when the button changes state
+                console.log('Selected study count:', button.textContent);
+            });
 
     </script>
 </body>
