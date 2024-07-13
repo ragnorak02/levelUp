@@ -37,7 +37,7 @@
         .home-icon {
             position: absolute;
             left: 10px;
-            font-size: 32px;            
+            font-size: 32px;
             cursor: pointer;
         }
 
@@ -47,22 +47,20 @@
             align-items: center;
             padding: 10px 30px;
             font-size: 18px;
-
         }
 
-                .main {
-                display: block; /* Changed from flex to block */
-                width: 100%; /* Ensure it takes the full width */
-            }
+        .main {
+            display: block;
+            width: 100%;
+        }
 
-            .workout-log {
-                text-align: center;
-                margin-top: 10px;
-                font-size: 8px;
-                width: 100%; /* Ensure it takes the full width */
-                box-sizing: border-box; /* Ensure padding and border are included in the width */
-            }
-
+        .workout-log {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
         .totals {
             margin-right: 50px;
@@ -72,20 +70,20 @@
             border-radius: 5px;
         }
 
-    .button-row {
+        .button-row {
             display: flex;
             justify-content: space-between;
             padding: 10px 10px;
             position: fixed;
             bottom: 20px;
             width: 100%;
-            box-sizing: border-box; 
+            box-sizing: border-box;
         }
 
         .save-workout {
             position: fixed;
             bottom: 20px;
-            right: 20%;            
+            right: 20%;
             transform: translateX(50%);
             font-size: 18px;
             background-color: #4CAF50;
@@ -135,6 +133,8 @@
             background-color: white;
             padding: 20px;
             border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
         }
 
         .close {
@@ -144,74 +144,37 @@
             cursor: pointer;
         }
 
-        .exercise-list {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .exercise-list li {
-            cursor: pointer;
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
         }
 
-        .exercise-list li:hover {
-            color: blue;
-        }
-
-        .body-group-div {
-            border: 1px solid #ccc;
-            margin: 5px;
-            padding: 5px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
-        }
-
-        .body-group-div h3 {
-            text-align: center;
-        }
-
-        .exercise strong {
-            text-align: left;
-            display: block; /* Makes the strong tag behave like a block element, aligning its content to the left */
-        }
-
-        .exercise {
-            border: 1px solid #ddd; /* Slightly lighter border for inner divs */
-            margin: 5px;
-            padding: 5px;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15); /* Slightly subtler drop shadow */
-            background-color: #f9f9f9; /* Optional: Adds a background color for better visibility */
-        }
-
-        .set {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin-top: 5px;
-            display: flex;
-            align-items: center;
-        }
-
-      .set input[type="text"] {
-            width: 30px; /* Adjusted to fit three digits comfortably */
-            margin-right: 10px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-
-
-        .add-set-button {
-            padding: 5px 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .calendar-header .arrow {
+            font-size: 24px;
             cursor: pointer;
         }
 
-        .add-set-button:hover {
-            background-color: #45a049;
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar div {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .calendar .header {
+            font-weight: bold;
+        }
+
+        .workout-day {
+            background-color: gold;
         }
     </style>
 </head>
@@ -219,9 +182,9 @@
 <body>
     <header>
         <div class="header-content">
-            <span class="home-icon"onclick="window.location='../main.html'">&#8962;</span>            
+            <span class="home-icon" onclick="window.location='../main.html'">&#8962;</span>
             <h1>Power Up!</h1>
-            <span class="calendar-icon" onclick="window.location='workoutCalendar.html'">📅</span>
+            <span class="calendar-icon" id="calendarIcon">📅</span>
         </div>
         <div class="date-navigator">
             <span class="arrow left-arrow">&#8592;</span>
@@ -270,9 +233,21 @@
                 </ul>
             </div>
         </div>
+
+        <!-- Calendar Popup -->
+        <div id="popupCalendar" class="popup">
+            <div class="popup-content">
+                <span class="close">&#10006;</span>
+                <div class="calendar-header">
+                    <span class="arrow left-arrow" id="prevMonth">&#8592;</span>
+                    <h2 id="calendarMonth"></h2>
+                    <span class="arrow right-arrow" id="nextMonth">&#8594;</span>
+                </div>
+                <div class="calendar" id="calendar"></div>
+            </div>
+        </div>
     </main>
     <script>
-        
         // Body Part Popup
         const popupBodyPart = document.getElementById('popupBodyPart');
         const bodyPartList = popupBodyPart.querySelector('.exercise-list');
@@ -280,6 +255,13 @@
         // Exercise Popup
         const popupExercise = document.getElementById('popupExercise');
         const exerciseList = popupExercise.querySelector('#exerciseList');
+
+        // Calendar Popup
+        const popupCalendar = document.getElementById('popupCalendar');
+        const calendar = document.getElementById('calendar');
+        const calendarMonth = document.getElementById('calendarMonth');
+        const prevMonth = document.getElementById('prevMonth');
+        const nextMonth = document.getElementById('nextMonth');
 
         // Start New Workout Button
         const addNewExerciseBtn = document.querySelector('.add-exercise');
@@ -306,6 +288,10 @@
             closePopup(popupExercise);
         });
 
+        popupCalendar.querySelector('.close').addEventListener('click', () => {
+            closePopup(popupCalendar);
+        });
+
         // Exercise options for each body part
         const exerciseOptions = {
             'Chest': ['Bench Press', 'Incline Bench Press', 'Cable Crossover', 'Cable Flyes', 'Incline Bench Press', 'Dumbbell Pullover', 'Incline Dumbbell Press', 'Dumbbell Flyes', 'Dumbbell Press', 'Chest Dips'],
@@ -316,7 +302,7 @@
             'Lats': ['Pull-Ups', 'Lat Pulldowns', 'Bent Over Rows', 'T-Bar Rows', 'Seated Cable Rows', 'Dumbbell Rows', 'Chin-Ups', 'Close Grip Pulldowns', 'Machine Pullovers', 'Barbell Rows']
         };
 
-       // Display Exercise Popup
+        // Display Exercise Popup
         bodyPartList.addEventListener('click', (e) => {
             const bodyPart = e.target.dataset.bodypart;
             if (exerciseOptions.hasOwnProperty(bodyPart)) {
@@ -362,89 +348,134 @@
             }
         });
 
-    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('calendarIcon').addEventListener('click', () => {
+            popupCalendar.style.display = 'flex';
+            loadCalendar(new Date());
+        });
 
-        loadWorkoutFromLocalStorage();
+        prevMonth.addEventListener('click', () => {
+            const currentDate = new Date(calendarMonth.getAttribute('data-date'));
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            loadCalendar(currentDate);
+        });
 
-         function loadWorkoutFromLocalStorage() {
-            const storedData = localStorage.getItem('powerUp');
-            if (storedData) {
-                const data = JSON.parse(storedData);
-                const currentDate = document.getElementById('currentDate').textContent;
+        nextMonth.addEventListener('click', () => {
+            const currentDate = new Date(calendarMonth.getAttribute('data-date'));
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            loadCalendar(currentDate);
+        });
 
-                if (data && data.date === currentDate) {
-                    // Assuming the structure of your workout data matches what we discussed
-                    Object.keys(data.workout).forEach(bodyPart => {
-                        data.workout[bodyPart].forEach(exercise => {
-                            addExercise(bodyPart, exercise.exercise); // You might need to adjust this to your existing addExercise logic
-                            exercise.sets.forEach(set => {
-                                // Here, you would add logic to append each set to the corresponding exercise
-                                // This could involve a modified version of your existing code that adds sets to exercises
-                                // For example, you might call a modified version of addSet() that accepts weight and reps as parameters
+        function loadCalendar(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+
+            calendarMonth.textContent = date.toLocaleDateString('default', { month: 'long', year: 'numeric' });
+            calendarMonth.setAttribute('data-date', date.toISOString());
+
+            calendar.innerHTML = '';
+
+            // Add days of the week header
+            const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            daysOfWeek.forEach(day => {
+                const headerDiv = document.createElement('div');
+                headerDiv.classList.add('header');
+                headerDiv.textContent = day;
+                calendar.appendChild(headerDiv);
+            });
+
+            // Add empty divs for days of the previous month
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDiv = document.createElement('div');
+                calendar.appendChild(emptyDiv);
+            }
+
+            // Add days of the current month
+            for (let day = 1; day <= lastDate; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.textContent = day;
+                const workoutData = localStorage.getItem('powerUp');
+                if (workoutData) {
+                    const data = JSON.parse(workoutData);
+                    const workoutDate = new Date(data.date);
+                    if (workoutDate.getDate() === day && workoutDate.getMonth() === month && workoutDate.getFullYear() === year) {
+                        dayDiv.classList.add('workout-day');
+                    }
+                }
+                calendar.appendChild(dayDiv);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadWorkoutFromLocalStorage();
+
+            function loadWorkoutFromLocalStorage() {
+                const storedData = localStorage.getItem('powerUp');
+                if (storedData) {
+                    const data = JSON.parse(storedData);
+                    const currentDate = document.getElementById('currentDate').textContent;
+
+                    if (data && data.date === currentDate) {
+                        Object.keys(data.workout).forEach(bodyPart => {
+                            data.workout[bodyPart].forEach(exercise => {
+                                addExercise(bodyPart, exercise.exercise);
+                                exercise.sets.forEach(set => {
+                                    // Add logic to append each set to the corresponding exercise
+                                });
                             });
                         });
-                    });
+                    }
                 }
             }
-        }
 
-        // Function to add an exercise
-        function addExercise(bodyPart, exerciseName) {
-            let bodyGroupDiv = document.querySelector(`.body-group-div[data-bodypart="${bodyPart}"]`);
-            if (!bodyGroupDiv) {
-                bodyGroupDiv = document.createElement('div');
-                bodyGroupDiv.classList.add('body-group-div');
-                bodyGroupDiv.setAttribute('data-bodypart', bodyPart);
-                const bodyPartLabel = document.createElement('h3');
-                bodyPartLabel.textContent = bodyPart;
-                bodyGroupDiv.appendChild(bodyPartLabel);
-                exerciseLog.appendChild(bodyGroupDiv);
-            }
+            function addExercise(bodyPart, exerciseName) {
+                let bodyGroupDiv = document.querySelector(`.body-group-div[data-bodypart="${bodyPart}"]`);
+                if (!bodyGroupDiv) {
+                    bodyGroupDiv = document.createElement('div');
+                    bodyGroupDiv.classList.add('body-group-div');
+                    bodyGroupDiv.setAttribute('data-bodypart', bodyPart);
+                    const bodyPartLabel = document.createElement('h3');
+                    bodyPartLabel.textContent = bodyPart;
+                    bodyGroupDiv.appendChild(bodyPartLabel);
+                    exerciseLog.appendChild(bodyGroupDiv);
+                }
 
-            const exerciseDiv = document.createElement('div');
-            exerciseDiv.classList.add('exercise');
-            exerciseDiv.innerHTML = `
-            <strong>${exerciseName}</strong>
-            <div class='set'
-                <label>Weight:</label>
-                <input type="text" name="weight" placeholder="Enter weight">
-                <label>Reps:</label>
-                <input type="text" name="reps" placeholder="Enter reps">
-                <button class="add-set-button">+</button>
-            </div>
-        `;
-            bodyGroupDiv.appendChild(exerciseDiv);
-        }
-
-        // Add exercises
-        // addExercise('Chest', 'Bench Press');
-        // addExercise('Triceps', 'Skull Crushers');
-        // addExercise('Chest', 'Cable Flyes');
-    });
-
-     function addSet(event) {
-        if (event.target.classList.contains('add-set-button')) {
-            const currentSetDiv = event.target.closest('.set');
-            const exerciseDiv = currentSetDiv.closest('.exercise');
-
-            // Create a new set div
-            const newSetDiv = document.createElement('div');
-            newSetDiv.classList.add('set');
-            newSetDiv.innerHTML = `
-                <label>Weight:</label>
-                <input type="text" name="weight" placeholder="Enter weight">
-                <label>Reps:</label>
-                <input type="text" name="reps" placeholder="Enter reps">
-                <button class="add-set-button">+</button>
+                const exerciseDiv = document.createElement('div');
+                exerciseDiv.classList.add('exercise');
+                exerciseDiv.innerHTML = `
+                <strong>${exerciseName}</strong>
+                <div class='set'>
+                    <label>Weight:</label>
+                    <input type="text" name="weight" placeholder="Enter weight">
+                    <label>Reps:</label>
+                    <input type="text" name="reps" placeholder="Enter reps">
+                    <button class="add-set-button">+</button>
+                </div>
             `;
+                bodyGroupDiv.appendChild(exerciseDiv);
+            }
+        });
 
-            // Append the new set div to the exercise div
-            exerciseDiv.appendChild(newSetDiv);
+        function addSet(event) {
+            if (event.target.classList.contains('add-set-button')) {
+                const currentSetDiv = event.target.closest('.set');
+                const exerciseDiv = currentSetDiv.closest('.exercise');
 
-            // Remove the 'add-set-button' from the current set
-            currentSetDiv.removeChild(event.target);
+                const newSetDiv = document.createElement('div');
+                newSetDiv.classList.add('set');
+                newSetDiv.innerHTML = `
+                    <label>Weight:</label>
+                    <input type="text" name="weight" placeholder="Enter weight">
+                    <label>Reps:</label>
+                    <input type="text" name="reps" placeholder="Enter reps">
+                    <button class="add-set-button">+</button>
+                `;
+                exerciseDiv.appendChild(newSetDiv);
+
+                currentSetDiv.removeChild(event.target);
+            }
         }
-    }
 
         document.addEventListener('click', addSet);
 
@@ -452,43 +483,40 @@
         document.getElementById('currentDate').textContent = currentDate.toLocaleDateString();
 
         document.querySelector('.save-workout').addEventListener('click', function () {
-                const workoutData = {
-                    date: document.getElementById('currentDate').textContent,
-                    workoutLength: '1:10', // You'll need to adjust this based on your actual tracking
-                    totalWeight: 0,
-                    totalSets: 0,
-                    workout: {}
-                };
+            const workoutData = {
+                date: document.getElementById('currentDate').textContent,
+                workoutLength: '1:10',
+                totalWeight: 0,
+                totalSets: 0,
+                workout: {}
+            };
 
-                document.querySelectorAll('.body-group-div').forEach(function (groupDiv) {
-                    const bodyPart = groupDiv.getAttribute('data-bodypart');
-                    workoutData.workout[bodyPart] = [];
+            document.querySelectorAll('.body-group-div').forEach(function (groupDiv) {
+                const bodyPart = groupDiv.getAttribute('data-bodypart');
+                workoutData.workout[bodyPart] = [];
 
-                    groupDiv.querySelectorAll('.exercise').forEach(function (exerciseDiv) {
-                        const exerciseName = exerciseDiv.querySelector('strong').textContent;
-                        const sets = [];
+                groupDiv.querySelectorAll('.exercise').forEach(function (exerciseDiv) {
+                    const exerciseName = exerciseDiv.querySelector('strong').textContent;
+                    const sets = [];
 
-                        exerciseDiv.querySelectorAll('.set').forEach(function (setDiv) {
-                            const weight = setDiv.querySelector('input[name="weight"]').value || 0;
-                            const reps = setDiv.querySelector('input[name="reps"]').value || 0;
+                    exerciseDiv.querySelectorAll('.set').forEach(function (setDiv) {
+                        const weight = setDiv.querySelector('input[name="weight"]').value || 0;
+                        const reps = setDiv.querySelector('input[name="reps"]').value || 0;
 
-                            sets.push({ weight: parseInt(weight, 10), reps: parseInt(reps, 10) });
-                            workoutData.totalWeight += parseInt(weight, 10) * parseInt(reps, 10);
-                            workoutData.totalSets++;
-                        });
+                        sets.push({ weight: parseInt(weight, 10), reps: parseInt(reps, 10) });
+                        workoutData.totalWeight += parseInt(weight, 10) * parseInt(reps, 10);
+                        workoutData.totalSets++;
+                    });
 
-                        workoutData.workout[bodyPart].push({
-                            exercise: exerciseName,
-                            sets: sets
-                        });
+                    workoutData.workout[bodyPart].push({
+                        exercise: exerciseName,
+                        sets: sets
                     });
                 });
-
-                console.log('workout data: ' + workoutData);
-                // Save to localStorage
-                localStorage.setItem('powerUp', JSON.stringify(workoutData));
             });
 
+            localStorage.setItem('powerUp', JSON.stringify(workoutData));
+        });
     </script>
 </body>
 
