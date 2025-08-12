@@ -1,0 +1,726 @@
+<<<<<<< HEAD
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Main Page</title>
+  <style>
+    
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #bfefff;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 10px;
+    }
+
+    .banner {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      background-color: #66a3ff;
+      /* Blue banner background */
+      color: #fff;
+      /* White text */
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+
+    .yellow-box {
+  width: 300px; /* Widened yellow box */
+  height: 180px; /* Increased height */
+  border-radius: 10px;
+  margin-right: 20px; /* Adjusted margin */
+  border: 1px solid #000; /* Black border */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Hide any overflow */
+}
+
+.yellow-box img {
+  width: auto; /* Let the image adjust its width according to its aspect ratio */
+  height: 100%; /* Set the height of the image to 100% */
+}
+
+    .progress-bars {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100%;
+      margin-bottom: 5px;
+      margin-right: 0;
+      /* Reset margin */
+    }
+
+    .progress-bar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      margin-right: 5px;
+    }
+
+    .progress-bar {
+      width: 55px;
+      height: 150px;
+      margin-bottom: 0px;
+      background-color: white;
+      /* White background */
+      border: 1px solid #000;
+      /* Black border */
+      border-radius: 5px;
+      position: relative;
+    }
+
+    .progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: inherit;
+      border-radius: inherit;
+    }
+
+    .strength {
+      background-color: red;
+      height: 79px;
+      /* Adjusted height for 66% completion */
+    }
+
+    .strength-label {
+      background-color: #ffcccc;
+      /* Lighter red background */
+    }
+
+    .wisdom {
+      background-color: green;
+      height: 84px;
+      /* Adjusted height for 70% completion */
+    }
+
+    .wisdom-label {
+      background-color: #ccffcc;
+      /* Lighter green background */
+    }
+
+    .health {
+      background-color: orange;
+      height: 48px;
+      /* Adjusted height for 40% completion */
+    }
+
+    .health-label {
+      background-color: #ffe0b3;
+      /* Lighter orange background */
+    }
+
+    .progress-label {
+      margin-top: 5px;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 3px;
+      border-radius: 5px;
+    }
+
+    .box {
+      width: 180px;
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      color: #000; /* Black text */
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .box img {
+      max-width: 100%; /* Ensure the image is not wider than the box */
+      max-height: 100%; /* Ensure the image is not taller than the box */
+      object-fit: cover; /* Cover the box area without distorting aspect ratio */
+    }
+
+    .box:hover {
+      opacity: 0.8;
+    }
+
+    .box.workout {
+    }
+
+    .box.study {
+    }
+
+    .box.recipe {
+    }
+
+    .exercise-history {
+      flex-grow: 1;
+      /* Expand history div to fill remaining space */
+      padding: 10px;
+      border: 1px solid #000;
+      border-radius: 10px;
+      margin-left: 10px;
+      /* Added margin between history and colored boxes */
+    }
+
+    .history-header {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .date {
+      text-decoration: underline;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .exercise {
+      margin-bottom: 10px;
+    }
+
+    .exercise-name {
+      font-weight: bold;
+    }
+
+    .weights {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .weight,
+    .reps {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .weight-label,
+    .reps-label {
+      font-size: 12px;
+      margin-left: 5px;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      width: 100%; /* Ensure column takes up full container width */
+    }
+
+    .body-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 50%; /* Each body-column takes up 50% of the column width */
+    }
+
+    .row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center; /* Center content in the row */
+      width: 100%; /* Row takes up full width of its parent (body-column) */
+      margin-bottom: 10px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="banner">LEVEL UP!</div>
+    <div class="row">
+      <div class="yellow-box">
+        <img src="https://giffiles.alphacoders.com/220/220162.gif" alt="Goku SSJ GIF">
+      </div>
+      <div class="progress-bars">
+        <div class="progress-bar-container">
+          <div class="progress-bar">
+            <div class="progress strength" style="height: 79%;"></div> <!-- 66% completion -->
+          </div>
+          <span class="progress-label strength-label">Strength</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar">
+            <div class="progress wisdom" style="height: 84%;"></div> <!-- 70% completion -->
+          </div>
+          <span class="progress-label wisdom-label">Wisdom</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar">
+            <div class="progress health" style="height: 48%;"></div> <!-- 40% completion -->
+          </div>
+          <span class="progress-label health-label">Health</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="column">
+      <div class="body-column">
+        <div class="row">
+          <a href="./powerUp/index.html" class="box workout">
+          <img src="https://qph.cf2.quoracdn.net/main-qimg-4027d128a604c47448e3cca96814020d" alt="Workout">
+          </a>
+        </div>
+        <div class="row">
+          <a href="./study/studyHome.html" class="box study">
+            <img src="https://miro.medium.com/v2/resize:fit:1080/1*vBi4Ycgdn5t3lu2SvQXuog.gif" alt="Workout">
+          </a>
+        </div>        
+        <div class="row">
+          <div class="box recipe">
+            <a href="#" class="box recipe">
+              <img src="https://i.pinimg.com/originals/99/bb/d0/99bbd0dadbb29ef6eef32389e25227fd.gif" alt="Workout">
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="body-column">
+        <div class="exercise-history">
+          <div class="history-header">History</div>
+          <div class="date">February 10, 2024</div>
+          <div class="exercise">
+            <div class="exercise-name">Bench Press</div>
+            <div class="weights">
+              <div class="weight">135<span class="weight-label">lbs</span></div>
+              <div class="reps">12<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">140<span class="weight-label">lbs</span></div>
+              <div class="reps">10<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">150<span class="weight-label">lbs</span></div>
+              <div class="reps">8<span class="reps-label">reps</span></div>
+            </div>
+          </div>
+          <div class="exercise">
+            <div class="exercise-name">Squats</div>
+            <div class="weights">
+              <div class="weight">185<span class="weight-label">lbs</span></div>
+              <div class="reps">12<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">200<span class="weight-label">lbs</span></div>
+              <div class="reps">10<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">215<span class="weight-label">lbs</span></div>
+              <div class="reps">8<span class="reps-label">reps</span></div>
+            </div>
+          </div>
+          <div class="exercise">
+            <div class="exercise-name">Deadlifts</div>
+            <div class="weights">
+              <div class="weight">225<span class="weight-label">lbs</span></div>
+              <div class="reps">12<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">240<span class="weight-label">lbs</span></div>
+              <div class="reps">10<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">255<span class="weight-label">lbs</span></div>
+              <div class="reps">8<span class="reps-label">reps</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  // Sample data to store in local storage
+  var userData = {
+    username: 'example_user',
+    level: 5,
+    experience: 200,
+    // Add more data as needed
+  };
+
+  // Store user data in local storage under 'levelUpData' key
+  localStorage.setItem('levelUpData', JSON.stringify(userData));
+</script>
+=======
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Main Page</title>
+  <style>
+    
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #bfefff;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 10px;
+    }
+
+    .banner {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      background-color: #66a3ff;
+      /* Blue banner background */
+      color: #fff;
+      /* White text */
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+
+    .yellow-box {
+  width: 300px; /* Widened yellow box */
+  height: 180px; /* Increased height */
+  border-radius: 10px;
+  margin-right: 20px; /* Adjusted margin */
+  border: 1px solid #000; /* Black border */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Hide any overflow */
+}
+
+.yellow-box img {
+  width: auto; /* Let the image adjust its width according to its aspect ratio */
+  height: 100%; /* Set the height of the image to 100% */
+}
+
+    .progress-bars {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100%;
+      margin-bottom: 5px;
+      margin-right: 0;
+      /* Reset margin */
+    }
+
+    .progress-bar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      margin-right: 5px;
+    }
+
+    .progress-bar {
+      width: 55px;
+      height: 150px;
+      margin-bottom: 0px;
+      background-color: white;
+      /* White background */
+      border: 1px solid #000;
+      /* Black border */
+      border-radius: 5px;
+      position: relative;
+    }
+
+    .progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: inherit;
+      border-radius: inherit;
+    }
+
+    .strength {
+      background-color: red;
+      height: 79px;
+      /* Adjusted height for 66% completion */
+    }
+
+    .strength-label {
+      background-color: #ffcccc;
+      /* Lighter red background */
+    }
+
+    .wisdom {
+      background-color: green;
+      height: 84px;
+      /* Adjusted height for 70% completion */
+    }
+
+    .wisdom-label {
+      background-color: #ccffcc;
+      /* Lighter green background */
+    }
+
+    .health {
+      background-color: orange;
+      height: 48px;
+      /* Adjusted height for 40% completion */
+    }
+
+    .health-label {
+      background-color: #ffe0b3;
+      /* Lighter orange background */
+    }
+
+    .progress-label {
+      margin-top: 5px;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 3px;
+      border-radius: 5px;
+    }
+
+    .box {
+      width: 180px;
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      color: #000; /* Black text */
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .box img {
+      max-width: 100%; /* Ensure the image is not wider than the box */
+      max-height: 100%; /* Ensure the image is not taller than the box */
+      object-fit: cover; /* Cover the box area without distorting aspect ratio */
+    }
+
+    .box:hover {
+      opacity: 0.8;
+    }
+
+    .box.workout {
+    }
+
+    .box.study {
+    }
+
+    .box.recipe {
+    }
+
+    .exercise-history {
+      flex-grow: 1;
+      /* Expand history div to fill remaining space */
+      padding: 10px;
+      border: 1px solid #000;
+      border-radius: 10px;
+      margin-left: 10px;
+      /* Added margin between history and colored boxes */
+    }
+
+    .history-header {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .date {
+      text-decoration: underline;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .exercise {
+      margin-bottom: 10px;
+    }
+
+    .exercise-name {
+      font-weight: bold;
+    }
+
+    .weights {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .weight,
+    .reps {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .weight-label,
+    .reps-label {
+      font-size: 12px;
+      margin-left: 5px;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      width: 100%; /* Ensure column takes up full container width */
+    }
+
+    .body-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 50%; /* Each body-column takes up 50% of the column width */
+    }
+
+    .row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center; /* Center content in the row */
+      width: 100%; /* Row takes up full width of its parent (body-column) */
+      margin-bottom: 10px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="banner">LEVEL UP!</div>
+    <div class="row">
+      <div class="yellow-box">
+        <img src="https://giffiles.alphacoders.com/220/220162.gif" alt="Goku SSJ GIF">
+      </div>
+      <div class="progress-bars">
+        <div class="progress-bar-container">
+          <div class="progress-bar">
+            <div class="progress strength" style="height: 79%;"></div> <!-- 66% completion -->
+          </div>
+          <span class="progress-label strength-label">Strength</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar">
+            <div class="progress wisdom" style="height: 84%;"></div> <!-- 70% completion -->
+          </div>
+          <span class="progress-label wisdom-label">Wisdom</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar">
+            <div class="progress health" style="height: 48%;"></div> <!-- 40% completion -->
+          </div>
+          <span class="progress-label health-label">Health</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="column">
+      <div class="body-column">
+        <div class="row">
+          <a href="./powerUp/index.html" class="box workout">
+          <img src="https://qph.cf2.quoracdn.net/main-qimg-4027d128a604c47448e3cca96814020d" alt="Workout">
+          </a>
+        </div>
+        <div class="row">
+          <a href="./study/studyHome.html" class="box study">
+            <img src="https://miro.medium.com/v2/resize:fit:1080/1*vBi4Ycgdn5t3lu2SvQXuog.gif" alt="Workout">
+          </a>
+        </div>        
+        <div class="row">
+          <div class="box recipe">
+            <a href="#" class="box recipe">
+              <img src="https://i.pinimg.com/originals/99/bb/d0/99bbd0dadbb29ef6eef32389e25227fd.gif" alt="Workout">
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="body-column">
+        <div class="exercise-history">
+          <div class="history-header">History</div>
+          <div class="date">February 10, 2024</div>
+          <div class="exercise">
+            <div class="exercise-name">Bench Press</div>
+            <div class="weights">
+              <div class="weight">135<span class="weight-label">lbs</span></div>
+              <div class="reps">12<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">140<span class="weight-label">lbs</span></div>
+              <div class="reps">10<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">150<span class="weight-label">lbs</span></div>
+              <div class="reps">8<span class="reps-label">reps</span></div>
+            </div>
+          </div>
+          <div class="exercise">
+            <div class="exercise-name">Squats</div>
+            <div class="weights">
+              <div class="weight">185<span class="weight-label">lbs</span></div>
+              <div class="reps">12<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">200<span class="weight-label">lbs</span></div>
+              <div class="reps">10<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">215<span class="weight-label">lbs</span></div>
+              <div class="reps">8<span class="reps-label">reps</span></div>
+            </div>
+          </div>
+          <div class="exercise">
+            <div class="exercise-name">Deadlifts</div>
+            <div class="weights">
+              <div class="weight">225<span class="weight-label">lbs</span></div>
+              <div class="reps">12<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">240<span class="weight-label">lbs</span></div>
+              <div class="reps">10<span class="reps-label">reps</span></div>
+            </div>
+            <div class="weights">
+              <div class="weight">255<span class="weight-label">lbs</span></div>
+              <div class="reps">8<span class="reps-label">reps</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  // Sample data to store in local storage
+  var userData = {
+    username: 'example_user',
+    level: 5,
+    experience: 200,
+    // Add more data as needed
+  };
+
+  // Store user data in local storage under 'levelUpData' key
+  localStorage.setItem('levelUpData', JSON.stringify(userData));
+</script>
+>>>>>>> c27f44797b771c489af8b662e535f32b7cb044b5
+</html>

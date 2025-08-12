@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Power Up!</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 0px;
+            font-size: 10px;
+            position: relative;
+        }
+
+        .home-icon {
+            font-size: 20px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .header-content h1 {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0;
+            width: auto;
+        }
+
+        .left-align-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-content h1 {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .information-div {
+            margin: 5px;
+            padding: 5px;
+            flex-grow: 1;
+            overflow: auto;
+        }
+
+        .main {
+            margin: 0px;
+            padding: 0px;
+            align-self: flex-end;
+            width: 100%;
+        }
+
+        .exercise {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+            margin: 0 2px 0 2px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            flex: 1;
+            max-width: 45%;
+            font-size: 11px;
+        }
+
+        .exercise-pair {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .workout-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 30px;
+            font-size: 18px;
+            margin: 0 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        h2 {
+            margin: 0 0 0px 0;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        @media (max-width: 600px) {
+            .exercise-pair {
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .exercise {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .exercise div {
+                margin-bottom: 5px;
+            }
+
+            .exercise p {
+                margin: 0;
+                font-size: 0.9em;
+            }
+
+            .exercise h2+div {
+                font-size: 0.8em;
+            }
+
+            .lastWorkedOut {
+                font-size: 0.8em;
+                padding-left: 20px;
+                white-space: nowrap;
+            }
+        }
+
+        .personalRecord {
+            margin-left: auto;
+            color: gold;
+            font-size: 24px;
+        }
+
+        .personalRecord:before {
+            content: '\2605';
+            display: none;
+        }
+
+        .column-row {
+            display: flex;
+            height: 105px;
+            bottom: auto;
+        }
+
+        .column {
+            display: fle;
+            text-align: center;
+            border-radius: 5px;
+            border: solid black 2px;
+            padding: 5px;
+            margin: 5px;
+            line-height: 2px;
+            
+            flex-grow: 1;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="left-align-container">
+            <button onclick="window.location.href='../main.html'" class="home-icon"><i class="fa fa-home"></i></button>
+        </div>
+        <h1>Power Up!</h1>
+    </header>
+    <div class="information-div">
+        <canvas id="weightChart" style="width: 100%; height: 300px;"></canvas>
+        <div class="column-row">
+            <div class="column">
+                <h3>Chest</h3>
+                <p id="chestTotal">0 lbs</p>
+            </div>
+            <div class="column">
+                <h3>Back</h3>
+                <p id="backTotal">0 lbs</p>
+            </div>
+            <div class="column">
+                <h3>Triceps</h3>
+                <p id="tricepsTotal">0 lbs</p>
+            </div>
+            <div class="column">
+                <h3>Biceps</h3>
+                <p id="bicepsTotal">0 lbs</p>
+            </div>
+            <div class="column">
+                <h3>Shoulders</h3>
+                <p id="shouldersTotal">0 lbs</p>
+            </div>
+        </div>
+    </div>
+    <main class="main">
+        <div class="exercise-pair">
+            <div id="chest" class="exercise">
+                <h2>Chest</h2>
+                <div class="lastWorkedOut">3 days ago</div>
+                <div class="personalRecord"></div>
+                <div>
+                    <strong>Bench Press</strong>
+                    <p>Weight: <span class="weight">100kg</span> Reps: <span class="reps">10</span></p>
+                </div>
+            </div>
+            <div id="triceps" class="exercise">
+                <h2>Triceps</h2>
+                <div class="lastWorkedOut">3 days ago</div>
+                <div class="personalRecord"></div>
+                <div>
+                    <strong>Skull crushers</strong>
+                    <p>Weight: <span class="weight">45 lbs</span> Reps: <span class="reps">10</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="exercise-pair">
+            <div id="back" class="exercise">
+                <h2>Back</h2>
+                <div class="lastWorkedOut">3 days ago</div>
+                <div class="personalRecord"></div>
+                <div>
+                    <strong>Seated Cable Rows</strong>
+                    <p>Weight: <span class="weight">20 lbs</span> Reps: <span class="reps">12</span></p>
+                </div>
+            </div>
+            <div id="biceps" class="exercise">
+                <h2>Biceps</h2>
+                <div class="lastWorkedOut">3 days ago</div>
+                <div class="personalRecord"></div>
+                <div>
+                    <strong>Curl</strong>
+                    <p>Weight: <span class="weight">20kg</span> Reps: <span class="reps">12</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="exercise-pair">
+            <div id="Shoulders" class="exercise">
+                <h2>Shoulders</h2>
+                <div class="lastWorkedOut">3 days ago</div>
+                <div class="personalRecord"></div>
+                <div>
+                    <strong>Pull Ups</strong>
+                    <p>Weight: <span class="weight">Bodyweight</span> Reps: <span class="reps">12</span></p>
+                </div>
+            </div>
+            <div id="Traps" class="exercise">
+                <h2>Traps</h2>
+                <div class="lastWorkedOut">3 days ago</div>
+                <div class="personalRecord"></div>
+                <div>
+                    <strong>Shrugs</strong>
+                    <p>Weight: <span class="weight">20kg</span> Reps: <span class="reps">12</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="exercise-pair">
+            <div id="Legs" class="exercise">
+                <h2>Legs</h2>
+                <div class="lastWorkedOut">3 days ago</div>
+                <div class="personalRecord"></div>
+                <div>
+                    <strong>Squats</strong>
+                    <p>Weight: <span class="weight">200 lbs</span> Reps: <span class="reps">12</span></p>
+                </div>
+            </div>
+            <div id="Calves" class="exercise">
+                <h2>Calves</h2>
+                <div class="lastWorkedOut">3 days ago</div>
+                <div class="personalRecord"></div>
+                <div>
+                    <strong>Calf Raises</strong>
+                    <p>Weight: <span class="weight">20kg</span> Reps: <span class="reps">12</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="workout-controls">
+            <button id="workout-btn">Workout</button>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('workout-btn').addEventListener('click', function () {
+                window.location.href = 'workout.html';
+            });
+
+            // Example demo data
+            const demoData = [
+                { date: '2023-05-01', totalWeight: 1500 },
+                { date: '2023-05-10', totalWeight: 1600 },
+                { date: '2023-05-20', totalWeight: 1700 },
+                { date: '2023-06-01', totalWeight: 1800 },
+                { date: '2023-06-10', totalWeight: 1900 },
+                { date: '2023-06-20', totalWeight: 2000 },
+                { date: '2023-07-01', totalWeight: 2100 },
+                { date: '2023-07-10', totalWeight: 2200 },
+                { date: '2023-07-20', totalWeight: 2300 }
+            ];
+
+            const ctx = document.getElementById('weightChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: demoData.map(data => data.date),
+                    datasets: [{
+                        label: 'Total Weight Lifted',
+                        data: demoData.map(data => data.totalWeight),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Total Weight Lifted (lbs)'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Set total pounds lifted for each body group using demo data
+            const totalWeights = {
+                chest: 200,
+                back: 250,
+                triceps: 150,
+                biceps: 180,
+                shoulders: 220
+            };
+
+            document.getElementById('chestTotal').textContent = totalWeights.chest + ' lbs';
+            document.getElementById('backTotal').textContent = totalWeights.back + ' lbs';
+            document.getElementById('tricepsTotal').textContent = totalWeights.triceps + ' lbs';
+            document.getElementById('bicepsTotal').textContent = totalWeights.biceps + ' lbs';
+            document.getElementById('shouldersTotal').textContent = totalWeights.shoulders + ' lbs';
+        });
+    </script>
+</body>
+
+</html>

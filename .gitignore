@@ -1,0 +1,8 @@
+# Ignore node modules
+node_modules/
+
+# Ignore Electron build output (common folders)
+dist/
+out/
+electron-out/
+release/
