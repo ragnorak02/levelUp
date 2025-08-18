@@ -8,8 +8,7 @@
   :root{
     --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7; --accent:#4CAF50; --accent-2:#2dd4bf;
     --ring:#2a3543; --warn:#f59e0b; --good:#22c55e; --bad:#ef4444;
-    /* calendar compaction */
-    --cal-gap:4px; --cal-radius:8px; --cal-font:.8rem; --cal-count:.7rem;
+    --cal-gap:4px; --cal-radius:10px; --cal-font:.9rem; --cal-count:.8rem;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -21,67 +20,80 @@
 
   header{
     display:flex; align-items:center; justify-content:space-between;
-    padding:.75rem 1rem; border-bottom:1px solid var(--ring); background:#0e141b;
+    padding:.6rem .9rem; border-bottom:1px solid var(--ring); background:#0e141b;
   }
-  header h1{margin:0; font-size:1.1rem; letter-spacing:.3px}
+  header h1{margin:0; font-size:1.05rem; letter-spacing:.2px}
   header .home{all:unset; cursor:pointer; padding:.35rem .6rem; border-radius:.6rem; border:1px solid var(--ring)}
   header .home:focus-visible{outline:2px solid var(--accent-2)}
 
-  .wrap{width:min(1100px, 100%); margin-inline:auto; padding:12px 14px 28px; flex:1; display:flex; flex-direction:column; gap:16px}
+  .wrap{width:min(1100px, 100%); margin-inline:auto; padding:10px 12px 18px; flex:1; display:flex; flex-direction:column; gap:10px}
 
-  .grid{display:grid; gap:12px; grid-template-columns: repeat(12, 1fr)}
+  .grid{display:grid; gap:10px; grid-template-columns: repeat(12, 1fr)}
   .card{
-    background:var(--card); border:1px solid var(--ring); border-radius:16px;
-    padding:14px; box-shadow:0 8px 30px rgba(0,0,0,.25);
+    background:var(--card); border:1px solid var(--ring); border-radius:14px;
+    padding:12px; box-shadow:0 8px 30px rgba(0,0,0,.25);
   }
-  .card h3{margin:.2rem 0 .6rem; font-size:.95rem; color:var(--muted); font-weight:600}
+  .card h3{margin:.1rem 0 .45rem; font-size:.95rem; color:var(--muted); font-weight:600}
 
   /* top cards */
   #weightCard{grid-column: span 4}
-  #lastWorkoutCard{grid-column: span 8; display:grid; grid-template-columns: 1.2fr 1fr; gap:14px}
-  .val{display:flex; align-items:baseline; gap:10px; font-size:2rem; font-weight:700}
+  #lastWorkoutCard{grid-column: span 8; display:grid; grid-template-columns: 1.15fr 1fr; gap:12px}
+  .val{display:flex; align-items:baseline; gap:8px; font-size:1.9rem; font-weight:700}
   .trend{font-size:.9rem; color:var(--muted)}
-  .spark{width:100%; height:64px; display:block}
-  .meta{display:flex; gap:16px; flex-wrap:wrap}
-  .badge{background:#0f1720; border:1px solid var(--ring); color:var(--muted); padding:.35rem .6rem; border-radius:999px; font-size:.85rem}
-  .ex-list{display:grid; gap:8px}
-  .ex{display:flex; justify-content:space-between; background:#0f141b; border:1px dashed #213043; border-radius:12px; padding:8px 10px; font-size:.95rem}
+  .spark{width:100%; height:60px; display:block}
+  .meta{display:flex; gap:10px; flex-wrap:wrap}
+  .badge{background:#0f1720; border:1px solid var(--ring); color:var(--muted); padding:.3rem .55rem; border-radius:999px; font-size:.82rem}
+  .ex-list{display:grid; gap:6px}
+  .ex{display:flex; justify-content:space-between; background:#0f141b; border:1px dashed #213043; border-radius:10px; padding:6px 8px; font-size:.95rem}
   .ex b{font-weight:700}
-  .cta-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .cta-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
   .cta{
     all:unset; cursor:pointer; background:linear-gradient(90deg, var(--accent), #22c55e);
-    color:#04130a; padding:.75rem 1rem; border-radius:12px; font-weight:700; box-shadow:0 6px 20px rgba(34,197,94,.25)
+    color:#04130a; padding:.65rem .9rem; border-radius:10px; font-weight:700; box-shadow:0 6px 20px rgba(34,197,94,.25)
   }
   .cta:active{transform:translateY(1px)}
-  .ghost{all:unset; cursor:pointer; color:var(--muted); padding:.6rem .8rem; border-radius:10px; border:1px solid var(--ring)}
+  .ghost{all:unset; cursor:pointer; color:var(--muted); padding:.5rem .7rem; border-radius:9px; border:1px solid var(--ring)}
 
   /* calendar (compact + half width on desktop) */
   .calendar{grid-column: span 6}
   .calendar h3{margin:0; font-size:1rem; color:var(--muted)}
-  .legend{display:flex; gap:12px; color:var(--muted); font-size:.85rem}
+  .legend{display:flex; gap:10px; color:var(--muted); font-size:.85rem}
   .legend .swatch{width:10px; height:10px; border-radius:4px; display:inline-block; border:1px solid #233446}
-  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:var(--cal-gap); margin-top:8px}
-  .dow{font-size:.8rem; color:var(--muted); text-align:center; padding:4px 0}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:var(--cal-gap); margin-top:6px}
+  .dow{font-size:.78rem; color:var(--muted); text-align:center; padding:3px 0}
   .day{
     aspect-ratio:1/1; border:1px solid var(--ring); border-radius:var(--cal-radius);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
-    font-size:var(--cal-font); position:relative; background:#0f141b;
+    position:relative; background:#0f141b;
   }
   .day.muted{opacity:.45}
-  .day.partial{ background:#1a1e10 }   /* subtle amber-ish dark */
-  .day.done{ background:#0e1a12 }      /* subtle green-ish dark */
+  .day.partial{ background:#1a1e10 }
+  .day.done{ background:#0e1a12 }
   .day.today{outline:2px solid var(--accent-2)}
-  .count{font-size:var(--cal-count); color:var(--muted)}
+  .num{
+    position:absolute; top:6px; left:7px; font-size:var(--cal-font); line-height:1; color:var(--ink);
+  }
+  .count{
+    position:absolute; bottom:6px; right:7px; font-size:var(--cal-count); color:var(--muted);
+  }
 
-  /* responsive */
+  /* responsive (fit on one mobile screen) */
   @media (max-width: 980px){
     #weightCard{grid-column:span 12}
     #lastWorkoutCard{grid-column:span 12}
     .calendar{grid-column:span 12}
     #lastWorkoutCard{grid-template-columns:1fr}
   }
-  @media (max-width: 720px){
+  @media (max-width: 480px){
+    .wrap{gap:8px; padding:8px 8px 12px}
+    .card{padding:10px; border-radius:12px}
     .val{font-size:1.6rem}
+    .spark{height:52px}
+    .badge{font-size:.78rem; padding:.25rem .5rem}
+    .ex{padding:6px 7px; font-size:.92rem}
+    .legend{font-size:.8rem}
+    .calendar .card{padding:8px}
+    .day{border-radius:8px}
+    :root{ --cal-font:.85rem; --cal-count:.7rem }
   }
 </style>
 </head>
@@ -119,9 +131,9 @@
         </div>
       </article>
 
-      <!-- Calendar: half width on desktop (approx 50%), full width on mobile -->
+      <!-- Calendar -->
       <section class="card calendar" id="calendar">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px">
           <h3 id="calTitle">—</h3>
           <div class="legend">
             <span><i class="swatch" style="background:#0f141b"></i> None</span>
@@ -136,60 +148,62 @@
   </div>
 
 <script>
-/** =======================
- * Demo data (replace/load)
- * Each workout: { date:'YYYY-MM-DD', bodyWeight: 185.4,
- *   exercises:[{name, sets:[{reps, weight, completed?:boolean}]}],
- *   inProgress?: boolean
- * }
- * ======================= */
-const workouts = [
-  { date:'2025-08-02', bodyWeight:185.8, exercises:[
-    {name:'Bench Press', sets:[{reps:8,weight:145,completed:true},{reps:8,weight:145,completed:true},{reps:6,weight:155,completed:true}]},
-    {name:'Incline DB Press', sets:[{reps:10,weight:45,completed:true},{reps:10,weight:45,completed:true}]},
-  ]},
-  { date:'2025-08-05', bodyWeight:185.1, exercises:[
-    {name:'Squat', sets:[{reps:8,weight:185,completed:true},{reps:6,weight:205,completed:true},{reps:5,weight:225,completed:true}]},
-    {name:'Leg Press', sets:[{reps:12,weight:270,completed:true},{reps:12,weight:270,completed:true}]},
-  ]},
-  { date:'2025-08-09', bodyWeight:184.7, exercises:[
-    {name:'Seated Cable Row', sets:[{reps:10,weight:120,completed:true},{reps:10,weight:120,completed:true},{reps:8,weight:130,completed:true}]},
-    {name:'Lat Pulldown', sets:[{reps:10,weight:110,completed:true},{reps:10,weight:110,completed:true}]},
-  ]},
-  { date:'2025-08-12', bodyWeight:184.2, exercises:[
-    {name:'OHP', sets:[{reps:6,weight:95,completed:true},{reps:6,weight:95,completed:true},{reps:5,weight:100,completed:true}]},
-    {name:'Lateral Raise', sets:[{reps:12,weight:15,completed:true},{reps:12,weight:15,completed:true}]},
-  ]},
-  { date:'2025-08-16', bodyWeight:183.9, exercises:[
-    {name:'Bench Press', sets:[{reps:8,weight:150,completed:true},{reps:8,weight:150,completed:true},{reps:6,weight:160,completed:true}]},
-    {name:'Triceps Pushdown', sets:[{reps:12,weight:60,completed:true},{reps:12,weight:60,completed:true}]},
-  ]},
-  // Example "today" already started
-  // Adjust/remove this block as needed
-  (()=>{ const t = new Date(); const iso = t.toISOString().slice(0,10);
-    return { date: iso, bodyWeight:183.5, inProgress:true, exercises:[
-      {name:'Deadlift', sets:[{reps:5,weight:225,completed:true},{reps:5,weight:235,completed:false},{reps:5,weight:245,completed:false}]},
-      {name:'Row', sets:[{reps:10,weight:125,completed:false},{reps:10,weight:125,completed:false}]},
-    ]};
-  })()
-];
-
+/* ========= Load data =========
+ * Reads your saved days from localStorage (keys powerUp:YYYY-MM-DD, written by workout.html)
+ * Converts them to the format this page uses.
+ */
 const today = new Date();
 const todayISO = today.toISOString().slice(0,10);
 const fmt = (d)=>new Date(d+'T00:00:00');
 
-/* ---------- helpers ---------- */
+function readLocalDays(){
+  const out = [];
+  for(let i=0; i<localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(!/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+    try{
+      const day = JSON.parse(localStorage.getItem(k));
+      if(!day?.date) continue;
+      // Convert to this page's "workout" shape
+      const converted = {
+        date: day.date,
+        bodyWeight: day.bodyWeight ?? undefined,
+        exercises: (day.exercises||[]).map(ex=>({
+          name: ex.name || ex.exercise || 'Exercise',
+          sets: (ex.sets||[]).map(s=>({
+            reps: Number(s.reps)||0,
+            weight: Number(s.weight)||0,
+            completed: !!s.done
+          }))
+        }))
+      };
+      out.push(converted);
+    }catch(e){}
+  }
+  return out.sort((a,b)=> fmt(a.date)-fmt(b.date));
+}
+
+/* Fallback demo data if local is empty (kept tiny) */
+const demoWorkouts = [
+  { date:'2025-08-12', bodyWeight:184.2, exercises:[
+    {name:'OHP', sets:[{reps:6,weight:95,completed:true},{reps:6,weight:95,completed:true},{reps:5,weight:100,completed:true}]},
+  ]},
+];
+
+/* Merge: prefer local; else demo */
+const workouts = (readLocalDays().length ? readLocalDays() : demoWorkouts);
+
 const byDateAsc = (a,b)=> fmt(a.date) - fmt(b.date);
 const shortDate = (d)=> new Date(d).toLocaleDateString(undefined, {month:'short', day:'numeric', weekday:'short'});
-const totalVolume = (workout)=> workout.exercises.reduce((sum, ex)=> sum + ex.sets.reduce((s, st)=> s + (st.weight||0)*(st.reps||0), 0), 0);
-const totalSets = (workout)=> workout.exercises.reduce((s,ex)=> s + ex.sets.length, 0);
-const completedSets = (workout)=> workout.exercises.reduce((s,ex)=> s + ex.sets.filter(st=>st.completed).length, 0);
+const totalVolume = (wo)=> wo.exercises.reduce((sum, ex)=> sum + ex.sets.reduce((s, st)=> s + (st.weight||0)*(st.reps||0), 0), 0);
+const totalSets = (wo)=> wo.exercises.reduce((s,ex)=> s + ex.sets.length, 0);
+const completedSets = (wo)=> wo.exercises.reduce((s,ex)=> s + ex.sets.filter(st=>st.completed).length, 0);
 
-/* ---------- tiny sparkline ---------- */
+/* Sparkline */
 function drawSpark(id, points){
   const c = document.getElementById(id);
   const w = c.clientWidth, h=c.clientHeight;
-  c.width = Math.max(300,w); c.height = Math.max(64,h);
+  c.width = Math.max(260,w); c.height = Math.max(52,h);
   const ctx = c.getContext('2d');
   ctx.clearRect(0,0,c.width,c.height);
   if(!points || points.length<2) return;
@@ -215,14 +229,22 @@ function drawSpark(id, points){
   ctx.fillStyle = '#e8eef6'; ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2); ctx.fill();
 }
 
-/* ---------- weight card ---------- */
+/* Weight card: use any bodyWeight fields we find */
 function renderWeight(){
-  if(workouts.length===0){ return; }
   const sorted = [...workouts].sort(byDateAsc);
-  const lastWeights = sorted.map(w=>({x:fmt(w.date), y:w.bodyWeight})).filter(p=>!isNaN(p.y));
+  const lastWeights = sorted
+    .filter(w=>typeof w.bodyWeight==='number' && !isNaN(w.bodyWeight))
+    .map(w=>({x:fmt(w.date), y:w.bodyWeight}));
+
+  if(lastWeights.length===0){
+    document.getElementById('latestWeight').textContent = '—';
+    document.getElementById('weightTrend').textContent = '';
+    return;
+  }
+
   const latest = lastWeights.at(-1)?.y;
   const prev   = lastWeights.at(-2)?.y;
-  document.getElementById('latestWeight').textContent = latest ? `${latest.toFixed(1)} lb` : '—';
+  document.getElementById('latestWeight').textContent = `${latest.toFixed(1)} lb`;
   const tEl = document.getElementById('weightTrend');
   const trend = (latest && prev) ? (latest - prev) : 0;
   if(trend){
@@ -232,44 +254,36 @@ function renderWeight(){
   drawSpark('weightSpark', lastWeights);
 }
 
-/* ---------- last/today workout panel ---------- */
+/* Today/Previous workout panel — now sourced from localStorage */
 function renderWorkoutPanel(){
   const list = [...workouts].sort(byDateAsc);
   const todayW = list.find(w=>w.date===todayISO);
   const inProgress = isTodayInProgress(todayW);
-
-  // CTA text + persist inProgress if user started earlier
   const startBtn = document.getElementById('startToday');
   startBtn.textContent = inProgress ? 'Continue Workout' : 'Start Today’s Workout';
 
-  // Panel content: today if in progress, else previous
-  const target = inProgress ? todayW : list.filter(w=>w.exercises?.length).slice(0,-1).at(-1) || list.at(-1);
+  // If there is a workout saved for today, always show it.
+  const hasToday = !!todayW;
+  const target = hasToday ? todayW : (list.filter(w=>w.exercises?.length).slice(0,-1).at(-1) || list.at(-1));
   const title = document.getElementById('workoutPanelTitle');
-  title.textContent = inProgress ? 'Today’s Workout' : 'Previous Workout';
+  title.textContent = hasToday ? 'Today’s Workout' : 'Previous Workout';
 
   document.getElementById('lastDate').textContent = shortDate(target.date);
   document.getElementById('lastVolume').textContent = totalVolume(target).toLocaleString()+' lb';
   document.getElementById('lastMoves').textContent = target.exercises.length;
   document.getElementById('lastSets').textContent = totalSets(target);
 
-  // Sets left only for today's
   const setsLeftWrap = document.getElementById('setsLeftBadge');
-  if(inProgress){
+  if(hasToday){
     const left = totalSets(target) - completedSets(target);
     setsLeftWrap.style.display = 'inline-flex';
     document.getElementById('setsLeft').textContent = left;
-  } else {
-    setsLeftWrap.style.display = 'none';
-  }
+  } else setsLeftWrap.style.display = 'none';
 
-  // Exercise rows
   const exList = document.getElementById('exList');
   exList.innerHTML = '';
   target.exercises.forEach(ex=>{
-    const setsTxt = ex.sets.map((s,i)=>{
-      const done = s.completed ? '✔' : '○';
-      return `${done} ${s.reps}×${s.weight||0}`;
-    }).join(', ');
+    const setsTxt = ex.sets.map(s=>`${s.completed?'✔':'○'} ${s.reps}×${s.weight||0}`).join(', ');
     const row = document.createElement('div');
     row.className='ex';
     row.innerHTML = `<b>${ex.name}</b><span>${setsTxt}</span>`;
@@ -277,7 +291,7 @@ function renderWorkoutPanel(){
   });
 }
 
-/* ---------- calendar (current month) ---------- */
+/* Calendar (numbers aligned) */
 function renderCalendar(){
   const calTitle = document.getElementById('calTitle');
   const calGrid  = document.getElementById('calGrid');
@@ -294,7 +308,7 @@ function renderCalendar(){
   const monthEnd   = new Date(year, month+1, 0);
   calTitle.textContent = monthStart.toLocaleDateString(undefined, {month:'long', year:'numeric'});
 
-  // Map day -> volume
+  // volumes by day from workouts (incl. localStorage)
   const byDay = new Map();
   workouts.forEach(w=>{
     const d = fmt(w.date);
@@ -312,34 +326,34 @@ function renderCalendar(){
   }
   for(let day=1; day<=monthEnd.getDate(); day++){
     const cell = document.createElement('div');
-    const isToday = (day===today.getDate() && month===today.getMonth() && year===today.getFullYear());
     const vol = byDay.get(day)||0;
     let state = '';
-    if(vol>0) state = vol>5000 ? 'done' : 'partial'; // tune threshold
-    cell.className = `day ${state} ${isToday?'today':''}`;
-    const num = document.createElement('div'); num.textContent = day;
-    const ct  = document.createElement('div'); ct.className='count'; ct.textContent = vol? Math.round(vol)+' lb':'';
-    cell.appendChild(num); if(vol) cell.appendChild(ct);
+    if(vol>0) state = vol>5000 ? 'done' : 'partial';
+    if(day===today.getDate() && month===today.getMonth() && year===today.getFullYear()) state += ' today';
+    cell.className = `day ${state}`.trim();
+
+    const num = document.createElement('div'); num.className='num'; num.textContent = day;
+    cell.appendChild(num);
+    if(vol){
+      const ct  = document.createElement('div'); ct.className='count'; ct.textContent = Math.round(vol)+' lb';
+      cell.appendChild(ct);
+    }
     calGrid.appendChild(cell);
   }
 }
 
-/* ---------- in-progress detection ---------- */
+/* In-progress detection */
 function isTodayInProgress(todayW){
-  if(!todayW) {
-    // also check persisted flag
+  if(!todayW){
     return localStorage.getItem('workoutInProgress') === todayISO;
   }
-  if(todayW.inProgress) return true;
-  // Consider "started" if any set exists and not all are completed
   const hasSets = totalSets(todayW) > 0;
   const allDone = completedSets(todayW) === totalSets(todayW);
   return hasSets && !allDone;
 }
 
-/* ---------- Buttons ---------- */
+/* Buttons */
 document.getElementById('startToday').addEventListener('click', ()=>{
-  // Toggle between starting and continuing
   localStorage.setItem('workoutInProgress', todayISO);
   window.location.href = 'workout.html?start=today';
 });
@@ -349,14 +363,19 @@ document.getElementById('viewAll').addEventListener('click', ()=>{
 document.getElementById('logWeight').addEventListener('click', ()=>{
   const w = prompt('Enter today’s weight (lb):');
   if(!w) return;
-  const dateISO = todayISO;
-  const existing = workouts.find(x=>x.date===dateISO);
-  if(existing){ existing.bodyWeight = parseFloat(w); }
-  else { workouts.push({date:dateISO, bodyWeight:parseFloat(w), exercises:[]}); }
-  renderWeight(); renderCalendar();
+  // persist weight onto today's saved object if present, else create a minimal one
+  const k = `powerUp:${todayISO}`;
+  const existing = localStorage.getItem(k);
+  if(existing){
+    const d = JSON.parse(existing); d.bodyWeight = parseFloat(w); localStorage.setItem(k, JSON.stringify(d));
+  }else{
+    localStorage.setItem(k, JSON.stringify({date: todayISO, bodyWeight:parseFloat(w), exercises:[]}));
+  }
+  // refresh from local storage
+  location.reload();
 });
 
-/* ---------- init ---------- */
+/* Init */
 function renderAll(){
   renderWeight();
   renderWorkoutPanel();
@@ -364,7 +383,7 @@ function renderAll(){
 }
 renderAll();
 window.addEventListener('resize', ()=>drawSpark('weightSpark',
-  [...workouts].sort(byDateAsc).map(w=>({x:fmt(w.date),y:w.bodyWeight}))
+  [...workouts].filter(w=>typeof w.bodyWeight==='number').sort(byDateAsc).map(w=>({x:fmt(w.date),y:w.bodyWeight}))
 ));
 </script>
 </body>

@@ -6,80 +6,86 @@
 <title>Power Up! — Today</title>
 <style>
   :root{
-    --bg:#0b0f14; --panel:#121a23; --ink:#e8eef6; --muted:#9fb0c7; --ring:#263341;
+    --bg:#080c11; --panel:#0d131a; --ink:#e8eef6; --muted:#9fb0c7; --ring:#1c2a37;
     --accent:#4CAF50; --danger:#ef4444; --warn:#f59e0b;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
-    background:linear-gradient(180deg,#0a0e13 0%, #0d131a 100%); color:var(--ink);
+    background:linear-gradient(180deg,#070b10 0%, #0a1016 100%); color:var(--ink);
     display:flex; flex-direction:column;
   }
-  header{
-    background:#0e141b; border-bottom:1px solid var(--ring);
-    color:var(--ink); padding:10px;
-  }
-  .bar{display:flex; align-items:center; justify-content:space-between; gap:8px}
+
+  header{background:#0b1118; border-bottom:1px solid var(--ring); color:var(--ink); padding:10px}
+  .bar{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
   .home{all:unset; cursor:pointer; border:1px solid var(--ring); padding:.35rem .6rem; border-radius:.6rem}
   h1{margin:0; font-size:1rem}
   .date-nav{display:flex; align-items:center; gap:10px}
   .date-nav button{all:unset; cursor:pointer; padding:.3rem .5rem; border:1px solid var(--ring); border-radius:.5rem}
   .date-str{min-width:9.5ch; text-align:center}
-  .icons{display:flex; gap:8px}
 
   .wrap{width:min(900px,100%); margin-inline:auto; padding:10px; display:flex; flex-direction:column; gap:10px; flex:1}
-  .totals{
-    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
-    background:var(--panel); border:1px solid var(--ring); border-radius:12px; padding:10px;
-    font-size:.95rem;
-  }
-  .chip{background:#0f1720; border:1px solid var(--ring); padding:.35rem .6rem; border-radius:999px; color:var(--muted)}
-  .chip b{color:var(--ink)}
 
-  .actions{display:flex; gap:10px; flex-wrap:wrap}
-  .btn{
-    all:unset; cursor:pointer; padding:.7rem 1rem; border-radius:12px; font-weight:700;
-    background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a; box-shadow:0 6px 20px rgba(34,197,94,.25)
+  /* Power card */
+  .card{
+    background:var(--panel); border:1px solid var(--ring); border-radius:14px;
+    padding:12px; box-shadow:0 8px 30px rgba(0,0,0,.25);
   }
+  #powerCard .top{display:flex; align-items:baseline; gap:10px}
+  #powerVal{font-size:1.9rem; font-weight:800}
+  #powerTrend{font-size:.9rem; color:var(--muted)}
+  .spark{width:100%; height:64px; display:block; margin-top:6px}
+  /* glow when > 1000 lb */
+  .glow-warn{box-shadow:0 0 0 1px rgba(245,158,11,.3), 0 0 16px rgba(245,158,11,.25), inset 0 0 20px rgba(245,158,11,.08)}
+  .glow-hot{box-shadow:0 0 0 1px rgba(239,68,68,.35), 0 0 24px rgba(239,68,68,.35), inset 0 0 24px rgba(239,68,68,.12)}
+
+  .totals{display:flex; gap:8px; flex-wrap:wrap; align-items:center; background:var(--panel); border:1px solid var(--ring); border-radius:12px; padding:10px; font-size:.95rem}
+  .chip{background:#0b1118; border:1px solid var(--ring); padding:.35rem .6rem; border-radius:999px; color:var(--muted)}
+  .chip b{color:var(--ink)}
+  .actions{display:flex; gap:10px; flex-wrap:wrap}
+  .btn{all:unset; cursor:pointer; padding:.7rem 1rem; border-radius:12px; font-weight:700; background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a; box-shadow:0 6px 20px rgba(34,197,94,.25)}
   .btn-ghost{all:unset; cursor:pointer; padding:.6rem .9rem; border:1px solid var(--ring); border-radius:10px; color:var(--muted)}
   .btn-danger{all:unset; cursor:pointer; padding:.45rem .6rem; border:1px solid #3a2227; border-radius:8px; color:#fecaca; background:#2a0f12}
   .btn-small{padding:.35rem .55rem; font-size:.85rem}
 
-  .group{background:var(--panel); border:1px solid var(--ring); border-radius:14px; padding:10px; margin-top:6px}
+  .group{background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:10px; margin-top:6px}
   .group h3{margin:.1rem 0 .4rem; font-size:1rem; color:var(--muted)}
   .ex{border:1px dashed var(--ring); border-radius:12px; padding:10px; margin:8px 0; display:grid; gap:8px}
   .ex-header{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
   .ex-name{font-weight:700}
-  .set-row{display:grid; grid-template-columns: 1fr 1fr 1fr auto auto; gap:6px; align-items:center}
-  .set-row input{width:100%; padding:.55rem .6rem; border:1px solid var(--ring); border-radius:8px; background:#0f141b; color:var(--ink)}
-  .set-row .done{display:flex; align-items:center; gap:6px; color:var(--muted); font-size:.9rem}
-  .set-row .tools{display:flex; gap:6px}
-  .tag{font-size:.85rem; color:var(--muted)}
-  .sum{font-size:.9rem; color:var(--muted)}
-  .flex{display:flex; gap:6px; flex-wrap:wrap}
-  .hidden{display:none!important}
+  .tag{font-size:.9rem; color:var(--muted)}
+  .sets{display:grid; gap:6px}
+
+  /* darker edit fields + compact width (~4 digits) */
+  .set-row{display:grid; grid-template-columns: auto auto 1fr auto; gap:8px; align-items:center}
+  .num-input{
+    width:6ch; max-width:6ch; /* ~4 digits + breathing room */
+    padding:.55rem .55rem; border:1px solid #15212c; border-radius:8px;
+    background:#091017; color:var(--ink); font-variant-numeric:tabular-nums;
+  }
+  .num-input:focus{outline:2px solid #213240}
+  .flags{display:flex; align-items:center; gap:12px; color:var(--muted); font-size:.9rem}
+  .tools{display:flex; gap:6px}
+
+  .spacer{height:70px}
 
   /* Popups */
   .popup{position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; padding:10px}
-  .sheet{width:min(650px, 96%); max-height:85vh; overflow:auto; background:#0f141b; border:1px solid var(--ring); border-radius:14px; padding:12px}
-  .sheet h2{margin:6px 0 10px; font-size:1rem; color:var(--muted)}
+  .sheet{width:min(650px, 96%); max-height:85vh; overflow:auto; background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:12px}
   .x{all:unset; cursor:pointer; float:right; border:1px solid var(--ring); padding:.25rem .5rem; border-radius:8px; color:var(--muted)}
   .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
-  .opt{border:1px solid var(--ring); padding:10px; border-radius:10px; cursor:pointer; background:#111922}
+  .opt{border:1px solid var(--ring); padding:10px; border-radius:10px; cursor:pointer; background:#0e151e}
   .opt:hover{outline:1px solid #2b3a4a}
-  .search{width:100%; padding:.6rem .7rem; border:1px solid var(--ring); border-radius:10px; background:#0f141b; color:var(--ink); margin-bottom:8px}
+  .search{width:100%; padding:.6rem .7rem; border:1px solid var(--ring); border-radius:10px; background:#0a1118; color:#e8eef6; margin-bottom:8px}
 
-  /* Calendar */
+  /* Calendar (unchanged here) */
   .calendar{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
-  .cal-head{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin:4px 0; color:var(--muted); font-size:.85rem}
+  .cal-head{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin:4px 0; color:#9fb0c7; font-size:.85rem}
   .cal-cell{border:1px solid var(--ring); border-radius:8px; padding:8px; text-align:center; background:#0f141b}
   .cal-cell.workout{background:#0e1a12}
   .cal-nav{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px}
   .cal-nav button{all:unset; cursor:pointer; border:1px solid var(--ring); padding:.3rem .6rem; border-radius:8px}
-
-  /* Mobile bottom space to avoid overlap with nav bars */
-  .spacer{height:70px}
 </style>
 </head>
 <body>
@@ -87,7 +93,7 @@
   <div class="bar">
     <button class="home" onclick="location.href='summary.html'">⟵ Home</button>
     <h1>Power Up! — Today’s Workout</h1>
-    <div class="icons">
+    <div class="bar">
       <button class="home" id="openCalendar">📅</button>
     </div>
   </div>
@@ -106,6 +112,17 @@
 </header>
 
 <main class="wrap">
+
+  <!-- Power Card -->
+  <section class="card" id="powerCard">
+    <h3 style="margin:.1rem 0 .25rem; color:var(--muted)">Today’s Volume</h3>
+    <div class="top">
+      <div id="powerVal">0 lb</div>
+      <div id="powerTrend" class="muted">—</div>
+    </div>
+    <canvas id="powerSpark" class="spark"></canvas>
+  </section>
+
   <section class="totals" id="totalsBar">
     <span class="chip">Sets: <b id="tSets">0</b></span>
     <span class="chip">Volume: <b id="tVol">0 lb</b></span>
@@ -122,7 +139,7 @@
 <div class="popup" id="bpPopup">
   <div class="sheet">
     <button class="x" data-close="#bpPopup">✕</button>
-    <h2>Select Body Part</h2>
+    <h2 style="margin:6px 0 10px; font-size:1rem; color:#9fb0c7">Select Body Part</h2>
     <div class="grid" id="bpGrid"></div>
   </div>
 </div>
@@ -131,7 +148,7 @@
 <div class="popup" id="exPopup">
   <div class="sheet">
     <button class="x" data-close="#exPopup">✕</button>
-    <h2 id="exTitle">Choose Exercise</h2>
+    <h2 id="exTitle" style="margin:6px 0 10px; font-size:1rem; color:#9fb0c7">Choose Exercise</h2>
     <input class="search" id="exSearch" placeholder="Search exercise…" />
     <div class="grid" id="exGrid"></div>
   </div>
@@ -154,7 +171,7 @@
 </div>
 
 <script>
-/* ------------------ Demo exercise catalog ------------------ */
+/* ---------- Catalog ---------- */
 const exerciseOptions = {
   Chest: ['Bench Press','Incline Bench Press','Dumbbell Press','Dumbbell Flyes','Cable Fly','Chest Dips'],
   Back: ['Deadlift','Bent Over Row','Seated Cable Row','Lat Pulldown','One-arm DB Row','Chest-supported Row'],
@@ -166,53 +183,114 @@ const exerciseOptions = {
 };
 const bodyParts = Object.keys(exerciseOptions);
 
-/* ------------------ State & storage ------------------ */
+/* ---------- State & storage ---------- */
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
-const todayISO = () => new Date().toISOString().slice(0,10);
-let current = new Date(); // navigable
+let current = new Date();
 const keyFor = (d)=>`powerUp:${d.toISOString().slice(0,10)}`;
 
-function blankDay(date){
-  return { date: date.toISOString().slice(0,10), totalWeight:0, totalSets:0, exercises:[] };
+function blankDay(date){ return { date: date.toISOString().slice(0,10), exercises:[] }; }
+function loadDay(date){ const raw = localStorage.getItem(keyFor(date)); return raw ? JSON.parse(raw) : blankDay(date); }
+function saveDay(day){ localStorage.setItem(`powerUp:${day.date}`, JSON.stringify(day)); }
+
+/* ---------- Maths ---------- */
+function exStats(ex){
+  const vol = ex.sets.reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
+  const reps = ex.sets.reduce((s,a)=> s + (Number(a.reps)||0), 0);
+  const avg = reps ? vol / reps : 0;
+  return { vol, reps, avg };
 }
-function loadDay(date){
-  const raw = localStorage.getItem(keyFor(date));
-  return raw ? JSON.parse(raw) : blankDay(date);
+function calcTotals(day){
+  let sets=0, vol=0;
+  day.exercises.forEach(ex=> ex.sets.forEach(s=>{ sets++; vol += (Number(s.weight)||0)*(Number(s.reps)||0); }));
+  return {sets, vol};
 }
-function saveDay(day){
-  localStorage.setItem(`powerUp:${day.date}`, JSON.stringify(day));
+function areAllSetsDone(day){
+  const all = day.exercises.flatMap(ex=> ex.sets);
+  return all.length>0 && all.every(s=> !!s.done);
 }
 
-/* ------------------ Rendering ------------------ */
+/* ---------- Sparkline ---------- */
+function drawSpark(el, points){
+  const c = typeof el==='string' ? document.getElementById(el) : el;
+  const w = c.clientWidth, h=c.clientHeight;
+  c.width = Math.max(300,w); c.height = Math.max(56,h);
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  if(points.length<2) return;
+
+  const xs = points.map((p,i)=>i);
+  const ys = points.map(p=>p);
+  const minX = 0, maxX = xs.length-1;
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const pad = 8;
+  const xScale = (i)=> pad + ((i-minX)/(maxX-minX||1))*(c.width-2*pad);
+  const yScale = (v)=> c.height - pad - ((v-minY)/(maxY-minY||1))*(c.height-2*pad);
+
+  ctx.strokeStyle = '#233446'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
+  ctx.beginPath(); ctx.moveTo(pad, yScale(minY)); ctx.lineTo(c.width-pad, yScale(minY)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.strokeStyle = '#2dd4bf'; ctx.lineWidth = 2; ctx.beginPath();
+  points.forEach((v,i)=>{ const x=xScale(i), y=yScale(v); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+  ctx.stroke();
+
+  const lx=xScale(points.length-1), ly=yScale(points.at(-1));
+  ctx.fillStyle = '#e8eef6'; ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2); ctx.fill();
+}
+
+/* ---------- Rendering ---------- */
 function render(){
-  // header date
   $('#dateStr').textContent = new Intl.DateTimeFormat(undefined,{weekday:'short',month:'short',day:'numeric'}).format(current);
 
   const day = loadDay(current);
-  const log = $('#log');
-  log.innerHTML = '';
+  renderPowerCard(day);
 
-  // groups by body part
-  const groups = groupBy(day.exercises, 'bodyPart'); // {Chest:[...]}
+  const log = $('#log'); log.innerHTML = '';
+  const groups = groupBy(day.exercises, 'bodyPart');
   Object.entries(groups).forEach(([bp, list])=>{
     const g = document.createElement('div');
-    g.className = 'group';
-    g.dataset.bodypart = bp;
+    g.className = 'group'; g.dataset.bodypart = bp;
     g.innerHTML = `<h3>${bp}</h3>`;
     list.forEach(ex=> g.appendChild(renderExercise(ex)));
     log.appendChild(g);
   });
 
-  // totals
   const {sets, vol} = calcTotals(day);
   $('#tSets').textContent = sets;
   $('#tVol').textContent = Math.round(vol) + ' lb';
   $('#tEx').textContent = day.exercises.length;
   $('#tStatus').textContent = sets === 0 ? 'Not started' : (areAllSetsDone(day) ? 'Completed' : 'In progress');
 
-  // refresh calendar if open
   if ($('#calPopup').style.display === 'flex') buildCalendar(current);
+}
+
+function renderPowerCard(day){
+  const { vol } = calcTotals(day);
+  const prev = (()=>{ // yesterday total (for small trend)
+    const y = new Date(current); y.setDate(y.getDate()-1);
+    return calcTotals(loadDay(y)).vol;
+  })();
+  $('#powerVal').textContent = Math.round(vol) + ' lb';
+  const trend = vol - prev;
+  $('#powerTrend').textContent = (prev>0) ? `${trend>=0?'+':''}${Math.round(trend)} vs. yesterday` : '—';
+
+  // cumulative points by set order
+  const points = [];
+  let run = 0;
+  day.exercises.forEach(ex=>{
+    ex.sets.forEach(s=>{
+      run += (Number(s.weight)||0)*(Number(s.reps)||0);
+      points.push(run);
+    });
+  });
+  if(points.length<2) { points.push(Math.max(0, run)); } // keep at least 2 points
+  drawSpark('powerSpark', points);
+
+  const card = document.getElementById('powerCard');
+  card.classList.remove('glow-warn','glow-hot');
+  if(vol > 1500) card.classList.add('glow-hot');
+  else if(vol > 5000) card.classList.add('glow-warn');
 }
 
 function renderExercise(ex){
@@ -220,14 +298,14 @@ function renderExercise(ex){
   node.className = 'ex';
   node.dataset.id = ex.id;
 
-  const sum = ex.sets.map(s=> (s.weight||0)*(s.reps||0)).reduce((a,b)=>a+b,0);
+  const {vol, avg} = exStats(ex);
   node.innerHTML = `
     <div class="ex-header">
       <div>
         <div class="ex-name">${ex.name}</div>
-        <div class="tag">${ex.sets.length} set(s) • ${Math.round(sum)} lb</div>
+        <div class="tag">${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep</div>
       </div>
-      <div class="flex">
+      <div class="actions" style="gap:6px">
         <button class="btn-ghost btn-small" data-act="addSet">+ Set</button>
         <button class="btn-ghost btn-small" data-act="dupLast">Duplicate Last</button>
         <button class="btn-danger btn-small" data-act="delEx">Delete</button>
@@ -240,17 +318,19 @@ function renderExercise(ex){
   return node;
 }
 
+/* Set row: darker inputs; Superset + Done flags; compact width */
 function renderSet(exId, s, idx){
   const row = document.createElement('div');
   row.className = 'set-row';
   row.dataset.exId = exId;
   row.dataset.idx = idx;
-
   row.innerHTML = `
-    <input inputmode="decimal" pattern="[0-9.]*" placeholder="Weight" value="${s.weight ?? ''}" data-field="weight" />
-    <input inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" data-field="reps" />
-    <input inputmode="decimal" pattern="[0-9.]*" placeholder="RPE (opt)" value="${s.rpe ?? ''}" data-field="rpe" />
-    <label class="done"><input type="checkbox" ${s.done?'checked':''} data-field="done" /> Done</label>
+    <input class="num-input" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" data-field="weight" />
+    <input class="num-input" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" data-field="reps" />
+    <div class="flags">
+      <label><input type="checkbox" ${s.superset?'checked':''} data-field="superset" /> Superset</label>
+      <label><input type="checkbox" ${s.done?'checked':''} data-field="done" /> Done</label>
+    </div>
     <div class="tools">
       <button class="btn-ghost btn-small" data-act="incW">+5</button>
       <button class="btn-ghost btn-small" data-act="decW">-5</button>
@@ -260,25 +340,16 @@ function renderSet(exId, s, idx){
   return row;
 }
 
-/* ------------------ Helpers ------------------ */
+/* ---------- Helpers & events ---------- */
 function groupBy(arr, key){ return arr.reduce((m,o)=>((m[o[key]]??=[]).push(o),m),{}); }
 function uid(){ return Math.random().toString(36).slice(2,9); }
-function calcTotals(day){
-  let sets=0, vol=0;
-  day.exercises.forEach(ex=> ex.sets.forEach(s=>{ sets++; vol += (Number(s.weight)||0)*(Number(s.reps)||0); }));
-  return {sets, vol};
-}
-function areAllSetsDone(day){
-  const all = day.exercises.flatMap(ex=> ex.sets);
-  return all.length>0 && all.every(s=> !!s.done);
-}
 
-/* ------------------ Popups ------------------ */
+/* Popups */
 function openPopup(id){ $(id).style.display='flex'; }
 function closePopup(id){ $(id).style.display='none'; }
 $$('.x').forEach(btn=> btn.addEventListener('click', e=> closePopup(e.target.dataset.close)));
 
-/* Body part -> exercise flow */
+/* Body part → exercise flow */
 $('#addExercise').addEventListener('click', ()=>{
   const grid = $('#bpGrid'); grid.innerHTML = '';
   bodyParts.forEach(bp=>{
@@ -292,11 +363,9 @@ $('#addExercise').addEventListener('click', ()=>{
 $('#bpGrid').addEventListener('click', (e)=>{
   const bp = e.target.closest('.opt')?.dataset.bp; if(!bp) return;
   closePopup('#bpPopup');
-  // populate ex list
   $('#exTitle').textContent = `Exercises — ${bp}`;
   const grid = $('#exGrid'); grid.innerHTML = '';
-  const list = exerciseOptions[bp];
-  list.forEach(name=>{
+  exerciseOptions[bp].forEach(name=>{
     const div = document.createElement('div'); div.className='opt'; div.textContent = name; div.dataset.name = name; div.dataset.bp = bp;
     grid.appendChild(div);
   });
@@ -306,9 +375,7 @@ $('#bpGrid').addEventListener('click', (e)=>{
 
 $('#exSearch').addEventListener('input', (e)=>{
   const q = e.target.value.toLowerCase();
-  $$('#exGrid .opt').forEach(x=>{
-    x.style.display = x.textContent.toLowerCase().includes(q) ? '' : 'none';
-  });
+  $$('#exGrid .opt').forEach(x=> x.style.display = x.textContent.toLowerCase().includes(q) ? '' : 'none');
 });
 
 $('#exGrid').addEventListener('click', (e)=>{
@@ -316,17 +383,14 @@ $('#exGrid').addEventListener('click', (e)=>{
   const name = opt.dataset.name; const bp = opt.dataset.bp;
   closePopup('#exPopup');
 
-  // add exercise with a first empty set
   const day = loadDay(current);
-  const ex = { id: uid(), bodyPart: bp, name, sets:[{weight:'', reps:'', rpe:'', done:false}] };
+  const ex = { id: uid(), bodyPart: bp, name, sets:[{weight:'', reps:'', superset:false, done:false}] };
   day.exercises.push(ex); saveDay(day); render();
 });
 
-/* ------------------ Exercise / Set interactions ------------------ */
+/* Exercise / Set actions */
 $('#log').addEventListener('click', (e)=>{
-  const act = e.target.dataset.act;
-  if(!act) return;
-
+  const act = e.target.dataset.act; if(!act) return;
   const day = loadDay(current);
 
   if(act==='delEx'){
@@ -337,14 +401,14 @@ $('#log').addEventListener('click', (e)=>{
   if(act==='addSet'){
     const exId = e.target.closest('.ex').dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
-    ex.sets.push({weight:'', reps:'', rpe:'', done:false});
+    ex.sets.push({weight:'', reps:'', superset:false, done:false});
     saveDay(day); render(); return;
   }
   if(act==='dupLast'){
     const exId = e.target.closest('.ex').dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
-    const last = ex.sets[ex.sets.length-1] || {weight:'', reps:'', rpe:''};
-    ex.sets.push({weight:last.weight, reps:last.reps, rpe:last.rpe, done:false});
+    const last = ex.sets[ex.sets.length-1] || {weight:'', reps:'', superset:false};
+    ex.sets.push({weight:last.weight, reps:last.reps, superset:last.superset, done:false});
     saveDay(day); render(); return;
   }
   if(act==='delSet' || act==='incW' || act==='decW'){
@@ -353,10 +417,7 @@ $('#log').addEventListener('click', (e)=>{
     const idx = Number(row.dataset.idx);
     if(act==='delSet'){
       ex.sets.splice(idx,1);
-      if(ex.sets.length===0){
-        // remove empty exercise
-        day.exercises = day.exercises.filter(x=>x.id!==ex.id);
-      }
+      if(ex.sets.length===0) day.exercises = day.exercises.filter(x=>x.id!==ex.id);
     }else{
       const delta = act==='incW' ? 5 : -5;
       const w = Number(ex.sets[idx].weight||0);
@@ -366,50 +427,59 @@ $('#log').addEventListener('click', (e)=>{
   }
 });
 
-/* inputs & checkbox autosave */
+/* Autosave inputs & checkboxes */
 $('#log').addEventListener('input', (e)=>{
   const row = e.target.closest('.set-row'); if(!row) return;
+  const field = e.target.dataset.field; if(!field) return;
+
   const day = loadDay(current);
   const ex = day.exercises.find(x=>x.id===row.dataset.exId);
   const idx = Number(row.dataset.idx);
-  const f = e.target.dataset.field;
-  let val = e.target.value;
-  if(f==='weight' || f==='reps' || f==='rpe'){ val = val.replace(/[^\d.]/g,''); }
-  if(f==='weight' || f==='rpe') ex.sets[idx][f] = val;
-  if(f==='reps') ex.sets[idx][f] = val;
-  saveDay(day);
-  // Update small summary under exercise name without full re-render
-  const sum = ex.sets.map(s=>(Number(s.weight)||0)*(Number(s.reps)||0)).reduce((a,b)=>a+b,0);
-  row.closest('.ex').querySelector('.tag').textContent = `${ex.sets.length} set(s) • ${Math.round(sum)} lb`;
-  // Update totals bar
-  const {sets, vol} = calcTotals(day);
-  $('#tSets').textContent = sets; $('#tVol').textContent = Math.round(vol)+' lb';
+
+  if(field==='weight' || field==='reps'){
+    // keep only up to 4 visible digits
+    let clean = e.target.value.replace(/[^\d.]/g,'');
+    if(clean.replace('.','').length > 4) clean = clean.slice(0,4);
+    e.target.value = clean;
+    ex.sets[idx][field] = clean;
+    saveDay(day);
+
+    // update exercise tag + totals + power card
+    const exNode = row.closest('.ex');
+    const {vol:ev, avg} = exStats(ex);
+    exNode.querySelector('.tag').textContent = `${ex.sets.length} set(s) • ${Math.round(ev)} lb • avg ${Math.round(avg)} lb/rep`;
+    const {sets, vol} = calcTotals(day);
+    $('#tSets').textContent = sets; $('#tVol').textContent = Math.round(vol)+' lb';
+    renderPowerCard(day);
+  }
 });
 
 $('#log').addEventListener('change', (e)=>{
-  if(e.target.dataset.field !== 'done') return;
-  const row = e.target.closest('.set-row');
+  const row = e.target.closest('.set-row'); if(!row) return;
+  const field = e.target.dataset.field; if(!field) return;
+
   const day = loadDay(current);
   const ex = day.exercises.find(x=>x.id===row.dataset.exId);
   const idx = Number(row.dataset.idx);
-  ex.sets[idx].done = e.target.checked;
-  saveDay(day);
-  $('#tStatus').textContent = areAllSetsDone(day) ? 'Completed' : 'In progress';
+
+  if(field==='done' || field==='superset'){
+    ex.sets[idx][field] = e.target.checked;
+    saveDay(day);
+    $('#tStatus').textContent = areAllSetsDone(day) ? 'Completed' : 'In progress';
+  }
 });
 
-/* ------------------ Save / Clear ------------------ */
+/* Save / Clear */
 $('#saveBtn').addEventListener('click', ()=>{
-  const day = loadDay(current);
-  saveDay(day);
-  $('#saveBtn').textContent = 'Saved ✔';
-  setTimeout(()=> $('#saveBtn').textContent='Save', 1200);
+  const day = loadDay(current); saveDay(day);
+  $('#saveBtn').textContent = 'Saved ✔'; setTimeout(()=> $('#saveBtn').textContent='Save', 1100);
 });
 $('#clearBtn').addEventListener('click', ()=>{
   if(!confirm('Clear all exercises for this day?')) return;
   saveDay(blankDay(current)); render();
 });
 
-/* ------------------ Date nav & calendar ------------------ */
+/* Date nav & calendar */
 $('#prevDay').addEventListener('click', ()=>{ current.setDate(current.getDate()-1); render(); });
 $('#nextDay').addEventListener('click', ()=>{ current.setDate(current.getDate()+1); render(); });
 
@@ -417,12 +487,7 @@ $('#openCalendar').addEventListener('click', ()=>{ openPopup('#calPopup'); build
 $('#calPrev').addEventListener('click', ()=>{ shiftCalendar(-1); });
 $('#calNext').addEventListener('click', ()=>{ shiftCalendar(1); });
 
-function shiftCalendar(delta){
-  const d = new Date($('#calMonth').dataset.anchor);
-  d.setMonth(d.getMonth()+delta);
-  buildCalendar(d);
-}
-
+function shiftCalendar(delta){ const d = new Date($('#calMonth').dataset.anchor); d.setMonth(d.getMonth()+delta); buildCalendar(d); }
 function buildCalendar(anchorDate){
   const y = anchorDate.getFullYear(), m = anchorDate.getMonth();
   $('#calMonth').textContent = new Intl.DateTimeFormat(undefined,{month:'long',year:'numeric'}).format(anchorDate);
@@ -440,27 +505,23 @@ function buildCalendar(anchorDate){
       const day = JSON.parse(localStorage.getItem(`powerUp:${dateISO}`));
       if(day.exercises?.length) c.classList.add('workout');
     }
-    c.addEventListener('click', ()=>{
-      current = new Date(y,m,d);
-      closePopup('#calPopup');
-      render();
-    });
+    c.addEventListener('click', ()=>{ current = new Date(y,m,d); closePopup('#calPopup'); render(); });
     grid.appendChild(c);
   }
 }
 
-/* ------------------ Boot ------------------ */
+/* Boot */
 (function init(){
-  // if landing today and there's a previous save under old key 'powerUp', migrate
   const legacy = localStorage.getItem('powerUp');
   if(legacy){
-    try{
-      const data = JSON.parse(legacy);
-      if(data?.date){ localStorage.setItem(`powerUp:${data.date}`, legacy); }
-    }catch{}
+    try{ const data = JSON.parse(legacy); if(data?.date){ localStorage.setItem(`powerUp:${data.date}`, legacy); } }catch{}
   }
-  // Start at today
   current = new Date(); render();
+  // resize spark if container width changes
+  window.addEventListener('resize', ()=>{
+    const day = loadDay(current);
+    renderPowerCard(day);
+  });
 })();
 </script>
 </body>
