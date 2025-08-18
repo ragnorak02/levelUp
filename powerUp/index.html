@@ -1,372 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Power Up!</title>
-    <style>
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-        }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Power Up! — Summary</title>
+<style>
+  :root{
+    --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7; --accent:#4CAF50; --accent-2:#2dd4bf;
+    --ring:#2a3543; --warn:#f59e0b; --good:#22c55e; --bad:#ef4444;
+    /* calendar compaction */
+    --cal-gap:4px; --cal-radius:8px; --cal-font:.8rem; --cal-count:.7rem;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+    background:linear-gradient(180deg,#0a0e13 0%, #0d131a 100%); color:var(--ink);
+    display:flex; flex-direction:column;
+  }
 
-        header {
-            display: flex;
-            align-items: center;
-            background-color: #4CAF50;
-            color: white;
-            padding: 0px;
-            font-size: 10px;
-            position: relative;
-        }
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.75rem 1rem; border-bottom:1px solid var(--ring); background:#0e141b;
+  }
+  header h1{margin:0; font-size:1.1rem; letter-spacing:.3px}
+  header .home{all:unset; cursor:pointer; padding:.35rem .6rem; border-radius:.6rem; border:1px solid var(--ring)}
+  header .home:focus-visible{outline:2px solid var(--accent-2)}
 
-        .home-icon {
-            font-size: 20px;
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
+  .wrap{width:min(1100px, 100%); margin-inline:auto; padding:12px 14px 28px; flex:1; display:flex; flex-direction:column; gap:16px}
 
-        .header-content h1 {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            margin: 0;
-            width: auto;
-        }
+  .grid{display:grid; gap:12px; grid-template-columns: repeat(12, 1fr)}
+  .card{
+    background:var(--card); border:1px solid var(--ring); border-radius:16px;
+    padding:14px; box-shadow:0 8px 30px rgba(0,0,0,.25);
+  }
+  .card h3{margin:.2rem 0 .6rem; font-size:.95rem; color:var(--muted); font-weight:600}
 
-        .left-align-container {
-            display: flex;
-            align-items: center;
-        }
+  /* top cards */
+  #weightCard{grid-column: span 4}
+  #lastWorkoutCard{grid-column: span 8; display:grid; grid-template-columns: 1.2fr 1fr; gap:14px}
+  .val{display:flex; align-items:baseline; gap:10px; font-size:2rem; font-weight:700}
+  .trend{font-size:.9rem; color:var(--muted)}
+  .spark{width:100%; height:64px; display:block}
+  .meta{display:flex; gap:16px; flex-wrap:wrap}
+  .badge{background:#0f1720; border:1px solid var(--ring); color:var(--muted); padding:.35rem .6rem; border-radius:999px; font-size:.85rem}
+  .ex-list{display:grid; gap:8px}
+  .ex{display:flex; justify-content:space-between; background:#0f141b; border:1px dashed #213043; border-radius:12px; padding:8px 10px; font-size:.95rem}
+  .ex b{font-weight:700}
+  .cta-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .cta{
+    all:unset; cursor:pointer; background:linear-gradient(90deg, var(--accent), #22c55e);
+    color:#04130a; padding:.75rem 1rem; border-radius:12px; font-weight:700; box-shadow:0 6px 20px rgba(34,197,94,.25)
+  }
+  .cta:active{transform:translateY(1px)}
+  .ghost{all:unset; cursor:pointer; color:var(--muted); padding:.6rem .8rem; border-radius:10px; border:1px solid var(--ring)}
 
-        .header-content h1 {
-            flex-grow: 1;
-            text-align: center;
-        }
+  /* calendar (compact + half width on desktop) */
+  .calendar{grid-column: span 6}
+  .calendar h3{margin:0; font-size:1rem; color:var(--muted)}
+  .legend{display:flex; gap:12px; color:var(--muted); font-size:.85rem}
+  .legend .swatch{width:10px; height:10px; border-radius:4px; display:inline-block; border:1px solid #233446}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:var(--cal-gap); margin-top:8px}
+  .dow{font-size:.8rem; color:var(--muted); text-align:center; padding:4px 0}
+  .day{
+    aspect-ratio:1/1; border:1px solid var(--ring); border-radius:var(--cal-radius);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    font-size:var(--cal-font); position:relative; background:#0f141b;
+  }
+  .day.muted{opacity:.45}
+  .day.partial{ background:#1a1e10 }   /* subtle amber-ish dark */
+  .day.done{ background:#0e1a12 }      /* subtle green-ish dark */
+  .day.today{outline:2px solid var(--accent-2)}
+  .count{font-size:var(--cal-count); color:var(--muted)}
 
-        .information-div {
-            margin: 5px;
-            padding: 5px;
-            flex-grow: 1;
-            overflow: auto;
-        }
-
-        .main {
-            margin: 0px;
-            padding: 0px;
-            align-self: flex-end;
-            width: 100%;
-        }
-
-        .exercise {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 5px;
-            margin: 0 2px 0 2px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            flex: 1;
-            max-width: 45%;
-            font-size: 11px;
-        }
-
-        .exercise-pair {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-
-        .workout-controls {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        button {
-            padding: 10px 30px;
-            font-size: 18px;
-            margin: 0 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        h2 {
-            margin: 0 0 0px 0;
-        }
-
-        p {
-            margin: 0;
-        }
-
-        @media (max-width: 600px) {
-            .exercise-pair {
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .exercise {
-                display: flex;
-                align-items: center;
-                flex-wrap: wrap;
-            }
-
-            .exercise div {
-                margin-bottom: 5px;
-            }
-
-            .exercise p {
-                margin: 0;
-                font-size: 0.9em;
-            }
-
-            .exercise h2+div {
-                font-size: 0.8em;
-            }
-
-            .lastWorkedOut {
-                font-size: 0.8em;
-                padding-left: 20px;
-                white-space: nowrap;
-            }
-        }
-
-        .personalRecord {
-            margin-left: auto;
-            color: gold;
-            font-size: 24px;
-        }
-
-        .personalRecord:before {
-            content: '\2605';
-            display: none;
-        }
-
-        .column-row {
-            display: flex;
-            height: 105px;
-            bottom: auto;
-        }
-
-        .column {
-            display: fle;
-            text-align: center;
-            border-radius: 5px;
-            border: solid black 2px;
-            padding: 5px;
-            margin: 5px;
-            line-height: 2px;
-            
-            flex-grow: 1;
-            overflow: auto;
-        }
-    </style>
+  /* responsive */
+  @media (max-width: 980px){
+    #weightCard{grid-column:span 12}
+    #lastWorkoutCard{grid-column:span 12}
+    .calendar{grid-column:span 12}
+    #lastWorkoutCard{grid-template-columns:1fr}
+  }
+  @media (max-width: 720px){
+    .val{font-size:1.6rem}
+  }
+</style>
 </head>
-
 <body>
-    <header>
-        <div class="left-align-container">
-            <button onclick="window.location.href='../main.html'" class="home-icon"><i class="fa fa-home"></i></button>
-        </div>
-        <h1>Power Up!</h1>
-    </header>
-    <div class="information-div">
-        <canvas id="weightChart" style="width: 100%; height: 300px;"></canvas>
-        <div class="column-row">
-            <div class="column">
-                <h3>Chest</h3>
-                <p id="chestTotal">0 lbs</p>
-            </div>
-            <div class="column">
-                <h3>Back</h3>
-                <p id="backTotal">0 lbs</p>
-            </div>
-            <div class="column">
-                <h3>Triceps</h3>
-                <p id="tricepsTotal">0 lbs</p>
-            </div>
-            <div class="column">
-                <h3>Biceps</h3>
-                <p id="bicepsTotal">0 lbs</p>
-            </div>
-            <div class="column">
-                <h3>Shoulders</h3>
-                <p id="shouldersTotal">0 lbs</p>
-            </div>
-        </div>
-    </div>
-    <main class="main">
-        <div class="exercise-pair">
-            <div id="chest" class="exercise">
-                <h2>Chest</h2>
-                <div class="lastWorkedOut">3 days ago</div>
-                <div class="personalRecord"></div>
-                <div>
-                    <strong>Bench Press</strong>
-                    <p>Weight: <span class="weight">100kg</span> Reps: <span class="reps">10</span></p>
-                </div>
-            </div>
-            <div id="triceps" class="exercise">
-                <h2>Triceps</h2>
-                <div class="lastWorkedOut">3 days ago</div>
-                <div class="personalRecord"></div>
-                <div>
-                    <strong>Skull crushers</strong>
-                    <p>Weight: <span class="weight">45 lbs</span> Reps: <span class="reps">10</span></p>
-                </div>
-            </div>
-        </div>
-        <div class="exercise-pair">
-            <div id="back" class="exercise">
-                <h2>Back</h2>
-                <div class="lastWorkedOut">3 days ago</div>
-                <div class="personalRecord"></div>
-                <div>
-                    <strong>Seated Cable Rows</strong>
-                    <p>Weight: <span class="weight">20 lbs</span> Reps: <span class="reps">12</span></p>
-                </div>
-            </div>
-            <div id="biceps" class="exercise">
-                <h2>Biceps</h2>
-                <div class="lastWorkedOut">3 days ago</div>
-                <div class="personalRecord"></div>
-                <div>
-                    <strong>Curl</strong>
-                    <p>Weight: <span class="weight">20kg</span> Reps: <span class="reps">12</span></p>
-                </div>
-            </div>
-        </div>
-        <div class="exercise-pair">
-            <div id="Shoulders" class="exercise">
-                <h2>Shoulders</h2>
-                <div class="lastWorkedOut">3 days ago</div>
-                <div class="personalRecord"></div>
-                <div>
-                    <strong>Pull Ups</strong>
-                    <p>Weight: <span class="weight">Bodyweight</span> Reps: <span class="reps">12</span></p>
-                </div>
-            </div>
-            <div id="Traps" class="exercise">
-                <h2>Traps</h2>
-                <div class="lastWorkedOut">3 days ago</div>
-                <div class="personalRecord"></div>
-                <div>
-                    <strong>Shrugs</strong>
-                    <p>Weight: <span class="weight">20kg</span> Reps: <span class="reps">12</span></p>
-                </div>
-            </div>
-        </div>
-        <div class="exercise-pair">
-            <div id="Legs" class="exercise">
-                <h2>Legs</h2>
-                <div class="lastWorkedOut">3 days ago</div>
-                <div class="personalRecord"></div>
-                <div>
-                    <strong>Squats</strong>
-                    <p>Weight: <span class="weight">200 lbs</span> Reps: <span class="reps">12</span></p>
-                </div>
-            </div>
-            <div id="Calves" class="exercise">
-                <h2>Calves</h2>
-                <div class="lastWorkedOut">3 days ago</div>
-                <div class="personalRecord"></div>
-                <div>
-                    <strong>Calf Raises</strong>
-                    <p>Weight: <span class="weight">20kg</span> Reps: <span class="reps">12</span></p>
-                </div>
-            </div>
-        </div>
-        <div class="workout-controls">
-            <button id="workout-btn">Workout</button>
-        </div>
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('workout-btn').addEventListener('click', function () {
-                window.location.href = 'workout.html';
-            });
+  <header>
+    <button class="home" onclick="location.href='../main.html'">⟵ Home</button>
+    <h1>Power Up! — Summary</h1>
+    <div style="width:60px"></div>
+  </header>
 
-            // Example demo data
-            const demoData = [
-                { date: '2023-05-01', totalWeight: 1500 },
-                { date: '2023-05-10', totalWeight: 1600 },
-                { date: '2023-05-20', totalWeight: 1700 },
-                { date: '2023-06-01', totalWeight: 1800 },
-                { date: '2023-06-10', totalWeight: 1900 },
-                { date: '2023-06-20', totalWeight: 2000 },
-                { date: '2023-07-01', totalWeight: 2100 },
-                { date: '2023-07-10', totalWeight: 2200 },
-                { date: '2023-07-20', totalWeight: 2300 }
-            ];
+  <div class="wrap">
+    <section class="grid">
+      <article class="card" id="weightCard">
+        <h3>Latest Weight</h3>
+        <div class="val"><span id="latestWeight">—</span><span class="trend" id="weightTrend"></span></div>
+        <canvas class="spark" id="weightSpark"></canvas>
+      </article>
 
-            const ctx = document.getElementById('weightChart').getContext('2d');
-            const chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: demoData.map(data => data.date),
-                    datasets: [{
-                        label: 'Total Weight Lifted',
-                        data: demoData.map(data => data.totalWeight),
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 2,
-                        fill: false
-                    }]
-                },
-                options: {
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'day'
-                            },
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Total Weight Lifted (lbs)'
-                            },
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
+      <article class="card" id="lastWorkoutCard">
+        <div>
+          <h3 id="workoutPanelTitle">Previous Workout</h3>
+          <div class="meta">
+            <span class="badge" id="lastDate">—</span>
+            <span class="badge">Total Volume: <b id="lastVolume">—</b></span>
+            <span class="badge">Exercises: <b id="lastMoves">—</b></span>
+            <span class="badge">Sets: <b id="lastSets">—</b></span>
+            <span class="badge" id="setsLeftBadge" style="display:none;">Sets Left: <b id="setsLeft">—</b></span>
+          </div>
+          <div class="ex-list" id="exList"></div>
+        </div>
+        <div class="cta-row">
+          <button class="cta" id="startToday">Start Today’s Workout</button>
+          <button class="ghost" id="viewAll">View All Workouts</button>
+          <button class="ghost" id="logWeight">Log Weight</button>
+        </div>
+      </article>
 
-            // Set total pounds lifted for each body group using demo data
-            const totalWeights = {
-                chest: 200,
-                back: 250,
-                triceps: 150,
-                biceps: 180,
-                shoulders: 220
-            };
+      <!-- Calendar: half width on desktop (approx 50%), full width on mobile -->
+      <section class="card calendar" id="calendar">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+          <h3 id="calTitle">—</h3>
+          <div class="legend">
+            <span><i class="swatch" style="background:#0f141b"></i> None</span>
+            <span><i class="swatch" style="background:#1a1e10"></i> Light</span>
+            <span><i class="swatch" style="background:#0e1a12"></i> Completed</span>
+          </div>
+        </div>
+        <div class="cal-grid" id="calDOW"></div>
+        <div class="cal-grid" id="calGrid"></div>
+      </section>
+    </section>
+  </div>
 
-            document.getElementById('chestTotal').textContent = totalWeights.chest + ' lbs';
-            document.getElementById('backTotal').textContent = totalWeights.back + ' lbs';
-            document.getElementById('tricepsTotal').textContent = totalWeights.triceps + ' lbs';
-            document.getElementById('bicepsTotal').textContent = totalWeights.biceps + ' lbs';
-            document.getElementById('shouldersTotal').textContent = totalWeights.shoulders + ' lbs';
-        });
-    </script>
+<script>
+/** =======================
+ * Demo data (replace/load)
+ * Each workout: { date:'YYYY-MM-DD', bodyWeight: 185.4,
+ *   exercises:[{name, sets:[{reps, weight, completed?:boolean}]}],
+ *   inProgress?: boolean
+ * }
+ * ======================= */
+const workouts = [
+  { date:'2025-08-02', bodyWeight:185.8, exercises:[
+    {name:'Bench Press', sets:[{reps:8,weight:145,completed:true},{reps:8,weight:145,completed:true},{reps:6,weight:155,completed:true}]},
+    {name:'Incline DB Press', sets:[{reps:10,weight:45,completed:true},{reps:10,weight:45,completed:true}]},
+  ]},
+  { date:'2025-08-05', bodyWeight:185.1, exercises:[
+    {name:'Squat', sets:[{reps:8,weight:185,completed:true},{reps:6,weight:205,completed:true},{reps:5,weight:225,completed:true}]},
+    {name:'Leg Press', sets:[{reps:12,weight:270,completed:true},{reps:12,weight:270,completed:true}]},
+  ]},
+  { date:'2025-08-09', bodyWeight:184.7, exercises:[
+    {name:'Seated Cable Row', sets:[{reps:10,weight:120,completed:true},{reps:10,weight:120,completed:true},{reps:8,weight:130,completed:true}]},
+    {name:'Lat Pulldown', sets:[{reps:10,weight:110,completed:true},{reps:10,weight:110,completed:true}]},
+  ]},
+  { date:'2025-08-12', bodyWeight:184.2, exercises:[
+    {name:'OHP', sets:[{reps:6,weight:95,completed:true},{reps:6,weight:95,completed:true},{reps:5,weight:100,completed:true}]},
+    {name:'Lateral Raise', sets:[{reps:12,weight:15,completed:true},{reps:12,weight:15,completed:true}]},
+  ]},
+  { date:'2025-08-16', bodyWeight:183.9, exercises:[
+    {name:'Bench Press', sets:[{reps:8,weight:150,completed:true},{reps:8,weight:150,completed:true},{reps:6,weight:160,completed:true}]},
+    {name:'Triceps Pushdown', sets:[{reps:12,weight:60,completed:true},{reps:12,weight:60,completed:true}]},
+  ]},
+  // Example "today" already started
+  // Adjust/remove this block as needed
+  (()=>{ const t = new Date(); const iso = t.toISOString().slice(0,10);
+    return { date: iso, bodyWeight:183.5, inProgress:true, exercises:[
+      {name:'Deadlift', sets:[{reps:5,weight:225,completed:true},{reps:5,weight:235,completed:false},{reps:5,weight:245,completed:false}]},
+      {name:'Row', sets:[{reps:10,weight:125,completed:false},{reps:10,weight:125,completed:false}]},
+    ]};
+  })()
+];
+
+const today = new Date();
+const todayISO = today.toISOString().slice(0,10);
+const fmt = (d)=>new Date(d+'T00:00:00');
+
+/* ---------- helpers ---------- */
+const byDateAsc = (a,b)=> fmt(a.date) - fmt(b.date);
+const shortDate = (d)=> new Date(d).toLocaleDateString(undefined, {month:'short', day:'numeric', weekday:'short'});
+const totalVolume = (workout)=> workout.exercises.reduce((sum, ex)=> sum + ex.sets.reduce((s, st)=> s + (st.weight||0)*(st.reps||0), 0), 0);
+const totalSets = (workout)=> workout.exercises.reduce((s,ex)=> s + ex.sets.length, 0);
+const completedSets = (workout)=> workout.exercises.reduce((s,ex)=> s + ex.sets.filter(st=>st.completed).length, 0);
+
+/* ---------- tiny sparkline ---------- */
+function drawSpark(id, points){
+  const c = document.getElementById(id);
+  const w = c.clientWidth, h=c.clientHeight;
+  c.width = Math.max(300,w); c.height = Math.max(64,h);
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  if(!points || points.length<2) return;
+
+  const xs = points.map(p=>p.x.getTime());
+  const ys = points.map(p=>p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const pad = 8;
+  const xScale = (t)=> pad + ((t-minX)/(maxX-minX||1))*(c.width-2*pad);
+  const yScale = (v)=> c.height - pad - ((v-minY)/(maxY-minY||1))*(c.height-2*pad);
+
+  ctx.strokeStyle = '#233446'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
+  ctx.beginPath(); ctx.moveTo(pad, yScale(minY)); ctx.lineTo(c.width-pad, yScale(minY)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-2') || '#2dd4bf';
+  ctx.lineWidth = 2; ctx.beginPath();
+  points.forEach((p,i)=>{ const x=xScale(p.x.getTime()), y=yScale(p.y); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+  ctx.stroke();
+
+  const lp = points[points.length-1]; const lx=xScale(lp.x.getTime()), ly=yScale(lp.y);
+  ctx.fillStyle = '#e8eef6'; ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2); ctx.fill();
+}
+
+/* ---------- weight card ---------- */
+function renderWeight(){
+  if(workouts.length===0){ return; }
+  const sorted = [...workouts].sort(byDateAsc);
+  const lastWeights = sorted.map(w=>({x:fmt(w.date), y:w.bodyWeight})).filter(p=>!isNaN(p.y));
+  const latest = lastWeights.at(-1)?.y;
+  const prev   = lastWeights.at(-2)?.y;
+  document.getElementById('latestWeight').textContent = latest ? `${latest.toFixed(1)} lb` : '—';
+  const tEl = document.getElementById('weightTrend');
+  const trend = (latest && prev) ? (latest - prev) : 0;
+  if(trend){
+    tEl.textContent = `${trend>0?'+':''}${trend.toFixed(1)} vs last`;
+    tEl.style.color = trend<0 ? 'var(--good)' : 'var(--bad)';
+  } else tEl.textContent = '';
+  drawSpark('weightSpark', lastWeights);
+}
+
+/* ---------- last/today workout panel ---------- */
+function renderWorkoutPanel(){
+  const list = [...workouts].sort(byDateAsc);
+  const todayW = list.find(w=>w.date===todayISO);
+  const inProgress = isTodayInProgress(todayW);
+
+  // CTA text + persist inProgress if user started earlier
+  const startBtn = document.getElementById('startToday');
+  startBtn.textContent = inProgress ? 'Continue Workout' : 'Start Today’s Workout';
+
+  // Panel content: today if in progress, else previous
+  const target = inProgress ? todayW : list.filter(w=>w.exercises?.length).slice(0,-1).at(-1) || list.at(-1);
+  const title = document.getElementById('workoutPanelTitle');
+  title.textContent = inProgress ? 'Today’s Workout' : 'Previous Workout';
+
+  document.getElementById('lastDate').textContent = shortDate(target.date);
+  document.getElementById('lastVolume').textContent = totalVolume(target).toLocaleString()+' lb';
+  document.getElementById('lastMoves').textContent = target.exercises.length;
+  document.getElementById('lastSets').textContent = totalSets(target);
+
+  // Sets left only for today's
+  const setsLeftWrap = document.getElementById('setsLeftBadge');
+  if(inProgress){
+    const left = totalSets(target) - completedSets(target);
+    setsLeftWrap.style.display = 'inline-flex';
+    document.getElementById('setsLeft').textContent = left;
+  } else {
+    setsLeftWrap.style.display = 'none';
+  }
+
+  // Exercise rows
+  const exList = document.getElementById('exList');
+  exList.innerHTML = '';
+  target.exercises.forEach(ex=>{
+    const setsTxt = ex.sets.map((s,i)=>{
+      const done = s.completed ? '✔' : '○';
+      return `${done} ${s.reps}×${s.weight||0}`;
+    }).join(', ');
+    const row = document.createElement('div');
+    row.className='ex';
+    row.innerHTML = `<b>${ex.name}</b><span>${setsTxt}</span>`;
+    exList.appendChild(row);
+  });
+}
+
+/* ---------- calendar (current month) ---------- */
+function renderCalendar(){
+  const calTitle = document.getElementById('calTitle');
+  const calGrid  = document.getElementById('calGrid');
+  const calDOW   = document.getElementById('calDOW');
+  calDOW.innerHTML = '';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{
+    const e = document.createElement('div');
+    e.className='dow'; e.textContent = d; calDOW.appendChild(e);
+  });
+
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const monthStart = new Date(year, month, 1);
+  const monthEnd   = new Date(year, month+1, 0);
+  calTitle.textContent = monthStart.toLocaleDateString(undefined, {month:'long', year:'numeric'});
+
+  // Map day -> volume
+  const byDay = new Map();
+  workouts.forEach(w=>{
+    const d = fmt(w.date);
+    if(d.getFullYear()===year && d.getMonth()===month){
+      const k = d.getDate();
+      byDay.set(k, (byDay.get(k)||0) + totalVolume(w));
+    }
+  });
+
+  calGrid.innerHTML = '';
+  const leadingBlanks = monthStart.getDay();
+  for(let i=0;i<leadingBlanks;i++){
+    const empty = document.createElement('div');
+    empty.className='day muted'; calGrid.appendChild(empty);
+  }
+  for(let day=1; day<=monthEnd.getDate(); day++){
+    const cell = document.createElement('div');
+    const isToday = (day===today.getDate() && month===today.getMonth() && year===today.getFullYear());
+    const vol = byDay.get(day)||0;
+    let state = '';
+    if(vol>0) state = vol>5000 ? 'done' : 'partial'; // tune threshold
+    cell.className = `day ${state} ${isToday?'today':''}`;
+    const num = document.createElement('div'); num.textContent = day;
+    const ct  = document.createElement('div'); ct.className='count'; ct.textContent = vol? Math.round(vol)+' lb':'';
+    cell.appendChild(num); if(vol) cell.appendChild(ct);
+    calGrid.appendChild(cell);
+  }
+}
+
+/* ---------- in-progress detection ---------- */
+function isTodayInProgress(todayW){
+  if(!todayW) {
+    // also check persisted flag
+    return localStorage.getItem('workoutInProgress') === todayISO;
+  }
+  if(todayW.inProgress) return true;
+  // Consider "started" if any set exists and not all are completed
+  const hasSets = totalSets(todayW) > 0;
+  const allDone = completedSets(todayW) === totalSets(todayW);
+  return hasSets && !allDone;
+}
+
+/* ---------- Buttons ---------- */
+document.getElementById('startToday').addEventListener('click', ()=>{
+  // Toggle between starting and continuing
+  localStorage.setItem('workoutInProgress', todayISO);
+  window.location.href = 'workout.html?start=today';
+});
+document.getElementById('viewAll').addEventListener('click', ()=>{
+  window.location.href = 'workouts.html';
+});
+document.getElementById('logWeight').addEventListener('click', ()=>{
+  const w = prompt('Enter today’s weight (lb):');
+  if(!w) return;
+  const dateISO = todayISO;
+  const existing = workouts.find(x=>x.date===dateISO);
+  if(existing){ existing.bodyWeight = parseFloat(w); }
+  else { workouts.push({date:dateISO, bodyWeight:parseFloat(w), exercises:[]}); }
+  renderWeight(); renderCalendar();
+});
+
+/* ---------- init ---------- */
+function renderAll(){
+  renderWeight();
+  renderWorkoutPanel();
+  renderCalendar();
+}
+renderAll();
+window.addEventListener('resize', ()=>drawSpark('weightSpark',
+  [...workouts].sort(byDateAsc).map(w=>({x:fmt(w.date),y:w.bodyWeight}))
+));
+</script>
 </body>
-
 </html>
