@@ -88,34 +88,6 @@
   .cal-cell.workout{background:#0e1a12}
   .cal-nav{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px}
   .cal-nav button{all:unset; cursor:pointer; border:1px solid var(--ring); padding:.3rem .6rem; border-radius:8px}
-  /* Make the Previous/Today's Workout card wrap naturally */
-#lastWorkoutCard { overflow-x: hidden; }          /* no horizontal scroll */
-
-.ex-list { display: grid; gap: 6px; }             /* your list layout */
-
-.ex{
-  display: flex;
-  align-items: flex-start;
-  gap: 6px 10px;
-  flex-wrap: wrap;                                /* <-- allow wrapping */
-  min-width: 0;                                   /* let children shrink */
-}
-
-.ex b{
-  flex: 0 0 auto;                                 /* label stays compact */
-  margin-right: 4px;
-}
-
-.ex span{
-  flex: 1 1 100%;                                 /* take the next line */
-  min-width: 0;
-  white-space: normal;                            /* wrap onto new lines */
-  word-break: break-word;                         /* break long names if needed */
-}
-
-/* Optional: badges above the list should wrap too */
-.meta{ display: flex; flex-wrap: wrap; gap: 8px; }
-
 </style>
 </head>
 <body>

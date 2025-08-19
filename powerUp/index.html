@@ -101,6 +101,48 @@
   .group-chip h4 { margin:0; font-size:.95rem; color:#e8eef6 }
   .group-chip .names { color:#9fb0c7; font-size:.9rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
   .group-chip .count { font-size:.8rem; color:#9fb0c7; border:1px solid #213043; border-radius:999px; padding:2px 8px; background:#0c1117 }
+
+  /* Grouped exercise list (no reps) */
+.group-chip{
+  display:flex;
+  align-items:flex-start;      /* don't force equal heights */
+  flex-wrap:wrap;              /* allow wrapping */
+  gap:8px 10px;
+  padding:8px 10px;
+  border:1px dashed #223143;
+  border-radius:10px;
+  background:#0f141b;
+  margin-bottom:6px;
+}
+
+.group-chip h4{
+  margin:0;
+  font-size:.95rem;
+  color:#e8eef6;
+  flex:0 0 auto;               /* keep the label compact */
+}
+
+.group-chip .names{
+  flex:1 1 100%;               /* take full row below on wrap */
+  color:#9fb0c7;
+  font-size:.9rem;
+  white-space:normal;          /* allow multi-line */
+  overflow:visible;            /* no clipping */
+  word-break:break-word;       /* break long words if needed */
+}
+
+.group-chip .count{
+  margin-left:auto;            /* stay at the end of the first row */
+  font-size:.8rem;
+  color:#9fb0c7;
+  border:1px solid #213043;
+  border-radius:999px;
+  padding:2px 8px;
+  background:#0c1117;
+}
+
+#lastWorkoutCard { overflow-x: hidden; }
+
 </style>
 </head>
 <body>
