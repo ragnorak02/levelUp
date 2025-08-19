@@ -54,6 +54,7 @@
   .btn-ghost{all:unset; cursor:pointer; padding:.6rem .9rem; border:1px solid var(--ring); border-radius:10px; color:var(--muted)}
   .btn-danger{all:unset; cursor:pointer; padding:.45rem .6rem; border:1px solid #3a2227; border-radius:8px; color:#fecaca; background:#2a0f12}
   .btn-small{padding:.35rem .55rem; font-size:.85rem}
+  .btn-today{all:unset; cursor:pointer; padding:.6rem .9rem; border:1px solid #d97706; border-radius:10px; color:#fbbf24; background:linear-gradient(90deg,#f59e0b,#d97706); font-weight:700}
 
   .group{background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:10px; margin-top:6px}
   .group h3{margin:.1rem 0 .4rem; font-size:1rem; color:var(--muted)}
@@ -66,15 +67,18 @@
   .ex-actions-bottom{display:flex; gap:8px; margin-top:4px}
 
   /* darker edit fields + compact width (~4 digits) */
-  .set-row{display:grid; grid-template-columns: auto auto 1fr auto; gap:8px; align-items:center}
+  .set-row{display:grid; grid-template-columns: auto auto auto 1fr auto; gap:8px; align-items:center}
+  .weight-input-group{display:flex; align-items:center; gap:4px}
   .num-input{
     width:6ch; max-width:6ch;
     padding:.55rem .55rem; border:1px solid #15212c; border-radius:8px;
     background:#091017; color:var(--ink); font-variant-numeric:tabular-nums;
   }
   .num-input:focus{outline:2px solid #213240}
+  .lbs-label{font-size:.85rem; color:var(--muted); white-space:nowrap}
   .flags{display:flex; align-items:center; gap:12px; color:var(--muted); font-size:.9rem}
   .tools{display:flex; gap:6px}
+  .finished-display{color:var(--muted); font-size:.9rem; text-align:right}
 
   .spacer{height:70px}
 
@@ -99,8 +103,8 @@
 <body>
 <header>
   <div class="bar">
-    <button class="home" onclick="location.href='summary.html'">⟵ Home</button>
-    <h1>Power Up! — Today’s Workout</h1>
+    <button class="home" onclick="location.href='index.html'">⟵ Home</button>
+    <h1>Power Up! — Today's Workout</h1>
     <div class="bar">
       <button class="home" id="openCalendar">📅</button>
     </div>
@@ -114,6 +118,7 @@
     <div class="actions">
       <button class="btn" id="addExercise">Add Exercise</button>
       <button class="btn-ghost" id="saveBtn">Save</button>
+      <button class="btn-today" id="todayBtn">Today</button>
       <button class="btn-ghost" id="clearBtn">Clear Day</button>
     </div>
   </div>
@@ -123,7 +128,7 @@
 
   <!-- Power Card -->
   <section class="card" id="powerCard">
-    <h3 style="margin:.1rem 0 .25rem; color:var(--muted)">Today’s Volume</h3>
+    <h3 style="margin:.1rem 0 .25rem; color:var(--muted)">Today's Volume</h3>
     <div class="top">
       <div id="powerVal">0 lb</div>
       <div id="powerTrend" class="muted">—</div>
@@ -323,49 +328,69 @@ function renderExercise(ex){
     </div>
     <div class="sets"></div>
     <div class="ex-actions-bottom">
-      <button class="btn-ghost btn-small" data-act="addSet">+ Set</button>
+      <button class="btn-ghost btn-small" data-act="addSet" ${ex.finished ? 'style="display:none"' : ''}>+ Set</button>
       <button class="btn" style="padding:.6rem 1.2rem" data-act="toggleFinished">${ex.finished ? 'Finished ✓' : 'Finish'}</button>
     </div>
   `;
   const setsWrap = node.querySelector('.sets');
   ex.sets.forEach((s, i)=> setsWrap.appendChild(renderSet(ex.id, s, i, !!ex.finished)));
 
-  // lock if finished
-  if(ex.finished) lockExerciseNode(node, true);
   return node;
 }
 
-/* Set row (same as before) */
+/* Set row with enhanced finished state */
 function renderSet(exId, s, idx, locked=false){
   const row = document.createElement('div');
   row.className = 'set-row';
   row.dataset.exId = exId;
   row.dataset.idx = idx;
-  row.innerHTML = `
-    <input class="num-input" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" data-field="weight" ${locked?'disabled':''}/>
-    <input class="num-input" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" data-field="reps" ${locked?'disabled':''}/>
-    <div class="flags">
-      <label><input type="checkbox" ${s.superset?'checked':''} data-field="superset" ${locked?'disabled':''}/> Superset</label>
-      <label><input type="checkbox" ${s.done?'checked':''} data-field="done" ${locked?'disabled':''}/> Done</label>
-    </div>
-    <div class="tools">
-      <button class="btn-ghost btn-small" data-act="incW" ${locked?'disabled':''}>+5</button>
-      <button class="btn-ghost btn-small" data-act="decW" ${locked?'disabled':''}>-5</button>
-      <button class="btn-danger btn-small" data-act="delSet" ${locked?'disabled':''}>✕</button>
-    </div>
-  `;
+  
+  const weight = Number(s.weight) || 0;
+  const reps = Number(s.reps) || 0;
+  const totalWeight = weight * reps;
+  
+  if (locked) {
+    // Finished state - show weight × reps calculation
+    row.innerHTML = `
+      <div class="weight-input-group">
+        <input class="num-input" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" disabled/>
+        <span class="lbs-label">lbs</span>
+      </div>
+      <input class="num-input" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" disabled/>
+      <div class="finished-display">${Math.round(totalWeight)} lbs</div>
+      <div class="flags" style="visibility:hidden;">
+        <label><input type="checkbox" ${s.superset?'checked':''} disabled/> Superset</label>
+        <label><input type="checkbox" ${s.done?'checked':''} disabled/> Done</label>
+      </div>
+      <div class="tools" style="visibility:hidden;"></div>
+    `;
+  } else {
+    // Active state - show all interactive elements
+    row.innerHTML = `
+      <div class="weight-input-group">
+        <input class="num-input" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" data-field="weight"/>
+        <span class="lbs-label">lbs</span>
+      </div>
+      <input class="num-input" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" data-field="reps"/>
+      <div></div>
+      <div class="flags">
+        <label><input type="checkbox" ${s.superset?'checked':''} data-field="superset"/> Superset</label>
+        <label><input type="checkbox" ${s.done?'checked':''} data-field="done"/> Done</label>
+      </div>
+      <div class="tools">
+        <button class="btn-ghost btn-small" data-act="incW">+5</button>
+        <button class="btn-ghost btn-small" data-act="decW">-5</button>
+        <button class="btn-danger btn-small" data-act="delSet">✕</button>
+      </div>
+    `;
+  }
+  
   return row;
 }
 
 /* ---------- Helpers & events ---------- */
 function groupBy(arr, key){ return arr.reduce((m,o)=>((m[o[key]]??=[]).push(o),m),{}); }
 function uid(){ return Math.random().toString(36).slice(2,9); }
-
-function lockExerciseNode(node, locked){
-  node.classList.toggle('finished', locked);
-  node.querySelectorAll('input,button[data-act="incW"],button[data-act="decW"],button[data-act="delSet"],button[data-act="addSet"]')
-      .forEach(el=>{ if(el.dataset.act==='toggleFinished') return; el.disabled = locked; });
-}
 
 /* Popups */
 function openPopup(id){ $(id).style.display='flex'; }
@@ -426,14 +451,7 @@ $('#log').addEventListener('click', (e)=>{
     const node = e.target.closest('.ex'); const exId = node.dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
     ex.finished = !ex.finished;
-    saveDay(day);
-    lockExerciseNode(node, ex.finished);
-    // update button text
-    e.target.textContent = ex.finished ? 'Finished ✓' : 'Finish';
-    // refresh bars/cards
-    const {sets, vol, exCount} = totalsFiltered(day);
-    $('#tSets').textContent = sets; $('#tVol').textContent = Math.round(vol)+' lb'; $('#tEx').textContent = exCount;
-    renderPowerCard(day);
+    saveDay(day); render();
     return;
   }
   if(act==='delSet' || act==='incW' || act==='decW'){
@@ -500,7 +518,7 @@ $('#log').addEventListener('change', (e)=>{
   }
 });
 
-/* Save / Clear */
+/* Save / Clear / Today */
 $('#saveBtn').addEventListener('click', ()=>{
   const day = loadDay(current); saveDay(day);
   $('#saveBtn').textContent = 'Saved ✔'; setTimeout(()=> $('#saveBtn').textContent='Save', 1100);
@@ -508,6 +526,9 @@ $('#saveBtn').addEventListener('click', ()=>{
 $('#clearBtn').addEventListener('click', ()=>{
   if(!confirm('Clear all exercises for this day?')) return;
   saveDay(blankDay(current)); render();
+});
+$('#todayBtn').addEventListener('click', ()=>{
+  current = new Date(); render();
 });
 
 /* Date nav & calendar */

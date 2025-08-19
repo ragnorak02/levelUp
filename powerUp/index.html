@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Power Up! — Summary</title>
+<title>Power Up!</title>
 <style>
   :root{
     --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7; --accent:#4CAF50; --accent-2:#2dd4bf;
@@ -100,7 +100,7 @@
 <body>
   <header>
     <button class="home" onclick="location.href='../main.html'">⟵ Home</button>
-    <h1>Power Up! — Summary</h1>
+    <h1>Power Up!</h1>
     <div style="width:60px"></div>
   </header>
 
@@ -126,7 +126,7 @@
         </div>
         <div class="cta-row">
           <button class="cta" id="startToday">Start Today’s Workout</button>
-          <button class="ghost" id="viewAll">View All Workouts</button>
+          <button class="ghost" id="analytics">View Analytics</button>
           <button class="ghost" id="logWeight">Log Weight</button>
         </div>
       </article>
@@ -357,8 +357,8 @@ document.getElementById('startToday').addEventListener('click', ()=>{
   localStorage.setItem('workoutInProgress', todayISO);
   window.location.href = 'workout.html?start=today';
 });
-document.getElementById('viewAll').addEventListener('click', ()=>{
-  window.location.href = 'workouts.html';
+document.getElementById('analytics').addEventListener('click', ()=>{
+  window.location.href = 'analytics.html';
 });
 document.getElementById('logWeight').addEventListener('click', ()=>{
   const w = prompt('Enter today’s weight (lb):');

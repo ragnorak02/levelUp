@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Power Up! — Analytics</title>
+<style>
+  :root{
+    --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7; --accent:#4CAF50; --accent-2:#2dd4bf;
+    --ring:#2a3543; --warn:#f59e0b; --good:#22c55e; --bad:#ef4444;
+    --gradient-primary: linear-gradient(135deg, #4CAF50, #2dd4bf);
+    --gradient-warning: linear-gradient(135deg, #f59e0b, #fb923c);
+    --gradient-danger: linear-gradient(135deg, #ef4444, #f87171);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+    background:linear-gradient(180deg,#0a0e13 0%, #0d131a 100%); color:var(--ink);
+    display:flex; flex-direction:column; overflow-x:hidden;
+  }
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.6rem .9rem; border-bottom:1px solid var(--ring); background:#0e141b;
+  }
+  header h1{margin:0; font-size:1.05rem; letter-spacing:.2px}
+  header .home{all:unset; cursor:pointer; padding:.35rem .6rem; border-radius:.6rem; border:1px solid var(--ring)}
+  header .nav-tabs{display:flex; gap:2px; background:#0a1016; padding:4px; border-radius:10px; border:1px solid var(--ring)}
+  header .tab{all:unset; cursor:pointer; padding:.4rem .8rem; border-radius:8px; font-size:.9rem; color:var(--muted); transition:all .2s}
+  header .tab.active{background:var(--gradient-primary); color:#04130a; font-weight:600}
+
+  .wrap{width:min(1200px, 100%); margin-inline:auto; padding:12px; flex:1; display:flex; flex-direction:column; gap:12px}
+
+  .grid{display:grid; gap:12px; grid-template-columns: repeat(12, 1fr)}
+  .card{
+    background:var(--card); border:1px solid var(--ring); border-radius:14px;
+    padding:14px; box-shadow:0 8px 30px rgba(0,0,0,.25);
+  }
+  .card h3{margin:.1rem 0 .6rem; font-size:1rem; color:var(--muted); font-weight:600; display:flex; align-items:center; gap:8px}
+  .card-icon{font-size:1.1rem}
+
+  /* Stats overview */
+  .stat-card{grid-column: span 3; text-align:center; position:relative; overflow:hidden}
+  .stat-card::before{content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gradient-primary)}
+  .stat-value{font-size:2rem; font-weight:800; margin:.5rem 0 .2rem; background:var(--gradient-primary); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text}
+  .stat-label{font-size:.85rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+  .stat-trend{font-size:.8rem; margin-top:.3rem; display:flex; align-items:center; justify-content:center; gap:4px}
+  .trend-up{color:var(--good)} .trend-down{color:var(--bad)} .trend-neutral{color:var(--muted)}
+
+  /* Charts */
+  .chart-card{grid-column: span 8; position:relative}
+  .chart-controls{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap}
+  .btn{all:unset; cursor:pointer; padding:.5rem .8rem; border-radius:8px; font-size:.85rem; font-weight:600; transition:all .2s}
+  .btn-primary{background:var(--gradient-primary); color:#04130a}
+  .btn-ghost{border:1px solid var(--ring); color:var(--muted)}
+  .btn-ghost:hover{background:rgba(255,255,255,.05)}
+  .btn-ghost.active{background:var(--accent-2); color:#04130a}
+  .chart-container{height:300px; position:relative}
+  .chart{width:100%; height:100%}
+
+  /* Personal Records */
+  .pr-card{grid-column: span 4}
+  .pr-list{display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto}
+  .pr-item{background:#0f141b; border:1px solid var(--ring); border-radius:10px; padding:10px; display:flex; justify-content:space-between; align-items:center}
+  .pr-exercise{font-weight:600; color:var(--ink)}
+  .pr-weight{color:var(--accent-2); font-weight:700}
+  .pr-date{font-size:.8rem; color:var(--muted)}
+
+  /* Exercise progression */
+  .progression-card{grid-column: span 12}
+  .exercise-selector{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap}
+  .exercise-chip{all:unset; cursor:pointer; padding:.4rem .7rem; border-radius:20px; border:1px solid var(--ring); color:var(--muted); font-size:.85rem; transition:all .2s}
+  .exercise-chip:hover{background:rgba(255,255,255,.05)}
+  .exercise-chip.active{background:var(--accent); color:#04130a; border-color:var(--accent)}
+
+  /* Weekly overview */
+  .weekly-card{grid-column: span 6}
+  .week-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:8px}
+  .week-day{aspect-ratio:1; border:1px solid var(--ring); border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:.8rem; position:relative}
+  .week-day.today{border-color:var(--accent-2); box-shadow:0 0 0 1px var(--accent-2)}
+  .week-day.workout{background:#0e1a12}
+  .week-day.partial{background:#1a1e10}
+  .week-day-name{color:var(--muted); font-size:.7rem}
+  .week-day-vol{color:var(--ink); font-weight:600; font-size:.75rem}
+
+  /* Responsive */
+  @media (max-width: 1024px){
+    .stat-card{grid-column: span 6}
+    .chart-card{grid-column: span 12}
+    .pr-card{grid-column: span 12}
+    .weekly-card{grid-column: span 12}
+  }
+  @media (max-width: 640px){
+    .stat-card{grid-column: span 12}
+    .wrap{padding:8px; gap:8px}
+    .card{padding:10px}
+    .stat-value{font-size:1.6rem}
+    .chart-container{height:250px}
+    header .nav-tabs{display:none}
+  }
+</style>
+</head>
+<body>
+  <header>
+    <button class="home" onclick="location.href='index.html'">⟵ Back</button>
+    <h1>Power Up! — Analytics</h1>
+    <div class="nav-tabs">
+      <button class="tab active" data-view="overview">Overview</button>
+      <button class="tab" data-view="trends">Trends</button>
+      <button class="tab" data-view="records">Records</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- Overview Tab -->
+    <div id="overviewTab" class="tab-content">
+      <section class="grid">
+        <!-- Stats Cards -->
+        <article class="card stat-card">
+          <div class="card-icon">💪</div>
+          <div class="stat-value" id="totalVolume">0</div>
+          <div class="stat-label">Total Volume (lb)</div>
+          <div class="stat-trend trend-up" id="volumeTrend">↗ +12% this week</div>
+        </article>
+
+        <article class="card stat-card">
+          <div class="card-icon">🏋️</div>
+          <div class="stat-value" id="totalWorkouts">0</div>
+          <div class="stat-label">Total Workouts</div>
+          <div class="stat-trend trend-neutral" id="workoutTrend">→ Same as last week</div>
+        </article>
+
+        <article class="card stat-card">
+          <div class="card-icon">🎯</div>
+          <div class="stat-value" id="totalSets">0</div>
+          <div class="stat-label">Total Sets</div>
+          <div class="stat-trend trend-up" id="setsTrend">↗ +8% this week</div>
+        </article>
+
+        <article class="card stat-card">
+          <div class="card-icon">⚡</div>
+          <div class="stat-value" id="avgVolume">0</div>
+          <div class="stat-label">Avg Volume</div>
+          <div class="stat-trend trend-up" id="avgTrend">↗ +156 lb/workout</div>
+        </article>
+
+        <!-- Volume Trends Chart -->
+        <article class="card chart-card">
+          <h3><span class="card-icon">📈</span>Volume Trends</h3>
+          <div class="chart-controls">
+            <button class="btn btn-ghost active" data-period="7d">7 Days</button>
+            <button class="btn btn-ghost" data-period="30d">30 Days</button>
+            <button class="btn btn-ghost" data-period="90d">90 Days</button>
+          </div>
+          <div class="chart-container">
+            <canvas class="chart" id="volumeChart"></canvas>
+          </div>
+        </article>
+
+        <!-- Personal Records -->
+        <article class="card pr-card">
+          <h3><span class="card-icon">🏆</span>Personal Records</h3>
+          <div class="pr-list" id="prList">
+            <!-- Dynamic content -->
+          </div>
+        </article>
+
+        <!-- This Week -->
+        <article class="card weekly-card">
+          <h3><span class="card-icon">📅</span>This Week</h3>
+          <div class="week-grid" id="weekGrid">
+            <!-- Dynamic content -->
+          </div>
+        </article>
+
+        <!-- Exercise Progression -->
+        <article class="card progression-card">
+          <h3><span class="card-icon">📊</span>Exercise Progression</h3>
+          <div class="exercise-selector" id="exerciseSelector">
+            <!-- Dynamic content -->
+          </div>
+          <div class="chart-container">
+            <canvas class="chart" id="progressionChart"></canvas>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <!-- Trends Tab -->
+    <div id="trendsTab" class="tab-content" style="display:none">
+      <section class="grid">
+        <article class="card chart-card" style="grid-column: span 12">
+          <h3><span class="card-icon">📈</span>Monthly Volume Comparison</h3>
+          <div class="chart-container" style="height:400px">
+            <canvas class="chart" id="monthlyChart"></canvas>
+          </div>
+        </article>
+        
+        <article class="card chart-card" style="grid-column: span 6">
+          <h3><span class="card-icon">⚖️</span>Body Weight Trend</h3>
+          <div class="chart-container">
+            <canvas class="chart" id="weightChart"></canvas>
+          </div>
+        </article>
+
+        <article class="card chart-card" style="grid-column: span 6">
+          <h3><span class="card-icon">🎯</span>Workout Frequency</h3>
+          <div class="chart-container">
+            <canvas class="chart" id="frequencyChart"></canvas>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <!-- Records Tab -->
+    <div id="recordsTab" class="tab-content" style="display:none">
+      <section class="grid">
+        <article class="card" style="grid-column: span 12">
+          <h3><span class="card-icon">🏆</span>All Personal Records</h3>
+          <div id="allRecords">
+            <!-- Dynamic content -->
+          </div>
+        </article>
+      </section>
+    </div>
+  </div>
+
+<script>
+/* ========= Data Loading ========= */
+function readLocalDays(){
+  const out = [];
+  for(let i=0; i<localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(!/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+    try{
+      const day = JSON.parse(localStorage.getItem(k));
+      if(!day?.date) continue;
+      const converted = {
+        date: day.date,
+        bodyWeight: day.bodyWeight ?? undefined,
+        exercises: (day.exercises||[]).map(ex=>({
+          name: ex.name || ex.exercise || 'Exercise',
+          bodyPart: ex.bodyPart || 'Unknown',
+          sets: (ex.sets||[]).map(s=>({
+            reps: Number(s.reps)||0,
+            weight: Number(s.weight)||0,
+            completed: !!s.done
+          })),
+          finished: !!ex.finished
+        }))
+      };
+      out.push(converted);
+    }catch(e){}
+  }
+  return out.sort((a,b)=> new Date(a.date) - new Date(b.date));
+}
+
+const workouts = readLocalDays();
+const today = new Date();
+const todayISO = today.toISOString().slice(0,10);
+
+/* ========= Analytics Functions ========= */
+function totalVolume(workout){
+  return workout.exercises.reduce((sum, ex) => {
+    return sum + ex.sets.reduce((setSum, set) => {
+      // Count all sets if exercise is finished, or only completed sets if not
+      if(ex.finished || set.completed) {
+        return setSum + (set.weight * set.reps);
+      }
+      return setSum;
+    }, 0);
+  }, 0);
+}
+
+function totalSets(workout){
+  return workout.exercises.reduce((sum, ex) => {
+    if(ex.finished) return sum + ex.sets.length;
+    return sum + ex.sets.filter(s => s.completed).length;
+  }, 0);
+}
+
+function getPersonalRecords(){
+  const records = new Map();
+  
+  workouts.forEach(workout => {
+    workout.exercises.forEach(ex => {
+      ex.sets.forEach(set => {
+        if((ex.finished || set.completed) && set.weight > 0) {
+          const key = ex.name.toLowerCase();
+          const currentPR = records.get(key);
+          if(!currentPR || set.weight > currentPR.weight) {
+            records.set(key, {
+              exercise: ex.name,
+              weight: set.weight,
+              reps: set.reps,
+              date: workout.date,
+              bodyPart: ex.bodyPart
+            });
+          }
+        }
+      });
+    });
+  });
+  
+  return Array.from(records.values()).sort((a,b) => b.weight - a.weight);
+}
+
+function getWeeklyData(){
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - today.getDay());
+  weekStart.setHours(0,0,0,0);
+  
+  const weekData = [];
+  for(let i = 0; i < 7; i++){
+    const day = new Date(weekStart);
+    day.setDate(weekStart.getDate() + i);
+    const dateISO = day.toISOString().slice(0,10);
+    const workout = workouts.find(w => w.date === dateISO);
+    
+    weekData.push({
+      date: dateISO,
+      day: day.toLocaleDateString(undefined, {weekday: 'short'}),
+      volume: workout ? totalVolume(workout) : 0,
+      hasWorkout: !!workout && workout.exercises.length > 0,
+      isToday: dateISO === todayISO
+    });
+  }
+  return weekData;
+}
+
+function getPeriodStats(days = 7){
+  const cutoff = new Date(today);
+  cutoff.setDate(today.getDate() - days);
+  
+  const periodWorkouts = workouts.filter(w => new Date(w.date) >= cutoff);
+  const volume = periodWorkouts.reduce((sum, w) => sum + totalVolume(w), 0);
+  const sets = periodWorkouts.reduce((sum, w) => sum + totalSets(w), 0);
+  
+  return {
+    workouts: periodWorkouts.length,
+    volume,
+    sets,
+    avgVolume: periodWorkouts.length ? Math.round(volume / periodWorkouts.length) : 0
+  };
+}
+
+/* ========= Chart Functions ========= */
+function drawChart(canvasId, data, options = {}){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  
+  const width = rect.width;
+  const height = rect.height;
+  const padding = 40;
+  
+  ctx.clearRect(0, 0, width, height);
+  
+  if(!data || data.length === 0) return;
+  
+  const values = data.map(d => d.y);
+  const minY = Math.min(...values);
+  const maxY = Math.max(...values);
+  const rangeY = maxY - minY || 1;
+  
+  // Grid lines
+  ctx.strokeStyle = '#233446';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([2, 3]);
+  for(let i = 0; i <= 4; i++){
+    const y = padding + (i / 4) * (height - 2 * padding);
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(width - padding, y);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  
+  // Line
+  ctx.strokeStyle = options.color || '#2dd4bf';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  
+  data.forEach((point, index) => {
+    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
+    const y = height - padding - ((point.y - minY) / rangeY) * (height - 2 * padding);
+    
+    if(index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  
+  // Points
+  ctx.fillStyle = options.color || '#2dd4bf';
+  data.forEach((point, index) => {
+    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
+    const y = height - padding - ((point.y - minY) / rangeY) * (height - 2 * padding);
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawVolumeChart(period = '7d'){
+  const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+  const chartData = [];
+  
+  for(let i = days - 1; i >= 0; i--){
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    const dateISO = date.toISOString().slice(0,10);
+    const workout = workouts.find(w => w.date === dateISO);
+    
+    chartData.push({
+      date: dateISO,
+      y: workout ? totalVolume(workout) : 0
+    });
+  }
+  
+  drawChart('volumeChart', chartData, {color: '#4CAF50'});
+}
+
+function drawProgressionChart(exerciseName){
+  if(!exerciseName) return;
+  
+  const progressionData = [];
+  workouts.forEach(workout => {
+    const exercise = workout.exercises.find(ex => 
+      ex.name.toLowerCase() === exerciseName.toLowerCase()
+    );
+    
+    if(exercise) {
+      const maxWeight = Math.max(...exercise.sets
+        .filter(s => ex.finished || s.completed)
+        .map(s => s.weight));
+      
+      if(maxWeight > 0) {
+        progressionData.push({
+          date: workout.date,
+          y: maxWeight
+        });
+      }
+    }
+  });
+  
+  drawChart('progressionChart', progressionData, {color: '#2dd4bf'});
+}
+
+/* ========= Render Functions ========= */
+function renderOverview(){
+  const thisWeek = getPeriodStats(7);
+  const lastWeek = getPeriodStats(14) - thisWeek;
+  
+  document.getElementById('totalVolume').textContent = thisWeek.volume.toLocaleString();
+  document.getElementById('totalWorkouts').textContent = thisWeek.workouts;
+  document.getElementById('totalSets').textContent = thisWeek.sets;
+  document.getElementById('avgVolume').textContent = thisWeek.avgVolume;
+  
+  // Personal Records
+  const prs = getPersonalRecords().slice(0, 8);
+  const prList = document.getElementById('prList');
+  prList.innerHTML = '';
+  
+  prs.forEach(pr => {
+    const item = document.createElement('div');
+    item.className = 'pr-item';
+    item.innerHTML = `
+      <div>
+        <div class="pr-exercise">${pr.exercise}</div>
+        <div class="pr-date">${new Date(pr.date).toLocaleDateString()}</div>
+      </div>
+      <div class="pr-weight">${pr.weight} lb</div>
+    `;
+    prList.appendChild(item);
+  });
+  
+  // This Week
+  const weekData = getWeeklyData();
+  const weekGrid = document.getElementById('weekGrid');
+  weekGrid.innerHTML = '';
+  
+  weekData.forEach(day => {
+    const cell = document.createElement('div');
+    cell.className = `week-day ${day.isToday ? 'today' : ''} ${
+      day.volume > 2000 ? 'workout' : day.volume > 0 ? 'partial' : ''
+    }`;
+    cell.innerHTML = `
+      <div class="week-day-name">${day.day}</div>
+      <div class="week-day-vol">${day.volume ? Math.round(day.volume/1000) + 'k' : '—'}</div>
+    `;
+    weekGrid.appendChild(cell);
+  });
+  
+  // Exercise Selector for Progression
+  const exercises = [...new Set(workouts.flatMap(w => 
+    w.exercises.map(ex => ex.name)
+  ))].sort();
+  
+  const selector = document.getElementById('exerciseSelector');
+  selector.innerHTML = '';
+  
+  exercises.slice(0, 12).forEach((exercise, index) => {
+    const chip = document.createElement('button');
+    chip.className = `exercise-chip ${index === 0 ? 'active' : ''}`;
+    chip.textContent = exercise;
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.exercise-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      drawProgressionChart(exercise);
+    });
+    selector.appendChild(chip);
+  });
+  
+  // Draw initial charts
+  drawVolumeChart('7d');
+  if(exercises.length > 0) drawProgressionChart(exercises[0]);
+}
+
+function renderAllRecords(){
+  const records = getPersonalRecords();
+  const container = document.getElementById('allRecords');
+  
+  // Group by body part
+  const byBodyPart = records.reduce((acc, record) => {
+    const part = record.bodyPart || 'Other';
+    if(!acc[part]) acc[part] = [];
+    acc[part].push(record);
+    return acc;
+  }, {});
+  
+  container.innerHTML = '';
+  Object.entries(byBodyPart).forEach(([bodyPart, records]) => {
+    const section = document.createElement('div');
+    section.innerHTML = `
+      <h4 style="margin:1rem 0 .5rem; color:var(--accent); font-size:1.1rem">${bodyPart}</h4>
+      <div style="display:grid; gap:8px">
+        ${records.map(pr => `
+          <div class="pr-item">
+            <div>
+              <div class="pr-exercise">${pr.exercise}</div>
+              <div class="pr-date">${pr.reps} reps • ${new Date(pr.date).toLocaleDateString()}</div>
+            </div>
+            <div class="pr-weight">${pr.weight} lb</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(section);
+  });
+}
+
+/* ========= Event Listeners ========= */
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const view = tab.dataset.view;
+    
+    // Update active tab
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    
+    // Show/hide content
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.style.display = 'none';
+    });
+    document.getElementById(view + 'Tab').style.display = 'block';
+    
+    // Render content
+    if(view === 'records') renderAllRecords();
+  });
+});
+
+// Chart period buttons
+document.querySelectorAll('[data-period]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-period]').forEach(b => {
+      b.classList.remove('active');
+      b.classList.add('btn-ghost');
+      b.classList.remove('btn-primary');
+    });
+    btn.classList.add('active');
+    btn.classList.add('btn-primary');
+    btn.classList.remove('btn-ghost');
+    
+    drawVolumeChart(btn.dataset.period);
+  });
+});
+
+// Initialize
+renderOverview();
+
+// Responsive chart redraw
+window.addEventListener('resize', () => {
+  setTimeout(() => {
+    drawVolumeChart(document.querySelector('[data-period].active')?.dataset.period || '7d');
+    const activeExercise = document.querySelector('.exercise-chip.active')?.textContent;
+    if(activeExercise) drawProgressionChart(activeExercise);
+  }, 100);
+});
+</script>
+</body>
+</html>
