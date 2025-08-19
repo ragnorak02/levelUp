@@ -69,12 +69,8 @@
   .day.partial{ background:#1a1e10 }
   .day.done{ background:#0e1a12 }
   .day.today{outline:2px solid var(--accent-2)}
-  .num{
-    position:absolute; top:6px; left:7px; font-size:var(--cal-font); line-height:1; color:var(--ink);
-  }
-  .count{
-    position:absolute; bottom:6px; right:7px; font-size:var(--cal-count); color:var(--muted);
-  }
+  .num{ position:absolute; top:6px; left:7px; font-size:var(--cal-font); line-height:1; color:var(--ink) }
+  .count{ position:absolute; bottom:6px; right:7px; font-size:var(--cal-count); color:var(--muted) }
 
   /* responsive (fit on one mobile screen) */
   @media (max-width: 980px){
@@ -95,6 +91,16 @@
     .day{border-radius:8px}
     :root{ --cal-font:.85rem; --cal-count:.7rem }
   }
+
+  /* Grouped exercise list (no reps) */
+  .group-chip {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 10px; border:1px dashed #223143; border-radius:10px;
+    background:#0f141b; margin-bottom:6px; gap:10px;
+  }
+  .group-chip h4 { margin:0; font-size:.95rem; color:#e8eef6 }
+  .group-chip .names { color:#9fb0c7; font-size:.9rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+  .group-chip .count { font-size:.8rem; color:#9fb0c7; border:1px solid #213043; border-radius:999px; padding:2px 8px; background:#0c1117 }
 </style>
 </head>
 <body>
@@ -148,10 +154,7 @@
   </div>
 
 <script>
-/* ========= Load data =========
- * Reads your saved days from localStorage (keys powerUp:YYYY-MM-DD, written by workout.html)
- * Converts them to the format this page uses.
- */
+/* ========= Load data ========= */
 const today = new Date();
 const todayISO = today.toISOString().slice(0,10);
 const fmt = (d)=>new Date(d+'T00:00:00');
@@ -164,12 +167,13 @@ function readLocalDays(){
     try{
       const day = JSON.parse(localStorage.getItem(k));
       if(!day?.date) continue;
-      // Convert to this page's "workout" shape
+      // Keep bodyPart so we can group later
       const converted = {
         date: day.date,
         bodyWeight: day.bodyWeight ?? undefined,
         exercises: (day.exercises||[]).map(ex=>({
           name: ex.name || ex.exercise || 'Exercise',
+          bodyPart: ex.bodyPart || ex.muscle || ex.group || 'Other',
           sets: (ex.sets||[]).map(s=>({
             reps: Number(s.reps)||0,
             weight: Number(s.weight)||0,
@@ -183,10 +187,10 @@ function readLocalDays(){
   return out.sort((a,b)=> fmt(a.date)-fmt(b.date));
 }
 
-/* Fallback demo data if local is empty (kept tiny) */
+/* Fallback demo data */
 const demoWorkouts = [
   { date:'2025-08-12', bodyWeight:184.2, exercises:[
-    {name:'OHP', sets:[{reps:6,weight:95,completed:true},{reps:6,weight:95,completed:true},{reps:5,weight:100,completed:true}]},
+    {name:'OHP', bodyPart:'Shoulders', sets:[{reps:6,weight:95,completed:true},{reps:6,weight:95,completed:true},{reps:5,weight:100,completed:true}]},
   ]},
 ];
 
@@ -229,7 +233,7 @@ function drawSpark(id, points){
   ctx.fillStyle = '#e8eef6'; ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2); ctx.fill();
 }
 
-/* Weight card: use any bodyWeight fields we find */
+/* Weight card */
 function renderWeight(){
   const sorted = [...workouts].sort(byDateAsc);
   const lastWeights = sorted
@@ -254,7 +258,7 @@ function renderWeight(){
   drawSpark('weightSpark', lastWeights);
 }
 
-/* Today/Previous workout panel — now sourced from localStorage */
+/* Today/Previous workout panel (grouped by muscle group, no reps) */
 function renderWorkoutPanel(){
   const list = [...workouts].sort(byDateAsc);
   const todayW = list.find(w=>w.date===todayISO);
@@ -262,7 +266,6 @@ function renderWorkoutPanel(){
   const startBtn = document.getElementById('startToday');
   startBtn.textContent = inProgress ? 'Continue Workout' : 'Start Today’s Workout';
 
-  // If there is a workout saved for today, always show it.
   const hasToday = !!todayW;
   const target = hasToday ? todayW : (list.filter(w=>w.exercises?.length).slice(0,-1).at(-1) || list.at(-1));
   const title = document.getElementById('workoutPanelTitle');
@@ -280,18 +283,26 @@ function renderWorkoutPanel(){
     document.getElementById('setsLeft').textContent = left;
   } else setsLeftWrap.style.display = 'none';
 
+  // --- grouped list (no reps)
   const exList = document.getElementById('exList');
   exList.innerHTML = '';
+  const groups = new Map(); // bodyPart -> Set(names)
   target.exercises.forEach(ex=>{
-    const setsTxt = ex.sets.map(s=>`${s.completed?'✔':'○'} ${s.reps}×${s.weight||0}`).join(', ');
+    const bp = ex.bodyPart || 'Other';
+    const name = ex.name || 'Exercise';
+    if(!groups.has(bp)) groups.set(bp, new Set());
+    groups.get(bp).add(name);
+  });
+  [...groups.entries()].forEach(([bp, nameSet])=>{
+    const names = [...nameSet];
     const row = document.createElement('div');
-    row.className='ex';
-    row.innerHTML = `<b>${ex.name}</b><span>${setsTxt}</span>`;
+    row.className = 'group-chip';
+    row.innerHTML = `<h4>${bp}</h4><div class="names" title="${names.join(', ')}">${names.join(', ')}</div><span class="count">${names.length}</span>`;
     exList.appendChild(row);
   });
 }
 
-/* Calendar (numbers aligned) */
+/* Calendar */
 function renderCalendar(){
   const calTitle = document.getElementById('calTitle');
   const calGrid  = document.getElementById('calGrid');
@@ -308,7 +319,6 @@ function renderCalendar(){
   const monthEnd   = new Date(year, month+1, 0);
   calTitle.textContent = monthStart.toLocaleDateString(undefined, {month:'long', year:'numeric'});
 
-  // volumes by day from workouts (incl. localStorage)
   const byDay = new Map();
   workouts.forEach(w=>{
     const d = fmt(w.date);
@@ -363,7 +373,6 @@ document.getElementById('analytics').addEventListener('click', ()=>{
 document.getElementById('logWeight').addEventListener('click', ()=>{
   const w = prompt('Enter today’s weight (lb):');
   if(!w) return;
-  // persist weight onto today's saved object if present, else create a minimal one
   const k = `powerUp:${todayISO}`;
   const existing = localStorage.getItem(k);
   if(existing){
@@ -371,7 +380,6 @@ document.getElementById('logWeight').addEventListener('click', ()=>{
   }else{
     localStorage.setItem(k, JSON.stringify({date: todayISO, bodyWeight:parseFloat(w), exercises:[]}));
   }
-  // refresh from local storage
   location.reload();
 });
 
