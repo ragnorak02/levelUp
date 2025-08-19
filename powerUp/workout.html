@@ -28,11 +28,7 @@
 
   .wrap{width:min(900px,100%); margin-inline:auto; padding:10px; display:flex; flex-direction:column; gap:10px; flex:1}
 
-  /* Power card */
-  .card{
-    background:var(--panel); border:1px solid var(--ring); border-radius:14px;
-    padding:12px; box-shadow:0 8px 30px rgba(0,0,0,.25);
-  }
+  .card{background:var(--panel); border:1px solid var(--ring); border-radius:14px; padding:12px; box-shadow:0 8px 30px rgba(0,0,0,.25)}
   #powerCard .top{display:flex; align-items:baseline; gap:10px}
   #powerVal{font-size:1.9rem; font-weight:800}
   #powerTrend{font-size:.9rem; color:var(--muted)}
@@ -40,13 +36,8 @@
   .glow-warn{box-shadow:0 0 0 1px rgba(245,158,11,.3), 0 0 16px rgba(245,158,11,.25), inset 0 0 20px rgba(245,158,11,.08)}
   .glow-hot{box-shadow:0 0 0 1px rgba(239,68,68,.35), 0 0 24px rgba(239,68,68,.35), inset 0 0 24px rgba(239,68,68,.12)}
 
-  /* STICKY totals bar */
-  .totals{
-    position:sticky; top:0; z-index:20;
-    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
-    background:rgba(13,19,26,.9); backdrop-filter:saturate(1.1) blur(3px);
-    border:1px solid var(--ring); border-radius:12px; padding:10px; font-size:.95rem;
-  }
+  .totals{position:sticky; top:0; z-index:20; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+    background:rgba(13,19,26,.9); backdrop-filter:saturate(1.1) blur(3px); border:1px solid var(--ring); border-radius:12px; padding:10px; font-size:.95rem}
   .chip{background:#0b1118; border:1px solid var(--ring); padding:.35rem .6rem; border-radius:999px; color:var(--muted)}
   .chip b{color:var(--ink)}
   .actions{display:flex; gap:10px; flex-wrap:wrap}
@@ -66,14 +57,9 @@
   .sets{display:grid; gap:6px}
   .ex-actions-bottom{display:flex; gap:8px; margin-top:4px}
 
-  /* darker edit fields + compact width (~4 digits) */
   .set-row{display:grid; grid-template-columns: auto auto auto 1fr auto; gap:8px; align-items:center}
   .weight-input-group{display:flex; align-items:center; gap:4px}
-  .num-input{
-    width:6ch; max-width:6ch;
-    padding:.55rem .55rem; border:1px solid #15212c; border-radius:8px;
-    background:#091017; color:var(--ink); font-variant-numeric:tabular-nums;
-  }
+  .num-input{width:6ch; max-width:6ch; padding:.55rem .55rem; border:1px solid #15212c; border-radius:8px; background:#091017; color:var(--ink); font-variant-numeric:tabular-nums}
   .num-input:focus{outline:2px solid #213240}
   .lbs-label{font-size:.85rem; color:var(--muted); white-space:nowrap}
   .flags{display:flex; align-items:center; gap:12px; color:var(--muted); font-size:.9rem}
@@ -85,12 +71,16 @@
   /* Popups */
   .popup{position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; padding:10px}
   .sheet{width:min(650px, 96%); max-height:85vh; overflow:auto; background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:12px}
-  .x{all:unset; cursor:pointer; float:right; border:1px solid var(--ring); padding:.25rem .5rem; border-radius:8px; color:var(--muted)}
+  .x{all:unset; cursor:pointer; float:right; border:1px solid var(--ring); padding:.25rem .5rem; border-radius:8px; color:#9fb0c7}
   .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
   .opt{border:1px solid var(--ring); padding:10px; border-radius:10px; cursor:pointer; background:#0e151e}
   .opt:hover{outline:1px solid #2b3a4a}
-  .search{width:100%; padding:.6rem .7rem; border:1px solid var(--ring); border-radius:10px; background:#0a1118; color:#e8eef6; margin-bottom:8px}
 
+  /* Create-new row in exercise popup */
+  .create-row{display:flex; gap:8px; align-items:center; margin-bottom:8px}
+  .create-input{flex:1; padding:.6rem .7rem; border:1px solid var(--ring); border-radius:10px; background:#0a1118; color:#e8eef6}
+  .create-btn{all:unset; cursor:pointer; padding:.6rem .9rem; border-radius:10px; font-weight:700; background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a; border:1px solid #295c38}
+  
   /* Calendar */
   .calendar{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
   .cal-head{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin:4px 0; color:#9fb0c7; font-size:.85rem}
@@ -98,6 +88,34 @@
   .cal-cell.workout{background:#0e1a12}
   .cal-nav{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px}
   .cal-nav button{all:unset; cursor:pointer; border:1px solid var(--ring); padding:.3rem .6rem; border-radius:8px}
+  /* Make the Previous/Today's Workout card wrap naturally */
+#lastWorkoutCard { overflow-x: hidden; }          /* no horizontal scroll */
+
+.ex-list { display: grid; gap: 6px; }             /* your list layout */
+
+.ex{
+  display: flex;
+  align-items: flex-start;
+  gap: 6px 10px;
+  flex-wrap: wrap;                                /* <-- allow wrapping */
+  min-width: 0;                                   /* let children shrink */
+}
+
+.ex b{
+  flex: 0 0 auto;                                 /* label stays compact */
+  margin-right: 4px;
+}
+
+.ex span{
+  flex: 1 1 100%;                                 /* take the next line */
+  min-width: 0;
+  white-space: normal;                            /* wrap onto new lines */
+  word-break: break-word;                         /* break long names if needed */
+}
+
+/* Optional: badges above the list should wrap too */
+.meta{ display: flex; flex-wrap: wrap; gap: 8px; }
+
 </style>
 </head>
 <body>
@@ -105,9 +123,7 @@
   <div class="bar">
     <button class="home" onclick="location.href='index.html'">⟵ Home</button>
     <h1>Power Up! — Today's Workout</h1>
-    <div class="bar">
-      <button class="home" id="openCalendar">📅</button>
-    </div>
+    <div class="bar"><button class="home" id="openCalendar">📅</button></div>
   </div>
   <div class="bar" style="margin-top:6px">
     <div class="date-nav">
@@ -125,8 +141,6 @@
 </header>
 
 <main class="wrap">
-
-  <!-- Power Card -->
   <section class="card" id="powerCard">
     <h3 style="margin:.1rem 0 .25rem; color:var(--muted)">Today's Volume</h3>
     <div class="top">
@@ -136,7 +150,6 @@
     <canvas id="powerSpark" class="spark"></canvas>
   </section>
 
-  <!-- STICKY totals -->
   <section class="totals" id="totalsBar">
     <span class="chip">Sets: <b id="tSets">0</b></span>
     <span class="chip">Volume: <b id="tVol">0 lb</b></span>
@@ -145,7 +158,6 @@
   </section>
 
   <div id="log"></div>
-
   <div class="spacer"></div>
 </main>
 
@@ -162,8 +174,14 @@
 <div class="popup" id="exPopup">
   <div class="sheet">
     <button class="x" data-close="#exPopup">✕</button>
-    <h2 id="exTitle" style="margin:6px 0 10px; font-size:1rem; color:#9fb0c7">Choose Exercise</h2>
-    <input class="search" id="exSearch" placeholder="Search exercise…" />
+    <h2 id="exTitle" style="margin:6px 0 10px; font-size:1rem; color:#9fb0c7">Exercises</h2>
+
+    <!-- create-new row -->
+    <div class="create-row">
+      <input id="exCreateInput" class="create-input" placeholder="Create new exercise name…" />
+      <button id="exCreateBtn" class="create-btn">Add</button>
+    </div>
+
     <div class="grid" id="exGrid"></div>
   </div>
 </div>
@@ -177,9 +195,7 @@
       <div id="calMonth">—</div>
       <button id="calNext">→</button>
     </div>
-    <div class="cal-head">
-      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-    </div>
+    <div class="cal-head"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
     <div class="calendar" id="calGrid"></div>
   </div>
 </div>
@@ -197,6 +213,16 @@ const exerciseOptions = {
 };
 const bodyParts = Object.keys(exerciseOptions);
 
+/* ---- custom exercise persistence ---- */
+const CUSTOM_KEY = 'powerUp:customExercises';
+const getCustom = ()=> { try{ return JSON.parse(localStorage.getItem(CUSTOM_KEY)) || {}; }catch{ return {}; } };
+const saveCustom = (obj)=> localStorage.setItem(CUSTOM_KEY, JSON.stringify(obj));
+function getAllExercises(bp){
+  const base = exerciseOptions[bp] || [];
+  const extras = getCustom()[bp] || [];
+  return [...new Set([...base, ...extras])]; // dedupe
+}
+
 /* ---------- State & storage ---------- */
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
@@ -209,16 +235,12 @@ function saveDay(day){ localStorage.setItem(`powerUp:${day.date}`, JSON.stringif
 
 /* ---------- Maths ---------- */
 function exStats(ex){
-  // Unfiltered exercise stats (for the line under name)
   const vol = ex.sets.reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
   const reps = ex.sets.reduce((s,a)=> s + (Number(a.reps)||0), 0);
   const avg = reps ? vol / reps : 0;
   return { vol, reps, avg };
 }
-// FILTER for "counted" sets: if exercise.finished -> count all; else only sets with done
-function countedSets(ex){
-  return ex.finished ? ex.sets : ex.sets.filter(s=> !!s.done);
-}
+function countedSets(ex){ return ex.finished ? ex.sets : ex.sets.filter(s=> !!s.done); }
 function totalsFiltered(day){
   let sets=0, vol=0, exCount=day.exercises.length;
   day.exercises.forEach(ex=>{
@@ -241,7 +263,6 @@ function drawSpark(el, points){
   const ctx = c.getContext('2d');
   ctx.clearRect(0,0,c.width,c.height);
   if(points.length<2) return;
-
   const xs = points.map((p,i)=>i);
   const ys = points.map(p=>p);
   const minX = 0, maxX = xs.length-1;
@@ -249,15 +270,12 @@ function drawSpark(el, points){
   const pad = 8;
   const xScale = (i)=> pad + ((i-minX)/(maxX-minX||1))*(c.width-2*pad);
   const yScale = (v)=> c.height - pad - ((v-minY)/(maxY-minY||1))*(c.height-2*pad);
-
   ctx.strokeStyle = '#233446'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
   ctx.beginPath(); ctx.moveTo(pad, yScale(minY)); ctx.lineTo(c.width-pad, yScale(minY)); ctx.stroke();
   ctx.setLineDash([]);
-
   ctx.strokeStyle = '#2dd4bf'; ctx.lineWidth = 2; ctx.beginPath();
   points.forEach((v,i)=>{ const x=xScale(i), y=yScale(v); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
   ctx.stroke();
-
   const lx=xScale(points.length-1), ly=yScale(points.at(-1));
   ctx.fillStyle = '#e8eef6'; ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2); ctx.fill();
 }
@@ -265,12 +283,11 @@ function drawSpark(el, points){
 /* ---------- Rendering ---------- */
 function render(){
   $('#dateStr').textContent = new Intl.DateTimeFormat(undefined,{weekday:'short',month:'short',day:'numeric'}).format(current);
-
   const day = loadDay(current);
   renderPowerCard(day);
 
   const log = $('#log'); log.innerHTML = '';
-  const groups = groupBy(day.exercises, 'bodyPart');
+  const groups = day.exercises.reduce((m,o)=>((m[o.bodyPart]??=[]).push(o),m),{});
   Object.entries(groups).forEach(([bp, list])=>{
     const g = document.createElement('div');
     g.className = 'group'; g.dataset.bodypart = bp;
@@ -289,35 +306,23 @@ function render(){
 }
 
 function renderPowerCard(day){
-  const { vol } = totalsFiltered(day); // filtered per req
+  const { vol } = totalsFiltered(day);
   const prev = (()=>{ const y = new Date(current); y.setDate(y.getDate()-1); return totalsFiltered(loadDay(y)).vol; })();
   $('#powerVal').textContent = Math.round(vol) + ' lb';
   const trend = vol - prev;
   $('#powerTrend').textContent = (prev>0) ? `${trend>=0?'+':''}${Math.round(trend)} vs. yesterday` : '—';
-
-  // cumulative by order of counted sets
-  const points = [];
-  let run = 0;
-  day.exercises.forEach(ex=>{
-    countedSets(ex).forEach(s=>{
-      run += (Number(s.weight)||0)*(Number(s.reps)||0);
-      points.push(run);
-    });
-  });
+  const points = []; let run = 0;
+  day.exercises.forEach(ex=> countedSets(ex).forEach(s=>{ run += (Number(s.weight)||0)*(Number(s.reps)||0); points.push(run); }));
   if(points.length<2) points.push(Math.max(0, run));
   drawSpark('powerSpark', points);
-
   const card = document.getElementById('powerCard');
-  card.classList.remove('glow-warn','glow-hot');
-  if(vol > 1500) card.classList.add('glow-hot');
-  else if(vol > 1000) card.classList.add('glow-warn');
+  card.classList.remove('glow-warn','glow-hot'); if(vol > 1500) card.classList.add('glow-hot'); else if(vol > 1000) card.classList.add('glow-warn');
 }
 
 function renderExercise(ex){
   const node = document.createElement('div');
   node.className = 'ex' + (ex.finished ? ' finished' : '');
   node.dataset.id = ex.id;
-
   const {vol, avg} = exStats(ex);
   node.innerHTML = `
     <div class="ex-header">
@@ -334,23 +339,14 @@ function renderExercise(ex){
   `;
   const setsWrap = node.querySelector('.sets');
   ex.sets.forEach((s, i)=> setsWrap.appendChild(renderSet(ex.id, s, i, !!ex.finished)));
-
   return node;
 }
 
-/* Set row with enhanced finished state */
 function renderSet(exId, s, idx, locked=false){
   const row = document.createElement('div');
-  row.className = 'set-row';
-  row.dataset.exId = exId;
-  row.dataset.idx = idx;
-  
-  const weight = Number(s.weight) || 0;
-  const reps = Number(s.reps) || 0;
-  const totalWeight = weight * reps;
-  
+  row.className = 'set-row'; row.dataset.exId = exId; row.dataset.idx = idx;
+  const weight = Number(s.weight) || 0; const reps = Number(s.reps) || 0; const totalWeight = weight * reps;
   if (locked) {
-    // Finished state - show weight × reps calculation
     row.innerHTML = `
       <div class="weight-input-group">
         <input class="num-input" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" disabled/>
@@ -358,14 +354,10 @@ function renderSet(exId, s, idx, locked=false){
       </div>
       <input class="num-input" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" disabled/>
       <div class="finished-display">${Math.round(totalWeight)} lbs</div>
-      <div class="flags" style="visibility:hidden;">
-        <label><input type="checkbox" ${s.superset?'checked':''} disabled/> Superset</label>
-        <label><input type="checkbox" ${s.done?'checked':''} disabled/> Done</label>
-      </div>
+      <div class="flags" style="visibility:hidden;"></div>
       <div class="tools" style="visibility:hidden;"></div>
     `;
   } else {
-    // Active state - show all interactive elements
     row.innerHTML = `
       <div class="weight-input-group">
         <input class="num-input" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" data-field="weight"/>
@@ -384,20 +376,18 @@ function renderSet(exId, s, idx, locked=false){
       </div>
     `;
   }
-  
   return row;
 }
 
 /* ---------- Helpers & events ---------- */
-function groupBy(arr, key){ return arr.reduce((m,o)=>((m[o[key]]??=[]).push(o),m),{}); }
 function uid(){ return Math.random().toString(36).slice(2,9); }
-
-/* Popups */
 function openPopup(id){ $(id).style.display='flex'; }
 function closePopup(id){ $(id).style.display='none'; }
 $$('.x').forEach(btn=> btn.addEventListener('click', e=> closePopup(e.target.dataset.close)));
 
 /* Body part → exercise flow */
+let currentBP = null;
+
 $('#addExercise').addEventListener('click', ()=>{
   const grid = $('#bpGrid'); grid.innerHTML = '';
   bodyParts.forEach(bp=>{
@@ -410,31 +400,53 @@ $('#addExercise').addEventListener('click', ()=>{
 
 $('#bpGrid').addEventListener('click', (e)=>{
   const bp = e.target.closest('.opt')?.dataset.bp; if(!bp) return;
+  currentBP = bp;
   closePopup('#bpPopup');
   $('#exTitle').textContent = `Exercises — ${bp}`;
-  const grid = $('#exGrid'); grid.innerHTML = '';
-  exerciseOptions[bp].forEach(name=>{
-    const div = document.createElement('div'); div.className='opt'; div.textContent = name; div.dataset.name = name; div.dataset.bp = bp;
-    grid.appendChild(div);
-  });
-  $('#exSearch').value='';
+  populateExerciseGrid(bp);
+  $('#exCreateInput').value = '';
   openPopup('#exPopup');
 });
 
-$('#exSearch').addEventListener('input', (e)=>{
-  const q = e.target.value.toLowerCase();
-  $$('#exGrid .opt').forEach(x=> x.style.display = x.textContent.toLowerCase().includes(q) ? '' : 'none');
+function populateExerciseGrid(bp){
+  const grid = $('#exGrid'); grid.innerHTML = '';
+  getAllExercises(bp).forEach(name=>{
+    const div = document.createElement('div');
+    div.className='opt'; div.textContent = name; div.dataset.name = name; div.dataset.bp = bp;
+    grid.appendChild(div);
+  });
+}
+
+/* Create-new button: adds to custom list and immediately creates the exercise */
+$('#exCreateBtn').addEventListener('click', ()=>{
+  const name = ($('#exCreateInput').value || '').trim();
+  if(!name || !currentBP) return;
+
+  // avoid duplicates (case-insensitive)
+  const existing = getAllExercises(currentBP).map(s=>s.toLowerCase());
+  if(!existing.includes(name.toLowerCase())){
+    const custom = getCustom();
+    custom[currentBP] = custom[currentBP] || [];
+    custom[currentBP].push(name);
+    saveCustom(custom);
+  }
+
+  // create the exercise for the day
+  createExerciseForDay(currentBP, name);
+  closePopup('#exPopup');
 });
 
 $('#exGrid').addEventListener('click', (e)=>{
   const opt = e.target.closest('.opt'); if(!opt) return;
-  const name = opt.dataset.name; const bp = opt.dataset.bp;
+  createExerciseForDay(opt.dataset.bp, opt.dataset.name);
   closePopup('#exPopup');
-
-  const day = loadDay(current);
-  const ex = { id: uid(), bodyPart: bp, name, finished:false, sets:[{weight:'', reps:'', superset:false, done:false}] };
-  day.exercises.push(ex); saveDay(day); render();
 });
+
+function createExerciseForDay(bp, name){
+  const day = loadDay(current);
+  day.exercises.push({ id: uid(), bodyPart: bp, name, finished:false, sets:[{weight:'', reps:'', superset:false, done:false}] });
+  saveDay(day); render();
+}
 
 /* Exercise / Set actions */
 $('#log').addEventListener('click', (e)=>{
@@ -450,9 +462,7 @@ $('#log').addEventListener('click', (e)=>{
   if(act==='toggleFinished'){
     const node = e.target.closest('.ex'); const exId = node.dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
-    ex.finished = !ex.finished;
-    saveDay(day); render();
-    return;
+    ex.finished = !ex.finished; saveDay(day); render(); return;
   }
   if(act==='delSet' || act==='incW' || act==='decW'){
     const row = e.target.closest('.set-row');
@@ -460,9 +470,7 @@ $('#log').addEventListener('click', (e)=>{
     const idx = Number(row.dataset.idx);
     if(act==='delSet'){
       ex.sets.splice(idx,1);
-      if(ex.sets.length===0){ // remove empty exercise
-        day.exercises = day.exercises.filter(x=>x.id!==ex.id);
-      }
+      if(ex.sets.length===0){ day.exercises = day.exercises.filter(x=>x.id!==ex.id); }
     }else{
       const delta = act==='incW' ? 5 : -5;
       const w = Number(ex.sets[idx].weight||0);
@@ -476,7 +484,6 @@ $('#log').addEventListener('click', (e)=>{
 $('#log').addEventListener('input', (e)=>{
   const row = e.target.closest('.set-row'); if(!row) return;
   const field = e.target.dataset.field; if(!field) return;
-
   const day = loadDay(current);
   const ex = day.exercises.find(x=>x.id===row.dataset.exId);
   const idx = Number(row.dataset.idx);
@@ -488,12 +495,10 @@ $('#log').addEventListener('input', (e)=>{
     ex.sets[idx][field] = clean;
     saveDay(day);
 
-    // update exercise tag
     const exNode = row.closest('.ex');
     const {vol:ev, avg} = exStats(ex);
     exNode.querySelector('.tag').textContent = `${ex.sets.length} set(s) • ${Math.round(ev)} lb • avg ${Math.round(avg)} lb/rep`;
 
-    // refresh filtered totals + power card
     const {sets, vol, exCount} = totalsFiltered(day);
     $('#tSets').textContent = sets; $('#tVol').textContent = Math.round(vol)+' lb'; $('#tEx').textContent = exCount;
     renderPowerCard(day);
@@ -503,14 +508,12 @@ $('#log').addEventListener('input', (e)=>{
 $('#log').addEventListener('change', (e)=>{
   const row = e.target.closest('.set-row'); if(!row) return;
   const field = e.target.dataset.field; if(!field) return;
-
   const day = loadDay(current);
   const ex = day.exercises.find(x=>x.id===row.dataset.exId);
   const idx = Number(row.dataset.idx);
 
   if(field==='done' || field==='superset'){
-    ex.sets[idx][field] = e.target.checked;
-    saveDay(day);
+    ex.sets[idx][field] = e.target.checked; saveDay(day);
     $('#tStatus').textContent = areAllSetsDone(day) ? 'Completed' : 'In progress';
     const {sets, vol, exCount} = totalsFiltered(day);
     $('#tSets').textContent = sets; $('#tVol').textContent = Math.round(vol)+' lb'; $('#tEx').textContent = exCount;
@@ -519,17 +522,9 @@ $('#log').addEventListener('change', (e)=>{
 });
 
 /* Save / Clear / Today */
-$('#saveBtn').addEventListener('click', ()=>{
-  const day = loadDay(current); saveDay(day);
-  $('#saveBtn').textContent = 'Saved ✔'; setTimeout(()=> $('#saveBtn').textContent='Save', 1100);
-});
-$('#clearBtn').addEventListener('click', ()=>{
-  if(!confirm('Clear all exercises for this day?')) return;
-  saveDay(blankDay(current)); render();
-});
-$('#todayBtn').addEventListener('click', ()=>{
-  current = new Date(); render();
-});
+$('#saveBtn').addEventListener('click', ()=>{ const day = loadDay(current); saveDay(day); $('#saveBtn').textContent = 'Saved ✔'; setTimeout(()=> $('#saveBtn').textContent='Save', 1100); });
+$('#clearBtn').addEventListener('click', ()=>{ if(!confirm('Clear all exercises for this day?')) return; saveDay(blankDay(current)); render(); });
+$('#todayBtn').addEventListener('click', ()=>{ current = new Date(); render(); });
 
 /* Date nav & calendar */
 $('#prevDay').addEventListener('click', ()=>{ current.setDate(current.getDate()-1); render(); });
@@ -544,11 +539,9 @@ function buildCalendar(anchorDate){
   const y = anchorDate.getFullYear(), m = anchorDate.getMonth();
   $('#calMonth').textContent = new Intl.DateTimeFormat(undefined,{month:'long',year:'numeric'}).format(anchorDate);
   $('#calMonth').dataset.anchor = new Date(y,m,1).toISOString();
-
   const grid = $('#calGrid'); grid.innerHTML='';
   const first = new Date(y,m,1).getDay();
   const last = new Date(y,m+1,0).getDate();
-
   for(let i=0;i<first;i++){ const c=document.createElement('div'); c.className='cal-cell'; c.style.visibility='hidden'; grid.appendChild(c); }
   for(let d=1; d<=last; d++){
     const c = document.createElement('div'); c.className='cal-cell'; c.textContent = d;
@@ -565,14 +558,9 @@ function buildCalendar(anchorDate){
 /* Boot */
 (function init(){
   const legacy = localStorage.getItem('powerUp');
-  if(legacy){
-    try{ const data = JSON.parse(legacy); if(data?.date){ localStorage.setItem(`powerUp:${data.date}`, legacy); } }catch{}
-  }
+  if(legacy){ try{ const data = JSON.parse(legacy); if(data?.date){ localStorage.setItem(`powerUp:${data.date}`, legacy); } }catch{} }
   current = new Date(); render();
-  window.addEventListener('resize', ()=>{
-    const day = loadDay(current);
-    renderPowerCard(day);
-  });
+  window.addEventListener('resize', ()=>{ const day = loadDay(current); renderPowerCard(day); });
 })();
 </script>
 </body>
