@@ -9,6 +9,7 @@
     --bg:#080c11; --panel:#0d131a; --ink:#e8eef6; --muted:#9fb0c7; --ring:#1c2a37;
     --accent:#4CAF50; --danger:#ef4444; --warn:#f59e0b;
     --finished-bg:#0f1f15; --finished-ring:#1f4030;
+    --orange:#ff9500; --orange-bg:#2a1f0a;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -38,6 +39,7 @@
 
   .totals{position:sticky; top:0; z-index:20; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
     background:rgba(13,19,26,.9); backdrop-filter:saturate(1.1) blur(3px); border:1px solid var(--ring); border-radius:12px; padding:10px; font-size:.95rem}
+  .totals.hidden{display:none}
   .chip{background:#0b1118; border:1px solid var(--ring); padding:.35rem .6rem; border-radius:999px; color:var(--muted)}
   .chip b{color:var(--ink)}
   .actions{display:flex; gap:10px; flex-wrap:wrap}
@@ -55,7 +57,7 @@
   .ex-name{font-weight:700}
   .tag{font-size:.9rem; color:var(--muted)}
   .sets{display:grid; gap:6px}
-  .ex-actions-bottom{display:flex; gap:8px; margin-top:4px}
+  .ex-actions-bottom{display:flex; gap:8px; margin-top:4px; justify-content:space-between; align-items:center}
 
   .set-row{display:grid; grid-template-columns: auto auto auto 1fr auto; gap:8px; align-items:center}
   .weight-input-group{display:flex; align-items:center; gap:4px}
@@ -69,12 +71,17 @@
   .spacer{height:70px}
 
   /* Popups */
-  .popup{position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; padding:10px}
+  .popup{position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; padding:10px; z-index:100}
   .sheet{width:min(650px, 96%); max-height:85vh; overflow:auto; background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:12px}
   .x{all:unset; cursor:pointer; float:right; border:1px solid var(--ring); padding:.25rem .5rem; border-radius:8px; color:#9fb0c7}
   .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
-  .opt{border:1px solid var(--ring); padding:10px; border-radius:10px; cursor:pointer; background:#0e151e}
+  .opt{border:1px solid var(--ring); padding:10px; border-radius:10px; cursor:pointer; background:#0e151e; position:relative}
   .opt:hover{outline:1px solid #2b3a4a}
+  .opt.used{background:var(--orange-bg); border-color:var(--orange); color:var(--orange)}
+
+  /* Exercise popup header with back button */
+  .ex-popup-header{display:flex; align-items:center; gap:10px; margin:6px 0 10px}
+  .back-btn{all:unset; cursor:pointer; border:1px solid var(--ring); padding:.25rem .5rem; border-radius:8px; color:#9fb0c7}
 
   /* Create-new row in exercise popup */
   .create-row{display:flex; gap:8px; align-items:center; margin-bottom:8px}
@@ -146,7 +153,10 @@
 <div class="popup" id="exPopup">
   <div class="sheet">
     <button class="x" data-close="#exPopup">✕</button>
-    <h2 id="exTitle" style="margin:6px 0 10px; font-size:1rem; color:#9fb0c7">Exercises</h2>
+    <div class="ex-popup-header">
+      <button class="back-btn" id="backToBP">← Back</button>
+      <h2 id="exTitle" style="margin:0; font-size:1rem; color:#9fb0c7; flex:1">Exercises</h2>
+    </div>
 
     <!-- create-new row -->
     <div class="create-row">
@@ -181,7 +191,8 @@ const exerciseOptions = {
   Triceps: ['Close-grip Bench','Skull Crushers','Cable Pushdown','Overhead Extension','Dips'],
   Shoulders: ['Overhead Press','Lateral Raise','Front Raise','Rear Delt Fly','Arnold Press','Upright Row','Shrug'],
   Legs: ['Back Squat','Front Squat','Leg Press','RDL','Lunge','Leg Extension','Ham Curl','Calf Raise'],
-  Lats: ['Pull-up','Chin-up','Close Grip Pulldown','Pullover Machine']
+  Lats: ['Pull-up','Chin-up','Close Grip Pulldown','Pullover Machine'],
+  Cardio: ['Running','Cycling','Rowing','Jump Rope','HIIT Circuit','Stair Climber']
 };
 const bodyParts = Object.keys(exerciseOptions);
 
@@ -189,6 +200,22 @@ const bodyParts = Object.keys(exerciseOptions);
 const CUSTOM_KEY = 'powerUp:customExercises';
 const getCustom = ()=> { try{ return JSON.parse(localStorage.getItem(CUSTOM_KEY)) || {}; }catch{ return {}; } };
 const saveCustom = (obj)=> localStorage.setItem(CUSTOM_KEY, JSON.stringify(obj));
+
+function addToCustomExercises(bodyPart, exerciseName) {
+  // Add to localStorage custom exercises
+  const custom = getCustom();
+  custom[bodyPart] = custom[bodyPart] || [];
+  if (!custom[bodyPart].includes(exerciseName)) {
+    custom[bodyPart].push(exerciseName);
+    saveCustom(custom);
+  }
+  
+  // Also add to the main exerciseOptions object for this session
+  if (!exerciseOptions[bodyPart].includes(exerciseName)) {
+    exerciseOptions[bodyPart].push(exerciseName);
+  }
+}
+
 function getAllExercises(bp){
   const base = exerciseOptions[bp] || [];
   const extras = getCustom()[bp] || [];
@@ -279,17 +306,36 @@ function render(){
 
 function renderPowerCard(day){
   const { vol } = totalsFiltered(day);
-  const prev = (()=>{ const y = new Date(current); y.setDate(y.getDate()-1); return totalsFiltered(loadDay(y)).vol; })();
+
+  // compute yesterday's total
+  const y = new Date(current);
+  y.setDate(y.getDate() - 1);
+  const prev = totalsFiltered(loadDay(y)).vol;
+
   $('#powerVal').textContent = Math.round(vol) + ' lb';
   const trend = vol - prev;
-  $('#powerTrend').textContent = (prev>0) ? `${trend>=0?'+':''}${Math.round(trend)} vs. yesterday` : '—';
-  const points = []; let run = 0;
-  day.exercises.forEach(ex=> countedSets(ex).forEach(s=>{ run += (Number(s.weight)||0)*(Number(s.reps)||0); points.push(run); }));
-  if(points.length<2) points.push(Math.max(0, run));
+  $('#powerTrend').textContent = (prev > 0)
+    ? `${trend >= 0 ? '+' : ''}${Math.round(trend)} vs. yesterday`
+    : '—';
+
+  const points = [];
+  let run = 0;
+  day.exercises.forEach(ex =>
+    countedSets(ex).forEach(s => {
+      run += (Number(s.weight) || 0) * (Number(s.reps) || 0);
+      points.push(run);
+    })
+  );
+  if (points.length < 2) points.push(Math.max(0, run));
+
   drawSpark('powerSpark', points);
+
   const card = document.getElementById('powerCard');
-  card.classList.remove('glow-warn','glow-hot'); if(vol > 1500) card.classList.add('glow-hot'); else if(vol > 1000) card.classList.add('glow-warn');
+  card.classList.remove('glow-warn','glow-hot');
+  if (vol > 1500) card.classList.add('glow-hot');
+  else if (vol > 1000) card.classList.add('glow-warn');
 }
+
 
 function renderExercise(ex){
   const node = document.createElement('div');
@@ -305,8 +351,11 @@ function renderExercise(ex){
     </div>
     <div class="sets"></div>
     <div class="ex-actions-bottom">
-      <button class="btn-ghost btn-small" data-act="addSet" ${ex.finished ? 'style="display:none"' : ''}>+ Set</button>
-      <button class="btn" style="padding:.6rem 1.2rem" data-act="toggleFinished">${ex.finished ? 'Finished ✓' : 'Finish'}</button>
+      <div>
+        <button class="btn-ghost btn-small" data-act="addSet" ${ex.finished ? 'style="display:none"' : ''}>+ Set</button>
+        <button class="btn" style="padding:.6rem 1.2rem" data-act="toggleFinished">${ex.finished ? 'Finished ✓' : 'Finish'}</button>
+      </div>
+      <button class="btn-ghost btn-small" data-act="removeSet" ${ex.sets.length <= 1 || ex.finished ? 'style="display:none"' : ''}>- Set</button>
     </div>
   `;
   const setsWrap = node.querySelector('.sets');
@@ -344,7 +393,6 @@ function renderSet(exId, s, idx, locked=false){
       <div class="tools">
         <button class="btn-ghost btn-small" data-act="incW">+5</button>
         <button class="btn-ghost btn-small" data-act="decW">-5</button>
-        <button class="btn-danger btn-small" data-act="delSet">✕</button>
       </div>
     `;
   }
@@ -353,20 +401,44 @@ function renderSet(exId, s, idx, locked=false){
 
 /* ---------- Helpers & events ---------- */
 function uid(){ return Math.random().toString(36).slice(2,9); }
-function openPopup(id){ $(id).style.display='flex'; }
-function closePopup(id){ $(id).style.display='none'; }
+function openPopup(id){ 
+  $(id).style.display='flex'; 
+  // Hide totals bar when opening popups
+  if (id === '#bpPopup' || id === '#exPopup') {
+    $('#totalsBar').classList.add('hidden');
+  }
+}
+function closePopup(id){ 
+  $(id).style.display='none'; 
+  // Show totals bar when closing popups
+  $('#totalsBar').classList.remove('hidden');
+}
 $$('.x').forEach(btn=> btn.addEventListener('click', e=> closePopup(e.target.dataset.close)));
 
 /* Body part → exercise flow */
 let currentBP = null;
 
 $('#addExercise').addEventListener('click', ()=>{
+  const day = loadDay(current);
+  const usedBodyParts = [...new Set(day.exercises.map(ex => ex.bodyPart))];
+  
   const grid = $('#bpGrid'); grid.innerHTML = '';
   bodyParts.forEach(bp=>{
     const div = document.createElement('div');
-    div.className = 'opt'; div.textContent = bp; div.dataset.bp = bp;
+    div.className = 'opt'; 
+    if (usedBodyParts.includes(bp)) {
+      div.classList.add('used');
+    }
+    div.textContent = bp; 
+    div.dataset.bp = bp;
     grid.appendChild(div);
   });
+  openPopup('#bpPopup');
+});
+
+// Back button in exercise popup
+$('#backToBP').addEventListener('click', ()=>{
+  closePopup('#exPopup');
   openPopup('#bpPopup');
 });
 
@@ -381,10 +453,19 @@ $('#bpGrid').addEventListener('click', (e)=>{
 });
 
 function populateExerciseGrid(bp){
+  const day = loadDay(current);
+  const usedExercises = day.exercises.filter(ex => ex.bodyPart === bp).map(ex => ex.name);
+  
   const grid = $('#exGrid'); grid.innerHTML = '';
   getAllExercises(bp).forEach(name=>{
     const div = document.createElement('div');
-    div.className='opt'; div.textContent = name; div.dataset.name = name; div.dataset.bp = bp;
+    div.className='opt'; 
+    if (usedExercises.includes(name)) {
+      div.classList.add('used');
+    }
+    div.textContent = name; 
+    div.dataset.name = name; 
+    div.dataset.bp = bp;
     grid.appendChild(div);
   });
 }
@@ -394,14 +475,8 @@ $('#exCreateBtn').addEventListener('click', ()=>{
   const name = ($('#exCreateInput').value || '').trim();
   if(!name || !currentBP) return;
 
-  // avoid duplicates (case-insensitive)
-  const existing = getAllExercises(currentBP).map(s=>s.toLowerCase());
-  if(!existing.includes(name.toLowerCase())){
-    const custom = getCustom();
-    custom[currentBP] = custom[currentBP] || [];
-    custom[currentBP].push(name);
-    saveCustom(custom);
-  }
+  // Add to custom exercises
+  addToCustomExercises(currentBP, name);
 
   // create the exercise for the day
   createExerciseForDay(currentBP, name);
@@ -410,8 +485,23 @@ $('#exCreateBtn').addEventListener('click', ()=>{
 
 $('#exGrid').addEventListener('click', (e)=>{
   const opt = e.target.closest('.opt'); if(!opt) return;
-  createExerciseForDay(opt.dataset.bp, opt.dataset.name);
-  closePopup('#exPopup');
+  const exerciseName = opt.dataset.name;
+  const bodyPart = opt.dataset.bp;
+  
+  // Check if exercise already exists for today
+  const day = loadDay(current);
+  const existingEx = day.exercises.find(ex => ex.name === exerciseName && ex.bodyPart === bodyPart);
+  
+  if (existingEx) {
+    // Add a new set to existing exercise instead of duplicating
+    existingEx.sets.push({weight:'', reps:'', superset:false, done:false});
+    saveDay(day);
+    render();
+    closePopup('#exPopup');
+  } else {
+    createExerciseForDay(bodyPart, exerciseName);
+    closePopup('#exPopup');
+  }
 });
 
 function createExerciseForDay(bp, name){
@@ -431,23 +521,30 @@ $('#log').addEventListener('click', (e)=>{
     ex.sets.push({weight:'', reps:'', superset:false, done:false});
     saveDay(day); render(); return;
   }
+  
+  if(act==='removeSet'){
+    const exId = e.target.closest('.ex').dataset.id;
+    const ex = day.exercises.find(x=>x.id===exId);
+    if(ex.sets.length > 1) {
+      ex.sets.pop(); // Remove the last set
+      saveDay(day); render();
+    }
+    return;
+  }
+  
   if(act==='toggleFinished'){
     const node = e.target.closest('.ex'); const exId = node.dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
     ex.finished = !ex.finished; saveDay(day); render(); return;
   }
-  if(act==='delSet' || act==='incW' || act==='decW'){
+  
+  if(act==='incW' || act==='decW'){
     const row = e.target.closest('.set-row');
     const ex = day.exercises.find(x=>x.id===row.dataset.exId);
     const idx = Number(row.dataset.idx);
-    if(act==='delSet'){
-      ex.sets.splice(idx,1);
-      if(ex.sets.length===0){ day.exercises = day.exercises.filter(x=>x.id!==ex.id); }
-    }else{
-      const delta = act==='incW' ? 5 : -5;
-      const w = Number(ex.sets[idx].weight||0);
-      ex.sets[idx].weight = Math.max(0, w + delta);
-    }
+    const delta = act==='incW' ? 5 : -5;
+    const w = Number(ex.sets[idx].weight||0);
+    ex.sets[idx].weight = Math.max(0, w + delta);
     saveDay(day); render(); return;
   }
 });
