@@ -14,6 +14,9 @@
     /* NEW: power levels + glow */
     --power-glow:#1e3a8a; /* deep blue default */
     --power-grad: linear-gradient(90deg,#0b1118, #0b1118);
+    
+    /* NEW: copied data indicators */
+    --copied-bg:#1a1f2b; --copied-ring:#2a3447; --copied-text:#22c55e;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -83,11 +86,13 @@
   .btn-danger{all:unset; cursor:pointer; padding:.45rem .6rem; border:1px solid #3a2227; border-radius:8px; color:#fecaca; background:#2a0f12}
   .btn-small{padding:.35rem .55rem; font-size:.85rem}
   .btn-today{all:unset; cursor:pointer; padding:.6rem .9rem; border:1px solid #d97706; border-radius:10px; color:#fbbf24; background:linear-gradient(90deg,#f59e0b,#d97706); font-weight:700}
+  .btn-purple{all:unset; cursor:pointer; padding:.7rem 1rem; border-radius:12px; font-weight:700; background:linear-gradient(90deg,#8b5cf6,#a855f7); color:#f3e8ff; box-shadow:0 6px 20px rgba(168,85,247,.25)}
 
   .group{background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:10px; margin-top:6px}
   .group h3{margin:.1rem 0 .4rem; font-size:1rem; color:var(--muted)}
   .ex{border:1px dashed var(--ring); border-radius:12px; padding:10px; margin:8px 0; display:grid; gap:8px; background:#0e141b}
   .ex.finished{background:var(--finished-bg); border-color:var(--finished-ring)}
+  .ex.copied{background:var(--copied-bg); border-color:var(--copied-ring)}
 
   /* NEW: drag styles */
   .ex.drag-armed{outline:1px dashed #375a7f}
@@ -104,6 +109,7 @@
   .weight-input-group{display:flex; align-items:center; gap:4px}
   .num-input{width:6ch; max-width:6ch; padding:.55rem .55rem; border:1px solid #15212c; border-radius:8px; background:#091017; color:var(--ink); font-variant-numeric:tabular-nums}
   .num-input:focus{outline:2px solid #213240}
+  .num-input.copied{background:var(--copied-bg); border-color:var(--copied-ring); color:var(--copied-text)}
   .lbs-label{font-size:.85rem; color:var(--muted); white-space:nowrap}
   .flags{display:flex; align-items:center; gap:12px; color:var(--muted); font-size:.9rem}
   .tools{display:flex; gap:6px}
@@ -136,6 +142,57 @@
   .cal-cell.workout{background:#0e1a12}
   .cal-nav{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px}
   .cal-nav button{all:unset; cursor:pointer; border:1px solid var(--ring); padding:.3rem .6rem; border-radius:8px}
+
+  /* NEW: Workout history styles */
+  .workout-card{
+    border:1px solid var(--ring); 
+    border-radius:10px; 
+    padding:12px; 
+    margin:8px 0; 
+    cursor:pointer; 
+    background:#0e151e;
+    transition: all 0.2s ease;
+  }
+  .workout-card:hover{
+    outline:1px solid #2b3a4a;
+    background:#101722;
+  }
+  .workout-date{
+    font-weight:700; 
+    color:var(--ink); 
+    margin-bottom:4px;
+  }
+  .workout-day{
+    color:var(--muted); 
+    font-size:.9rem; 
+    margin-bottom:6px;
+  }
+  .workout-body-parts{
+    display:flex; 
+    gap:6px; 
+    flex-wrap:wrap; 
+    margin-bottom:6px;
+  }
+  .body-part-tag{
+    background:#1a2332; 
+    color:var(--accent); 
+    padding:.2rem .5rem; 
+    border-radius:999px; 
+    font-size:.8rem;
+    border:1px solid rgba(76,175,80,.3);
+  }
+  .workout-exercises{
+    font-size:.85rem; 
+    color:var(--muted); 
+    margin-top:4px;
+  }
+  .workout-stats{
+    display:flex; 
+    gap:12px; 
+    margin-top:6px; 
+    font-size:.8rem; 
+    color:var(--muted);
+  }
 </style>
 </head>
 <body>
@@ -152,6 +209,7 @@
       <button id="nextDay">→</button>
     </div>
     <div class="actions">
+      <button class="btn-purple" id="addWorkout">Add Workout</button>
       <button class="btn" id="addExercise">Add Exercise</button>
       <button class="btn-ghost" id="saveBtn">Save</button>
       <button class="btn-today" id="todayBtn">Today</button>
@@ -223,6 +281,15 @@
   </div>
 </div>
 
+<!-- NEW: Add Workout sheet -->
+<div class="popup" id="workoutPopup">
+  <div class="sheet">
+    <button class="x" data-close="#workoutPopup">✕</button>
+    <h2 style="margin:6px 0 10px; font-size:1rem; color:#9fb0c7">Previous Workouts</h2>
+    <div id="workoutHistory"></div>
+  </div>
+</div>
+
 <script>
 /* ---------- Catalog ---------- */
 const exerciseOptions = {
@@ -269,6 +336,105 @@ const keyFor = (d)=>`powerUp:${d.toISOString().slice(0,10)}`;
 function blankDay(date){ return { date: date.toISOString().slice(0,10), exercises:[] }; }
 function loadDay(date){ const raw = localStorage.getItem(keyFor(date)); return raw ? JSON.parse(raw) : blankDay(date); }
 function saveDay(day){ localStorage.setItem(`powerUp:${day.date}`, JSON.stringify(day)); }
+
+/* ---------- NEW: Workout history functions ---------- */
+function getPreviousWorkouts(limit = 5) {
+  const workouts = [];
+  const today = new Date();
+  const currentDateStr = current.toISOString().slice(0,10);
+  
+  // Look back up to 90 days for workouts
+  for (let i = 1; i <= 90 && workouts.length < limit; i++) {
+    const checkDate = new Date(today);
+    checkDate.setDate(checkDate.getDate() - i);
+    const checkDateStr = checkDate.toISOString().slice(0,10);
+    
+    // Skip if this is the current day we're viewing
+    if (checkDateStr === currentDateStr) continue;
+    
+    // Check if there's data for this date
+    const storageKey = `powerUp:${checkDateStr}`;
+    const rawData = localStorage.getItem(storageKey);
+    
+    if (rawData) {
+      try {
+        const day = JSON.parse(rawData);
+        if (day.exercises && day.exercises.length > 0) {
+          const stats = totalsFiltered(day);
+          const bodyParts = [...new Set(day.exercises.map(ex => ex.bodyPart))];
+          
+          workouts.push({
+            date: checkDate,
+            day: day,
+            bodyParts: bodyParts,
+            stats: stats
+          });
+        }
+      } catch (e) {
+        // Skip invalid data
+        continue;
+      }
+    }
+  }
+  
+  return workouts;
+}
+
+function duplicateWorkout(sourceDay) {
+  const currentDay = loadDay(current);
+  
+  // Don't clear current exercises - merge instead
+  
+  // Copy exercises with modifications
+  sourceDay.exercises.forEach(sourceEx => {
+    // Check if this exercise already exists
+    const existingEx = currentDay.exercises.find(ex => 
+      ex.name === sourceEx.name && ex.bodyPart === sourceEx.bodyPart
+    );
+    
+    if (existingEx) {
+      // Add missing sets to existing exercise
+      const existingSetsCount = existingEx.sets.length;
+      const sourceSetsCount = sourceEx.sets.length;
+      
+      if (sourceSetsCount > existingSetsCount) {
+        // Add the missing sets
+        for (let i = existingSetsCount; i < sourceSetsCount; i++) {
+          const sourceSet = sourceEx.sets[i];
+          existingEx.sets.push({
+            weight: sourceSet.weight || '',
+            reps: sourceSet.reps || '',
+            superset: sourceSet.superset || false,
+            done: false,
+            copied: true
+          });
+        }
+      }
+    } else {
+      // Create new exercise
+      const newEx = {
+        id: uid(),
+        bodyPart: sourceEx.bodyPart,
+        name: sourceEx.name,
+        finished: false,
+        copied: true, // Mark as copied
+        sets: sourceEx.sets.map(sourceSet => ({
+          weight: sourceSet.weight || '',
+          reps: sourceSet.reps || '',
+          superset: sourceSet.superset || false,
+          done: false, // Reset done status
+          copied: true // Mark set as copied
+        }))
+      };
+      
+      currentDay.exercises.push(newEx);
+    }
+  });
+  
+  saveDay(currentDay);
+  render();
+  closePopup('#workoutPopup');
+}
 
 /* ---------- Maths ---------- */
 function exStats(ex){
@@ -417,12 +583,13 @@ function renderPowerCard(day){
 
   const points = [];
   let run = 0;
-  day.exercises.forEach(ex =>
-    countedSets(ex).forEach(s => {
+  day.exercises.forEach(ex => {
+    const sets = countedSets(ex);
+    sets.forEach(s => {
       run += (Number(s.weight) || 0) * (Number(s.reps) || 0);
       points.push(run);
-    })
-  );
+    });
+  });
   if (points.length < 2) points.push(Math.max(0, run));
 
   drawSpark('powerSpark', points);
@@ -433,15 +600,16 @@ function renderPowerCard(day){
 
 function renderExercise(ex){
   const node = document.createElement('div');
-  node.className = 'ex' + (ex.finished ? ' finished' : '');
+  node.className = 'ex' + (ex.finished ? ' finished' : '') + (ex.copied ? ' copied' : '');
   node.dataset.id = ex.id;
   node.setAttribute('tabindex','0'); // focusable for accessibility
 
   const {vol, avg} = exStats(ex);
+  const copiedText = ex.copied ? ' (copied)' : '';
   node.innerHTML = `
-    <div class="ex-header">
+    <div class="ex-header" data-act="removeCopied">
       <div>
-        <div class="ex-name">${ex.name}</div>
+        <div class="ex-name">${ex.name}${copiedText}</div>
         <div class="tag">${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep</div>
       </div>
     </div>
@@ -475,12 +643,13 @@ function renderSet(exId, s, idx, locked=false){
       <div class="tools" style="visibility:hidden;"></div>
     `;
   } else {
+    const copiedClass = s.copied ? ' copied' : '';
     row.innerHTML = `
       <div class="weight-input-group">
-        <input class="num-input" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" data-field="weight"/>
+        <input class="num-input${copiedClass}" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" data-field="weight"/>
         <span class="lbs-label">lbs</span>
       </div>
-      <input class="num-input" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" data-field="reps"/>
+      <input class="num-input${copiedClass}" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" data-field="reps"/>
       <div></div>
       <div class="flags">
         <label><input type="checkbox" ${s.superset?'checked':''} data-field="superset"/> Superset</label>
@@ -499,7 +668,7 @@ function renderSet(exId, s, idx, locked=false){
 function uid(){ return Math.random().toString(36).slice(2,9); }
 function openPopup(id){ 
   $(id).style.display='flex'; 
-  if (id === '#bpPopup' || id === '#exPopup') {
+  if (id === '#bpPopup' || id === '#exPopup' || id === '#workoutPopup') {
     $('#totalsBar').classList.add('hidden');
   }
 }
@@ -507,7 +676,60 @@ function closePopup(id){
   $(id).style.display='none'; 
   $('#totalsBar').classList.remove('hidden');
 }
-$$('.x').forEach(btn=> btn.addEventListener('click', e=> closePopup(e.target.dataset.close)));
+Array.from(document.querySelectorAll('.x')).forEach(btn=> btn.addEventListener('click', e=> closePopup(e.target.dataset.close)));
+
+/* NEW: Add Workout button handler */
+$('#addWorkout').addEventListener('click', ()=>{
+  const workouts = getPreviousWorkouts();
+  const container = $('#workoutHistory');
+  container.innerHTML = '';
+  
+  if (workouts.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted); text-align:center; padding:20px;">No previous workouts found</p>';
+  } else {
+    workouts.forEach(workout => {
+      const card = document.createElement('div');
+      card.className = 'workout-card';
+      
+      const dateStr = workout.date.toLocaleDateString(undefined, {
+        weekday: 'long',
+        month: 'short',
+        day: 'numeric'
+      });
+      
+      const dayStr = workout.date.toLocaleDateString(undefined, {
+        weekday: 'long'
+      });
+      
+      // Get first few exercises for preview
+      const exerciseNames = workout.day.exercises.slice(0, 3).map(ex => ex.name);
+      const exercisePreview = exerciseNames.join(', ') + 
+        (workout.day.exercises.length > 3 ? ` +${workout.day.exercises.length - 3} more` : '');
+      
+      card.innerHTML = `
+        <div class="workout-date">${dateStr}</div>
+        <div class="workout-day">${dayStr}</div>
+        <div class="workout-body-parts">
+          ${workout.bodyParts.map(bp => `<span class="body-part-tag">${bp}</span>`).join('')}
+        </div>
+        <div class="workout-exercises">${exercisePreview}</div>
+        <div class="workout-stats">
+          <span>${workout.stats.sets} sets</span>
+          <span>${Math.round(workout.stats.vol)} lb volume</span>
+          <span>${workout.stats.exCount} exercises</span>
+        </div>
+      `;
+      
+      card.addEventListener('click', () => {
+        duplicateWorkout(workout.day);
+      });
+      
+      container.appendChild(card);
+    });
+  }
+  
+  openPopup('#workoutPopup');
+});
 
 /* Body part → exercise flow */
 let currentBP = null;
@@ -604,12 +826,29 @@ $('#log').addEventListener('click', (e)=>{
   const act = e.target.dataset.act; if(!act) return;
   const day = loadDay(current);
 
+  if(act==='removeCopied'){
+    const exId = e.target.closest('.ex').dataset.id;
+    const ex = day.exercises.find(x=>x.id===exId);
+    if(ex.copied) {
+      ex.copied = false;
+      saveDay(day);
+      render();
+    }
+    return;
+  }
+
   if(act==='addSet'){
     const exId = e.target.closest('.ex').dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
-    // NEW: duplicate previous weight, clear reps, reset done
+    // NEW: copy weight and reps from the last set, mark as copied
     const last = ex.sets.at(-1) || {};
-    ex.sets.push({weight:last.weight ?? '', reps:'', superset:last.superset ?? false, done:false});
+    ex.sets.push({
+      weight: last.weight ?? '', 
+      reps: last.reps ?? '', 
+      superset: last.superset ?? false, 
+      done: false,
+      copied: (last.weight || last.reps) ? true : false // Mark as copied if there's data to copy
+    });
     saveDay(day); render(); return;
   }
   
@@ -626,11 +865,15 @@ $('#log').addEventListener('click', (e)=>{
   if(act==='toggleFinished'){
     const node = e.target.closest('.ex'); const exId = node.dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
-    // NEW: finishing marks all sets done, flags finished
+    // NEW: finishing marks all sets done, flags finished, removes copied status
     const nowFinished = !ex.finished;
     ex.finished = nowFinished;
     if(nowFinished){
-      ex.sets.forEach(s => s.done = true);
+      ex.sets.forEach(s => {
+        s.done = true;
+        s.copied = false; // Remove copied flag when finished
+      });
+      ex.copied = false; // Remove copied flag from exercise
     }
     saveDay(day); render(); return;
   }
@@ -659,6 +902,13 @@ $('#log').addEventListener('input', (e)=>{
     if(clean.replace('.','').length > 4) clean = clean.slice(0,4);
     e.target.value = clean;
     ex.sets[idx][field] = clean;
+    
+    // Remove copied styling when user modifies input
+    if(ex.sets[idx].copied) {
+      ex.sets[idx].copied = false;
+      e.target.classList.remove('copied');
+    }
+    
     saveDay(day);
 
     const exNode = row.closest('.ex');
@@ -678,19 +928,43 @@ $('#log').addEventListener('change', (e)=>{
   const ex = day.exercises.find(x=>x.id===row.dataset.exId);
   const idx = Number(row.dataset.idx);
 
-  if(field==='done' || field==='superset'){
-    ex.sets[idx][field] = e.target.checked; saveDay(day);
+  if(field==='done'){
+    ex.sets[idx].done = e.target.checked; 
+    
+    // Remove copied flag from set and exercise when any set is marked as done
+    if(e.target.checked) {
+      ex.sets[idx].copied = false;
+      ex.copied = false; // Remove copied flag from entire exercise
+      
+      // Update input styling for this set
+      const weightInput = row.querySelector('input[data-field="weight"]');
+      const repsInput = row.querySelector('input[data-field="reps"]');
+      if(weightInput) weightInput.classList.remove('copied');
+      if(repsInput) repsInput.classList.remove('copied');
+      
+      saveDay(day);
+      // Re-render to update exercise header
+      render();
+      return; // Early return since render() will handle the rest
+    }
+    
+    saveDay(day);
     $('#tStatus').textContent = areAllSetsDone(day) ? 'Completed' : 'In progress';
     const {sets, vol, exCount} = totalsFiltered(day);
     $('#tSets').textContent = sets; $('#tVol').textContent = Math.round(vol)+' lb'; $('#tEx').textContent = exCount;
     renderPowerCard(day);
+  }
+  
+  if(field==='superset'){
+    ex.sets[idx].superset = e.target.checked;
+    saveDay(day);
   }
 });
 
 /* ---------- NEW: Long-press drag & drop for exercises ---------- */
 function armDragAndDrop(){
   // make each .ex draggable only after long press
-  $$('.ex').forEach(exNode=>{
+  Array.from(document.querySelectorAll('.ex')).forEach(exNode=>{
     exNode.draggable = false;
     let pressTimer = null;
     const arm = ()=>{
@@ -728,7 +1002,7 @@ function armDragAndDrop(){
       exNode.draggable = false;
       exNode.classList.remove('drag-armed');
       // clean highlights
-      $$('.ex.drop-over').forEach(n=>n.classList.remove('drop-over'));
+      Array.from(document.querySelectorAll('.ex.drop-over')).forEach(n=>n.classList.remove('drop-over'));
     });
   });
 
@@ -746,7 +1020,7 @@ function armDragAndDrop(){
     const destGroup = e.target.closest('.group');
     if(!dest || !destGroup) return;
     e.preventDefault();
-    $$('.ex.drop-over').forEach(n=>n.classList.remove('drop-over'));
+    Array.from(document.querySelectorAll('.ex.drop-over')).forEach(n=>n.classList.remove('drop-over'));
 
     const draggedId = e.dataTransfer.getData('text/plain');
     const destId = dest.dataset.id;
