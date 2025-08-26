@@ -885,7 +885,6 @@ function renderExercise(ex){
           <button class="btn-ghost btn-small" data-act="addSet" style="display:none">+ Set</button>
           <button class="btn" style="padding:.6rem 1.2rem" data-act="toggleFinished">Finished ✓</button>
         </div>
-        <button class="btn-danger btn-small" data-act="removeExercise">Remove Exercise</button>
       </div>
     `;
     
@@ -965,7 +964,10 @@ function renderExercise(ex){
           <button class="btn-ghost btn-small" data-act="addSet">+ Set</button>
           <button class="btn" style="padding:.6rem 1.2rem" data-act="toggleFinished">Finish</button>
         </div>
-        <button class="btn-ghost btn-small" data-act="removeSet" ${ex.sets.length <= 1 ? 'style="display:none"' : ''}>- Set</button>
+        <div style="display:flex; gap:8px">
+          <button class="btn-ghost btn-small" data-act="removeSet" ${ex.sets.length <= 1 ? 'style="display:none"' : ''}>- Set</button>
+          <button class="btn-danger btn-small" data-act="removeExercise">Remove Exercise</button>
+        </div>
       </div>
     `;
     const setsWrap = node.querySelector('.sets');
@@ -1000,7 +1002,7 @@ function renderSet(exId, s, idx, locked=false){
       <input class="num-input${copiedClass}" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" data-field="reps"/>
       <div></div>
       <div class="flags">
-        <label><input type="checkbox" ${s.superset?'checked':''} data-field="superset"/> Superset</label>
+        <label><input type="checkbox" ${s.superset?'checked':''} data-field="superset"/> Rest Pause</label>
         <label><input type="checkbox" ${s.done?'checked':''} data-field="done"/> Done</label>
       </div>
       <div class="tools"></div>

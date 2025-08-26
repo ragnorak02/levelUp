@@ -36,11 +36,11 @@
   .card h3{margin:.1rem 0 .45rem; font-size:.95rem; color:var(--muted); font-weight:600}
 
   /* top cards */
-  #weightCard{grid-column: span 4}
-  #lastWorkoutCard{grid-column: span 8; display:grid; grid-template-columns: 1.15fr 1fr; gap:12px}
-  .val{display:flex; align-items:baseline; gap:8px; font-size:1.9rem; font-weight:700}
-  .trend{font-size:.9rem; color:var(--muted)}
-  .spark{width:100%; height:60px; display:block}
+  #powerCard{grid-column: span 3}
+  #lastWorkoutCard{grid-column: span 9; display:grid; grid-template-columns: 1.15fr 1fr; gap:12px}
+  .val{display:flex; align-items:baseline; gap:8px; font-size:1.6rem; font-weight:700}
+  .trend{font-size:.8rem; color:var(--muted)}
+  .spark{width:100%; height:45px; display:block}
   .meta{display:flex; gap:10px; flex-wrap:wrap}
   .badge{background:#0f1720; border:1px solid var(--ring); color:var(--muted); padding:.3rem .55rem; border-radius:999px; font-size:.82rem}
   .ex-list{display:grid; gap:6px}
@@ -53,28 +53,77 @@
   }
   .cta:active{transform:translateY(1px)}
   .ghost{all:unset; cursor:pointer; color:var(--muted); padding:.5rem .7rem; border-radius:9px; border:1px solid var(--ring)}
+  .small-btn{all:unset; cursor:pointer; color:var(--muted); padding:.4rem .6rem; border-radius:8px; border:1px solid var(--ring); font-size:.85rem}
+
+  /* Power level styling */
+  .power-level{
+    font-size:1.8rem; 
+    font-weight:800; 
+    background:linear-gradient(45deg, #fbbf24, #f59e0b, #d97706);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-shadow:0 2px 4px rgba(0,0,0,0.3);
+  }
+  .level-progress{
+    width:100%; 
+    height:8px; 
+    background:#1a2332; 
+    border-radius:4px; 
+    overflow:hidden;
+    margin:8px 0;
+  }
+  .level-bar{
+    height:100%; 
+    background:linear-gradient(90deg, #fbbf24, #f59e0b); 
+    border-radius:4px;
+    transition:width 0.3s ease;
+  }
+
+  /* Workout navigation */
+  .workout-nav{
+    display:flex; 
+    align-items:center; 
+    gap:8px; 
+    margin-bottom:8px;
+  }
+  .nav-btn{
+    all:unset; 
+    cursor:pointer; 
+    padding:.3rem .5rem; 
+    border:1px solid var(--ring); 
+    border-radius:8px; 
+    font-size:.9rem;
+    color:var(--muted);
+  }
+  .nav-btn:hover{background:rgba(255,255,255,0.05)}
+  .nav-btn:disabled{opacity:0.4; cursor:not-allowed}
 
   /* calendar (compact + half width on desktop) */
   .calendar{grid-column: span 6}
   .calendar h3{margin:0; font-size:1rem; color:var(--muted)}
   .legend{display:flex; gap:10px; color:var(--muted); font-size:.85rem}
   .legend .swatch{width:10px; height:10px; border-radius:4px; display:inline-block; border:1px solid #233446}
+  .cal-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px}
+  .cal-nav{display:flex; align-items:center; gap:8px}
+  .cal-nav button{all:unset; cursor:pointer; padding:.3rem .5rem; border:1px solid var(--ring); border-radius:8px; font-size:.9rem; color:var(--muted)}
   .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:var(--cal-gap); margin-top:6px}
   .dow{font-size:.78rem; color:var(--muted); text-align:center; padding:3px 0}
   .day{
     aspect-ratio:1/1; border:1px solid var(--ring); border-radius:var(--cal-radius);
-    position:relative; background:#0f141b;
+    position:relative; background:#0f141b; cursor:pointer;
   }
-  .day.muted{opacity:.45}
-  .day.partial{ background:#1a1e10 }
-  .day.done{ background:#0e1a12 }
+  .day:hover{background:#1a1f26}
+  .day.muted{opacity:.45; cursor:default}
+  .day.muted:hover{background:#0f141b}
+  .day.done{ background:#16a34a }
   .day.today{outline:2px solid var(--accent-2)}
   .num{ position:absolute; top:6px; left:7px; font-size:var(--cal-font); line-height:1; color:var(--ink) }
   .count{ position:absolute; bottom:6px; right:7px; font-size:var(--cal-count); color:var(--muted) }
 
   /* responsive (fit on one mobile screen) */
   @media (max-width: 980px){
-    #weightCard{grid-column:span 12}
+    #powerCard{grid-column:span 12}
     #lastWorkoutCard{grid-column:span 12}
     .calendar{grid-column:span 12}
     #lastWorkoutCard{grid-template-columns:1fr}
@@ -82,8 +131,8 @@
   @media (max-width: 480px){
     .wrap{gap:8px; padding:8px 8px 12px}
     .card{padding:10px; border-radius:12px}
-    .val{font-size:1.6rem}
-    .spark{height:52px}
+    .val{font-size:1.4rem}
+    .spark{height:40px}
     .badge{font-size:.78rem; padding:.25rem .5rem}
     .ex{padding:6px 7px; font-size:.92rem}
     .legend{font-size:.8rem}
@@ -154,15 +203,29 @@
 
   <div class="wrap">
     <section class="grid">
-      <article class="card" id="weightCard">
-        <h3>Latest Weight</h3>
-        <div class="val"><span id="latestWeight">—</span><span class="trend" id="weightTrend"></span></div>
-        <canvas class="spark" id="weightSpark"></canvas>
+      <article class="card" id="powerCard">
+        <h3>Power Level</h3>
+        <div class="val">
+          <span class="power-level" id="powerLevel">Lv 1</span>
+          <span class="trend" id="powerTrend">Novice</span>
+        </div>
+        <div class="level-progress">
+          <div class="level-bar" id="levelBar" style="width: 0%"></div>
+        </div>
+        <div style="margin-top:8px; margin-bottom:6px;">
+          <div style="font-size:.85rem; color:var(--muted); margin-bottom:2px;">Current Weight</div>
+          <div style="font-size:1.1rem; font-weight:600;" id="currentWeight">—</div>
+        </div>
+        <button class="small-btn" id="logWeight">Log Weight</button>
       </article>
 
       <article class="card" id="lastWorkoutCard">
         <div>
-          <h3 id="workoutPanelTitle">Previous Workout</h3>
+          <div class="workout-nav">
+            <button class="nav-btn" id="prevWorkout">←</button>
+            <h3 id="workoutPanelTitle">Previous Workout</h3>
+            <button class="nav-btn" id="nextWorkout">→</button>
+          </div>
           <div class="meta">
             <span class="badge" id="lastDate">—</span>
             <span class="badge">Total Volume: <b id="lastVolume">—</b></span>
@@ -173,21 +236,23 @@
           <div class="ex-list" id="exList"></div>
         </div>
         <div class="cta-row">
-          <button class="cta" id="startToday">Start Today’s Workout</button>
-          <button class="ghost" id="analytics">View Analytics</button>
-          <button class="ghost" id="logWeight">Log Weight</button>
+          <button class="cta" id="startToday">Start Today's Workout</button>
+          <button class="ghost" id="analytics">Analytics</button>
         </div>
       </article>
 
       <!-- Calendar -->
       <section class="card calendar" id="calendar">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px">
+        <div class="cal-header">
           <h3 id="calTitle">—</h3>
-          <div class="legend">
-            <span><i class="swatch" style="background:#0f141b"></i> None</span>
-            <span><i class="swatch" style="background:#1a1e10"></i> Light</span>
-            <span><i class="swatch" style="background:#0e1a12"></i> Completed</span>
+          <div class="cal-nav">
+            <button id="calPrev">←</button>
+            <button id="calNext">→</button>
           </div>
+        </div>
+        <div class="legend">
+          <span><i class="swatch" style="background:#0f141b"></i> None</span>
+          <span><i class="swatch" style="background:#16a34a"></i> Completed</span>
         </div>
         <div class="cal-grid" id="calDOW"></div>
         <div class="cal-grid" id="calGrid"></div>
@@ -200,6 +265,13 @@
 const today = new Date();
 const todayISO = today.toISOString().slice(0,10);
 const fmt = (d)=>new Date(d+'T00:00:00');
+
+// Calendar navigation state
+let currentCalendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+// Workout navigation state
+let currentWorkoutIndex = 0;
+let workoutDates = [];
 
 function readLocalDays(){
   const out = [];
@@ -245,6 +317,49 @@ const totalVolume = (wo)=> wo.exercises.reduce((sum, ex)=> sum + ex.sets.reduce(
 const totalSets = (wo)=> wo.exercises.reduce((s,ex)=> s + ex.sets.length, 0);
 const completedSets = (wo)=> wo.exercises.reduce((s,ex)=> s + ex.sets.filter(st=>st.completed).length, 0);
 
+/* Power Level Calculation */
+function calculatePowerLevel() {
+  const totalVol = workouts.reduce((sum, w) => sum + totalVolume(w), 0);
+  const maxWeight = Math.max(...workouts.flatMap(w => w.exercises.flatMap(e => e.sets.map(s => s.weight || 0))));
+  const totalWorkouts = workouts.filter(w => w.exercises.length > 0).length;
+  
+  // Power score combines volume, max weight, and consistency
+  const powerScore = (totalVol * 0.6) + (maxWeight * 100) + (totalWorkouts * 200);
+  
+  // Define power levels (JRPG style)
+  const levels = [
+    { threshold: 0, level: 1, title: "Novice", next: 5000 },
+    { threshold: 5000, level: 2, title: "Apprentice", next: 12000 },
+    { threshold: 12000, level: 3, title: "Warrior", next: 25000 },
+    { threshold: 25000, level: 4, title: "Knight", next: 45000 },
+    { threshold: 45000, level: 5, title: "Champion", next: 75000 },
+    { threshold: 75000, level: 6, title: "Master", next: 120000 },
+    { threshold: 120000, level: 7, title: "Grandmaster", next: 180000 },
+    { threshold: 180000, level: 8, title: "Legend", next: 250000 },
+    { threshold: 250000, level: 9, title: "Mythic", next: 350000 },
+    { threshold: 350000, level: 10, title: "Godlike", next: 500000 }
+  ];
+  
+  let currentLevel = levels[0];
+  for (let i = 0; i < levels.length; i++) {
+    if (powerScore >= levels[i].threshold) {
+      currentLevel = levels[i];
+    } else {
+      break;
+    }
+  }
+  
+  const progress = currentLevel.next ? 
+    Math.min(((powerScore - currentLevel.threshold) / (currentLevel.next - currentLevel.threshold)) * 100, 100) : 100;
+  
+  return {
+    level: currentLevel.level,
+    title: currentLevel.title,
+    progress: progress,
+    score: Math.round(powerScore)
+  };
+}
+
 /* Sparkline */
 function drawSpark(id, points){
   const c = document.getElementById(id);
@@ -275,52 +390,71 @@ function drawSpark(id, points){
   ctx.fillStyle = '#e8eef6'; ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2); ctx.fill();
 }
 
-/* Weight card */
-function renderWeight(){
+/* Power Level card */
+function renderPowerLevel(){
+  const power = calculatePowerLevel();
+  document.getElementById('powerLevel').textContent = `Lv ${power.level}`;
+  document.getElementById('powerTrend').textContent = power.title;
+  document.getElementById('levelBar').style.width = `${power.progress}%`;
+  
+  // Render current weight
   const sorted = [...workouts].sort(byDateAsc);
-  const lastWeights = sorted
+  const lastWeight = sorted
     .filter(w=>typeof w.bodyWeight==='number' && !isNaN(w.bodyWeight))
-    .map(w=>({x:fmt(w.date), y:w.bodyWeight}));
-
-  if(lastWeights.length===0){
-    document.getElementById('latestWeight').textContent = '—';
-    document.getElementById('weightTrend').textContent = '';
-    return;
+    .at(-1);
+  
+  const weightEl = document.getElementById('currentWeight');
+  if(lastWeight){
+    weightEl.textContent = `${lastWeight.bodyWeight.toFixed(1)} lb`;
+  } else {
+    weightEl.textContent = '—';
   }
-
-  const latest = lastWeights.at(-1)?.y;
-  const prev   = lastWeights.at(-2)?.y;
-  document.getElementById('latestWeight').textContent = `${latest.toFixed(1)} lb`;
-  const tEl = document.getElementById('weightTrend');
-  const trend = (latest && prev) ? (latest - prev) : 0;
-  if(trend){
-    tEl.textContent = `${trend>0?'+':''}${trend.toFixed(1)} vs last`;
-    tEl.style.color = trend<0 ? 'var(--good)' : 'var(--bad)';
-  } else tEl.textContent = '';
-  drawSpark('weightSpark', lastWeights);
 }
 
-/* Today/Previous workout panel (grouped by muscle group, no reps) */
+/* Workout navigation setup */
+function setupWorkoutNavigation() {
+  // Get all workout dates, including today if it exists
+  const allDates = [...new Set([...workouts.map(w => w.date), todayISO])].sort().reverse();
+  workoutDates = allDates;
+  
+  // Find current workout index (default to today or most recent)
+  const todayIndex = workoutDates.indexOf(todayISO);
+  currentWorkoutIndex = todayIndex >= 0 ? todayIndex : 0;
+}
+
+/* Today/Previous workout panel with navigation */
 function renderWorkoutPanel(){
-  const list = [...workouts].sort(byDateAsc);
-  const todayW = list.find(w=>w.date===todayISO);
-  const inProgress = isTodayInProgress(todayW);
+  setupWorkoutNavigation();
+  
+  const currentDate = workoutDates[currentWorkoutIndex];
+  const workout = workouts.find(w => w.date === currentDate) || { date: currentDate, exercises: [], bodyWeight: undefined };
+  
+  const isToday = currentDate === todayISO;
+  const inProgress = isToday && isTodayInProgress(workout);
+  
+  // Update navigation buttons
+  document.getElementById('prevWorkout').disabled = currentWorkoutIndex >= workoutDates.length - 1;
+  document.getElementById('nextWorkout').disabled = currentWorkoutIndex <= 0;
+  
   const startBtn = document.getElementById('startToday');
-  startBtn.textContent = inProgress ? 'Continue Workout' : 'Start Today’s Workout';
+  if (isToday) {
+    startBtn.textContent = inProgress ? 'Continue Workout' : 'Start Today\'s Workout';
+    startBtn.style.display = 'block';
+  } else {
+    startBtn.style.display = 'none';
+  }
 
-  const hasToday = !!todayW;
-  const target = hasToday ? todayW : (list.filter(w=>w.exercises?.length).slice(0,-1).at(-1) || list.at(-1));
   const title = document.getElementById('workoutPanelTitle');
-  title.textContent = hasToday ? 'Today’s Workout' : 'Previous Workout';
+  title.textContent = isToday ? 'Today\'s Workout' : shortDate(workout.date);
 
-  document.getElementById('lastDate').textContent = shortDate(target.date);
-  document.getElementById('lastVolume').textContent = totalVolume(target).toLocaleString()+' lb';
-  document.getElementById('lastMoves').textContent = target.exercises.length;
-  document.getElementById('lastSets').textContent = totalSets(target);
+  document.getElementById('lastDate').textContent = shortDate(workout.date);
+  document.getElementById('lastVolume').textContent = totalVolume(workout).toLocaleString()+' lb';
+  document.getElementById('lastMoves').textContent = workout.exercises.length;
+  document.getElementById('lastSets').textContent = totalSets(workout);
 
   const setsLeftWrap = document.getElementById('setsLeftBadge');
-  if(hasToday){
-    const left = totalSets(target) - completedSets(target);
+  if(isToday && workout.exercises.length > 0){
+    const left = totalSets(workout) - completedSets(workout);
     setsLeftWrap.style.display = 'inline-flex';
     document.getElementById('setsLeft').textContent = left;
   } else setsLeftWrap.style.display = 'none';
@@ -329,7 +463,7 @@ function renderWorkoutPanel(){
   const exList = document.getElementById('exList');
   exList.innerHTML = '';
   const groups = new Map(); // bodyPart -> Set(names)
-  target.exercises.forEach(ex=>{
+  workout.exercises.forEach(ex=>{
     const bp = ex.bodyPart || 'Other';
     const name = ex.name || 'Exercise';
     if(!groups.has(bp)) groups.set(bp, new Set());
@@ -355,8 +489,8 @@ function renderCalendar(){
     e.className='dow'; e.textContent = d; calDOW.appendChild(e);
   });
 
-  const year = today.getFullYear();
-  const month = today.getMonth();
+  const year = currentCalendarMonth.getFullYear();
+  const month = currentCalendarMonth.getMonth();
   const monthStart = new Date(year, month, 1);
   const monthEnd   = new Date(year, month+1, 0);
   calTitle.textContent = monthStart.toLocaleDateString(undefined, {month:'long', year:'numeric'});
@@ -372,17 +506,38 @@ function renderCalendar(){
 
   calGrid.innerHTML = '';
   const leadingBlanks = monthStart.getDay();
-  for(let i=0;i<leadingBlanks;i++){
-    const empty = document.createElement('div');
-    empty.className='day muted'; calGrid.appendChild(empty);
+  
+  // Add previous month trailing dates
+  for(let i = leadingBlanks - 1; i >= 0; i--){
+    const prevDate = new Date(year, month, -i);
+    const cell = document.createElement('div');
+    cell.className = 'day muted';
+    const num = document.createElement('div'); 
+    num.className = 'num'; 
+    num.textContent = prevDate.getDate();
+    cell.appendChild(num);
+    calGrid.appendChild(cell);
   }
+  
+  // Current month dates
   for(let day=1; day<=monthEnd.getDate(); day++){
     const cell = document.createElement('div');
     const vol = byDay.get(day)||0;
     let state = '';
-    if(vol>0) state = vol>5000 ? 'done' : 'partial';
+    if(vol > 0) state = 'done';
+    
+    const cellDate = new Date(year, month, day);
+    const cellDateStr = cellDate.toISOString().slice(0,10);
+    
     if(day===today.getDate() && month===today.getMonth() && year===today.getFullYear()) state += ' today';
     cell.className = `day ${state}`.trim();
+    
+    // Make clickable if has workout data or is today/future
+    if(vol > 0 || cellDateStr >= todayISO) {
+      cell.addEventListener('click', () => {
+        window.location.href = `workout.html?date=${cellDateStr}`;
+      });
+    }
 
     const num = document.createElement('div'); num.className='num'; num.textContent = day;
     cell.appendChild(num);
@@ -396,7 +551,7 @@ function renderCalendar(){
 
 /* In-progress detection */
 function isTodayInProgress(todayW){
-  if(!todayW){
+  if(!todayW || !todayW.exercises){
     return localStorage.getItem('workoutInProgress') === todayISO;
   }
   const hasSets = totalSets(todayW) > 0;
@@ -404,16 +559,18 @@ function isTodayInProgress(todayW){
   return hasSets && !allDone;
 }
 
-/* Buttons */
+/* Event Listeners */
 document.getElementById('startToday').addEventListener('click', ()=>{
   localStorage.setItem('workoutInProgress', todayISO);
   window.location.href = 'workout.html?start=today';
 });
+
 document.getElementById('analytics').addEventListener('click', ()=>{
   window.location.href = 'analytics.html';
 });
+
 document.getElementById('logWeight').addEventListener('click', ()=>{
-  const w = prompt('Enter today’s weight (lb):');
+  const w = prompt('Enter today\'s weight (lb):');
   if(!w) return;
   const k = `powerUp:${todayISO}`;
   const existing = localStorage.getItem(k);
@@ -425,16 +582,40 @@ document.getElementById('logWeight').addEventListener('click', ()=>{
   location.reload();
 });
 
+// Workout navigation
+document.getElementById('prevWorkout').addEventListener('click', () => {
+  if (currentWorkoutIndex < workoutDates.length - 1) {
+    currentWorkoutIndex++;
+    renderWorkoutPanel();
+  }
+});
+
+document.getElementById('nextWorkout').addEventListener('click', () => {
+  if (currentWorkoutIndex > 0) {
+    currentWorkoutIndex--;
+    renderWorkoutPanel();
+  }
+});
+
+// Calendar navigation
+document.getElementById('calPrev').addEventListener('click', () => {
+  currentCalendarMonth = new Date(currentCalendarMonth.getFullYear(), currentCalendarMonth.getMonth() - 1, 1);
+  renderCalendar();
+});
+
+document.getElementById('calNext').addEventListener('click', () => {
+  currentCalendarMonth = new Date(currentCalendarMonth.getFullYear(), currentCalendarMonth.getMonth() + 1, 1);
+  renderCalendar();
+});
+
 /* Init */
 function renderAll(){
-  renderWeight();
+  renderPowerLevel();
   renderWorkoutPanel();
   renderCalendar();
 }
 renderAll();
-window.addEventListener('resize', ()=>drawSpark('weightSpark',
-  [...workouts].filter(w=>typeof w.bodyWeight==='number').sort(byDateAsc).map(w=>({x:fmt(w.date),y:w.bodyWeight}))
-));
+
 </script>
 </body>
 </html>
