@@ -112,7 +112,162 @@
   .num-input.copied{background:var(--copied-bg); border-color:var(--copied-ring); color:var(--copied-text)}
   .lbs-label{font-size:.85rem; color:var(--muted); white-space:nowrap}
   .flags{display:flex; align-items:center; gap:12px; color:var(--muted); font-size:.9rem}
-  .tools{display:flex; gap:6px}
+  /* NEW: Comparison styles for finished exercises */
+  .comparison-section{
+    margin:8px 0;
+    border-top:1px solid var(--ring);
+    padding-top:8px;
+  }
+  .comparison-label{
+    text-align:center;
+    font-size:.8rem;
+    color:var(--muted);
+    margin-bottom:8px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  .comparison-row{
+    display:grid; 
+    grid-template-columns: auto 1fr auto auto auto auto; 
+    gap:12px; 
+    align-items:center;
+    padding:8px 0;
+    border-bottom:1px solid rgba(28,42,55,0.5);
+  }
+  .comparison-row:last-child{border-bottom:none}
+  .set-label{
+    font-size:.85rem; 
+    color:var(--muted); 
+    min-width:40px;
+    font-weight:600;
+  }
+  .set-data{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .current-data{
+    font-weight:700; 
+    color:var(--ink);
+    font-size:1rem;
+  }
+  .previous-data{
+    font-weight:700;
+    color:#9fb0c7;
+    font-size:1rem;
+  }
+  .vs-separator{
+    color:var(--muted);
+    font-size:.9rem;
+  }
+  .comparison-indicator{
+    font-size:.9rem; 
+    font-weight:700;
+    text-align:center;
+    min-width:20px;
+  }
+  .comparison-indicator.better{color:var(--accent)}
+  .comparison-indicator.same{color:#f59e0b}
+  .comparison-indicator.worse{color:#ef4444}
+  .comparison-difference{
+    font-size:.8rem;
+    font-weight:600;
+    color:var(--muted);
+    text-align:right;
+    min-width:60px;
+  }
+  .comparison-difference.better{color:var(--accent)}
+  .comparison-difference.worse{color:#ef4444}
+  
+  /* NEW: Mini strength indicator */
+  .strength-indicator{
+    width:60px;
+    height:20px;
+    position:relative;
+    background:#1a2332;
+    border-radius:3px;
+    overflow:hidden;
+    border:1px solid var(--ring);
+  }
+  .strength-bar{
+    height:100%;
+    transition:width 0.3s ease;
+    border-radius:2px;
+  }
+  .strength-bar.better{
+    background:linear-gradient(90deg, var(--accent), #16a34a);
+  }
+  .strength-bar.worse{
+    background:linear-gradient(90deg, #dc2626, #ef4444);
+  }
+  .strength-bar.same{
+    background:linear-gradient(90deg, #d97706, #f59e0b);
+    width:50% !important;
+  }
+  .strength-label{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:.7rem;
+    font-weight:600;
+    color:var(--ink);
+    text-shadow:0 1px 2px rgba(0,0,0,0.5);
+  }
+
+  /* NEW: Collapsible sections */
+  .group{position:relative}
+  .group-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+    padding:4px 0;
+    border-bottom:1px solid var(--ring);
+    margin-bottom:8px;
+  }
+  .group-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .collapse-icon{
+    font-size:1.2rem;
+    color:var(--muted);
+    transition:transform 0.2s ease;
+  }
+  .group.collapsed .collapse-icon{
+    transform:rotate(-90deg);
+  }
+  .group.collapsed .group-content{
+    display:none;
+  }
+  
+  .ex-header{
+    cursor:pointer;
+    position:relative;
+  }
+  .ex-header::after{
+    content:'▼';
+    position:absolute;
+    right:8px;
+    top:50%;
+    transform:translateY(-50%);
+    color:var(--muted);
+    font-size:.8rem;
+    transition:transform 0.2s ease;
+  }
+  .ex.collapsed .ex-header::after{
+    transform:translateY(-50%) rotate(-90deg);
+  }
+  .ex.collapsed .sets,
+  .ex.collapsed .ex-actions-bottom{
+    display:none;
+  }
   .finished-display{color:var(--muted); font-size:.9rem; text-align:right}
 
   .spacer{height:70px}
@@ -337,7 +492,99 @@ function blankDay(date){ return { date: date.toISOString().slice(0,10), exercise
 function loadDay(date){ const raw = localStorage.getItem(keyFor(date)); return raw ? JSON.parse(raw) : blankDay(date); }
 function saveDay(day){ localStorage.setItem(`powerUp:${day.date}`, JSON.stringify(day)); }
 
-/* ---------- NEW: Workout history functions ---------- */
+/* ---------- NEW: Exercise comparison functions ---------- */
+function getPreviousExerciseData(exerciseName, bodyPart) {
+  const currentDateStr = current.toISOString().slice(0,10);
+  
+  // Look back up to 90 days for the same exercise
+  for (let i = 1; i <= 90; i++) {
+    const checkDate = new Date(current);
+    checkDate.setDate(checkDate.getDate() - i);
+    const checkDateStr = checkDate.toISOString().slice(0,10);
+    
+    const storageKey = `powerUp:${checkDateStr}`;
+    const rawData = localStorage.getItem(storageKey);
+    
+    if (rawData) {
+      try {
+        const day = JSON.parse(rawData);
+        if (day.exercises) {
+          const previousEx = day.exercises.find(ex => 
+            ex.name === exerciseName && ex.bodyPart === bodyPart
+          );
+          if (previousEx) {
+            return previousEx.sets;
+          }
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+  }
+  
+  return null;
+}
+
+function compareWeight(current, previous) {
+  const currentWeight = Number(current) || 0;
+  const previousWeight = Number(previous) || 0;
+  
+  if (currentWeight > previousWeight) return 'better';
+  if (currentWeight === previousWeight && currentWeight > 0) return 'same';
+  if (currentWeight < previousWeight) return 'worse';
+  return '';
+}
+
+function calculateStrengthChange(currentWeight, currentReps, previousWeight, previousReps) {
+  const currentTotal = (Number(currentWeight) || 0) * (Number(currentReps) || 0);
+  const previousTotal = (Number(previousWeight) || 0) * (Number(previousReps) || 0);
+  
+  if (previousTotal === 0) return { type: 'new', percentage: 0, label: 'NEW' };
+  
+  const change = currentTotal - previousTotal;
+  const percentage = Math.abs(change / previousTotal) * 100;
+  
+  if (change > 0) {
+    return { 
+      type: 'better', 
+      percentage: Math.min(percentage, 100), 
+      label: `+${Math.round(percentage)}%` 
+    };
+  } else if (change < 0) {
+    return { 
+      type: 'worse', 
+      percentage: Math.min(percentage, 100), 
+      label: `-${Math.round(percentage)}%` 
+    };
+  } else {
+    return { type: 'same', percentage: 0, label: '=' };
+  }
+}
+
+function calculateDifference(currentWeight, currentReps, previousWeight, previousReps) {
+  const cw = Number(currentWeight) || 0;
+  const cr = Number(currentReps) || 0;
+  const pw = Number(previousWeight) || 0;
+  const pr = Number(previousReps) || 0;
+  
+  const weightDiff = cw - pw;
+  const repsDiff = cr - pr;
+  
+  let weightStr = '';
+  let repsStr = '';
+  
+  if (weightDiff > 0) weightStr = `+${weightDiff}`;
+  else if (weightDiff < 0) weightStr = `${weightDiff}`;
+  else if (cw > 0) weightStr = '=';
+  else weightStr = '—';
+  
+  if (repsDiff > 0) repsStr = `+${repsDiff}`;
+  else if (repsDiff < 0) repsStr = `${repsDiff}`;
+  else if (cr > 0) repsStr = '=';
+  else repsStr = '—';
+  
+  return `${weightStr} × ${repsStr}`;
+}
 function getPreviousWorkouts(limit = 5) {
   const workouts = [];
   const today = new Date();
@@ -550,8 +797,18 @@ function render(){
 
     const g = document.createElement('div');
     g.className = 'group'; g.dataset.bodypart = bp;
-    g.innerHTML = `<h3>${bp}</h3>`;
-    sorted.forEach(ex=> g.appendChild(renderExercise(ex)));
+    g.innerHTML = `
+      <div class="group-header" data-act="toggleGroup">
+        <div class="group-title">
+          <span class="collapse-icon">▼</span>
+          <h3 style="margin:0; font-size:1rem; color:var(--muted)">${bp}</h3>
+        </div>
+      </div>
+      <div class="group-content"></div>
+    `;
+    
+    const content = g.querySelector('.group-content');
+    sorted.forEach(ex=> content.appendChild(renderExercise(ex)));
     log.appendChild(g);
   });
 
@@ -606,24 +863,115 @@ function renderExercise(ex){
 
   const {vol, avg} = exStats(ex);
   const copiedText = ex.copied ? ' (copied)' : '';
-  node.innerHTML = `
-    <div class="ex-header" data-act="removeCopied">
-      <div>
-        <div class="ex-name">${ex.name}${copiedText}</div>
-        <div class="tag">${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep</div>
+  
+  if (ex.finished) {
+    // For finished exercises, show comparison with previous workout
+    const previousSets = getPreviousExerciseData(ex.name, ex.bodyPart);
+    
+    node.innerHTML = `
+      <div class="ex-header" data-act="toggleExercise">
+        <div>
+          <div class="ex-name">${ex.name}${copiedText}</div>
+          <div class="tag">${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep</div>
+        </div>
       </div>
-    </div>
-    <div class="sets"></div>
-    <div class="ex-actions-bottom">
-      <div>
-        <button class="btn-ghost btn-small" data-act="addSet" ${ex.finished ? 'style="display:none"' : ''}>+ Set</button>
-        <button class="btn" style="padding:.6rem 1.2rem" data-act="toggleFinished">${ex.finished ? 'Finished ✓' : 'Finish'}</button>
+      <div class="sets" id="comparison-${ex.id}">
+        <div class="comparison-section">
+          <div class="comparison-label">Performance Comparison</div>
+        </div>
       </div>
-      <button class="btn-ghost btn-small" data-act="removeSet" ${ex.sets.length <= 1 || ex.finished ? 'style="display:none"' : ''}>- Set</button>
-    </div>
-  `;
-  const setsWrap = node.querySelector('.sets');
-  ex.sets.forEach((s, i)=> setsWrap.appendChild(renderSet(ex.id, s, i, !!ex.finished)));
+      <div class="ex-actions-bottom">
+        <div>
+          <button class="btn-ghost btn-small" data-act="addSet" style="display:none">+ Set</button>
+          <button class="btn" style="padding:.6rem 1.2rem" data-act="toggleFinished">Finished ✓</button>
+        </div>
+        <button class="btn-danger btn-small" data-act="removeExercise">Remove Exercise</button>
+      </div>
+    `;
+    
+    const setsWrap = node.querySelector('.comparison-section');
+    
+    // Create comparison view
+    const maxSets = Math.max(ex.sets.length, previousSets ? previousSets.length : 0);
+    for (let i = 0; i < maxSets; i++) {
+      const currentSet = ex.sets[i];
+      const previousSet = previousSets ? previousSets[i] : null;
+      
+      const comparisonRow = document.createElement('div');
+      comparisonRow.className = 'comparison-row';
+      
+      if (currentSet) {
+        const currentWeight = currentSet.weight || '0';
+        const currentReps = currentSet.reps || '0';
+        const previousWeight = previousSet ? (previousSet.weight || '0') : '0';
+        const previousReps = previousSet ? (previousSet.reps || '0') : '0';
+        
+        const weightComparison = compareWeight(currentWeight, previousWeight);
+        const indicatorSymbol = weightComparison === 'better' ? '↑' : 
+                               weightComparison === 'same' ? '=' : 
+                               weightComparison === 'worse' ? '↓' : '';
+        
+        const difference = calculateDifference(currentWeight, currentReps, previousWeight, previousReps);
+        const diffClass = weightComparison === 'better' ? 'better' : 
+                         weightComparison === 'worse' ? 'worse' : '';
+        
+        const strengthChange = calculateStrengthChange(currentWeight, currentReps, previousWeight, previousReps);
+        
+        comparisonRow.innerHTML = `
+          <div class="set-label">Set ${i+1}</div>
+          <div class="set-data">
+            <div class="current-data">${currentWeight} lbs × ${currentReps}</div>
+            <div class="vs-separator">vs</div>
+            <div class="previous-data">${previousSet ? previousWeight : '—'} × ${previousSet ? previousReps : '—'}</div>
+          </div>
+          <div class="comparison-indicator ${weightComparison}">${indicatorSymbol}</div>
+          <div class="comparison-difference ${diffClass}">${difference}</div>
+          <div class="strength-indicator">
+            <div class="strength-bar ${strengthChange.type}" style="width: ${strengthChange.type === 'same' ? '50' : strengthChange.percentage}%"></div>
+            <div class="strength-label">${strengthChange.label}</div>
+          </div>
+        `;
+      } else if (previousSet) {
+        comparisonRow.innerHTML = `
+          <div class="set-label">Set ${i+1}</div>
+          <div class="set-data">
+            <div class="current-data">—</div>
+            <div class="vs-separator">vs</div>
+            <div class="previous-data">${previousSet.weight || '0'} × ${previousSet.reps || '0'}</div>
+          </div>
+          <div class="comparison-indicator"></div>
+          <div class="comparison-difference">Missing</div>
+          <div class="strength-indicator">
+            <div class="strength-bar worse" style="width: 100%"></div>
+            <div class="strength-label">-100%</div>
+          </div>
+        `;
+      }
+      
+      setsWrap.appendChild(comparisonRow);
+    }
+  } else {
+    // Normal view for unfinished exercises
+    node.innerHTML = `
+      <div class="ex-header" data-act="toggleExercise">
+        <div>
+          <div class="ex-name">${ex.name}${copiedText}</div>
+          <div class="tag">${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep</div>
+        </div>
+      </div>
+      <div class="sets"></div>
+      <div class="ex-actions-bottom">
+        <div>
+          <button class="btn-ghost btn-small" data-act="addSet">+ Set</button>
+          <button class="btn" style="padding:.6rem 1.2rem" data-act="toggleFinished">Finish</button>
+        </div>
+        <button class="btn-ghost btn-small" data-act="removeSet" ${ex.sets.length <= 1 ? 'style="display:none"' : ''}>- Set</button>
+      </div>
+    `;
+    const setsWrap = node.querySelector('.sets');
+    ex.sets.forEach((s, i)=> setsWrap.appendChild(renderSet(ex.id, s, i, false)));
+  }
+  
   return node;
 }
 
@@ -638,7 +986,7 @@ function renderSet(exId, s, idx, locked=false){
         <span class="lbs-label">lbs</span>
       </div>
       <input class="num-input" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" disabled/>
-      <div class="finished-display">${Math.round(totalWeight)} lbs</div>
+      <div></div>
       <div class="flags" style="visibility:hidden;"></div>
       <div class="tools" style="visibility:hidden;"></div>
     `;
@@ -655,10 +1003,7 @@ function renderSet(exId, s, idx, locked=false){
         <label><input type="checkbox" ${s.superset?'checked':''} data-field="superset"/> Superset</label>
         <label><input type="checkbox" ${s.done?'checked':''} data-field="done"/> Done</label>
       </div>
-      <div class="tools">
-        <button class="btn-ghost btn-small" data-act="incW">+5</button>
-        <button class="btn-ghost btn-small" data-act="decW">-5</button>
-      </div>
+      <div class="tools"></div>
     `;
   }
   return row;
@@ -826,6 +1171,18 @@ $('#log').addEventListener('click', (e)=>{
   const act = e.target.dataset.act; if(!act) return;
   const day = loadDay(current);
 
+  if(act==='toggleGroup'){
+    const group = e.target.closest('.group');
+    group.classList.toggle('collapsed');
+    return;
+  }
+
+  if(act==='toggleExercise'){
+    const exercise = e.target.closest('.ex');
+    exercise.classList.toggle('collapsed');
+    return;
+  }
+
   if(act==='removeCopied'){
     const exId = e.target.closest('.ex').dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
@@ -861,6 +1218,17 @@ $('#log').addEventListener('click', (e)=>{
     }
     return;
   }
+
+  if(act==='removeExercise'){
+    if(!confirm('Remove this entire exercise?')) return;
+    const exId = e.target.closest('.ex').dataset.id;
+    const exIndex = day.exercises.findIndex(x=>x.id===exId);
+    if(exIndex >= 0) {
+      day.exercises.splice(exIndex, 1);
+      saveDay(day); render();
+    }
+    return;
+  }
   
   if(act==='toggleFinished'){
     const node = e.target.closest('.ex'); const exId = node.dataset.id;
@@ -875,16 +1243,6 @@ $('#log').addEventListener('click', (e)=>{
       });
       ex.copied = false; // Remove copied flag from exercise
     }
-    saveDay(day); render(); return;
-  }
-  
-  if(act==='incW' || act==='decW'){
-    const row = e.target.closest('.set-row');
-    const ex = day.exercises.find(x=>x.id===row.dataset.exId);
-    const idx = Number(row.dataset.idx);
-    const delta = act==='incW' ? 5 : -5;
-    const w = Number(ex.sets[idx].weight||0);
-    ex.sets[idx].weight = Math.max(0, w + delta);
     saveDay(day); render(); return;
   }
 });
