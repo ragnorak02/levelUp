@@ -40,7 +40,7 @@
     background:var(--panel);
     border:1px solid var(--ring);
     border-radius:14px; padding:12px;
-    box-shadow:0 8px 30px rgba(0,0,0,.25)
+    box-shadow:0 8px 30px rgba(0,0,0,.25);
   }
   #powerCard{
     position:relative;
@@ -88,8 +88,16 @@
   .btn-today{all:unset; cursor:pointer; padding:.6rem .9rem; border:1px solid #d97706; border-radius:10px; color:#fbbf24; background:linear-gradient(90deg,#f59e0b,#d97706); font-weight:700}
   .btn-purple{all:unset; cursor:pointer; padding:.7rem 1rem; border-radius:12px; font-weight:700; background:linear-gradient(90deg,#8b5cf6,#a855f7); color:#f3e8ff; box-shadow:0 6px 20px rgba(168,85,247,.25)}
 
-  .group{background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:10px; margin-top:6px}
+  /* Super-groups */
+  .supergroup{background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:10px}
+  .supergroup h2{margin:.2rem 0 .4rem; font-size:1rem; color:#c7d2fe}
+  .supergroup.hidden{display:none}
+
+  /* Body-part groups */
+  .group{background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:10px; margin-top:10px; position:relative}
   .group h3{margin:.1rem 0 .4rem; font-size:1rem; color:var(--muted)}
+  .group.hidden{display:none}
+
   .ex{border:1px dashed var(--ring); border-radius:12px; padding:10px; margin:8px 0; display:grid; gap:8px; background:#0e141b}
   .ex.finished{background:var(--finished-bg); border-color:var(--finished-ring)}
   .ex.copied{background:var(--copied-bg); border-color:var(--copied-ring)}
@@ -112,167 +120,45 @@
   .num-input.copied{background:var(--copied-bg); border-color:var(--copied-ring); color:var(--copied-text)}
   .lbs-label{font-size:.85rem; color:var(--muted); white-space:nowrap}
   .flags{display:flex; align-items:center; gap:12px; color:var(--muted); font-size:.9rem}
-  /* NEW: Comparison styles for finished exercises */
-  .comparison-section{
-    margin:8px 0;
-    border-top:1px solid var(--ring);
-    padding-top:8px;
-  }
-  .comparison-label{
-    text-align:center;
-    font-size:.8rem;
-    color:var(--muted);
-    margin-bottom:8px;
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-  }
-  .comparison-row{
-    display:grid; 
-    grid-template-columns: auto 1fr auto auto auto auto; 
-    gap:12px; 
-    align-items:center;
-    padding:8px 0;
-    border-bottom:1px solid rgba(28,42,55,0.5);
-  }
+
+  /* Comparison (finished view) */
+  .comparison-section{margin:8px 0; border-top:1px solid var(--ring); padding-top:8px;}
+  .comparison-label{text-align:center; font-size:.8rem; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;}
+  .comparison-row{display:grid; grid-template-columns: auto 1fr auto auto auto auto; gap:12px; align-items:center; padding:8px 0; border-bottom:1px solid rgba(28,42,55,0.5);}
   .comparison-row:last-child{border-bottom:none}
-  .set-label{
-    font-size:.85rem; 
-    color:var(--muted); 
-    min-width:40px;
-    font-weight:600;
-  }
-  .set-data{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-  .current-data{
-    font-weight:700; 
-    color:var(--ink);
-    font-size:1rem;
-  }
-  .previous-data{
-    font-weight:700;
-    color:#9fb0c7;
-    font-size:1rem;
-  }
-  .vs-separator{
-    color:var(--muted);
-    font-size:.9rem;
-  }
-  .comparison-indicator{
-    font-size:.9rem; 
-    font-weight:700;
-    text-align:center;
-    min-width:20px;
-  }
+  .set-label{font-size:.85rem; color:var(--muted); min-width:40px; font-weight:600;}
+  .set-data{display:flex; justify-content:space-between; align-items:center;}
+  .current-data{font-weight:700; color:var(--ink); font-size:1rem;}
+  .previous-data{font-weight:700; color:#9fb0c7; font-size:1rem;}
+  .vs-separator{color:var(--muted); font-size:.9rem;}
+  .comparison-indicator{font-size:.9rem; font-weight:700; text-align:center; min-width:20px;}
   .comparison-indicator.better{color:var(--accent)}
   .comparison-indicator.same{color:#f59e0b}
   .comparison-indicator.worse{color:#ef4444}
-  .comparison-difference{
-    font-size:.8rem;
-    font-weight:600;
-    color:var(--muted);
-    text-align:right;
-    min-width:60px;
-  }
+  .comparison-difference{font-size:.8rem; font-weight:600; color:var(--muted); text-align:right; min-width:60px;}
   .comparison-difference.better{color:var(--accent)}
   .comparison-difference.worse{color:#ef4444}
-  
-  /* NEW: Mini strength indicator */
-  .strength-indicator{
-    width:60px;
-    height:20px;
-    position:relative;
-    background:#1a2332;
-    border-radius:3px;
-    overflow:hidden;
-    border:1px solid var(--ring);
-  }
-  .strength-bar{
-    height:100%;
-    transition:width 0.3s ease;
-    border-radius:2px;
-  }
-  .strength-bar.better{
-    background:linear-gradient(90deg, var(--accent), #16a34a);
-  }
-  .strength-bar.worse{
-    background:linear-gradient(90deg, #dc2626, #ef4444);
-  }
-  .strength-bar.same{
-    background:linear-gradient(90deg, #d97706, #f59e0b);
-    width:50% !important;
-  }
-  .strength-label{
-    position:absolute;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:.7rem;
-    font-weight:600;
-    color:var(--ink);
-    text-shadow:0 1px 2px rgba(0,0,0,0.5);
-  }
+  .strength-indicator{width:60px; height:20px; position:relative; background:#1a2332; border-radius:3px; overflow:hidden; border:1px solid var(--ring);}
+  .strength-bar{height:100%; transition:width 0.3s ease; border-radius:2px;}
+  .strength-bar.better{background:linear-gradient(90deg, var(--accent), #16a34a);}
+  .strength-bar.worse{background:linear-gradient(90deg, #dc2626, #ef4444);}
+  .strength-bar.same{background:linear-gradient(90deg, #d97706, #f59e0b); width:50% !important;}
+  .strength-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:600; color:var(--ink); text-shadow:0 1px 2px rgba(0,0,0,0.5);}
 
-  /* NEW: Collapsible sections */
-  .group{position:relative}
-  .group-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    cursor:pointer;
-    padding:4px 0;
-    border-bottom:1px solid var(--ring);
-    margin-bottom:8px;
-  }
-  .group-title{
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .collapse-icon{
-    font-size:1.2rem;
-    color:var(--muted);
-    transition:transform 0.2s ease;
-  }
-  .group.collapsed .collapse-icon{
-    transform:rotate(-90deg);
-  }
-  .group.collapsed .group-content{
-    display:none;
-  }
-  
-  .ex-header{
-    cursor:pointer;
-    position:relative;
-  }
-  .ex-header::after{
-    content:'▼';
-    position:absolute;
-    right:8px;
-    top:50%;
-    transform:translateY(-50%);
-    color:var(--muted);
-    font-size:.8rem;
-    transition:transform 0.2s ease;
-  }
-  .ex.collapsed .ex-header::after{
-    transform:translateY(-50%) rotate(-90deg);
-  }
-  .ex.collapsed .sets,
-  .ex.collapsed .ex-actions-bottom{
-    display:none;
-  }
-  .finished-display{color:var(--muted); font-size:.9rem; text-align:right}
+  /* Collapsible sections */
+  .group-header{display:flex; align-items:center; justify-content:space-between; cursor:pointer; padding:4px 0; border-bottom:1px solid var(--ring); margin-bottom:8px;}
+  .group-title{display:flex; align-items:center; gap:8px;}
+  .collapse-icon{font-size:1.2rem; color:var(--muted); transition:transform 0.2s ease;}
+  .group.collapsed .collapse-icon{transform:rotate(-90deg);}
+  .group.collapsed .group-content{display:none;}
+  .ex-header{cursor:pointer; position:relative;}
+  .ex-header::after{content:'▼'; position:absolute; right:8px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:.8rem; transition:transform 0.2s ease;}
+  .ex.collapsed .ex-header::after{transform:translateY(-50%) rotate(-90deg);}
+  .ex.collapsed .sets, .ex.collapsed .ex-actions-bottom{display:none;}
 
   .spacer{height:70px}
 
-  /* Popups */
+  /* Popups (unchanged) */
   .popup{position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; padding:10px; z-index:100}
   .sheet{width:min(650px, 96%); max-height:85vh; overflow:auto; background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:12px}
   .x{all:unset; cursor:pointer; float:right; border:1px solid var(--ring); padding:.25rem .5rem; border-radius:8px; color:#9fb0c7}
@@ -280,74 +166,25 @@
   .opt{border:1px solid var(--ring); padding:10px; border-radius:10px; cursor:pointer; background:#0e151e; position:relative}
   .opt:hover{outline:1px solid #2b3a4a}
   .opt.used{background:var(--orange-bg); border-color:var(--orange); color:var(--orange)}
-
-  /* Exercise popup header with back button */
   .ex-popup-header{display:flex; align-items:center; gap:10px; margin:6px 0 10px}
   .back-btn{all:unset; cursor:pointer; border:1px solid var(--ring); padding:.25rem .5rem; border-radius:8px; color:#9fb0c7}
-
-  /* Create-new row in exercise popup */
   .create-row{display:flex; gap:8px; align-items:center; margin-bottom:8px}
   .create-input{flex:1; padding:.6rem .7rem; border:1px solid var(--ring); border-radius:10px; background:#0a1118; color:#e8eef6}
   .create-btn{all:unset; cursor:pointer; padding:.6rem .9rem; border-radius:10px; font-weight:700; background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a; border:1px solid #295c38}
-  
-  /* Calendar */
   .calendar{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
   .cal-head{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin:4px 0; color:#9fb0c7; font-size:.85rem}
   .cal-cell{border:1px solid var(--ring); border-radius:8px; padding:8px; text-align:center; background:#0f141b}
   .cal-cell.workout{background:#0e1a12}
   .cal-nav{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px}
   .cal-nav button{all:unset; cursor:pointer; border:1px solid var(--ring); padding:.3rem .6rem; border-radius:8px}
-
-  /* NEW: Workout history styles */
-  .workout-card{
-    border:1px solid var(--ring); 
-    border-radius:10px; 
-    padding:12px; 
-    margin:8px 0; 
-    cursor:pointer; 
-    background:#0e151e;
-    transition: all 0.2s ease;
-  }
-  .workout-card:hover{
-    outline:1px solid #2b3a4a;
-    background:#101722;
-  }
-  .workout-date{
-    font-weight:700; 
-    color:var(--ink); 
-    margin-bottom:4px;
-  }
-  .workout-day{
-    color:var(--muted); 
-    font-size:.9rem; 
-    margin-bottom:6px;
-  }
-  .workout-body-parts{
-    display:flex; 
-    gap:6px; 
-    flex-wrap:wrap; 
-    margin-bottom:6px;
-  }
-  .body-part-tag{
-    background:#1a2332; 
-    color:var(--accent); 
-    padding:.2rem .5rem; 
-    border-radius:999px; 
-    font-size:.8rem;
-    border:1px solid rgba(76,175,80,.3);
-  }
-  .workout-exercises{
-    font-size:.85rem; 
-    color:var(--muted); 
-    margin-top:4px;
-  }
-  .workout-stats{
-    display:flex; 
-    gap:12px; 
-    margin-top:6px; 
-    font-size:.8rem; 
-    color:var(--muted);
-  }
+  .workout-card{border:1px solid var(--ring); border-radius:10px; padding:12px; margin:8px 0; cursor:pointer; background:#0e151e; transition: all 0.2s ease;}
+  .workout-card:hover{outline:1px solid #2b3a4a; background:#101722;}
+  .workout-date{font-weight:700; color:var(--ink); margin-bottom:4px;}
+  .workout-day{color:var(--muted); font-size:.9rem; margin-bottom:6px;}
+  .workout-body-parts{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;}
+  .body-part-tag{background:#1a2332; color:var(--accent); padding:.2rem .5rem; border-radius:999px; font-size:.8rem; border:1px solid rgba(76,175,80,.3);}
+  .workout-exercises{font-size:.85rem; color:var(--muted); margin-top:4px;}
+  .workout-stats{display:flex; gap:12px; margin-top:6px; font-size:.8rem; color:var(--muted);}
 </style>
 </head>
 <body>
@@ -388,9 +225,24 @@
     <span class="chip">Volume: <b id="tVol">0 lb</b></span>
     <span class="chip">Exercises: <b id="tEx">0</b></span>
     <span class="chip">Status: <b id="tStatus">Not started</b></span>
+    <!-- NEW: collapse / expand all icons -->
+    <div style="margin-left:auto; display:flex; gap:6px;">
+      <button class="home" id="collapseAll" title="Collapse all">▾</button>
+      <button class="home" id="expandAll" title="Expand all">▣</button>
+    </div>
   </section>
 
-  <div id="log"></div>
+  <!-- NEW: Supergroups -->
+  <section id="sg-inprogress" class="supergroup">
+    <h2>In Progress</h2>
+    <div id="log-inprogress"></div>
+  </section>
+
+  <section id="sg-completed" class="supergroup">
+    <h2>Completed</h2>
+    <div id="log-completed"></div>
+  </section>
+
   <div class="spacer"></div>
 </main>
 
@@ -412,7 +264,6 @@
       <h2 id="exTitle" style="margin:0; font-size:1rem; color:#9fb0c7; flex:1">Exercises</h2>
     </div>
 
-    <!-- create-new row -->
     <div class="create-row">
       <input id="exCreateInput" class="create-input" placeholder="Create new exercise name…" />
       <button id="exCreateBtn" class="create-btn">Add</button>
@@ -436,7 +287,7 @@
   </div>
 </div>
 
-<!-- NEW: Add Workout sheet -->
+<!-- Add Workout sheet -->
 <div class="popup" id="workoutPopup">
   <div class="sheet">
     <button class="x" data-close="#workoutPopup">✕</button>
@@ -492,195 +343,78 @@ function blankDay(date){ return { date: date.toISOString().slice(0,10), exercise
 function loadDay(date){ const raw = localStorage.getItem(keyFor(date)); return raw ? JSON.parse(raw) : blankDay(date); }
 function saveDay(day){ localStorage.setItem(`powerUp:${day.date}`, JSON.stringify(day)); }
 
-/* ---------- NEW: Exercise comparison functions ---------- */
+/* ---------- Exercise comparison (unchanged) ---------- */
 function getPreviousExerciseData(exerciseName, bodyPart) {
-  const currentDateStr = current.toISOString().slice(0,10);
-  
-  // Look back up to 90 days for the same exercise
   for (let i = 1; i <= 90; i++) {
     const checkDate = new Date(current);
     checkDate.setDate(checkDate.getDate() - i);
-    const checkDateStr = checkDate.toISOString().slice(0,10);
-    
-    const storageKey = `powerUp:${checkDateStr}`;
-    const rawData = localStorage.getItem(storageKey);
-    
+    const rawData = localStorage.getItem(`powerUp:${checkDate.toISOString().slice(0,10)}`);
     if (rawData) {
       try {
         const day = JSON.parse(rawData);
-        if (day.exercises) {
-          const previousEx = day.exercises.find(ex => 
-            ex.name === exerciseName && ex.bodyPart === bodyPart
-          );
-          if (previousEx) {
-            return previousEx.sets;
-          }
-        }
-      } catch (e) {
-        continue;
-      }
+        const previousEx = day.exercises?.find(ex => ex.name === exerciseName && ex.bodyPart === bodyPart);
+        if (previousEx) return previousEx.sets;
+      } catch {}
     }
   }
-  
   return null;
 }
-
-function compareWeight(current, previous) {
-  const currentWeight = Number(current) || 0;
-  const previousWeight = Number(previous) || 0;
-  
-  if (currentWeight > previousWeight) return 'better';
-  if (currentWeight === previousWeight && currentWeight > 0) return 'same';
-  if (currentWeight < previousWeight) return 'worse';
-  return '';
+function compareWeight(c,p){ c=Number(c)||0; p=Number(p)||0; if(c>p) return 'better'; if(c===p && c>0) return 'same'; if(c<p) return 'worse'; return ''; }
+function calculateStrengthChange(cw,cr,pw,pr){
+  const current=(Number(cw)||0)*(Number(cr)||0), prev=(Number(pw)||0)*(Number(pr)||0);
+  if(prev===0) return {type:'new',percentage:0,label:'NEW'};
+  const diff=current-prev, pct=Math.min(Math.abs(diff/prev)*100,100);
+  return diff>0 ? {type:'better',percentage:pct,label:`+${Math.round(pct)}%`} :
+         diff<0 ? {type:'worse',percentage:pct,label:`-${Math.round(pct)}%`} :
+                  {type:'same',percentage:0,label:'='};
 }
-
-function calculateStrengthChange(currentWeight, currentReps, previousWeight, previousReps) {
-  const currentTotal = (Number(currentWeight) || 0) * (Number(currentReps) || 0);
-  const previousTotal = (Number(previousWeight) || 0) * (Number(previousReps) || 0);
-  
-  if (previousTotal === 0) return { type: 'new', percentage: 0, label: 'NEW' };
-  
-  const change = currentTotal - previousTotal;
-  const percentage = Math.abs(change / previousTotal) * 100;
-  
-  if (change > 0) {
-    return { 
-      type: 'better', 
-      percentage: Math.min(percentage, 100), 
-      label: `+${Math.round(percentage)}%` 
-    };
-  } else if (change < 0) {
-    return { 
-      type: 'worse', 
-      percentage: Math.min(percentage, 100), 
-      label: `-${Math.round(percentage)}%` 
-    };
-  } else {
-    return { type: 'same', percentage: 0, label: '=' };
-  }
+function calculateDifference(cw,cr,pw,pr){
+  const w=(Number(cw)||0)-(Number(pw)||0);
+  const r=(Number(cr)||0)-(Number(pr)||0);
+  const ws = w>0?`+${w}`: w<0?`${w}`: (Number(cw)||0)>0?'=':'—';
+  const rs = r>0?`+${r}`: r<0?`${r}`: (Number(cr)||0)>0?'=':'—';
+  return `${ws} × ${rs}`;
 }
-
-function calculateDifference(currentWeight, currentReps, previousWeight, previousReps) {
-  const cw = Number(currentWeight) || 0;
-  const cr = Number(currentReps) || 0;
-  const pw = Number(previousWeight) || 0;
-  const pr = Number(previousReps) || 0;
-  
-  const weightDiff = cw - pw;
-  const repsDiff = cr - pr;
-  
-  let weightStr = '';
-  let repsStr = '';
-  
-  if (weightDiff > 0) weightStr = `+${weightDiff}`;
-  else if (weightDiff < 0) weightStr = `${weightDiff}`;
-  else if (cw > 0) weightStr = '=';
-  else weightStr = '—';
-  
-  if (repsDiff > 0) repsStr = `+${repsDiff}`;
-  else if (repsDiff < 0) repsStr = `${repsDiff}`;
-  else if (cr > 0) repsStr = '=';
-  else repsStr = '—';
-  
-  return `${weightStr} × ${repsStr}`;
-}
-function getPreviousWorkouts(limit = 5) {
-  const workouts = [];
-  const today = new Date();
-  const currentDateStr = current.toISOString().slice(0,10);
-  
-  // Look back up to 90 days for workouts
-  for (let i = 1; i <= 90 && workouts.length < limit; i++) {
-    const checkDate = new Date(today);
-    checkDate.setDate(checkDate.getDate() - i);
-    const checkDateStr = checkDate.toISOString().slice(0,10);
-    
-    // Skip if this is the current day we're viewing
-    if (checkDateStr === currentDateStr) continue;
-    
-    // Check if there's data for this date
-    const storageKey = `powerUp:${checkDateStr}`;
-    const rawData = localStorage.getItem(storageKey);
-    
-    if (rawData) {
-      try {
-        const day = JSON.parse(rawData);
-        if (day.exercises && day.exercises.length > 0) {
-          const stats = totalsFiltered(day);
-          const bodyParts = [...new Set(day.exercises.map(ex => ex.bodyPart))];
-          
-          workouts.push({
-            date: checkDate,
-            day: day,
-            bodyParts: bodyParts,
-            stats: stats
-          });
-        }
-      } catch (e) {
-        // Skip invalid data
-        continue;
+function getPreviousWorkouts(limit=5){
+  const workouts=[]; const today=new Date(); const cur=current.toISOString().slice(0,10);
+  for(let i=1;i<=90 && workouts.length<limit;i++){
+    const d=new Date(today); d.setDate(d.getDate()-i);
+    const iso=d.toISOString().slice(0,10); if(iso===cur) continue;
+    const raw=localStorage.getItem(`powerUp:${iso}`); if(!raw) continue;
+    try{
+      const day=JSON.parse(raw);
+      if(day.exercises?.length){
+        const stats=totalsFiltered(day);
+        const bps=[...new Set(day.exercises.map(ex=>ex.bodyPart))];
+        workouts.push({date:d, day, bodyParts:bps, stats});
       }
-    }
+    }catch{}
   }
-  
   return workouts;
 }
-
-function duplicateWorkout(sourceDay) {
+function duplicateWorkout(sourceDay){
   const currentDay = loadDay(current);
-  
-  // Don't clear current exercises - merge instead
-  
-  // Copy exercises with modifications
-  sourceDay.exercises.forEach(sourceEx => {
-    // Check if this exercise already exists
-    const existingEx = currentDay.exercises.find(ex => 
-      ex.name === sourceEx.name && ex.bodyPart === sourceEx.bodyPart
-    );
-    
-    if (existingEx) {
-      // Add missing sets to existing exercise
-      const existingSetsCount = existingEx.sets.length;
-      const sourceSetsCount = sourceEx.sets.length;
-      
-      if (sourceSetsCount > existingSetsCount) {
-        // Add the missing sets
-        for (let i = existingSetsCount; i < sourceSetsCount; i++) {
-          const sourceSet = sourceEx.sets[i];
-          existingEx.sets.push({
-            weight: sourceSet.weight || '',
-            reps: sourceSet.reps || '',
-            superset: sourceSet.superset || false,
-            done: false,
-            copied: true
-          });
-        }
+  sourceDay.exercises.forEach(src=>{
+    const existing=currentDay.exercises.find(e=>e.name===src.name && e.bodyPart===src.bodyPart);
+    if(existing){
+      const need = src.sets.length-existing.sets.length;
+      for(let i=0;i<need;i++){
+        const s=src.sets[existing.sets.length+i];
+        existing.sets.push({weight:s.weight||'', reps:s.reps||'', superset:s.superset||false, done:false, copied:true});
       }
-    } else {
-      // Create new exercise
-      const newEx = {
+    }else{
+      currentDay.exercises.push({
         id: uid(),
-        bodyPart: sourceEx.bodyPart,
-        name: sourceEx.name,
+        bodyPart: src.bodyPart,
+        name: src.name,
         finished: false,
-        copied: true, // Mark as copied
-        sets: sourceEx.sets.map(sourceSet => ({
-          weight: sourceSet.weight || '',
-          reps: sourceSet.reps || '',
-          superset: sourceSet.superset || false,
-          done: false, // Reset done status
-          copied: true // Mark set as copied
-        }))
-      };
-      
-      currentDay.exercises.push(newEx);
+        completed: false, /* NEW */
+        copied: true,
+        sets: src.sets.map(s=>({weight:s.weight||'', reps:s.reps||'', superset:s.superset||false, done:false, copied:true}))
+      });
     }
   });
-  
-  saveDay(currentDay);
-  render();
-  closePopup('#workoutPopup');
+  saveDay(currentDay); render(); closePopup('#workoutPopup');
 }
 
 /* ---------- Maths ---------- */
@@ -730,71 +464,73 @@ function drawSpark(el, points){
   ctx.fillStyle = '#e8eef6'; ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2); ctx.fill();
 }
 
-/* ---------- NEW: Power levels & flash ---------- */
+/* ---------- Power levels ---------- */
 const POWER_LEVELS = [
-  {th:0,    color:'#1e3a8a'}, // deep blue
-  {th:1000, color:'#0ea5e9'}, // sky/teal
-  {th:2000, color:'#22c55e'}, // green
-  {th:3500, color:'#eab308'}, // yellow
-  {th:5000, color:'#f59e0b'}, // orange
-  {th:6500, color:'#ef4444'}, // red
-  {th:8000, color:'#f5d142'}  // gold (super saiyan)
+  {th:0,    color:'#1e3a8a'},
+  {th:1000, color:'#0ea5e9'},
+  {th:2000, color:'#22c55e'},
+  {th:3500, color:'#eab308'},
+  {th:5000, color:'#f59e0b'},
+  {th:6500, color:'#ef4444'},
+  {th:8000, color:'#f5d142'}
 ];
-let lastLevelIdx = -1; // per-render session
-
-function levelFor(vol){
-  let idx = 0;
-  for(let i=0;i<POWER_LEVELS.length;i++){
-    if(vol >= POWER_LEVELS[i].th) idx = i;
-  }
-  return idx;
-}
-
+let lastLevelIdx = -1;
+const levelFor = (vol)=> POWER_LEVELS.reduce((idx,lv,i)=> vol>=lv.th?i:idx,0);
 function applyPowerTheme(vol){
   const card = document.getElementById('powerCard');
   const idx = levelFor(vol);
   const col = POWER_LEVELS[idx].color;
   card.style.setProperty('--power-glow', col);
-
-  // sweeping gradient for flash
   const left = POWER_LEVELS[Math.max(0, idx-1)].color;
   const right = POWER_LEVELS[Math.min(POWER_LEVELS.length-1, idx+1)].color;
-  const grad = `linear-gradient(90deg,
-    transparent 0%,
-    ${left}22 10%,
-    ${col}55 30%,
-    #ffffff22 50%,
-    ${right}55 70%,
-    transparent 90%)`;
+  const grad = `linear-gradient(90deg, transparent 0%, ${left}22 10%, ${col}55 30%, #ffffff22 50%, ${right}55 70%, transparent 90%)`;
   card.style.setProperty('--power-grad', grad);
-
-  // trigger flash only when crossing a new level
-  const root = document.body; // add a one-shot class to parent to restart animation
   if(idx !== lastLevelIdx){
-    root.classList.remove('level-up');
-    // force reflow to retrigger animation
-    void card.offsetWidth;
-    root.classList.add('level-up');
-    lastLevelIdx = idx;
-    // auto remove class so it can retrigger later
-    setTimeout(()=>document.body.classList.remove('level-up'), 700);
+    document.body.classList.remove('level-up'); void card.offsetWidth; document.body.classList.add('level-up');
+    lastLevelIdx = idx; setTimeout(()=>document.body.classList.remove('level-up'), 700);
   }
 }
 
-/* ---------- Rendering ---------- */
+/* ---------- Rendering with super-groups ---------- */
 function render(){
   $('#dateStr').textContent = new Intl.DateTimeFormat(undefined,{weekday:'short',month:'short',day:'numeric'}).format(current);
   const day = loadDay(current);
   renderPowerCard(day);
 
-  const log = $('#log'); log.innerHTML = '';
+  // Partition exercises by completed flag (NEW)
+  const inProg = day.exercises.filter(ex=> !ex.completed);
+  const done   = day.exercises.filter(ex=> !!ex.completed);
+
+  // Render each supergroup
+  renderSuperGroup('#log-inprogress', '#sg-inprogress', inProg);
+  renderSuperGroup('#log-completed', '#sg-completed', done);
+
+  const {sets, vol, exCount} = totalsFiltered(day);
+  $('#tSets').textContent = sets;
+  $('#tVol').textContent = Math.round(vol) + ' lb';
+  $('#tEx').textContent = exCount;
+  $('#tStatus').textContent = (sets === 0) ? 'Not started' : (areAllSetsDone(day) ? 'Completed' : 'In progress');
+
+  if ($('#calPopup').style.display === 'flex') buildCalendar(current);
+
+  armDragAndDrop();
+}
+
+function renderSuperGroup(containerSel, superSel, list){
+  const container = $(containerSel);
+  container.innerHTML = '';
 
   // group by body part
-  const groups = day.exercises.reduce((m,o)=>((m[o.bodyPart]??=[]).push(o),m),{});
-  Object.entries(groups).forEach(([bp, list])=>{
-    // NEW: sort unfinished first (finished go to bottom)
-    const sorted = [...list].sort((a,b)=> (a.finished===b.finished)?0 : (a.finished?1:-1));
+  const groups = list.reduce((m,o)=>((m[o.bodyPart]??=[]).push(o),m),{});
+  const bodyPartsSorted = Object.keys(groups).sort();
 
+  bodyPartsSorted.forEach(bp=>{
+    const exList = groups[bp];
+
+    // If there are zero items (shouldn't happen), skip
+    if(!exList.length) return;
+
+    // Body-part group container
     const g = document.createElement('div');
     g.className = 'group'; g.dataset.bodypart = bp;
     g.innerHTML = `
@@ -806,30 +542,22 @@ function render(){
       </div>
       <div class="group-content"></div>
     `;
-    
     const content = g.querySelector('.group-content');
-    sorted.forEach(ex=> content.appendChild(renderExercise(ex)));
-    log.appendChild(g);
+
+    // Keep user order; no auto-sort on finish anymore
+    exList.forEach(ex=> content.appendChild(renderExercise(ex)));
+
+    container.appendChild(g);
   });
 
-  const {sets, vol, exCount} = totalsFiltered(day);
-  $('#tSets').textContent = sets;
-  $('#tVol').textContent = Math.round(vol) + ' lb';
-  $('#tEx').textContent = exCount;
-  $('#tStatus').textContent = (sets === 0) ? 'Not started' : (areAllSetsDone(day) ? 'Completed' : 'In progress');
-
-  if ($('#calPopup').style.display === 'flex') buildCalendar(current);
-
-  // NEW: arm drag after render
-  armDragAndDrop();
+  // Hide the entire supergroup if it has no body-part groups
+  const superNode = $(superSel);
+  superNode.classList.toggle('hidden', container.children.length === 0);
 }
 
 function renderPowerCard(day){
   const { vol } = totalsFiltered(day);
-
-  // compute yesterday's total
-  const y = new Date(current);
-  y.setDate(y.getDate() - 1);
+  const y = new Date(current); y.setDate(y.getDate() - 1);
   const prev = totalsFiltered(loadDay(y)).vol;
 
   $('#powerVal').textContent = Math.round(vol) + ' lb';
@@ -842,16 +570,10 @@ function renderPowerCard(day){
   let run = 0;
   day.exercises.forEach(ex => {
     const sets = countedSets(ex);
-    sets.forEach(s => {
-      run += (Number(s.weight) || 0) * (Number(s.reps) || 0);
-      points.push(run);
-    });
+    sets.forEach(s => { run += (Number(s.weight) || 0) * (Number(s.reps) || 0); points.push(run); });
   });
   if (points.length < 2) points.push(Math.max(0, run));
-
   drawSpark('powerSpark', points);
-
-  // NEW: dynamic glow + level sweep
   applyPowerTheme(vol);
 }
 
@@ -859,15 +581,13 @@ function renderExercise(ex){
   const node = document.createElement('div');
   node.className = 'ex' + (ex.finished ? ' finished' : '') + (ex.copied ? ' copied' : '');
   node.dataset.id = ex.id;
-  node.setAttribute('tabindex','0'); // focusable for accessibility
+  node.setAttribute('tabindex','0');
 
   const {vol, avg} = exStats(ex);
   const copiedText = ex.copied ? ' (copied)' : '';
-  
+
   if (ex.finished) {
-    // For finished exercises, show comparison with previous workout
     const previousSets = getPreviousExerciseData(ex.name, ex.bodyPart);
-    
     node.innerHTML = `
       <div class="ex-header" data-act="toggleExercise">
         <div>
@@ -884,73 +604,55 @@ function renderExercise(ex){
         <div>
           <button class="btn-ghost btn-small" data-act="addSet" style="display:none">+ Set</button>
           <button class="btn" style="padding:.6rem 1.2rem" data-act="toggleFinished">Finished ✓</button>
+          <button class="btn-ghost btn-small" data-act="markComplete">${ex.completed?'Completed ✓':'Complete ⤵'}</button>
         </div>
       </div>
     `;
-    
     const setsWrap = node.querySelector('.comparison-section');
-    
-    // Create comparison view
     const maxSets = Math.max(ex.sets.length, previousSets ? previousSets.length : 0);
     for (let i = 0; i < maxSets; i++) {
-      const currentSet = ex.sets[i];
-      const previousSet = previousSets ? previousSets[i] : null;
-      
-      const comparisonRow = document.createElement('div');
-      comparisonRow.className = 'comparison-row';
-      
-      if (currentSet) {
-        const currentWeight = currentSet.weight || '0';
-        const currentReps = currentSet.reps || '0';
-        const previousWeight = previousSet ? (previousSet.weight || '0') : '0';
-        const previousReps = previousSet ? (previousSet.reps || '0') : '0';
-        
-        const weightComparison = compareWeight(currentWeight, previousWeight);
-        const indicatorSymbol = weightComparison === 'better' ? '↑' : 
-                               weightComparison === 'same' ? '=' : 
-                               weightComparison === 'worse' ? '↓' : '';
-        
-        const difference = calculateDifference(currentWeight, currentReps, previousWeight, previousReps);
-        const diffClass = weightComparison === 'better' ? 'better' : 
-                         weightComparison === 'worse' ? 'worse' : '';
-        
-        const strengthChange = calculateStrengthChange(currentWeight, currentReps, previousWeight, previousReps);
-        
-        comparisonRow.innerHTML = `
+      const cs = ex.sets[i], ps = previousSets ? previousSets[i] : null;
+      const row = document.createElement('div'); row.className = 'comparison-row';
+      if (cs) {
+        const cw = cs.weight||'0', cr = cs.reps||'0', pw = ps ? (ps.weight||'0') : '0', pr = ps ? (ps.reps||'0') : '0';
+        const cmp = compareWeight(cw,pw);
+        const sym = cmp==='better'?'↑':cmp==='same'?'=':cmp==='worse'?'↓':'';
+        const diffStr = calculateDifference(cw,cr,pw,pr);
+        const diffCls = cmp==='better'?'better':(cmp==='worse'?'worse':'');
+        const sc = calculateStrengthChange(cw,cr,pw,pr);
+        row.innerHTML = `
           <div class="set-label">Set ${i+1}</div>
           <div class="set-data">
-            <div class="current-data">${currentWeight} lbs × ${currentReps}</div>
+            <div class="current-data">${cw} lbs × ${cr}</div>
             <div class="vs-separator">vs</div>
-            <div class="previous-data">${previousSet ? previousWeight : '—'} × ${previousSet ? previousReps : '—'}</div>
+            <div class="previous-data">${ps ? pw : '—'} × ${ps ? pr : '—'}</div>
           </div>
-          <div class="comparison-indicator ${weightComparison}">${indicatorSymbol}</div>
-          <div class="comparison-difference ${diffClass}">${difference}</div>
+          <div class="comparison-indicator ${cmp}">${sym}</div>
+          <div class="comparison-difference ${diffCls}">${diffStr}</div>
           <div class="strength-indicator">
-            <div class="strength-bar ${strengthChange.type}" style="width: ${strengthChange.type === 'same' ? '50' : strengthChange.percentage}%"></div>
-            <div class="strength-label">${strengthChange.label}</div>
+            <div class="strength-bar ${sc.type}" style="width:${sc.type==='same'?'50':sc.percentage}%"></div>
+            <div class="strength-label">${sc.label}</div>
           </div>
         `;
-      } else if (previousSet) {
-        comparisonRow.innerHTML = `
+      } else {
+        row.innerHTML = `
           <div class="set-label">Set ${i+1}</div>
           <div class="set-data">
             <div class="current-data">—</div>
             <div class="vs-separator">vs</div>
-            <div class="previous-data">${previousSet.weight || '0'} × ${previousSet.reps || '0'}</div>
+            <div class="previous-data">${ps?.weight||'0'} × ${ps?.reps||'0'}</div>
           </div>
           <div class="comparison-indicator"></div>
           <div class="comparison-difference">Missing</div>
           <div class="strength-indicator">
-            <div class="strength-bar worse" style="width: 100%"></div>
+            <div class="strength-bar worse" style="width:100%"></div>
             <div class="strength-label">-100%</div>
           </div>
         `;
       }
-      
-      setsWrap.appendChild(comparisonRow);
+      setsWrap.appendChild(row);
     }
   } else {
-    // Normal view for unfinished exercises
     node.innerHTML = `
       <div class="ex-header" data-act="toggleExercise">
         <div>
@@ -963,6 +665,7 @@ function renderExercise(ex){
         <div>
           <button class="btn-ghost btn-small" data-act="addSet">+ Set</button>
           <button class="btn" style="padding:.6rem 1.2rem" data-act="toggleFinished">Finish</button>
+          <button class="btn-ghost btn-small" data-act="markComplete">${ex.completed?'Completed ✓':'Complete ⤵'}</button>
         </div>
         <div style="display:flex; gap:8px">
           <button class="btn-ghost btn-small" data-act="removeSet" ${ex.sets.length <= 1 ? 'style="display:none"' : ''}>- Set</button>
@@ -973,14 +676,12 @@ function renderExercise(ex){
     const setsWrap = node.querySelector('.sets');
     ex.sets.forEach((s, i)=> setsWrap.appendChild(renderSet(ex.id, s, i, false)));
   }
-  
   return node;
 }
 
 function renderSet(exId, s, idx, locked=false){
   const row = document.createElement('div');
   row.className = 'set-row'; row.dataset.exId = exId; row.dataset.idx = idx;
-  const weight = Number(s.weight) || 0; const reps = Number(s.reps) || 0; const totalWeight = weight * reps;
   if (locked) {
     row.innerHTML = `
       <div class="weight-input-group">
@@ -1013,247 +714,152 @@ function renderSet(exId, s, idx, locked=false){
 
 /* ---------- Helpers & events ---------- */
 function uid(){ return Math.random().toString(36).slice(2,9); }
-function openPopup(id){ 
-  $(id).style.display='flex'; 
-  if (id === '#bpPopup' || id === '#exPopup' || id === '#workoutPopup') {
-    $('#totalsBar').classList.add('hidden');
-  }
-}
-function closePopup(id){ 
-  $(id).style.display='none'; 
-  $('#totalsBar').classList.remove('hidden');
-}
+function openPopup(id){ $(id).style.display='flex'; if (id === '#bpPopup' || id === '#exPopup' || id === '#workoutPopup') $('#totalsBar').classList.add('hidden'); }
+function closePopup(id){ $(id).style.display='none'; $('#totalsBar').classList.remove('hidden'); }
 Array.from(document.querySelectorAll('.x')).forEach(btn=> btn.addEventListener('click', e=> closePopup(e.target.dataset.close)));
 
 /* NEW: Add Workout button handler */
 $('#addWorkout').addEventListener('click', ()=>{
   const workouts = getPreviousWorkouts();
   const container = $('#workoutHistory');
-  container.innerHTML = '';
-  
-  if (workouts.length === 0) {
-    container.innerHTML = '<p style="color:var(--muted); text-align:center; padding:20px;">No previous workouts found</p>';
-  } else {
-    workouts.forEach(workout => {
-      const card = document.createElement('div');
-      card.className = 'workout-card';
-      
-      const dateStr = workout.date.toLocaleDateString(undefined, {
-        weekday: 'long',
-        month: 'short',
-        day: 'numeric'
-      });
-      
-      const dayStr = workout.date.toLocaleDateString(undefined, {
-        weekday: 'long'
-      });
-      
-      // Get first few exercises for preview
-      const exerciseNames = workout.day.exercises.slice(0, 3).map(ex => ex.name);
-      const exercisePreview = exerciseNames.join(', ') + 
-        (workout.day.exercises.length > 3 ? ` +${workout.day.exercises.length - 3} more` : '');
-      
-      card.innerHTML = `
-        <div class="workout-date">${dateStr}</div>
-        <div class="workout-day">${dayStr}</div>
-        <div class="workout-body-parts">
-          ${workout.bodyParts.map(bp => `<span class="body-part-tag">${bp}</span>`).join('')}
-        </div>
-        <div class="workout-exercises">${exercisePreview}</div>
-        <div class="workout-stats">
-          <span>${workout.stats.sets} sets</span>
-          <span>${Math.round(workout.stats.vol)} lb volume</span>
-          <span>${workout.stats.exCount} exercises</span>
-        </div>
-      `;
-      
-      card.addEventListener('click', () => {
-        duplicateWorkout(workout.day);
-      });
-      
-      container.appendChild(card);
-    });
-  }
-  
+  container.innerHTML = workouts.length ? '' : '<p style="color:var(--muted); text-align:center; padding:20px;">No previous workouts found</p>';
+  workouts.forEach(workout=>{
+    const card=document.createElement('div'); card.className='workout-card';
+    const dateStr = workout.date.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});
+    const dayStr = workout.date.toLocaleDateString(undefined,{weekday:'long'});
+    const names = workout.day.exercises.slice(0,3).map(ex=>ex.name);
+    const preview = names.join(', ') + (workout.day.exercises.length>3?` +${workout.day.exercises.length-3} more`:'');
+
+    card.innerHTML = `
+      <div class="workout-date">${dateStr}</div>
+      <div class="workout-day">${dayStr}</div>
+      <div class="workout-body-parts">${workout.bodyParts.map(bp=>`<span class="body-part-tag">${bp}</span>`).join('')}</div>
+      <div class="workout-exercises">${preview}</div>
+      <div class="workout-stats"><span>${workout.stats.sets} sets</span><span>${Math.round(workout.stats.vol)} lb volume</span><span>${workout.stats.exCount} exercises</span></div>
+    `;
+    card.addEventListener('click', ()=> duplicateWorkout(workout.day));
+    container.appendChild(card);
+  });
   openPopup('#workoutPopup');
 });
 
 /* Body part → exercise flow */
 let currentBP = null;
-
 $('#addExercise').addEventListener('click', ()=>{
-  const day = loadDay(current);
-  const usedBodyParts = [...new Set(day.exercises.map(ex => ex.bodyPart))];
-  
-  const grid = $('#bpGrid'); grid.innerHTML = '';
+  const day=loadDay(current);
+  const used=[...new Set(day.exercises.map(ex=>ex.bodyPart))];
+  const grid=$('#bpGrid'); grid.innerHTML='';
   bodyParts.forEach(bp=>{
-    const div = document.createElement('div');
-    div.className = 'opt'; 
-    if (usedBodyParts.includes(bp)) {
-      div.classList.add('used');
-    }
-    div.textContent = bp; 
-    div.dataset.bp = bp;
-    grid.appendChild(div);
+    const div=document.createElement('div'); div.className='opt'; if(used.includes(bp)) div.classList.add('used');
+    div.textContent=bp; div.dataset.bp=bp; grid.appendChild(div);
   });
   openPopup('#bpPopup');
 });
-
-// Back button in exercise popup
-$('#backToBP').addEventListener('click', ()=>{
-  closePopup('#exPopup');
-  openPopup('#bpPopup');
-});
-
+$('#backToBP').addEventListener('click', ()=>{ closePopup('#exPopup'); openPopup('#bpPopup'); });
 $('#bpGrid').addEventListener('click', (e)=>{
-  const bp = e.target.closest('.opt')?.dataset.bp; if(!bp) return;
-  currentBP = bp;
-  closePopup('#bpPopup');
-  $('#exTitle').textContent = `Exercises — ${bp}`;
-  populateExerciseGrid(bp);
-  $('#exCreateInput').value = '';
-  openPopup('#exPopup');
+  const bp=e.target.closest('.opt')?.dataset.bp; if(!bp) return;
+  currentBP = bp; closePopup('#bpPopup'); $('#exTitle').textContent = `Exercises — ${bp}`;
+  populateExerciseGrid(bp); $('#exCreateInput').value=''; openPopup('#exPopup');
 });
-
 function populateExerciseGrid(bp){
-  const day = loadDay(current);
-  const usedExercises = day.exercises.filter(ex => ex.bodyPart === bp).map(ex => ex.name);
-  
-  const grid = $('#exGrid'); grid.innerHTML = '';
+  const day=loadDay(current);
+  const used = day.exercises.filter(ex=>ex.bodyPart===bp).map(ex=>ex.name);
+  const grid=$('#exGrid'); grid.innerHTML='';
   getAllExercises(bp).forEach(name=>{
-    const div = document.createElement('div');
-    div.className='opt'; 
-    if (usedExercises.includes(name)) {
-      div.classList.add('used');
-    }
-    div.textContent = name; 
-    div.dataset.name = name; 
-    div.dataset.bp = bp;
-    grid.appendChild(div);
+    const div=document.createElement('div'); div.className='opt'; if(used.includes(name)) div.classList.add('used');
+    div.textContent=name; div.dataset.name=name; div.dataset.bp=bp; grid.appendChild(div);
   });
 }
-
-/* Create-new button */
 $('#exCreateBtn').addEventListener('click', ()=>{
-  const name = ($('#exCreateInput').value || '').trim();
-  if(!name || !currentBP) return;
+  const name=($('#exCreateInput').value||'').trim(); if(!name || !currentBP) return;
   addToCustomExercises(currentBP, name);
   createExerciseForDay(currentBP, name);
   closePopup('#exPopup');
 });
-
 $('#exGrid').addEventListener('click', (e)=>{
-  const opt = e.target.closest('.opt'); if(!opt) return;
-  const exerciseName = opt.dataset.name;
-  const bodyPart = opt.dataset.bp;
-  const day = loadDay(current);
-  const existingEx = day.exercises.find(ex => ex.name === exerciseName && ex.bodyPart === bodyPart);
-  
-  if (existingEx) {
-    // NEW: duplicate last set's weight, clear reps
-    const last = existingEx.sets.at(-1) || {};
-    existingEx.sets.push({weight:last.weight ?? '', reps:'', superset:last.superset ?? false, done:false});
-    saveDay(day);
-    render();
-    closePopup('#exPopup');
-  } else {
-    createExerciseForDay(bodyPart, exerciseName);
-    closePopup('#exPopup');
+  const opt=e.target.closest('.opt'); if(!opt) return;
+  const name=opt.dataset.name, bp=opt.dataset.bp;
+  const day=loadDay(current);
+  const existing = day.exercises.find(ex=>ex.name===name && ex.bodyPart===bp);
+  if(existing){
+    const last=existing.sets.at(-1)||{};
+    existing.sets.push({weight:last.weight??'', reps:last.reps??'', superset:last.superset??false, done:false, copied:(last.weight||last.reps)?true:false});
+    saveDay(day); render(); closePopup('#exPopup');
+  }else{
+    createExerciseForDay(bp, name); closePopup('#exPopup');
   }
 });
-
 function createExerciseForDay(bp, name){
-  const day = loadDay(current);
-  day.exercises.push({ id: uid(), bodyPart: bp, name, finished:false, sets:[{weight:'', reps:'', superset:false, done:false}] });
+  const day=loadDay(current);
+  day.exercises.push({ id: uid(), bodyPart: bp, name, finished:false, completed:false, sets:[{weight:'', reps:'', superset:false, done:false}] });
   saveDay(day); render();
 }
 
 /* Exercise / Set actions */
-$('#log').addEventListener('click', (e)=>{
+function parentDay(){ return loadDay(current); }
+
+document.addEventListener('click', (e)=>{
   const act = e.target.dataset.act; if(!act) return;
-  const day = loadDay(current);
 
-  if(act==='toggleGroup'){
-    const group = e.target.closest('.group');
-    group.classList.toggle('collapsed');
-    return;
-  }
+  // Group toggles (collapsible)
+  if(act==='toggleGroup'){ const g=e.target.closest('.group'); if(g){ g.classList.toggle('collapsed'); } return; }
+  if(act==='toggleExercise'){ const ex=e.target.closest('.ex'); if(ex){ ex.classList.toggle('collapsed'); } return; }
 
-  if(act==='toggleExercise'){
-    const exercise = e.target.closest('.ex');
-    exercise.classList.toggle('collapsed');
-    return;
-  }
-
-  if(act==='removeCopied'){
-    const exId = e.target.closest('.ex').dataset.id;
-    const ex = day.exercises.find(x=>x.id===exId);
-    if(ex.copied) {
-      ex.copied = false;
-      saveDay(day);
-      render();
-    }
-    return;
-  }
+  const day = parentDay();
 
   if(act==='addSet'){
     const exId = e.target.closest('.ex').dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
-    // NEW: copy weight and reps from the last set, mark as copied
     const last = ex.sets.at(-1) || {};
-    ex.sets.push({
-      weight: last.weight ?? '', 
-      reps: last.reps ?? '', 
-      superset: last.superset ?? false, 
-      done: false,
-      copied: (last.weight || last.reps) ? true : false // Mark as copied if there's data to copy
-    });
+    ex.sets.push({weight:last.weight??'', reps:last.reps??'', superset:last.superset??false, done:false, copied:(last.weight||last.reps)?true:false});
     saveDay(day); render(); return;
   }
-  
   if(act==='removeSet'){
     const exId = e.target.closest('.ex').dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
-    if(ex.sets.length > 1) {
-      ex.sets.pop();
-      saveDay(day); render();
-    }
+    if(ex.sets.length>1){ ex.sets.pop(); saveDay(day); render(); }
     return;
   }
-
   if(act==='removeExercise'){
     if(!confirm('Remove this entire exercise?')) return;
     const exId = e.target.closest('.ex').dataset.id;
-    const exIndex = day.exercises.findIndex(x=>x.id===exId);
-    if(exIndex >= 0) {
-      day.exercises.splice(exIndex, 1);
-      saveDay(day); render();
-    }
+    const idx = day.exercises.findIndex(x=>x.id===exId);
+    if(idx>=0){ day.exercises.splice(idx,1); saveDay(day); render(); }
     return;
   }
-  
+
   if(act==='toggleFinished'){
-    const node = e.target.closest('.ex'); const exId = node.dataset.id;
+    const exId = e.target.closest('.ex').dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
-    // NEW: finishing marks all sets done, flags finished, removes copied status
     const nowFinished = !ex.finished;
     ex.finished = nowFinished;
     if(nowFinished){
-      ex.sets.forEach(s => {
-        s.done = true;
-        s.copied = false; // Remove copied flag when finished
-      });
-      ex.copied = false; // Remove copied flag from exercise
+      ex.sets.forEach(s=>{ s.done=true; s.copied=false; });
+      ex.copied=false;
+    }
+    // IMPORTANT: do NOT move card here. Sorting/grouping only respects ex.completed.
+    saveDay(day); render(); return;
+  }
+
+  if(act==='markComplete'){
+    const exId = e.target.closest('.ex').dataset.id;
+    const ex = day.exercises.find(x=>x.id===exId);
+    ex.completed = !ex.completed; // allow undo if needed
+    // If user marks complete but not finished, assume all sets done
+    if(ex.completed && !ex.finished){
+      ex.finished = true;
+      ex.sets.forEach(s=>{ s.done=true; s.copied=false; });
+      ex.copied=false;
     }
     saveDay(day); render(); return;
   }
 });
 
 /* Autosave inputs & checkboxes */
-$('#log').addEventListener('input', (e)=>{
+document.addEventListener('input', (e)=>{
   const row = e.target.closest('.set-row'); if(!row) return;
   const field = e.target.dataset.field; if(!field) return;
-  const day = loadDay(current);
+  const day = parentDay();
   const ex = day.exercises.find(x=>x.id===row.dataset.exId);
   const idx = Number(row.dataset.idx);
 
@@ -1262,15 +868,10 @@ $('#log').addEventListener('input', (e)=>{
     if(clean.replace('.','').length > 4) clean = clean.slice(0,4);
     e.target.value = clean;
     ex.sets[idx][field] = clean;
-    
-    // Remove copied styling when user modifies input
-    if(ex.sets[idx].copied) {
-      ex.sets[idx].copied = false;
-      e.target.classList.remove('copied');
-    }
-    
+    if(ex.sets[idx].copied){ ex.sets[idx].copied=false; e.target.classList.remove('copied'); }
     saveDay(day);
 
+    // update header stats quickly
     const exNode = row.closest('.ex');
     const {vol:ev, avg} = exStats(ex);
     exNode.querySelector('.tag').textContent = `${ex.sets.length} set(s) • ${Math.round(ev)} lb • avg ${Math.round(avg)} lb/rep`;
@@ -1281,124 +882,84 @@ $('#log').addEventListener('input', (e)=>{
   }
 });
 
-$('#log').addEventListener('change', (e)=>{
+document.addEventListener('change', (e)=>{
   const row = e.target.closest('.set-row'); if(!row) return;
   const field = e.target.dataset.field; if(!field) return;
-  const day = loadDay(current);
+  const day = parentDay();
   const ex = day.exercises.find(x=>x.id===row.dataset.exId);
   const idx = Number(row.dataset.idx);
 
   if(field==='done'){
     ex.sets[idx].done = e.target.checked; 
-    
-    // Remove copied flag from set and exercise when any set is marked as done
-    if(e.target.checked) {
-      ex.sets[idx].copied = false;
-      ex.copied = false; // Remove copied flag from entire exercise
-      
-      // Update input styling for this set
-      const weightInput = row.querySelector('input[data-field="weight"]');
-      const repsInput = row.querySelector('input[data-field="reps"]');
-      if(weightInput) weightInput.classList.remove('copied');
-      if(repsInput) repsInput.classList.remove('copied');
-      
-      saveDay(day);
-      // Re-render to update exercise header
-      render();
-      return; // Early return since render() will handle the rest
+    if(e.target.checked){
+      ex.sets[idx].copied=false;
+      const w=row.querySelector('input[data-field="weight"]'); const r=row.querySelector('input[data-field="reps"]');
+      if(w) w.classList.remove('copied'); if(r) r.classList.remove('copied');
+      saveDay(day); render(); return;
     }
-    
     saveDay(day);
     $('#tStatus').textContent = areAllSetsDone(day) ? 'Completed' : 'In progress';
     const {sets, vol, exCount} = totalsFiltered(day);
     $('#tSets').textContent = sets; $('#tVol').textContent = Math.round(vol)+' lb'; $('#tEx').textContent = exCount;
     renderPowerCard(day);
   }
-  
-  if(field==='superset'){
-    ex.sets[idx].superset = e.target.checked;
-    saveDay(day);
-  }
+  if(field==='superset'){ ex.sets[idx].superset = e.target.checked; saveDay(day); }
 });
 
-/* ---------- NEW: Long-press drag & drop for exercises ---------- */
+/* ---------- Long-press drag & drop ---------- */
 function armDragAndDrop(){
-  // make each .ex draggable only after long press
   Array.from(document.querySelectorAll('.ex')).forEach(exNode=>{
     exNode.draggable = false;
     let pressTimer = null;
-    const arm = ()=>{
-      exNode.classList.add('drag-armed');
-      exNode.draggable = true;
-    };
-    const disarm = ()=>{
-      exNode.classList.remove('drag-armed');
-      if(!exNode.classList.contains('dragging')) exNode.draggable = false;
-    };
+    const arm = ()=>{ exNode.classList.add('drag-armed'); exNode.draggable = true; };
+    const disarm = ()=>{ exNode.classList.remove('drag-armed'); if(!exNode.classList.contains('dragging')) exNode.draggable=false; };
 
     const onPressStart = (evt)=>{
-      // ignore clicks on inputs/buttons inside
       const t = evt.target;
       if(t.closest('input') || t.closest('button')) return;
       pressTimer = setTimeout(arm, 300);
     };
-    const onPressEnd = ()=>{
-      clearTimeout(pressTimer);
-      // keep armed until dragstart triggers shortly after
-      setTimeout(disarm, 400);
-    };
+    const onPressEnd = ()=>{ clearTimeout(pressTimer); setTimeout(disarm, 400); };
 
     exNode.addEventListener('mousedown', onPressStart);
     exNode.addEventListener('touchstart', onPressStart, {passive:true});
     ['mouseup','mouseleave','touchend','touchcancel'].forEach(ev=> exNode.addEventListener(ev, onPressEnd));
 
-    exNode.addEventListener('dragstart', (e)=>{
-      exNode.classList.add('dragging');
-      e.dataTransfer.setData('text/plain', exNode.dataset.id);
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    exNode.addEventListener('dragend', ()=>{
-      exNode.classList.remove('dragging');
-      exNode.draggable = false;
-      exNode.classList.remove('drag-armed');
-      // clean highlights
-      Array.from(document.querySelectorAll('.ex.drop-over')).forEach(n=>n.classList.remove('drop-over'));
-    });
+    exNode.addEventListener('dragstart', (e)=>{ exNode.classList.add('dragging'); e.dataTransfer.setData('text/plain', exNode.dataset.id); e.dataTransfer.effectAllowed='move'; });
+    exNode.addEventListener('dragend', ()=>{ exNode.classList.remove('dragging'); exNode.draggable=false; exNode.classList.remove('drag-armed'); $$('.ex.drop-over').forEach(n=>n.classList.remove('drop-over')); });
   });
 
-  // allow drop on .group container by delegating to .ex targets
-  $('#log').addEventListener('dragover', (e)=>{
+  // allow drop inside either supergroup by delegating to .ex targets
+  document.body.addEventListener('dragover', (e)=>{
     const targetEx = e.target.closest('.ex');
     if(targetEx){ e.preventDefault(); targetEx.classList.add('drop-over'); }
   });
-  $('#log').addEventListener('dragleave', (e)=>{
+  document.body.addEventListener('dragleave', (e)=>{
     const targetEx = e.target.closest('.ex');
     if(targetEx){ targetEx.classList.remove('drop-over'); }
   });
-  $('#log').addEventListener('drop', (e)=>{
+  document.body.addEventListener('drop', (e)=>{
     const dest = e.target.closest('.ex');
     const destGroup = e.target.closest('.group');
     if(!dest || !destGroup) return;
     e.preventDefault();
-    Array.from(document.querySelectorAll('.ex.drop-over')).forEach(n=>n.classList.remove('drop-over'));
+    $$('.ex.drop-over').forEach(n=>n.classList.remove('drop-over'));
 
     const draggedId = e.dataTransfer.getData('text/plain');
-    const destId = dest.dataset.id;
-    if(!draggedId || draggedId === destId) return;
+    const destId = dest.dataset.id; if(!draggedId || draggedId===destId) return;
 
-    const day = loadDay(current);
+    const day = parentDay();
     const draggedIdx = day.exercises.findIndex(x=> x.id===draggedId);
     const destIdx = day.exercises.findIndex(x=> x.id===destId);
     if(draggedIdx<0 || destIdx<0) return;
 
-    // If dropping into a different body group, move there (topologically allowed).
+    // Move across body-part group if needed
     const destBP = destGroup.dataset.bodypart;
     day.exercises[draggedIdx].bodyPart = destBP;
 
-    // Reinsert before/after depending on vertical position
+    // Reinsert before/after based on drop Y
     const destRect = dest.getBoundingClientRect();
-    const midY = destRect.top + destRect.height/2;
-    const before = (e.clientY < midY);
+    const before = (e.clientY < destRect.top + destRect.height/2);
 
     const item = day.exercises.splice(draggedIdx,1)[0];
     const newIndex = (draggedIdx < destIdx)
@@ -1406,10 +967,17 @@ function armDragAndDrop(){
       : (before ? destIdx : destIdx+1);
 
     day.exercises.splice(Math.max(0, Math.min(day.exercises.length, newIndex)), 0, item);
-    saveDay(day);
-    render();
+    saveDay(day); render();
   }, {capture:true});
 }
+
+/* ---------- Collapse / Expand All ---------- */
+$('#collapseAll').addEventListener('click', ()=>{
+  $$('.group').forEach(g=> g.classList.add('collapsed'));
+});
+$('#expandAll').addEventListener('click', ()=>{
+  $$('.group').forEach(g=> g.classList.remove('collapsed'));
+});
 
 /* Save / Clear / Today */
 $('#saveBtn').addEventListener('click', ()=>{ const day = loadDay(current); saveDay(day); $('#saveBtn').textContent = 'Saved ✔'; setTimeout(()=> $('#saveBtn').textContent='Save', 1100); });
