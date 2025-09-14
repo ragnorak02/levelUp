@@ -1,323 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Learn</title>
-    <style>
-        body {
-            margin-top: 10px;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #9AD0C2;
-            flex-direction: column;
-        }
-
-        .header {
-            text-align: center;
-            background-color: #2D9596;
-            color: white;
-            padding: 10px 10px;
-            border-radius: 10px;
-            border: 2px solid black;
-            font-size: 24px;
-            width: 90%;
-            margin: 5px auto;
-        }
-
-        .nav-menu {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .nav-menu button {
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            height: 60px;
-            background-color: #387ADF;
-            color: white;
-        }
-
-        .nav-menu button:hover {
-            background-color: #45a049;
-        }
-
-        .progress-bar-container,
-        .category-progress-bar-container {
-            width: 80%;
-            margin: 0 auto;
-        }
-
-        .progress-bar,
-        .category-progress-bar {
-            margin-top: 10px;
-            background-color: lightblue;
-            border-radius: 5px;
-            padding: 0px;
-            position: relative;
-        }
-
-        .progress-bar-inner,
-        .category-progress-bar-inner {
-            background-color: orange;
-            height: 20px;
-            border-radius: 5px;
-            width: 50%;
-            transition: width 0.5s ease-in-out;
-            position: relative;
-        }
-
-        .progress-text,
-        .category-progress-text {
-            color: black;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .action-row {
-            margin-top: 20px;
-        }
-
-        .category-button {
-                margin: 5px 5px;
-                padding: 35px; /* Adjust padding if necessary to match the desired size */
-                font-size: 16px;
-                background-color: #F1FADA;
-                color: black;
-                border: 2px solid black;
-                border-radius: 10px;
-                cursor: pointer;
-                transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-                position: relative;
-                overflow: hidden;
-                white-space: nowrap;
-                box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); /* Drop shadow effect */
-            }
-
-            .category-button:hover {
-                background-color: #45a049;
-                border-color: #45a049;
-                color: #FFFFFF;
-                box-shadow: 0 6px 12px 0 rgba(0,0,0,0.3); /* Slightly more pronounced shadow on hover */
-            }
-
-        .button-row-container {
-            max-width: 350px;
-            margin-left: 5px;
-            padding-left: 5px;
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
-        }
-
-        #buttonRow {
-            display: inline-block;
-        }
-
-        .study-count-button {
-            border-radius: 50%; /* Make the button round */
-            width: 60px; /* Adjust size as necessary */
-            height: 60px;
-            background-color: #387ADF; /* Example color */
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-
-        .study-count-button:hover {
-            background-color: #45a049;
-        }
-
-        .study-count-label {
-            color: #FFF; /* Light text color for visibility */
-            background-color: #387ADF; /* A distinct background color */
-            padding: 5px 15px; /* Padding around the text */
-            border-radius: 20px; /* Rounded corners for a pill shape */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
-            font-family: Arial, sans-serif; /* Consistent font family */
-            font-size: 18px; /* Larger font size for emphasis */
-            margin-bottom: 10px; /* Spacing above the button for visual separation */
-            display: inline-block; /* Ensure the background only wraps the text */
-        }
-
-        /* Adjusting the round button to ensure it's centered and styled distinctly */
-        #studyCountButton {
-            border-radius: 50%; /* Maintain the round shape */
-            width: 60px; /* Specific width */
-            height: 60px; /* Matching height for a perfect circle */
-            margin: 0 auto; /* Centering the button */
-            display: block; /* Allow margin auto to center the button */
-            font-size: 16px; /* Font size for the number inside the button */
-            background-color: #4CAF50; /* Distinct background color */
-            color: white; /* Text color */
-            border: 2px solid white; /* Border to make the button stand out */
-            cursor: pointer; /* Cursor to indicate it's clickable */
-            outline: none; /* Remove the outline to keep the design clean */
-        }
-        #study-count-row {
-            text-align: center; /* Center the contents */
-            position: fixed; /* Fix position to the bottom */
-            bottom: 10px; /* 10px from the bottom of the viewport */
-            left: 0;
-            width: 100%; /* Full width to help center the content */
-            box-sizing: border-box; /* Ensure padding does not add to the width */
-        }
-    </style>
+    <link rel="stylesheet" href="main.css">
+    <title>Study Hub</title>
 </head>
-
 <body>
-    <div class="header">Study</div>
-    <div class="nav-menu">
-        <button onclick="window.location.href='../main.html'"><i class="fa fa-home"></i></button>
-        <button onclick="window.location.href = 'studyHome.html';">Study</button>
-        <button onclick="window.location.href = 'createCard.html';">Create New Cards</button>
-        <button onclick="window.location.href = 'viewCards.html';">View All Cards</button>
-    </div>
-    <div class="progress-bar-container">
-        <div class="progress-bar">
-            <div class="progress-bar-inner" id="progressBar">
-                <div class="progress-text" id="progressText"></div>
+    <header>
+        <div class="header-bar">
+            <button class="home-btn" onclick="location.href='../main.html'">⟵ Home</button>
+            <h1>Study Hub</h1>
+            <nav class="nav-pills">
+                <button class="nav-pill active" onclick="location.href='studyHome.html'">Study</button>
+                <button class="nav-pill" onclick="location.href='createCard.html'">Create</button>
+                <button class="nav-pill" onclick="location.href='viewCards.html'">Library</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <!-- Progress Overview -->
+        <section class="card">
+            <h3>📊 Learning Progress</h3>
+            <div class="progress-overview">
+                <div class="progress-circle">
+                    <div class="circle-bg"></div>
+                    <div class="circle-progress" style="--progress: 0"></div>
+                    <div class="progress-text">
+                        <div class="progress-value">0%</div>
+                        <div class="progress-label">Mastered</div>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item" id="total-cards">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Total Cards</div>
+                    </div>
+                    <div class="stat-item" id="new-cards">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">New</div>
+                    </div>
+                    <div class="stat-item" id="learning-cards">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Learning</div>
+                    </div>
+                    <div class="stat-item" id="mastered-cards">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Mastered</div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="progress-count" id="progressCount">0 cards stored</div>
-    </div>
-    <div class="action-row">
-        <div class="row-header">Categories</div>
-        <div class="row-header-info" id="categoryInfo">0 words in 0 categories</div>
-        <div class="button-row-container" id="buttonRow">
-            <!-- Category buttons will be dynamically added here -->
-        </div>
-    </div>
-    <div class="action-row" id="study-action-row">
-        <div class="row-header">Study Options</div>
-        <div class="button-row-container" id="studyButtonRow">
-            <!-- New and Review buttons will be dynamically added here -->
-        </div>
-    </div>
-    <div class="action-row" id="study-count-row">
-        <div class="row-header">Study Count</div>
-        <button id="studyCountButton" class="study-count-button">All</button>
-    </div>
-    <script>
+        </section>
 
-        // Retrieve data from local storage
-        let data = JSON.parse(localStorage.getItem('levelupFlashData'))?.flashcards || [];
-        var cardCount = data.length;
-        var memorizedCount = data.filter(item => item.memorized === true).length;
+        <!-- Categories -->
+        <section class="card">
+            <h3>📚 Categories</h3>
+            <div class="category-grid" id="category-grid">
+                <!-- Dynamic content -->
+            </div>
+        </section>
 
-        // Update the progress bar width and count
-        var progressBar = document.getElementById('progressBar');
-        var progressCount = document.getElementById('progressCount');
-        var progressText = document.getElementById('progressText');
+        <!-- Study Options -->
+        <section class="card">
+            <h3>🎯 Study Options</h3>
+            <div class="study-grid">
+                <a href="#" class="study-option primary" data-mode="learn">
+                    <div class="study-icon">🌱</div>
+                    <div class="study-title">Learn New</div>
+                    <div class="study-desc">Study new and unmastered cards</div>
+                </a>
+                <a href="#" class="study-option" data-mode="review">
+                    <div class="study-icon">🔄</div>
+                    <div class="study-title">Review</div>
+                    <div class="study-desc">Practice learned cards</div>
+                </a>
+                <a href="#" class="study-option" data-mode="test">
+                    <div class="study-icon">⚡</div>
+                    <div class="study-title">Quick Test</div>
+                    <div class="study-desc">Random cards from all categories</div>
+                </a>
+            </div>
 
-        var percentage = (memorizedCount / cardCount * 100).toFixed(2); // Calculate percentage with 2 decimal places
-        progressBar.style.width = percentage + '%';
-        progressCount.textContent = memorizedCount + ' of ' + cardCount + " mastered";
-        progressText.textContent = percentage + '%'; // Display percentage inside progress bar
+            <!-- Study Count Selector -->
+            <div class="count-selector">
+                <span class="count-label">Cards per session:</span>
+                <div class="count-options">
+                    <button class="count-option active" data-count="all">All</button>
+                    <button class="count-option" data-count="5">5</button>
+                    <button class="count-option" data-count="10">10</button>
+                    <button class="count-option" data-count="15">15</button>
+                    <button class="count-option" data-count="20">20</button>
+                </div>
+            </div>
+        </section>
+    </main>
 
-        // Get unique sorted categories
-        const uniqueCategories = [...new Set(data.map(item => item.category))].sort();
-
-        // Populate the button row with buttons for each category
-        const buttonRowContainer = document.getElementById('buttonRow');
-        uniqueCategories.forEach(category => {
-            const categoryCards = data.filter(item => item.category === category);
-            const learnedCards = categoryCards.filter(card => card.memorized).length;
-            const totalCards = categoryCards.length;
-
-            const button = document.createElement('button');
-            button.textContent = `${category} (${learnedCards}/${totalCards})`;
-            button.className = 'category-button';
-
-            const categoryProgressBarContainer = document.createElement('div');
-            categoryProgressBarContainer.className = 'category-progress-bar-container';
-
-            const categoryProgressBar = document.createElement('div');
-            categoryProgressBar.className = 'category-progress-bar';
-
-            const categoryProgressBarInner = document.createElement('div');
-            categoryProgressBarInner.className = 'category-progress-bar-inner';
-            categoryProgressBarInner.style.width = `${(learnedCards / totalCards) * 100}%`;
-
-            const categoryProgressText = document.createElement('div');
-            categoryProgressText.className = 'category-progress-text';
-            categoryProgressText.textContent = `${((learnedCards / totalCards) * 100).toFixed(2)}%`;
-
-            categoryProgressBar.appendChild(categoryProgressBarInner);
-            categoryProgressBar.appendChild(categoryProgressText);
-            categoryProgressBarContainer.appendChild(categoryProgressBar);
-            button.appendChild(categoryProgressBarContainer);
-
-            button.addEventListener('click', () => navigateToLearnPage(category));
-
-            buttonRowContainer.appendChild(button);
-        });
-
-        // Study options - New and Review Buttons
-        const studyButtonRowContainer = document.getElementById('studyButtonRow');
-
-        // New Button Creation
-        const learnButton = document.createElement('button');
-        learnButton.textContent = 'Learn';
-        learnButton.className = 'category-button';
-        learnButton.onclick = function () {
-            navigateToLearnPage('all', 'all'); 
-        };
-
-        // Review Button Creation
-        const reviewButton = document.createElement('button');
-        reviewButton.textContent = 'Review';
-        reviewButton.className = 'category-button';
-        reviewButton.onclick = function () {
-            navigateToLearnPage('library', 'all');
-        };
-
-        // Adding buttons to the DOM
-        studyButtonRowContainer.appendChild(learnButton);
-        studyButtonRowContainer.appendChild(reviewButton);
-
-
-        // Update the category info
-        const categoryInfo = document.getElementById('categoryInfo');
-        categoryInfo.textContent = `${data.length} words in ${uniqueCategories.length} categories`;
-
-        // Function to navigate to learn page with the selected category
-        function navigateToLearnPage(selectedCategory) {
-            const studyCountButton = document.getElementById('studyCountButton');
-            const studyCount = studyCountButton.textContent; // Get the current text from the study count button
-
-            // Construct the URL with both the selected category and study count
-            const url = `learn.html?category=${selectedCategory}&studyCount=${studyCount}`;
-            window.location.href = url;
-        }
-
-        document.getElementById('studyCountButton').addEventListener('click', function () {
-                const button = this; // Reference to the button
-                const values = ['all', '5', '10', '15', '20']; // Values to cycle through
-                let currentIndex = values.indexOf(button.textContent); // Get current index
-
-                // Increment index to cycle to the next value, reset to 'All' after '20'
-                currentIndex = currentIndex + 1 < values.length ? currentIndex + 1 : 0;
-
-                // Update button text
-                button.textContent = values[currentIndex];
-
-                // Optionally, implement any additional logic you need when the button changes state
-                console.log('Selected study count:', button.textContent);
-            });
-
-    </script>
+    <script src="js/data.js"></script>
+    <script src="js/home.js"></script>
 </body>
-
 </html>

@@ -1,602 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Learn</title>
-    <style>        
-        body {
-            margin-top: 10px;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #EADFB4;
-            flex-direction: column;
-            
-        }
-
-       .header {
-            text-align: center;
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 10px;
-            border-radius: 10px;
-            border: 2px solid black;
-            font-size: 24px;
-            width: 90%;
-            margin: 5px auto;
-        }
-
-        .button {
-            padding: 20px 40px;
-            /* Increased padding for larger buttons */
-            font-size: 18px;
-            /* Increased font size for larger buttons */
-            border: none;
-            border-radius: 10px;
-            /* Increased border-radius for rounded corners */
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .btn {
-            padding: 40px 50px;
-            font-size: 22px;
-            border: thin, black;
-            border-radius: 10px;
-            color: orange;
-            cursor: pointer;
-            transition: background-color 0.5s;
-            margin: 0 5px;
-        }
-
-        .btn:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-container {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-        }
-
-        .btns-fixed {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .btn-container {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 10px;
-        }
-        
-
-        
-
-        .btn:hover {
-            background-color: #0056b3;
-        }
-
-        .card {
-            width: 300px;
-            height: 200px;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-size: auto;
-            perspective: 1000px;
-            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-        }
-
-        .card-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .card-content {
-            width: 90%;
-            height: 90%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            transition: transform 0.5s;
-            backface-visibility: hidden;
-        }
-
-        .container {
-            margin-bottom: 100px;
-            /* Adjust as needed */
-        }
-
-        .card.flip .front {
-            animation: flipFront 0.2s forwards;
-        }
-
-        .card.flip .back {
-            animation: flipBack 0.2s forwards;
-        }
-
-        @keyframes flipFront {
-            from {
-                transform: rotateY(0deg);
-            }
-
-            to {
-                transform: rotateY(-180deg);
-            }
-        }
-
-        @keyframes flipBack {
-            from {
-                transform: rotateY(180deg);
-            }
-
-            to {
-                transform: rotateY(0deg);
-            }
-        }
-
-        .card.flip .slideOutRight {
-            animation: slideOutRight 1s forwards;
-        }
-
-        .card.flip .slideOutLeft {
-            animation: slideOutLeft 1s forwards;
-        }
-
-        @keyframes slideOutRight {
-            from {
-                transform: translateX(0);
-            }
-
-            to {
-                transform: translateX(100%);
-            }
-        }
-
-        @keyframes slideOutLeft {
-            from {
-                transform: translateX(0);
-            }
-
-            to {
-                transform: translateX(-100%);
-            }
-        }
-      
-        .counter {
-            display: flex;
-            top: 20px;
-            left: 10px;
-            font-size: 24px;
-        }
-
-        .front,
-        .back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .back {
-            transform: rotateY(180deg);
-        }
-
-        .log {
-            margin-top: 20px;
-            margin-bottom: 10px;
-            height: 20px;
-            visibility: hidden;
-            text-align: center;
-        }
-
-        .slideOutRight {
-            animation: slideOutRight 1s forwards;
-        }
-
-        .slideOutLeft {
-            animation: slideOutLeft 1s forwards;
-        } 
-        
-        
-
-        .nav-menu {
-            text-align: center;
-            margin-bottom: 20px;
-            
-        }
-
-        .nav-menu button {
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;   
-            background-color: #4CAF50;
-            color: white;                     
-            height: 60px;
-        }
-
-        .nav-menu button:hover {
-            background-color: #45a049;
-        }
-    .language-toggle {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-    #toggleLanguageButton {
-        padding: 20px; /* Make the button twice as big */
-        font-size: 16px; /* Increase font size */
-    }
-
-    /* Default button style */
-    #toggleLanguageButton {
-        background-color: lightblue;
-        color: black;
-        border: 2px solid black;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s, color 0.3s;
-    }
-
-    /* Button style when pressed */
-    #toggleLanguageButton:hover {
-        background-color: orange;
-    }
-        
-    </style>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="learn.css">
+    <title>Study Session</title>
 </head>
-
 <body>
-<div class="header">View Cards</div>
-<div class="nav-menu">
-    <button onclick="window.location.href='../main.html'"><i class="fa fa-home"></i></button>
-    <button onclick="window.location.href = 'studyHome.html';">Study</button>
-    <button onclick="window.location.href = 'createCard.html';">Create New Cards</button>
-    <button onclick="window.location.href = 'viewCards.html';">View All Cards</button>
-</div>
+    <header>
+        <div class="header-bar">
+            <button class="home-btn" onclick="location.href='studyHome.html'">⟵ Back</button>
+            <h1>Study Session</h1>
+            <nav class="nav-pills">
+                <button class="nav-pill" onclick="location.href='studyHome.html'">Study</button>
+                <button class="nav-pill" onclick="location.href='createCard.html'">Create</button>
+                <button class="nav-pill" onclick="location.href='viewCards.html'">Library</button>
+            </nav>
+        </div>
+    </header>
 
-<div class="deckCategory" id="deckCategory"></div>
-<div class="counter" id="cardCounter">Card Counter: 0 / 0</div>
-    <div class="container">
-    <div class="language-toggle">
-        <button id="toggleLanguageButton" onclick="toggleLanguage()">English</button>
-    </div>
-        <div class="log" id="log"></div>
-        <div class="card" id="flashcard">
-            <div class="card-content">
-                <div class="front">Front Content</div>
-                <div class="back">Back Content</div>
-                
+    <main class="wrap">
+        <div class="study-container">
+            <!-- Session Info -->
+            <div class="session-info">
+                <div class="session-progress" id="session-progress">1 / 10</div>
+                <button class="language-toggle" id="language-toggle">English</button>
+            </div>
+
+            <!-- Flashcard -->
+            <div class="flashcard-container">
+                <div class="flashcard" id="flashcard">
+                    <div class="card-face card-front">
+                        <div class="card-content" id="card-front">
+                            Loading...
+                        </div>
+                    </div>
+                    <div class="card-face card-back">
+                        <div class="card-content" id="card-back">
+                            Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TTS Button -->
+            <button class="tts-btn" id="tts-btn" title="Speak (S)">
+                🔊
+            </button>
+
+            <!-- Action Buttons (Desktop) -->
+            <div class="study-actions desktop-only">
+                <button class="action-btn incorrect" id="incorrect-btn">
+                    ❌ Incorrect (←)
+                </button>
+                <button class="action-btn correct" id="correct-btn">
+                    ✅ Correct (→)
+                </button>
+            </div>
+
+            <!-- Mobile Swipe Hints -->
+            <div class="swipe-hints">
+                <p>Tap card to flip • Swipe left for incorrect • Swipe right for correct</p>
             </div>
         </div>
-        <button class="button" onclick="speakText()">Speak</button> <!-- New button -->
-    </div>
+    </main>
 
-    <div class="btns-fixed">
-        <!-- <div class="btn-container">
-            <button class="btn" onclick="clickLeft()">No</button>
-            <button class="btn" onclick="clickRight()">Yes</button>
-        </div>  -->
-
-        <div class="btn-container">
-            <div class="btn-container">
-                 <!-- First button
-                <button class="btn" onclick="clickLeft()">No</button>
-            
-                Second button
-                <button class="btn" onclick="clickRight()">Yes</button>  -->
-
-            <!-- Third button -->
-            <button class="btn" onclick="reset()">Reset</button>
-
-            <!-- Fourth button -->
-            <button class="btn" onclick="saveAndExit()">Save and reload</button>
-        </div>
-    </div>
-
-    <script>
-        let isBackFirst = false; // Flag to indicate if back of the card is displayed first
-
-         function toggleLanguage() {
-                const toggleButton = document.getElementById('toggleLanguageButton');
-
-                if (!isBackFirst) {
-                    // Set back of the card to display first
-                    isBackFirst = true;
-                    toggleButton.style.backgroundColor = 'orange';
-                    toggleButton.textContent = 'korean';
-                } else {
-                    // Set front of the card to display first (default behavior)
-                    isBackFirst = false;
-                    toggleButton.style.backgroundColor = 'lightblue'; // Reset button color to default
-                    toggleButton.textContent = 'english';
-                }
-            }
-
-        const flashcard = document.getElementById('flashcard');
-        const frontContent = document.querySelector('.front');
-        const backContent = document.querySelector('.back');
-        const cardCounter = document.getElementById('cardCounter');
-        const category = document.getElementById('category');
-        const logText = document.querySelector('.log');
-        //const completedMessage = document.getElementById('completedMessage');
-        const buttonsContainer = document.getElementById('buttonsContainer');
-
-
-        let touchStartX = 0;
-        let flashcards = [];
-        let currentCardIndex = 0;
-        let cardsLearned = 0;
-
-        // Retrieve the category of cards selected value from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const deckCategory = urlParams.get('category');
-        const studyCount = urlParams.get('studyCount');
-
-        // Retrieve the 'levelupdata' flashcards and assign it to the variable flashcardsDB
-        let flashcardsDB = JSON.parse(localStorage.getItem('levelupFlashData'))?.flashcards || [];
-
-        // Function to limit the number of flashcards based on studyCount
-        const limitFlashcards = (cards) => {
-            // Check if studyCount is numeric and limit the number of cards accordingly
-            if (!isNaN(studyCount)) {
-                console.log("if studycount:" + studyCount);
-                return cards.slice(0, parseInt(studyCount));
-            } else if (studyCount === 'All') {
-                // If studyCount is 'all', do not limit the number of cards
-                console.log(" else if studycount:" + studyCount);
-                return cards;
-            } else {
-                // Default case, potentially for invalid studyCount values
-                console.log("else studycount:" + studyCount);
-                return cards.slice(0, 10); // You can adjust the default number as needed
-            }
-            };
-
-            // Retrieve flashcards from local storage based on 'deckCategory' value
-            if (deckCategory === 'library') {
-                flashcards = limitFlashcards(flashcardsDB);
-            }
-            else if (deckCategory === 'all') {
-                flashcards = limitFlashcards(flashcardsDB.filter(card => !card.memorized));
-            } else {
-                flashcards = limitFlashcards(flashcardsDB.filter(card => card.category === deckCategory && !card.memorized));
-            }
-        // Retrieve flashcards from local storage based on 'allCards' value
-        // if (deckCategory === 'library') {
-        //     flashcards = flashcardsDB;
-        // }
-        // else if (deckCategory === 'all') {
-        //     flashcards = flashcardsDB.filter(card => !card.memorized);
-
-        // } else {
-        //      flashcards = flashcardsDB.filter(card => card.category === deckCategory && !card.memorized);
-        // }
-
-        let flashcardsOriginal = [...flashcards];
-        const deckLength = flashcardsOriginal.length;
-        cardCounter.textContent = 'Card Counter: ' + cardsLearned + ' / ' + deckLength;
-        updateCardContent();
-
-        flashcard.addEventListener('touchstart', handleTouchStart);
-        flashcard.addEventListener('touchmove', handleTouchMove);
-        flashcard.addEventListener('touchend', handleTouchEnd);
-        flashcard.addEventListener('click', handleMouseClick);
-
-        console.log();
-        
-        function handleTouchStart(event) {
-            touchStartX = event.touches[0].clientX;
-        }
-
-        function handleTouchMove(event) {
-            // Prevent default scrolling behavior
-            event.preventDefault();
-        }
-
-        function handleTouchEnd(event) {
-            const touchEndX = event.changedTouches[0].clientX;
-            const deltaX = touchEndX - touchStartX;
-
-            if (deltaX === 0) {
-                // Tap gesture
-                toggleFlip();
-            } else if (deltaX > 0) {
-                // Swipe right gesture
-                slideOutCard('slideOutRight');
-            } else {
-                // Swipe left gesture
-                slideOutCard('slideOutLeft');
-            }
-        }
-
-        function clickRight() {
-            slideOutCard('slideOutRight');
-        }
-
-        function clickLeft() {
-            slideOutCard('slideOutLeft');
-        }
-
-        function handleMouseClick() {
-            //  if (!flashcard.classList.contains('flip')) {
-            //     // Flip the card to show back content
-            //     flashcard.classList.add('flip');
-            // } else {
-            //     // Flip the card to show front content
-            //     flashcard.classList.remove('flip');
-            // }
-
-        }
-
-        function toggleFlip() {
-            if (!flashcard.classList.contains('flip')) {
-                // Flip the card to show back content
-                flashcard.classList.add('flip');
-            } else {
-                // Flip the card to show front content
-                flashcard.classList.remove('flip');
-            }
-        }
-
-        function slideOutCard(animationClass) {
-            if (cardsLearned < flashcardsOriginal.length) {
-                // Slide out the card
-                flashcard.classList.add(animationClass);
-                setTimeout(() => {
-                    // Reset card to initial state
-                    flashcard.classList.remove(animationClass);
-
-                    // Update the memorized property based on swipe direction
-                    if (animationClass === 'slideOutRight') {
-                        // Swipe right, mark the flashcard as memorized
-                        logText.textContent = 'Learned';
-                        logText.style.visibility = 'visible';
-                        flashcards[0].memorized = true;
-                        cardsLearned++;
-                        cardCounter.textContent = 'Card Counter: ' + cardsLearned + ' / ' + deckLength;
-                        //localStorage.setItem('levelupdata', JSON.stringify({ flashcards: flashcards }));
-
-                    } else if (animationClass === 'slideOutLeft') {
-                        // Swipe left, leave the memorized property unchanged                        
-                        logText.textContent = 'Reshuffled into deck';
-                        logText.style.visibility = 'visible';
-                        flashcards[0].memorized = false;
-                        flashcards = shuffleArray(flashcards); // Shuffle the flashcards
-                    }
-
-                    // Hide the log text after 2 seconds
-                    setTimeout(() => {
-                        logText.textContent = '';
-                        logText.style.visibility = 'hidden'; // Hide the log
-                    }, 500);
-
-                    const reshuffleCard = flashcards.shift();
-                    if (!reshuffleCard.memorized) {
-                        flashcards.push(reshuffleCard);
-                    }
-                    updateCardContent();
-                }, 1000); // Adjust the timing to match the animation duration
-            } else {
-                    // All cards have been cycled through
-                    //completedMessage.textContent = "You've completed the flash!";
-                    cardsLearned++;
-                    cardCounter.textContent = 'Card Counter: ' + cardsLearned + ' / ' + deckLength;
-                    logText.textContent = 'complete. try again or exit';
-                    logText.style.visibility = 'visible';
-                    
-            }
-        }
-
-        function updateCardContent() {
-                flashcard.classList.remove('flip');
-                if (flashcards.length) {
-                    const currentCard = flashcards[0];
-                    if (isBackFirst) {
-                        // Display back of the card first
-                        frontContent.textContent = currentCard.back;
-                        backContent.textContent = currentCard.front;
-                    } else {
-                        // Display front of the card first (default behavior)
-                        frontContent.textContent = currentCard.front;
-                        backContent.textContent = currentCard.back;
-                    }
-                } else {
-                    frontContent.textContent = 'Complete, reset or save and exit';
-                    backContent.textContent = 'put secret here';
-                }
-            }
-
-        function reset() {
-            // Redirect the user to the learn page to start again
-            cardsLearned = 0;
-            cardCounter.textContent = 'Card Counter: ' + cardsLearned + ' / ' + deckLength;
-            //flashcardsOriginal is ALSO being modified as we go
-            flashcards = [...flashcardsOriginal];
-            console.log(flashcards);
-            //resetMemorized(flashcards);          
-            updateCardContent();
-        }
-
-        function saveAndExit() {
-                // Save any data if needed and then redirect the user to the home page or any other page
-                var flashcardsJSON = {
-                    "flashcards": flashcardsDB
-                };
-                localStorage.setItem('levelupFlashData', JSON.stringify(flashcardsJSON));
-
-                // Get the current URL and extract the query parameters
-                const currentURL = new URL(window.location.href);
-                const deckCategory = currentURL.searchParams.get('category');
-                
-                // Redirect to the study home page with the same deckCategory value
-                const url = `learn.html?category=${deckCategory}&studyCount=${studyCount}`;
-                console.log(studyCount);
-                console.log("url: " + url);
-                window.location.href = url;
-            }
-
-        function resetMemorized(array) {
-                array.forEach(card => {
-                    console.log("memory value: " + card.memorized);
-                    card.memorized = false;
-                });
-            }
-
-        // Function to shuffle an array
-            function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-                return array;
-            }
-
-        function speakText() {
-                var text;
-                var lang;
-                
-                if (!document.querySelector('#flashcard').classList.contains('flip')) {
-                    text = document.querySelector('.front').innerText;
-                    lang = 'en-US'; // English language for front content
-                } else {                  
-                    text = document.querySelector('.back').innerText;
-                    
-                    lang = 'ko-KR'; // Korean language for back content
-                }
-
-                var utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = lang;
-                speechSynthesis.speak(utterance);
-            }
-        
-
-       
-        
-    </script>
-
+    <script src="js/data.js"></script>
+    <script src="js/learn.js"></script>
 </body>
-
 </html>

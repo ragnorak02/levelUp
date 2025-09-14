@@ -1,631 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>View Cards</title>
-    <style>
-        body {
-            margin-top: 10px;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #EADFB4;
-            flex-direction: column;
-
-        }
-
-        .header {
-            text-align: center;
-            background-color: #9BB0C1;
-            color: white;
-            padding: 10px 10px;
-            border-radius: 10px;
-            border: 2px solid black;
-            font-size: 24px;
-            width: 90%;
-            margin: 5px auto;
-        }
-
-        .nav-menu {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .nav-menu button {
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            height: 60px;
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .nav-menu button:hover {
-            background-color: #45a049;
-        }
-
-        .card {
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #ccc;
-            margin-bottom: 5px;
-            padding: 0px;
-            position: relative;
-            transition: transform 0.3s ease;
-            font-size: 20px;
-        }
-
-        .card.selected {
-            background-color: #ffe5cc;
-            /* Light orange background when selected */
-        }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0px;
-        }
-
-        .content-section {
-            width: 48%;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            background-color: #f0f0f0;
-            /* Light grey background */
-            user-select: none;
-            /* Prevent text selection */
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: flex-end;
-            display: none; /* Hide by default */
-        }
-
-        .button-container .button {
-            margin-right: 10px; /* Add space between buttons */
-        }
-
-        .button {
-            padding: 5px 10px;
-            cursor: pointer;
-            background-color: #66a3ff;
-            color: #fff;
-            border: none;
-            border-radius: 3px;
-            margin-top: 5px;
-        }
-
-        .button:hover {
-            background-color: #4d94ff;
-        }
-
-        .editable {
-            cursor: text;
-            /* Change cursor on hover */
-        }
-
-        .editable:hover {
-            background-color: #f9f9f9;
-            /* Light grey background on hover */
-        }
-
-        /* Styles for category headers */
-        .category-header {
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            text-align: center;
-            text-transform: capitalize;
-            /* Capitalize first letter of each word */
-        }
-
-        /* Styles for card container */
-        .card-category-container {
-            border: 1px solid #000;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 20px;
-            background-color: #bfefff;
-            /* Light blue background color */
-        }
-
-        /* Additional styles */
-        .info-container {
-            display: flex;
-            justify-content: space-evenly;
-            text-align: center;
-            margin: 10px;
-            padding: 5px;
-        }
-
-        .info-label {
-            font-weight: bold;
-        }
-
-        .checkmark {
-            float: right;
-            padding: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="view.css">
+    <title>Card Library</title>
 </head>
-
 <body>
-
-    <div class="header">View</div>
-    <div class="nav-menu">
-        <button onclick="window.location.href='../main.html'"><i class="fa fa-home"></i></button>
-        <button onclick="window.location.href = 'studyHome.html';">Study</button>
-        <button onclick="window.location.href = 'createCard.html';">Create New Cards</button>
-        <button onclick="window.location.href = 'viewCards.html';">View All Cards</button>
-    </div>
-    <div class="button-row">
-        <button onclick="setMemorized(false)">Reset All</button>
-        <button onclick="insertLibrary()">Insert Library</button>
-        <button onclick="deleteAllCards()">Delete All</button>
-    </div>
-    <!-- Fields for additional information -->
-    <div class="info-container">
-        <div class="total-cards">
-            <span class="info-label">Total Cards:</span>
-            <span id="total-cards-count">0</span>
+    <header>
+        <div class="header-bar">
+            <button class="home-btn" onclick="location.href='../main.html'">⟵ Home</button>
+            <h1>Card Library</h1>
+            <nav class="nav-pills">
+                <button class="nav-pill" onclick="location.href='studyHome.html'">Study</button>
+                <button class="nav-pill" onclick="location.href='createCard.html'">Create</button>
+                <button class="nav-pill active" onclick="location.href='viewCards.html'">Library</button>
+            </nav>
         </div>
-        <div class="learned-cards">
-            <span class="info-label">Learned:</span>
-            <span id="learned-cards-count">0</span>
-        </div>
-        <div class="categories-count">
-            <span class="info-label">Categories:</span>
-            <span id="categories-count">0</span>
-        </div>
-    </div>
+    </header>
 
-    <div id="container"></div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Retrieve data from local storage
-            let levelupdata = JSON.parse(localStorage.getItem('levelupFlashData')) || {
-                flashcards: []
-            };
-
-            var storedData = levelupdata.flashcards;
+    <main class="wrap">
+        <!-- Controls -->
+        <section class="card">
+            <div class="controls-section">
+                <div class="filters-group">
+                    <div class="filter-group">
+                        <label class="filter-label">Search</label>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            class="search-input" 
+                            placeholder="Search cards..."
+                        >
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Category</label>
+                        <select id="category-filter" class="filter-select">
+                            <option value="all">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select id="state-filter" class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="new">New</option>
+                            <option value="studied">Studied</option>
+                            <option value="learning">Learning</option>
+                            <option value="learned">Learned</option>
+                            <option value="mastered">Mastered</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="actions-group">
+                    <button class="action-btn primary" id="export-btn">
+                        💾 Export
+                    </button>
+                    <button class="action-btn secondary" onclick="document.getElementById('import-input').click()">
+                        📁 Import
+                    </button>
+                    <button class="action-btn secondary" id="reset-all-btn">
+                        🔄 Reset All
+                    </button>
+                    <button class="action-btn danger" id="delete-all-btn">
+                        🗑️ Delete All
+                    </button>
+                </div>
+            </div>
             
-            const container = document.getElementById('container');
+            <!-- Hidden file input for import -->
+            <input type="file" id="import-input" class="hidden" accept=".json">
+        </section>
 
-            // Update additional information fields
-            const totalCardsCount = document.getElementById('total-cards-count');
-            const learnedCardsCount = document.getElementById('learned-cards-count');
-            //let testFlashcards = JSON.stringify(levelupdata);
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stats-item">
+                Showing: <span class="stats-value" id="filtered-count">0</span> cards
+            </div>
+            <div class="stats-item">
+                Total: <span class="stats-value" id="total-count">0</span> cards
+            </div>
+            <div class="stats-item">
+                Progress: <span class="stats-value" id="overall-progress">0%</span> mastered
+            </div>
+        </div>
 
-            var testFlashcards = {
-                "flashcards": levelupdata
-            };
+        <!-- Cards Container -->
+        <div id="cards-container">
+            <!-- Dynamic content -->
+        </div>
+    </main>
 
-            if(totalCardsCount){
-                totalCardsCount.textContent = storedData.length;
-            }
-            if(learnedCardsCount){
-                learnedCardsCount.textContent = storedData.filter(card => card.memorized).length;
-            }
-
-            // Check if there are cards to display
-            if (storedData.length === 0) {
-                const noCardsMessage = document.createElement('div');
-                noCardsMessage.classList.add('no-cards');
-                noCardsMessage.textContent = "No cards, please create a flashcard";
-
-                const createButton = document.createElement('button');
-                createButton.textContent = "Create New Flashcard";
-                createButton.addEventListener('click', () => {
-                    window.location.href = './createcard.html';
-                });
-
-                noCardsMessage.appendChild(createButton);
-                container.appendChild(noCardsMessage);
-            } else {
-                // Group flashcards by category
-                const flashcardsByCategory = groupFlashcardsByCategory(storedData);
-
-                // Iterate through each category
-                for (const category in flashcardsByCategory) {
-                    if (flashcardsByCategory.hasOwnProperty(category)) {
-                        // Create a div container for the category
-                        const categoryContainer = document.createElement('div');
-                        categoryContainer.classList.add('card-category-container');
-
-                        // Create a header for the category
-                        const categoryHeader = document.createElement('div');
-                        categoryHeader.classList.add('category-header');
-                        categoryHeader.textContent = category;
-                        categoryContainer.appendChild(categoryHeader);
-
-                        // Iterate through flashcards in the category
-                        flashcardsByCategory[category].forEach((flashcard, index) => {
-                            const cardDiv = createCard(flashcard.front, flashcard.back, index, flashcard.memorized);
-                            categoryContainer.appendChild(cardDiv);
-                        });
-
-                        // Append the category container to the main container
-                        container.appendChild(categoryContainer);
-                    }
-                }
-            }
-
-            //set categories count
-            document.getElementById('categories-count').textContent = document.getElementsByClassName('card-category-container').length;
-
-            // Function to group flashcards by category
-            function groupFlashcardsByCategory(flashcards) {
-                const groupedFlashcards = {};
-                flashcards.forEach(flashcard => {
-                    if (!groupedFlashcards[flashcard.category]) {
-                        groupedFlashcards[flashcard.category] = [];
-                    }
-                    groupedFlashcards[flashcard.category].push(flashcard);
-                });
-                return groupedFlashcards;
-            }
-
-            function createCard(frontContent, backContent, cardIndex, memorized) {
-                const card = document.createElement('div');
-                card.classList.add('card');
-
-                const frontInput = document.createElement('input');
-                frontInput.classList.add('content-section', 'editable');
-                frontInput.value = frontContent;
-                frontInput.readOnly = true;
-
-                const backInput = document.createElement('input');
-                backInput.classList.add('content-section', 'editable');
-                backInput.value = backContent;
-                backInput.readOnly = true;
-
-                const row1 = document.createElement('div');
-                row1.classList.add('row');
-                row1.appendChild(frontInput);
-                row1.appendChild(backInput);
-
-                var checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-
-                if (memorized) {
-                    checkbox.checked = true; 
-
-                    // var checkbox = document.createElement('input');
-                    // checkbox.type = 'checkbox';
-
-                    // //label.appendChild(checkbox);
-
-                    // const checkmark = document.createElement('span');
-                    // checkmark.classList.add('checkmark');
-                    // checkmark.innerHTML = '&#10003;'; // Checkmark symbol
-                    
-                }
-                row1.appendChild(checkbox);
-                const buttonContainer = document.createElement('div');
-                buttonContainer.classList.add('button-container');
-
-                const clearButton = document.createElement('button');
-                clearButton.textContent = 'Clear';
-                clearButton.classList.add('button');
-                clearButton.addEventListener('click', () => {
-                    frontInput.value = '';
-                    frontInput.focus(); // Keep cursor in the front text input field
-                    backInput.value = '';
-                });
-
-                const updateButton = document.createElement('button');
-                updateButton.textContent = 'Update';
-                updateButton.classList.add('button');
-                updateButton.addEventListener('click', () => {
-                    storedData[cardIndex].front = frontInput.value;
-                    storedData[cardIndex].back = backInput.value;
-                    localStorage.setItem('levelupFlashData', JSON.stringify(storedData));
-
-                    // Hide all buttons
-                    const buttons = buttonContainer.querySelectorAll('.button');
-                    buttons.forEach(button => {
-                        button.style.display = 'none';
-                    });
-
-                    // Make inputs readonly
-                    frontInput.readOnly = true;
-                    backInput.readOnly = true;
-                });
-
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.classList.add('button');
-                deleteButton.addEventListener('click', () => {
-                // Remove the card from the stored data
-                storedData.splice(cardIndex, 1);
-
-                // Update the local storage
-                localStorage.setItem('levelupFlashData', JSON.stringify(storedData));
-                console.log('stored data: ' + JSON.stringify(storedData));
-                // Remove the card from the DOM
-                card.remove();
-
-                 if (totalCardsCount) {
-                        totalCardsCount.textContent = storedData.length;
-                    }
-
-                // Update the total cards count
-                //totalCardsCount.textContent = storedData.length;
-                console.log('length data: ' + JSON.stringify(storedData.length));
-                // Reload the page
-                window.location.href = 'viewCards.html';
-                //location.reload();
-                });
-
-                buttonContainer.appendChild(clearButton);
-                buttonContainer.appendChild(updateButton);
-                buttonContainer.appendChild(deleteButton);
-
-                card.appendChild(row1);
-                card.appendChild(buttonContainer);
-
-
-
-                // Add an event listener to each card
-                card.addEventListener('click', (event) => {
-                    // Check if the click target is an input field
-                    const isInputField = event.target.tagName.toLowerCase() === 'input';
-
-                    // Toggle button container visibility based on input field click
-                    buttonContainer.style.display = isInputField ? 'flex' : buttonContainer.style.display === 'none' ? 'flex' : 'none';
-
-                    // Toggle selected class for the clicked card
-                    card.classList.toggle('selected', isInputField);
-
-                    // Make inputs editable only when selected
-                    frontInput.readOnly = backInput.readOnly = !isInputField;
-
-                    // Remove selected class from other cards and hide their button containers
-                    const allCards = document.querySelectorAll('.card');
-                    allCards.forEach(c => {
-                        if (c !== card) {
-                            c.classList.remove('selected');
-                            c.querySelector('.button-container').style.display = 'none';
-                        }
-                    });
-                });
-
-                return card;
-            }
-        });
-
-        function deleteAllCards() {
-            localStorage.removeItem('levelupFlashData');
-            document.getElementById('container').innerHTML = '';
-        }
-
-        function setMemorized(memorized) {
-
-            //Retrieve data from local storage
-            let levelupdata = JSON.parse(localStorage.getItem('levelupFlashData')) || { flashcards: [] };
-            let cardList = levelupdata.flashcards;
-
-            // Loop through all cards and set memorized property to false
-            cardList.forEach(card => {
-                console.log(card.front + " is memorized = " + card.memorized);
-                card.memorized = memorized;
-            });
-
-            // Update the local storage with the modified data
-            localStorage.setItem('levelupFlashData', JSON.stringify(levelupdata));
-
-            // Optional: Display a message or perform any other actions after unlearning all cards
-            console.log('All cards have been unlearned.');
-            window.location.href = 'viewCards.html';
-        }
-
-        function insertLibrary() {
-             //this is to set the temporary data. will need to update this once i work on lifting + recipes datasets
-            let levelupdataTemp = {
-                flashcards: [
-                    { front: 'house', back: '집', memorized: false, category: 'noun' },
-                    { front: 'love', back: '사랑', memorized: false, category: 'noun' },
-                    { front: 'hello', back: '안녕하세요', memorized: false, category: 'greeting' },
-                    { front: 'goodbye', back: '안녕', memorized: false, category: 'greeting' },
-                    { front: 'school', back: '학교', memorized: false, category: 'place' },
-                    { front: 'mountain', back: '산', memorized: false, category: 'place' },
-                    { front: 'book', back: '책', memorized: false, category: 'object' },
-                    { front: 'pen', back: '펜', memorized: false, category: 'object' },
-                    { front: 'sleep', back: '잠', memorized: false, category: 'verb' },
-                    { front: 'study', back: '공부', memorized: false, category: 'verb' },
-                    { front: 'friend', back: '친구', memorized: false, category: 'noun' },
-                    { front: 'time', back: '시간', memorized: false, category: 'noun' },
-                    { front: 'thank you', back: '감사합니다', memorized: false, category: 'greeting' },
-                    { front: 'please', back: '부탁합니다', memorized: false, category: 'greeting' },
-                    { front: 'restaurant', back: '음식점', memorized: false, category: 'place' },
-                    { front: 'beach', back: '해변', memorized: false, category: 'place' },
-                    { front: 'computer', back: '컴퓨터', memorized: false, category: 'object' },
-                    { front: 'phone', back: '전화', memorized: false, category: 'object' },
-                    { front: 'drink', back: '마시다', memorized: false, category: 'verb' },
-                    { front: 'write', back: '쓰다', memorized: false, category: 'verb' },
-                    { front: 'family', back: '가족', memorized: false, category: 'noun' },
-                    { front: 'money', back: '돈', memorized: false, category: 'noun' },
-                    { front: 'sorry', back: '미안합니다', memorized: false, category: 'greeting' },
-                    { front: 'park', back: '공원', memorized: false, category: 'place' },
-                    { front: 'market', back: '시장', memorized: false, category: 'place' },
-                    { front: 'television', back: '텔레비전', memorized: false, category: 'object' },
-                    { front: 'car', back: '자동차', memorized: false, category: 'object' },
-                    { front: 'eat', back: '먹다', memorized: false, category: 'verb' },
-                    { front: 'read', back: '읽다', memorized: false, category: 'verb' },
-                    { front: 'job', back: '일', memorized: false, category: 'noun' },
-                    { front: 'weather', back: '날씨', memorized: false, category: 'noun' },
-                    { front: 'nice to meet you', back: '만나서 반가워요', memorized: false, category: 'greeting' },
-                    { front: 'excuse me', back: '실례합니다', memorized: false, category: 'greeting' },
-                    { front: 'library', back: '도서관', memorized: false, category: 'place' },
-                    { front: 'hospital', back: '병원', memorized: false, category: 'place' },
-                    { front: 'chair', back: '의자', memorized: false, category: 'object' },
-                    { front: 'table', back: '탁자', memorized: false, category: 'object' },
-                    { front: 'speak', back: '말하다', memorized: false, category: 'verb' },
-                    { front: 'listen', back: '듣다', memorized: false, category: 'verb' },
-                    { front: 'city', back: '도시', memorized: false, category: 'noun' },
-                    { front: 'country', back: '나라', memorized: false, category: 'noun' },
-                    { front: 'see you later', back: '나중에 봐요', memorized: false, category: 'greeting' },
-                    { front: 'how much?', back: '얼마에요?', memorized: false, category: 'greeting' },
-                    { front: 'bank', back: '은행', memorized: false, category: 'place' },
-                    { front: 'airport', back: '공항', memorized: false, category: 'place' },
-                    { front: 'shoes', back: '신발', memorized: false, category: 'object' },
-                    { front: 'clothes', back: '옷', memorized: false, category: 'object' },
-                    { front: 'buy', back: '사다', memorized: false, category: 'verb' },
-                    { front: 'sell', back: '팔다', memorized: false, category: 'verb' },
-                    { front: 'work', back: '일', memorized: false, category: 'noun' },
-                    { front: 'how are you?', back: '잘 지내세요?', memorized: false, category: 'greeting' },
-                    { front: 'what time is it?', back: '몇 시예요?', memorized: false, category: 'greeting' },
-                    { front: 'museum', back: '박물관', memorized: false, category: 'place' },
-                    { front: 'movie theater', back: '영화관', memorized: false, category: 'place' },
-                    { front: 'bed', back: '침대', memorized: false, category: 'object' },
-                    { front: 'window', back: '창문', memorized: false, category: 'object' },
-                    { front: 'cook', back: '요리하다', memorized: false, category: 'verb' },
-                    { front: 'clean', back: '청소하다', memorized: false, category: 'verb' },
-                    { front: 'bus', back: '버스', memorized: false, category: 'noun' },
-                    { front: 'subway', back: '지하철', memorized: false, category: 'noun' },
-                    { front: 'I', back: '나', memorized: false, category: 'pronoun' },
-                    { front: 'you', back: '너', memorized: false, category: 'pronoun' },
-                    { front: 'he', back: '그', memorized: false, category: 'pronoun' },
-                    { front: 'she', back: '그녀', memorized: false, category: 'pronoun' },
-                    { front: 'we', back: '우리', memorized: false, category: 'pronoun' },
-                    { front: 'they', back: '그들', memorized: false, category: 'pronoun' },
-                    { front: 'apple', back: '사과', memorized: false, category: 'noun' },
-                    { front: 'banana', back: '바나나', memorized: false, category: 'noun' },
-                    { front: 'orange', back: '오렌지', memorized: false, category: 'noun' },
-                    { front: 'grape', back: '포도', memorized: false, category: 'noun' },
-                    { front: 'melon', back: '멜론', memorized: false, category: 'noun' },
-                    { front: 'strawberry', back: '딸기', memorized: false, category: 'noun' },
-                    { front: 'chicken', back: '닭고기', memorized: false, category: 'noun' },
-                    { front: 'beef', back: '소고기', memorized: false, category: 'noun' },
-                    { front: 'pork', back: '돼지고기', memorized: false, category: 'noun' },
-                    { front: 'fish', back: '생선', memorized: false, category: 'noun' },
-                    { front: 'shrimp', back: '새우', memorized: false, category: 'noun' },
-                    { front: 'vegetable', back: '야채', memorized: false, category: 'noun' },
-                    { front: 'fruit', back: '과일', memorized: false, category: 'noun' },
-                    { front: 'rice', back: '쌀', memorized: false, category: 'noun' },
-                    { front: 'noodle', back: '국수', memorized: false, category: 'noun' },
-                    { front: 'soup', back: '국', memorized: false, category: 'noun' },
-                    { front: 'bread', back: '빵', memorized: false, category: 'noun' },
-                    { front: 'cake', back: '케이크', memorized: false, category: 'noun' },
-                    { front: 'ice cream', back: '아이스크림', memorized: false, category: 'noun' },
-                    { front: 'milk', back: '우유', memorized: false, category: 'noun' },
-                    { front: 'coffee', back: '커피', memorized: false, category: 'noun' },
-                    { front: 'tea', back: '차', memorized: false, category: 'noun' },
-                    { front: 'juice', back: '주스', memorized: false, category: 'noun' },
-                    { front: 'water', back: '물', memorized: false, category: 'noun' },
-                    { front: 'soda', back: '탄산수', memorized: false, category: 'noun' },
-                    { front: 'beer', back: '맥주', memorized: false, category: 'noun' },
-                    { front: 'wine', back: '와인', memorized: false, category: 'noun' },
-                    { front: 'whiskey', back: '위스키', memorized: false, category: 'noun' },
-                    { front: 'vodka', back: '보드카', memorized: false, category: 'noun' },
-                    { front: 'rum', back: '럼', memorized: false, category: 'noun' },
-                    { front: 'gin', back: '진', memorized: false, category: 'noun' },
-                    { front: 'tequila', back: '테킬라', memorized: false, category: 'noun' },
-                    { front: 'village', back: '마을', memorized: false, category: 'noun' },
-                    { front: 'city', back: '도시', memorized: false, category: 'noun' },
-                    { front: 'town', back: '읍', memorized: false, category: 'noun' },
-                    { front: 'country', back: '나라', memorized: false, category: 'noun' },
-                    { front: 'continent', back: '대륙', memorized: false, category: 'noun' },
-                    { front: 'ocean', back: '바다', memorized: false, category: 'noun' },
-                    { front: 'river', back: '강', memorized: false, category: 'noun' },
-                    { front: 'lake', back: '호수', memorized: false, category: 'noun' },
-                    { front: 'mountain', back: '산', memorized: false, category: 'noun' },
-                    { front: 'forest', back: '숲', memorized: false, category: 'noun' },
-                    { front: 'desert', back: '사막', memorized: false, category: 'noun' },
-                    { front: 'island', back: '섬', memorized: false, category: 'noun' },
-                    { front: 'beach', back: '해변', memorized: false, category: 'noun' },
-                    { front: 'hill', back: '언덕', memorized: false, category: 'noun' },
-                    { front: 'valley', back: '계곡', memorized: false, category: 'noun' },
-                    { front: 'peninsula', back: '반도', memorized: false, category: 'noun' },
-                    { front: 'plain', back: '평야', memorized: false, category: 'noun' },
-                    { front: 'sky', back: '하늘', memorized: false, category: 'noun' },
-                    { front: 'sun', back: '태양', memorized: false, category: 'noun' },
-                    { front: 'moon', back: '달', memorized: false, category: 'noun' },
-                    { front: 'star', back: '별', memorized: false, category: 'noun' },
-                    { front: 'cloud', back: '구름', memorized: false, category: 'noun' },
-                    { front: 'rain', back: '비', memorized: false, category: 'noun' },
-                    { front: 'snow', back: '눈', memorized: false, category: 'noun' },
-                    { front: 'wind', back: '바람', memorized: false, category: 'noun' },
-                    { front: 'storm', back: '폭풍', memorized: false, category: 'noun' },
-                    { front: 'thunder', back: '천둥', memorized: false, category: 'noun' },
-                    { front: 'lightning', back: '번개', memorized: false, category: 'noun' },
-                    { front: 'beautiful', back: '아름다운', memorized: false, category: 'adjective' },
-                    { front: 'ugly', back: '추한', memorized: false, category: 'adjective' },
-                    { front: 'happy', back: '행복한', memorized: false, category: 'adjective' },
-                    { front: 'sad', back: '슬픈', memorized: false, category: 'adjective' },
-                    { front: 'big', back: '큰', memorized: false, category: 'adjective' },
-                    { front: 'first sale of the day / initiate', back: '개시', memorized: false, category: 'noun' },
-                    { front: 'hot', back: '더운', memorized: false, category: 'adjective' },
-                    { front: 'cold', back: '추운', memorized: false, category: 'adjective' },
-                    { front: 'fast', back: '빠른', memorized: false, category: 'adjective' },
-                    { front: 'slow', back: '느린', memorized: false, category: 'adjective' },
-                    { front: 'young', back: '젊은', memorized: false, category: 'adjective' },
-                    { front: 'old', back: '늙은', memorized: false, category: 'adjective' },
-                    { front: 'tall', back: '키가 큰', memorized: false, category: 'adjective' },
-                    { front: 'short', back: '키가 작은', memorized: false, category: 'adjective' },
-                    { front: 'bright', back: '밝은', memorized: false, category: 'adjective' },
-                    { front: 'dark', back: '어두운', memorized: false, category: 'adjective' },
-                    { front: 'strong', back: '강한', memorized: false, category: 'adjective' },
-                    { front: 'weak', back: '약한', memorized: false, category: 'adjective' },
-                    { front: 'smart', back: '똑똑한', memorized: false, category: 'adjective' },
-                    { front: 'stupid', back: '멍청한', memorized: false, category: 'adjective' },
-                    { front: 'clean', back: '깨끗한', memorized: false, category: 'adjective' },
-                    { front: 'dirty', back: '더러운', memorized: false, category: 'adjective' },
-                    { front: 'noisy', back: '시끄러운', memorized: false, category: 'adjective' },
-                    { front: 'quiet', back: '조용한', memorized: false, category: 'adjective' },
-                    { front: 'expensive', back: '비싼', memorized: false, category: 'adjective' },
-                    { front: 'cheap', back: '싼', memorized: false, category: 'adjective' },
-                    { front: 'good', back: '좋은', memorized: false, category: 'adjective' },
-                    { front: 'bad', back: '나쁜', memorized: false, category: 'adjective' },
-                    { front: 'easy', back: '쉬운', memorized: false, category: 'adjective' },
-                    { front: 'difficult', back: '어려운', memorized: false, category: 'adjective' },
-                    { front: 'interesting', back: '재미있는', memorized: false, category: 'adjective' },
-                    { front: 'boring', back: '지루한', memorized: false, category: 'adjective' },
-                    { front: 'chair', back: '의자', memorized: false, category: 'noun' },
-                    { front: 'good', back: '좋은', memorized: false, category: 'adjective' },
-                    { front: 'clean', back: '청소하다', memorized: false, category: 'verb' },
-                    { front: 'bag', back: '가방', memorized: false, category: 'object' },
-                    { front: 'buy', back: '사다', memorized: false, category: 'verb' },
-                    { front: 'cup', back: '컵', memorized: false, category: 'object' },
-                    { front: 'glass', back: '유리잔', memorized: false, category: 'object' },
-                    { front: 'plate', back: '접시', memorized: false, category: 'object' },
-                    { front: 'knife', back: '칼', memorized: false, category: 'object' },
-                    { front: 'fork', back: '포크', memorized: false, category: 'object' },
-                    { front: 'walk', back: '걷다', memorized: false, category: 'verb' },
-                    { front: 'run', back: '달리다', memorized: false, category: 'verb' },
-                    { front: 'see', back: '보다', memorized: false, category: 'verb' },
-                    { front: 'hear', back: '듣다', memorized: false, category: 'verb' },
-                    { front: 'make', back: '만들다', memorized: false, category: 'verb' },
-                    { front: 'big', back: '큰', memorized: false, category: 'adjective' },
-                    { front: 'small', back: '작은', memorized: false, category: 'adjective' },
-                    { front: 'home', back: '집', memorized: false, category: 'place' },
-                    { front: 'school', back: '학교', memorized: false, category: 'place' },
-                    { front: 'office', back: '사무실', memorized: false, category: 'place' },
-                    { front: 'meal', back: '식사', memorized: false, category: 'noun' },
-                    { front: 'how', back: '어떻게', memorized: false, category: 'adverb' },
-                    { front: 'wash', back: '씻다', memorized: false, category: 'verb' },
-                    { front: 'run', back: '달리다', memorized: false, category: 'verb' },
-                    { front: 'bag', back: '가방', memorized: false, category: 'object' },
-                    { front: 'how much is it?', back: '얼마예요', memorized: false, category: 'phrase' },
-                    ]
-            };
-            //console.log(levelupdataTemp);
-            console.log(JSON.stringify(levelupdataTemp));
-            localStorage.setItem('levelupFlashData', JSON.stringify(levelupdataTemp));
-            //window.location.href = './viewCards.html';
-            }
-
-    </script>
+    <script src="js/data.js"></script>
+    <script src="js/view.js"></script>
 </body>
-
 </html>

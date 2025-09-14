@@ -1,0 +1,350 @@
+/* study/create.css - Additional styles for create card page */
+
+/* Form Styles */
+.create-form {
+    background: var(--panel);
+    border: 1px solid var(--ring);
+    border-radius: 14px;
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--ring);
+    border-radius: 10px;
+    color: var(--ink);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.form-input::placeholder {
+    color: var(--muted);
+    opacity: 0.7;
+}
+
+/* Category Input Toggle */
+.category-input-group {
+    position: relative;
+}
+
+.category-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.category-toggle {
+    appearance: none;
+    width: 40px;
+    height: 20px;
+    background: var(--ring);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.category-toggle:checked {
+    background: var(--accent);
+}
+
+.category-toggle::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s;
+}
+
+.category-toggle:checked::before {
+    transform: translateX(20px);
+}
+
+.category-toggle-label {
+    font-size: .85rem;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+#category-text-input {
+    display: none;
+}
+
+/* Quick Category Buttons */
+.quick-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.quick-add-btn {
+    all: unset;
+    cursor: pointer;
+    padding: .4rem .8rem;
+    background: var(--card-bg);
+    border: 1px solid var(--ring);
+    border-radius: 20px;
+    font-size: .8rem;
+    color: var(--muted);
+    transition: all 0.2s;
+}
+
+.quick-add-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Action Buttons */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.btn-primary {
+    all: unset;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #04130a;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: .95rem;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+}
+
+.btn-secondary {
+    all: unset;
+    cursor: pointer;
+    background: var(--card-bg);
+    color: var(--muted);
+    border: 1px solid var(--ring);
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: .95rem;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.btn-secondary:hover {
+    background: var(--hover-bg);
+    color: var(--ink);
+}
+
+/* Messages */
+.message {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: .9rem;
+    font-weight: 500;
+}
+
+.message-success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: var(--accent);
+}
+
+.message-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--danger);
+}
+
+.message-info {
+    background: rgba(45, 212, 191, 0.1);
+    border: 1px solid rgba(45, 212, 191, 0.3);
+    color: var(--accent-2);
+}
+
+/* Stats Cards */
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--ring);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: .8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+/* Recent Cards */
+.recent-cards-section {
+    margin-top: 32px;
+}
+
+.recent-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.recent-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card-bg);
+    border: 1px solid var(--ring);
+    border-radius: 10px;
+    padding: 12px 16px;
+    transition: background 0.2s;
+}
+
+.recent-card:hover {
+    background: var(--hover-bg);
+}
+
+.recent-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.recent-card-text {
+    font-size: .9rem;
+    color: var(--ink);
+    margin-bottom: 4px;
+    word-break: break-word;
+}
+
+.recent-card-meta {
+    font-size: .75rem;
+    color: var(--muted);
+}
+
+.recent-card-delete {
+    all: unset;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    color: var(--danger);
+    transition: background 0.2s;
+    margin-left: 12px;
+}
+
+.recent-card-delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.no-cards {
+    text-align: center;
+    color: var(--muted);
+    font-style: italic;
+    padding: 24px;
+}
+
+/* Import Section */
+.import-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--ring);
+    text-align: center;
+}
+
+.import-description {
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-size: .9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .create-form {
+        margin: 0 16px;
+        padding: 16px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
+    
+    .stats-overview {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .quick-categories {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-overview {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .recent-card {
+        padding: 10px 12px;
+    }
+    
+    .recent-card-text {
+        font-size: .85rem;
+    }
+}

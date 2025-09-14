@@ -1,288 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Create New Cards</title>
-    <style>
-        body {
-            margin-top: 10px;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #EADFB4;
-            flex-direction: column;
-
-        }
-
-        .header {
-            text-align: center;
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 10px;
-            border-radius: 10px;
-            border: 2px solid black;
-            font-size: 24px;
-            width: 90%;
-            margin: 5px auto;
-        }
-
-        .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background-color: #66a3ff;
-            /* Blue background */
-            color: #fff;
-            /* White text */
-        }
-
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-
-
-        .nav-menu {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .nav-menu button {
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            height: 60px;
-        }
-
-        .nav-menu button:hover {
-            background-color: #45a049;
-        }
-
-        .create-new-cards {
-
-            margin: 5px;
-            padding: 0px;
-            text-align: center;
-            border-radius: 5px;
-            color: #fff;
-        }
-
-        .input-group {
-            margin: 5px 0px 0px 0px;
-            border: 1px solid #000;
-            background-color: lightblue;
-            /* Thin black border */
-            padding: 5px;
-            display: flex;
-            align-items: center;
-            font-size: 120%;
-            /* Align items vertically */
-        }
-
-        .input-label {
-            /* Moved inside input-group */
-            width: 120px;
-            margin: 0px;
-            color: black;
-        }
-
-        .input-field {
-            border: 1px solid #000;
-            /* Thin black border */
-            margin: 5px;
-            padding: 5px;
-            width: 100%;
-        }
-
-        .add-button {
-            padding: 5px 50px;
-            cursor: pointer;
-            background-color: #fff;
-            /* White background */
-            color: #000;
-            /* Black text */
-            border: none;
-            border-radius: 3px;
-            margin: 45px;
-            font-size: 200%;
-        }
-
-        .add-button:hover {
-            background-color: #f0f0f0;
-            /* Light grey background on hover */
-        }
-
-        .counter {
-            border: 1px solid #000;
-            padding: 5px;
-            margin: 5px;
-            width: 50%;
-            font-size: 150%;
-            /* Double the font size */
-        }
-
-        .dropdown-input {
-    /* display: none; */ /* Remove this line */
-    visibility: hidden; /* Add this line */
-    position: absolute; /* Add this line */
-    z-index: 1; /* Add this line */
-    background-color: #fff; /* Add this line */
-}
-
-.dropdown-input.show-dropdown {
-    visibility: visible; /* Add this line */
-}
-
-    </style>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="create.css">
+    <title>Create Cards</title>
 </head>
-
 <body>
-    <div class="header">Create</div>
-    <div class="nav-menu">
-        <button onclick="window.location.href='../main.html'"><i class="fa fa-home"></i></button>
-        <button onclick="window.location.href = 'studyHome.html';">Study</button>
-        <button onclick="window.location.href = 'createCard.html';">Create New Cards</button>
-        <button onclick="window.location.href = 'viewCards.html';">View All Cards</button>
-    </div>
-
-    <!-- <div class="counter">
-        Total Cards: <span id="card-count"></span>
-    </div>-->
-
-    <div class="create-new-cards">
-        <div class="input-group">
-            <label for="front-input" class="input-label">Front:</label>
-            <input type="text" id="front-input" class="input-field">
+    <header>
+        <div class="header-bar">
+            <button class="home-btn" onclick="location.href='../main.html'">⟵ Home</button>
+            <h1>Create Cards</h1>
+            <nav class="nav-pills">
+                <button class="nav-pill" onclick="location.href='studyHome.html'">Study</button>
+                <button class="nav-pill active" onclick="location.href='createCard.html'">Create</button>
+                <button class="nav-pill" onclick="location.href='viewCards.html'">Library</button>
+            </nav>
         </div>
-        <div class="input-group">
-            <label for="back-input" class="input-label">Back:</label>
-            <input type="text" id="back-input" class="input-field">
-        </div>
-        <div class="input-group">
-            <label for="category-input" class="input-label">Category:</label>
-            <div id="category-input" class="input-field dropdown-input">
-                <select id="category-dropdown">
-                    <!-- Dropdown options will be populated dynamically here -->
-                </select>
+    </header>
+
+    <main class="wrap">
+        <!-- Stats Overview -->
+        <section class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-number" id="total-cards-stat">0</div>
+                <div class="stat-label">Total Cards</div>
             </div>
-            <input type="text" id="category-text" class="input-field dropdown-input">
-            <input type="checkbox" id="toggle-dropdown">
-            <label for="toggle-dropdown">New</label>
-        </div>
-        <button class="add-button" onclick="addCard()">Add</button>
-    </div>
+            <div class="stat-card">
+                <div class="stat-number" id="categories-stat">0</div>
+                <div class="stat-label">Categories</div>
+            </div>
+        </section>
 
-    <script>
+        <!-- Create Form -->
+        <section class="card">
+            <h3>✨ Create New Card</h3>
+            <form class="create-form" id="create-form">
+                <!-- Front Input -->
+                <div class="form-group">
+                    <label for="front-input" class="form-label">Front (English)</label>
+                    <input 
+                        type="text" 
+                        id="front-input" 
+                        class="form-input" 
+                        placeholder="Enter the word or phrase to learn..."
+                        required
+                    >
+                </div>
 
-        // Load flashcards from localStorage
-        let levelupdata = JSON.parse(localStorage.getItem('levelupFlashData')) || {
-            flashcards: []
-        };
+                <!-- Back Input -->
+                <div class="form-group">
+                    <label for="back-input" class="form-label">Back (Translation)</label>
+                    <input 
+                        type="text" 
+                        id="back-input" 
+                        class="form-input" 
+                        placeholder="Enter the translation or definition..."
+                        required
+                    >
+                </div>
 
-        JSON.stringify(levelupdata);
+                <!-- Category Input -->
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <div class="category-input-group">
+                        <div class="category-toggle-container">
+                            <input type="checkbox" id="category-toggle" class="category-toggle">
+                            <label for="category-toggle" class="category-toggle-label">Existing Category</label>
+                        </div>
+                        
+                        <select id="category-dropdown" class="form-input">
+                            <option value="">Select category...</option>
+                        </select>
+                        
+                        <input 
+                            type="text" 
+                            id="category-text-input" 
+                            class="form-input" 
+                            placeholder="Enter new category..."
+                        >
 
-        function addCard() {
-            const frontInput = document.getElementById('front-input');
-            const backInput = document.getElementById('back-input');
-            let categoryInput = document.getElementById('category-input');
-            const categoryTextInput = document.getElementById('category-text');
-            const useDropdownCheckbox = document.getElementById('toggle-dropdown');
+                        <!-- Quick Category Buttons -->
+                        <div class="quick-categories">
+                            <button type="button" class="quick-add-btn" data-category="noun">Noun</button>
+                            <button type="button" class="quick-add-btn" data-category="verb">Verb</button>
+                            <button type="button" class="quick-add-btn" data-category="adjective">Adjective</button>
+                            <button type="button" class="quick-add-btn" data-category="greeting">Greeting</button>
+                            <button type="button" class="quick-add-btn" data-category="phrase">Phrase</button>
+                        </div>
+                    </div>
+                </div>
 
-            const front = frontInput.value.trim();
-            const back = backInput.value.trim();
-            let category;
-            if (useDropdownCheckbox.checked) {
-                category = categoryTextInput.value.toLowerCase().trim();
-                if (category === '') {
-                    alert("Please fill in all fields.");
-                    return;
-                }
-            } else {
-                const dropdown = document.getElementById('category-dropdown');
-                category = dropdown.value;
-            }
-                    if (front !== '' && back !== '' && category !== '') {
-                        const newCard = {
-                            front: front,
-                            back: back,
-                            memorized: false, // Default to false
-                            category: category
-                        };
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="add-card-btn">
+                        ➕ Add Card
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="location.href='studyHome.html'">
+                        📚 Go Study
+                    </button>
+                </div>
+            </form>
+        </section>
 
-                        // Add new card to the flashcards array
-                        levelupdata.flashcards.push(newCard);
+        <!-- Recent Cards -->
+        <section class="card recent-cards-section">
+            <h3>🕒 Recent Cards</h3>
+            <div class="recent-cards" id="recent-cards">
+                <!-- Dynamic content -->
+            </div>
+        </section>
 
-                        // Save the updated levelupdata to localStorage
-                        localStorage.setItem('levelupFlashData', JSON.stringify(levelupdata));
+        <!-- Import Sample Data -->
+        <section class="card import-section">
+            <h3>📥 Sample Data</h3>
+            <p class="import-description">
+                Need some cards to get started? Import sample Korean vocabulary cards.
+            </p>
+            <button class="btn-secondary" id="import-sample-btn">
+                Import Sample Cards
+            </button>
+        </section>
+    </main>
 
-                        // Clear input fields
-                        frontInput.value = '';
-                        backInput.value = '';
-                        if (useDropdownCheckbox.checked) {
-                            categoryInput.innerText = '';
-                        } else {
-                            categoryTextInput.value = '';
-                        }
-
-                        // Update card count
-                        updateCardCount();
-
-                        // Reload the page
-                        location.reload();
-                    } else {
-                        alert("Please fill in all fields.");
-                    }
-                }
-
-                function updateCardCount() {
-                    const cardCount = document.getElementById('card-count');
-                    //cardCount.textContent = levelupdata.length;
-                }
-
-               // Populate dropdown menu with categories from local storage
-                function populateDropdown() {
-                    const categories = Array.from(new Set(levelupdata.flashcards.map(card => card.category)));
-                    categories.sort(); // Sort categories alphabetically
-                    const categoryDropdown = document.getElementById('category-dropdown');
-                    categoryDropdown.innerHTML = ''; // Clear previous options
-                    categories.forEach(category => {
-                        const option = document.createElement('option');
-                        option.value = category;
-                        option.textContent = category;
-                        categoryDropdown.appendChild(option);
-                    });
-                }
-
-
-                // Toggle visibility of dropdown or text input based on checkbox state
-                document.getElementById('toggle-dropdown').addEventListener('change', function () {
-                    const useDropdownCheckbox = document.getElementById('toggle-dropdown');
-                    const categoryDropdown = document.getElementById('category-input');
-                    const categoryTextInput = document.getElementById('category-text');
-
-                    if (!useDropdownCheckbox.checked) {
-                        categoryDropdown.classList.remove('dropdown-input');
-                        categoryTextInput.classList.add('dropdown-input');
-                    } else {
-                        categoryDropdown.classList.add('dropdown-input');
-                        categoryTextInput.classList.remove('dropdown-input');
-                    }
-                });
-
-                // Update card count on page load
-                updateCardCount();
-                populateDropdown();
-            </script>
+    <script src="js/data.js"></script>
+    <script src="js/create.js"></script>
 </body>
-
 </html>

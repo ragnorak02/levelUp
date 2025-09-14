@@ -1,0 +1,420 @@
+/* study/main.css - Main stylesheet for study section */
+
+:root {
+    --bg: #080c11;
+    --panel: #0d131a;
+    --ink: #e8eef6;
+    --muted: #9fb0c7;
+    --ring: #1c2a37;
+    --accent: #4CAF50;
+    --accent-2: #2dd4bf;
+    --danger: #ef4444;
+    --warn: #f59e0b;
+    --purple: #8b5cf6;
+    --card-bg: #0e141b;
+    --hover-bg: #1a1f26;
+    --success-bg: #0f1f15;
+    --success-ring: #1f4030;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
+    background: linear-gradient(180deg, #070b10 0%, #0a1016 100%);
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styles */
+header {
+    background: #0b1118;
+    border-bottom: 1px solid var(--ring);
+    color: var(--ink);
+    padding: 12px;
+}
+
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.home-btn {
+    all: unset;
+    cursor: pointer;
+    border: 1px solid var(--ring);
+    padding: .4rem .7rem;
+    border-radius: .6rem;
+    font-size: .9rem;
+    color: var(--muted);
+    transition: background 0.2s;
+}
+
+.home-btn:hover {
+    background: var(--hover-bg);
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.nav-pills {
+    display: flex;
+    gap: 6px;
+    background: var(--panel);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--ring);
+}
+
+.nav-pill {
+    all: unset;
+    cursor: pointer;
+    padding: .4rem .8rem;
+    border-radius: 8px;
+    font-size: .9rem;
+    color: var(--muted);
+    transition: all .2s;
+}
+
+.nav-pill.active {
+    background: linear-gradient(90deg, var(--accent), #22c55e);
+    color: #04130a;
+    font-weight: 600;
+}
+
+/* Layout */
+.wrap {
+    width: min(1000px, 100%);
+    margin-inline: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+}
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--ring);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
+}
+
+.card h3 {
+    margin: .1rem 0 .6rem;
+    font-size: 1rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+/* Progress Overview */
+.progress-overview {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    align-items: center;
+}
+
+.progress-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+}
+
+.circle-bg, .circle-progress {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.circle-bg {
+    background: var(--ring);
+}
+
+.circle-progress {
+    background: conic-gradient(
+        var(--accent) 0deg,
+        var(--accent-2) calc(var(--progress, 0) * 3.6deg),
+        transparent calc(var(--progress, 0) * 3.6deg)
+    );
+    mask: radial-gradient(circle at center, transparent 35%, black 35%);
+    -webkit-mask: radial-gradient(circle at center, transparent 35%, black 35%);
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.progress-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.progress-label {
+    font-size: .8rem;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--ring);
+    border-radius: 10px;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.stat-label {
+    font-size: .8rem;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+/* Category Grid */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.category-card {
+    background: var(--card-bg);
+    border: 1px solid var(--ring);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.category-card:hover {
+    background: var(--hover-bg);
+    border-color: var(--accent);
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.category-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ink);
+    text-transform: capitalize;
+}
+
+.category-count {
+    background: var(--ring);
+    color: var(--muted);
+    padding: .2rem .6rem;
+    border-radius: 12px;
+    font-size: .8rem;
+}
+
+.category-progress {
+    width: 100%;
+    height: 8px;
+    background: var(--ring);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.category-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.category-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: .85rem;
+    color: var(--muted);
+}
+
+/* Study Options */
+.study-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.study-option {
+    background: var(--card-bg);
+    border: 1px solid var(--ring);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: inherit;
+}
+
+.study-option:hover {
+    background: var(--hover-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .3);
+}
+
+.study-option.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #04130a;
+    border-color: var(--accent);
+}
+
+.study-option.primary:hover {
+    transform: translateY(-2px) scale(1.02);
+}
+
+.study-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.study-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.study-desc {
+    font-size: .85rem;
+    opacity: 0.8;
+}
+
+/* Study Count Selector */
+.count-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.count-label {
+    font-size: .9rem;
+    color: var(--muted);
+}
+
+.count-options {
+    display: flex;
+    gap: 6px;
+    background: var(--card-bg);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--ring);
+}
+
+.count-option {
+    all: unset;
+    cursor: pointer;
+    padding: .4rem .8rem;
+    border-radius: 6px;
+    font-size: .85rem;
+    color: var(--muted);
+    transition: all .2s;
+}
+
+.count-option.active {
+    background: var(--accent);
+    color: #04130a;
+    font-weight: 600;
+}
+
+.count-option:hover:not(.active) {
+    background: var(--hover-bg);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .progress-overview {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 16px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .study-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .wrap {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .card {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-bar {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .nav-pills {
+        order: -1;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .progress-circle {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .progress-value {
+        font-size: 1.2rem;
+    }
+}
