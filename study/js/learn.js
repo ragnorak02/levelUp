@@ -14,7 +14,6 @@ class StudySession {
         this.isKoreanFirst = false;
         this.touchStartX = 0;
         this.touchStartY = 0;
-        this.touchStartTime = 0;
         this.isSwiping = false;
 
         this.init();
@@ -105,9 +104,9 @@ class StudySession {
 
         // Touch events for mobile swiping
         if (flashcard) {
-            flashcard.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: true });
+            flashcard.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
             flashcard.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
-            flashcard.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: true });
+            flashcard.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
         }
 
         // Keyboard shortcuts
@@ -115,38 +114,40 @@ class StudySession {
     }
 
     handleTouchStart(e) {
+        if (e.touches.length !== 1) return;
+        
         this.touchStartX = e.touches[0].clientX;
         this.touchStartY = e.touches[0].clientY;
-        this.touchStartTime = Date.now();
         this.isSwiping = false;
     }
 
     handleTouchMove(e) {
+        if (e.touches.length !== 1) return;
+        
         const deltaX = Math.abs(e.touches[0].clientX - this.touchStartX);
         const deltaY = Math.abs(e.touches[0].clientY - this.touchStartY);
         
-        // Mark as swiping if horizontal movement is significant
-        if (deltaX > 30 && deltaX > deltaY) {
+        if (deltaX > deltaY && deltaX > 10) {
             this.isSwiping = true;
-            e.preventDefault();
+            e.preventDefault(); // Prevent scrolling
         }
     }
 
     handleTouchEnd(e) {
+        if (e.changedTouches.length !== 1) return;
+        
         const deltaX = e.changedTouches[0].clientX - this.touchStartX;
         const deltaY = Math.abs(e.changedTouches[0].clientY - this.touchStartY);
-        const touchDuration = Date.now() - this.touchStartTime;
-        const totalMovement = Math.abs(deltaX) + deltaY;
         
-        if (this.isSwiping && Math.abs(deltaX) > 50) {
+        if (this.isSwiping && Math.abs(deltaX) > 50 && deltaY < 100) {
             // Swipe detected
             if (deltaX > 0) {
                 this.answerCard(true); // Swipe right = correct
             } else {
                 this.answerCard(false); // Swipe left = incorrect
             }
-        } else if (touchDuration < 500 && totalMovement < 30) {
-            // Tap detected - quick touch with minimal movement
+        } else if (!this.isSwiping && Math.abs(deltaX) < 10 && deltaY < 10) {
+            // Tap detected
             this.flipCard();
         }
         
