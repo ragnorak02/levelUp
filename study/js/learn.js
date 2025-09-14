@@ -127,7 +127,9 @@ class StudySession {
         const deltaX = Math.abs(e.touches[0].clientX - this.touchStartX);
         const deltaY = Math.abs(e.touches[0].clientY - this.touchStartY);
         
-        if (deltaX > deltaY && deltaX > 10) {
+        // Only consider it swiping if horizontal movement is significantly more than vertical
+        // and the horizontal movement is substantial
+        if (deltaX > deltaY && deltaX > 30) {
             this.isSwiping = true;
             e.preventDefault(); // Prevent scrolling
         }
