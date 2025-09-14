@@ -14,6 +14,7 @@ class StudySession {
         this.isKoreanFirst = false;
         this.touchStartX = 0;
         this.touchStartY = 0;
+        this.touchStartTime = 0;
         this.isSwiping = false;
 
         this.init();
@@ -118,6 +119,7 @@ class StudySession {
         
         this.touchStartX = e.touches[0].clientX;
         this.touchStartY = e.touches[0].clientY;
+        this.touchStartTime = Date.now();
         this.isSwiping = false;
     }
 
@@ -129,7 +131,7 @@ class StudySession {
         
         // Only consider it swiping if horizontal movement is significantly more than vertical
         // and the horizontal movement is substantial
-        if (deltaX > deltaY && deltaX > 30) {
+        if (deltaX > deltaY && deltaX > 25) {
             this.isSwiping = true;
             e.preventDefault(); // Prevent scrolling
         }
@@ -140,6 +142,7 @@ class StudySession {
         
         const deltaX = e.changedTouches[0].clientX - this.touchStartX;
         const deltaY = Math.abs(e.changedTouches[0].clientY - this.touchStartY);
+        const touchDuration = Date.now() - this.touchStartTime;
         
         if (this.isSwiping && Math.abs(deltaX) > 50 && deltaY < 100) {
             // Swipe detected
@@ -148,8 +151,8 @@ class StudySession {
             } else {
                 this.answerCard(false); // Swipe left = incorrect
             }
-        } else if (!this.isSwiping && Math.abs(deltaX) < 10 && deltaY < 10) {
-            // Tap detected
+        } else if (!this.isSwiping && Math.abs(deltaX) < 25 && deltaY < 25 && touchDuration < 300) {
+            // Quick tap detected - must be under 300ms and minimal movement
             this.flipCard();
         }
         

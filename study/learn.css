@@ -59,7 +59,7 @@
     height: 250px;
     position: relative;
     transform-style: preserve-3d;
-    transition: transform 0.6s;
+    transition: transform 0.3s; /* Sped up from 0.6s to 0.3s (2x faster) */
     cursor: pointer;
     user-select: none;
 }
