@@ -357,6 +357,7 @@ function getPeriodStats(days = 7){
 }
 
 /* ========= Chart Functions ========= */
+// Original chart function (reverted for volume trends)
 function drawChart(canvasId, data, options = {}){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
@@ -377,24 +378,10 @@ function drawChart(canvasId, data, options = {}){
   
   if(!data || data.length === 0) return;
   
-  // Filter out days with zero volume for line connections (only for volume chart)
-  let chartData = data;
-  if(canvasId === 'volumeChart') {
-    const workoutDays = data.filter(d => d.y > 0);
-    if(workoutDays.length === 0) return;
-    chartData = workoutDays;
-  }
-  
-  const values = chartData.map(d => d.y);
+  const values = data.map(d => d.y);
   const minY = Math.min(...values);
   const maxY = Math.max(...values);
   const rangeY = maxY - minY || 1;
-  
-  // Add some padding to Y range for better visualization
-  const yPadding = rangeY * 0.1;
-  const adjustedMinY = Math.max(0, minY - yPadding);
-  const adjustedMaxY = maxY + yPadding;
-  const adjustedRangeY = adjustedMaxY - adjustedMinY;
   
   // Grid lines
   ctx.strokeStyle = '#233446';
@@ -409,26 +396,14 @@ function drawChart(canvasId, data, options = {}){
   }
   ctx.setLineDash([]);
   
-  // Calculate x positions
-  const getXPosition = (dataIndex) => {
-    if(canvasId === 'volumeChart') {
-      // For volume chart, maintain daily spacing
-      const originalIndex = data.findIndex(d => d.date === chartData[dataIndex].date);
-      return padding + (originalIndex / (data.length - 1)) * (width - 2 * padding);
-    } else {
-      // For other charts, use even spacing
-      return padding + (dataIndex / (chartData.length - 1)) * (width - 2 * padding);
-    }
-  };
-  
   // Line
   ctx.strokeStyle = options.color || '#2dd4bf';
   ctx.lineWidth = 3;
   ctx.beginPath();
   
-  chartData.forEach((point, index) => {
-    const x = getXPosition(index);
-    const y = height - padding - ((point.y - adjustedMinY) / adjustedRangeY) * (height - 2 * padding);
+  data.forEach((point, index) => {
+    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
+    const y = height - padding - ((point.y - minY) / rangeY) * (height - 2 * padding);
     
     if(index === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
@@ -437,23 +412,13 @@ function drawChart(canvasId, data, options = {}){
   
   // Points
   ctx.fillStyle = options.color || '#2dd4bf';
-  chartData.forEach((point, index) => {
-    const x = getXPosition(index);
-    const y = height - padding - ((point.y - adjustedMinY) / adjustedRangeY) * (height - 2 * padding);
+  data.forEach((point, index) => {
+    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
+    const y = height - padding - ((point.y - minY) / rangeY) * (height - 2 * padding);
     
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, Math.PI * 2);
     ctx.fill();
-    
-    // Highlight last point for progression chart
-    if(canvasId === 'progressionChart' && index === chartData.length - 1) {
-      ctx.shadowColor = options.color || '#2dd4bf';
-      ctx.shadowBlur = 10;
-      ctx.beginPath();
-      ctx.arc(x, y, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-    }
   });
 }
 
@@ -525,11 +490,92 @@ function drawProgressionChart(exerciseName){
     return;
   }
   
-  // Draw the chart
-  drawChart('progressionChart', progressionData, {color: '#2dd4bf'});
+  // Draw the progression chart with enhanced styling
+  drawProgressionChartEnhanced('progressionChart', progressionData, {color: '#2dd4bf'});
   
   // Update progression info
   updateProgressionInfo(exerciseName, progressionData);
+}
+
+// Special enhanced chart function for progression only
+function drawProgressionChartEnhanced(canvasId, data, options = {}){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  
+  const width = rect.width;
+  const height = rect.height;
+  const padding = 40;
+  
+  ctx.clearRect(0, 0, width, height);
+  
+  if(!data || data.length === 0) return;
+  
+  const values = data.map(d => d.y);
+  const minY = Math.min(...values);
+  const maxY = Math.max(...values);
+  const rangeY = maxY - minY || 1;
+  
+  // Add some padding to Y range for better visualization
+  const yPadding = rangeY * 0.1;
+  const adjustedMinY = Math.max(0, minY - yPadding);
+  const adjustedMaxY = maxY + yPadding;
+  const adjustedRangeY = adjustedMaxY - adjustedMinY;
+  
+  // Grid lines
+  ctx.strokeStyle = '#233446';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([2, 3]);
+  for(let i = 0; i <= 4; i++){
+    const y = padding + (i / 4) * (height - 2 * padding);
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(width - padding, y);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  
+  // Line
+  ctx.strokeStyle = options.color || '#2dd4bf';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  
+  data.forEach((point, index) => {
+    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
+    const y = height - padding - ((point.y - adjustedMinY) / adjustedRangeY) * (height - 2 * padding);
+    
+    if(index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  
+  // Points with enhanced styling
+  ctx.fillStyle = options.color || '#2dd4bf';
+  data.forEach((point, index) => {
+    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
+    const y = height - padding - ((point.y - adjustedMinY) / adjustedRangeY) * (height - 2 * padding);
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Highlight last point (most recent)
+    if(index === data.length - 1) {
+      ctx.shadowColor = options.color || '#2dd4bf';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  });
 }
 
 function renderNoProgressionData(exerciseName) {
