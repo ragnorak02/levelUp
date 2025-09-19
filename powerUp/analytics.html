@@ -74,6 +74,17 @@
   .exercise-chip:hover{background:rgba(255,255,255,.05)}
   .exercise-chip.active{background:var(--accent); color:#04130a; border-color:var(--accent)}
 
+  /* Progression stats */
+  .progression-stat{text-align:center; padding:12px; background:#0f141b; border:1px solid var(--ring); border-radius:10px}
+  .progression-stat .stat-value{font-size:1.2rem; font-weight:700; margin-bottom:4px}
+  .progression-stat .stat-label{font-size:.8rem; color:var(--muted)}
+
+  /* No data message */
+  .no-progression-data{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    text-align:center; color:var(--muted); font-size:1rem;
+  }
+
   /* Weekly overview */
   .weekly-card{grid-column: span 6}
   .week-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:8px}
@@ -366,10 +377,24 @@ function drawChart(canvasId, data, options = {}){
   
   if(!data || data.length === 0) return;
   
-  const values = data.map(d => d.y);
+  // Filter out days with zero volume for line connections (only for volume chart)
+  let chartData = data;
+  if(canvasId === 'volumeChart') {
+    const workoutDays = data.filter(d => d.y > 0);
+    if(workoutDays.length === 0) return;
+    chartData = workoutDays;
+  }
+  
+  const values = chartData.map(d => d.y);
   const minY = Math.min(...values);
   const maxY = Math.max(...values);
   const rangeY = maxY - minY || 1;
+  
+  // Add some padding to Y range for better visualization
+  const yPadding = rangeY * 0.1;
+  const adjustedMinY = Math.max(0, minY - yPadding);
+  const adjustedMaxY = maxY + yPadding;
+  const adjustedRangeY = adjustedMaxY - adjustedMinY;
   
   // Grid lines
   ctx.strokeStyle = '#233446';
@@ -384,14 +409,26 @@ function drawChart(canvasId, data, options = {}){
   }
   ctx.setLineDash([]);
   
+  // Calculate x positions
+  const getXPosition = (dataIndex) => {
+    if(canvasId === 'volumeChart') {
+      // For volume chart, maintain daily spacing
+      const originalIndex = data.findIndex(d => d.date === chartData[dataIndex].date);
+      return padding + (originalIndex / (data.length - 1)) * (width - 2 * padding);
+    } else {
+      // For other charts, use even spacing
+      return padding + (dataIndex / (chartData.length - 1)) * (width - 2 * padding);
+    }
+  };
+  
   // Line
   ctx.strokeStyle = options.color || '#2dd4bf';
   ctx.lineWidth = 3;
   ctx.beginPath();
   
-  data.forEach((point, index) => {
-    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
-    const y = height - padding - ((point.y - minY) / rangeY) * (height - 2 * padding);
+  chartData.forEach((point, index) => {
+    const x = getXPosition(index);
+    const y = height - padding - ((point.y - adjustedMinY) / adjustedRangeY) * (height - 2 * padding);
     
     if(index === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
@@ -400,13 +437,23 @@ function drawChart(canvasId, data, options = {}){
   
   // Points
   ctx.fillStyle = options.color || '#2dd4bf';
-  data.forEach((point, index) => {
-    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
-    const y = height - padding - ((point.y - minY) / rangeY) * (height - 2 * padding);
+  chartData.forEach((point, index) => {
+    const x = getXPosition(index);
+    const y = height - padding - ((point.y - adjustedMinY) / adjustedRangeY) * (height - 2 * padding);
     
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, Math.PI * 2);
     ctx.fill();
+    
+    // Highlight last point for progression chart
+    if(canvasId === 'progressionChart' && index === chartData.length - 1) {
+      ctx.shadowColor = options.color || '#2dd4bf';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
   });
 }
 
@@ -429,36 +476,134 @@ function drawVolumeChart(period = '7d'){
   drawChart('volumeChart', chartData, {color: '#4CAF50'});
 }
 
+// Enhanced Exercise Progression Chart
 function drawProgressionChart(exerciseName){
   if(!exerciseName) return;
   
   const progressionData = [];
+  
+  // Find all workouts that contain this exercise
   workouts.forEach(workout => {
     const exercise = workout.exercises.find(ex => 
-      ex.name.toLowerCase() === exerciseName.toLowerCase()
+      ex.name.toLowerCase().trim() === exerciseName.toLowerCase().trim()
     );
     
-    if(exercise) {
-      const maxWeight = Math.max(...exercise.sets
-        .filter(s => ex.finished || s.completed)
-        .map(s => s.weight));
+    if(exercise && exercise.sets && exercise.sets.length > 0) {
+      // Get completed sets only
+      const completedSets = exercise.sets.filter(set => {
+        return exercise.finished || set.completed;
+      });
       
-      if(maxWeight > 0) {
-        progressionData.push({
-          date: workout.date,
-          y: maxWeight
-        });
+      if(completedSets.length > 0) {
+        // Find the maximum weight from completed sets
+        const maxWeight = Math.max(...completedSets
+          .map(s => Number(s.weight) || 0)
+          .filter(w => w > 0));
+        
+        if(maxWeight > 0) {
+          progressionData.push({
+            date: workout.date,
+            y: maxWeight,
+            workout: workout
+          });
+        }
       }
     }
   });
   
+  // Sort by date
+  progressionData.sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  // Clear previous chart and messages
+  const canvas = document.getElementById('progressionChart');
+  const container = canvas.parentElement;
+  const existingMessage = container.querySelector('.no-progression-data');
+  if(existingMessage) existingMessage.remove();
+  
+  if(progressionData.length === 0) {
+    renderNoProgressionData(exerciseName);
+    return;
+  }
+  
+  // Draw the chart
   drawChart('progressionChart', progressionData, {color: '#2dd4bf'});
+  
+  // Update progression info
+  updateProgressionInfo(exerciseName, progressionData);
+}
+
+function renderNoProgressionData(exerciseName) {
+  const container = document.querySelector('#progressionChart').parentElement;
+  
+  const message = document.createElement('div');
+  message.className = 'no-progression-data';
+  message.innerHTML = `
+    <div style="font-size: 2rem; margin-bottom: 8px;">📊</div>
+    <div>No data found for <strong>${exerciseName}</strong></div>
+    <div style="font-size: 0.9rem; margin-top: 4px;">Complete some workouts to see progression</div>
+  `;
+  
+  container.style.position = 'relative';
+  container.appendChild(message);
+}
+
+function updateProgressionInfo(exerciseName, data) {
+  // Create or update progression info panel
+  let infoPanel = document.getElementById('progression-info');
+  
+  if(!infoPanel) {
+    infoPanel = document.createElement('div');
+    infoPanel.id = 'progression-info';
+    infoPanel.style.cssText = `
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--ring);
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+    `;
+    
+    const chartContainer = document.getElementById('progressionChart').parentElement;
+    chartContainer.appendChild(infoPanel);
+  }
+  
+  // Calculate stats
+  const weights = data.map(d => d.y);
+  const startWeight = weights[0];
+  const currentWeight = weights[weights.length - 1];
+  const maxWeight = Math.max(...weights);
+  const totalGain = currentWeight - startWeight;
+  const percentGain = startWeight > 0 ? ((totalGain / startWeight) * 100) : 0;
+  
+  infoPanel.innerHTML = `
+    <div class="progression-stat">
+      <div class="stat-value" style="color: var(--accent)">${currentWeight} lb</div>
+      <div class="stat-label">Current Max</div>
+    </div>
+    <div class="progression-stat">
+      <div class="stat-value" style="color: var(--accent-2)">${maxWeight} lb</div>
+      <div class="stat-label">All-Time PR</div>
+    </div>
+    <div class="progression-stat">
+      <div class="stat-value" style="color: ${totalGain >= 0 ? 'var(--accent)' : 'var(--bad)'}">
+        ${totalGain >= 0 ? '+' : ''}${totalGain} lb
+      </div>
+      <div class="stat-label">Total Gain</div>
+    </div>
+    <div class="progression-stat">
+      <div class="stat-value" style="color: ${percentGain >= 0 ? 'var(--accent)' : 'var(--bad)'}">
+        ${percentGain >= 0 ? '+' : ''}${percentGain.toFixed(1)}%
+      </div>
+      <div class="stat-label">Percent Gain</div>
+    </div>
+  `;
 }
 
 /* ========= Render Functions ========= */
 function renderOverview(){
   const thisWeek = getPeriodStats(7);
-  const lastWeek = getPeriodStats(14) - thisWeek;
   
   document.getElementById('totalVolume').textContent = thisWeek.volume.toLocaleString();
   document.getElementById('totalWorkouts').textContent = thisWeek.workouts;
@@ -508,7 +653,12 @@ function renderOverview(){
   const selector = document.getElementById('exerciseSelector');
   selector.innerHTML = '';
   
-  exercises.slice(0, 12).forEach((exercise, index) => {
+  if(exercises.length === 0) {
+    selector.innerHTML = '<p style="color: var(--muted); text-align: center; padding: 20px;">No exercises found. Complete some workouts to see progression.</p>';
+    return;
+  }
+  
+  exercises.slice(0, 15).forEach((exercise, index) => {
     const chip = document.createElement('button');
     chip.className = `exercise-chip ${index === 0 ? 'active' : ''}`;
     chip.textContent = exercise;
