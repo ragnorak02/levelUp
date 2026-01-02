@@ -118,6 +118,7 @@
   .day.muted:hover{background:#0f141b}
   .day.done{ background:#16a34a }
   .day.today{outline:2px solid var(--accent-2)}
+  .day.selected{outline:2px solid var(--accent); outline-offset:-2px}
   .num{ position:absolute; top:6px; left:7px; font-size:var(--cal-font); line-height:1; color:var(--ink) }
   .count{ position:absolute; bottom:6px; right:7px; font-size:var(--cal-count); color:var(--muted) }
 
@@ -143,54 +144,44 @@
 
   /* Grouped exercise list (no reps) */
   .group-chip {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:8px 10px; border:1px dashed #223143; border-radius:10px;
-    background:#0f141b; margin-bottom:6px; gap:10px;
+    display:flex;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    padding:8px 10px;
+    border:1px dashed #223143;
+    border-radius:10px;
+    background:#0f141b;
+    margin-bottom:6px;
   }
-  .group-chip h4 { margin:0; font-size:.95rem; color:#e8eef6 }
-  .group-chip .names { color:#9fb0c7; font-size:.9rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
-  .group-chip .count { font-size:.8rem; color:#9fb0c7; border:1px solid #213043; border-radius:999px; padding:2px 8px; background:#0c1117 }
 
-  /* Grouped exercise list (no reps) */
-.group-chip{
-  display:flex;
-  align-items:flex-start;      /* don't force equal heights */
-  flex-wrap:wrap;              /* allow wrapping */
-  gap:8px 10px;
-  padding:8px 10px;
-  border:1px dashed #223143;
-  border-radius:10px;
-  background:#0f141b;
-  margin-bottom:6px;
-}
+  .group-chip h4{
+    margin:0;
+    font-size:.95rem;
+    color:#e8eef6;
+    flex:0 0 auto;
+  }
 
-.group-chip h4{
-  margin:0;
-  font-size:.95rem;
-  color:#e8eef6;
-  flex:0 0 auto;               /* keep the label compact */
-}
+  .group-chip .names{
+    flex:1 1 100%;
+    color:#9fb0c7;
+    font-size:.9rem;
+    white-space:normal;
+    overflow:visible;
+    word-break:break-word;
+  }
 
-.group-chip .names{
-  flex:1 1 100%;               /* take full row below on wrap */
-  color:#9fb0c7;
-  font-size:.9rem;
-  white-space:normal;          /* allow multi-line */
-  overflow:visible;            /* no clipping */
-  word-break:break-word;       /* break long words if needed */
-}
+  .group-chip .count{
+    margin-left:auto;
+    font-size:.8rem;
+    color:#9fb0c7;
+    border:1px solid #213043;
+    border-radius:999px;
+    padding:2px 8px;
+    background:#0c1117;
+  }
 
-.group-chip .count{
-  margin-left:auto;            /* stay at the end of the first row */
-  font-size:.8rem;
-  color:#9fb0c7;
-  border:1px solid #213043;
-  border-radius:999px;
-  padding:2px 8px;
-  background:#0c1117;
-}
-
-#lastWorkoutCard { overflow-x: hidden; }
+  #lastWorkoutCard { overflow-x: hidden; }
 
 </style>
 </head>
@@ -223,7 +214,7 @@
         <div>
           <div class="workout-nav">
             <button class="nav-btn" id="prevWorkout">←</button>
-            <h3 id="workoutPanelTitle">Previous Workout</h3>
+            <h3 id="workoutPanelTitle">Today's Workout</h3>
             <button class="nav-btn" id="nextWorkout">→</button>
           </div>
           <div class="meta">
@@ -269,9 +260,8 @@ const fmt = (d)=>new Date(d+'T00:00:00');
 // Calendar navigation state
 let currentCalendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-// Workout navigation state
-let currentWorkoutIndex = 0;
-let workoutDates = [];
+// Selected workout date (defaults to today)
+let selectedWorkoutDate = todayISO;
 
 function readLocalDays(){
   const out = [];
@@ -281,7 +271,6 @@ function readLocalDays(){
     try{
       const day = JSON.parse(localStorage.getItem(k));
       if(!day?.date) continue;
-      // Keep bodyPart so we can group later
       const converted = {
         date: day.date,
         bodyWeight: day.bodyWeight ?? undefined,
@@ -312,7 +301,10 @@ const demoWorkouts = [
 const workouts = (readLocalDays().length ? readLocalDays() : demoWorkouts);
 
 const byDateAsc = (a,b)=> fmt(a.date) - fmt(b.date);
-const shortDate = (d)=> new Date(d).toLocaleDateString(undefined, {month:'short', day:'numeric', weekday:'short'});
+const shortDate = (d)=> {
+  const date = new Date(d + 'T12:00:00'); // Use noon to avoid timezone issues
+  return date.toLocaleDateString(undefined, {month:'short', day:'numeric', weekday:'short'});
+};
 const totalVolume = (wo)=> wo.exercises.reduce((sum, ex)=> sum + ex.sets.reduce((s, st)=> s + (st.weight||0)*(st.reps||0), 0), 0);
 const totalSets = (wo)=> wo.exercises.reduce((s,ex)=> s + ex.sets.length, 0);
 const completedSets = (wo)=> wo.exercises.reduce((s,ex)=> s + ex.sets.filter(st=>st.completed).length, 0);
@@ -323,10 +315,8 @@ function calculatePowerLevel() {
   const maxWeight = Math.max(...workouts.flatMap(w => w.exercises.flatMap(e => e.sets.map(s => s.weight || 0))));
   const totalWorkouts = workouts.filter(w => w.exercises.length > 0).length;
   
-  // Power score combines volume, max weight, and consistency
   const powerScore = (totalVol * 0.6) + (maxWeight * 100) + (totalWorkouts * 200);
   
-  // Define power levels (JRPG style)
   const levels = [
     { threshold: 0, level: 1, title: "Novice", next: 5000 },
     { threshold: 5000, level: 2, title: "Apprentice", next: 12000 },
@@ -397,7 +387,6 @@ function renderPowerLevel(){
   document.getElementById('powerTrend').textContent = power.title;
   document.getElementById('levelBar').style.width = `${power.progress}%`;
   
-  // Render current weight
   const sorted = [...workouts].sort(byDateAsc);
   const lastWeight = sorted
     .filter(w=>typeof w.bodyWeight==='number' && !isNaN(w.bodyWeight))
@@ -411,43 +400,34 @@ function renderPowerLevel(){
   }
 }
 
-/* Workout navigation setup */
-function setupWorkoutNavigation() {
-  // Get all workout dates, including today if it exists
-  const allDates = [...new Set([...workouts.map(w => w.date), todayISO])].sort().reverse();
-  workoutDates = allDates;
-  
-  // Find current workout index (default to today or most recent)
-  const todayIndex = workoutDates.indexOf(todayISO);
-  currentWorkoutIndex = todayIndex >= 0 ? todayIndex : 0;
-}
-
-/* Today/Previous workout panel with navigation */
+/* Workout panel - shows selected date */
 function renderWorkoutPanel(){
-  setupWorkoutNavigation();
+  const workout = workouts.find(w => w.date === selectedWorkoutDate) || { date: selectedWorkoutDate, exercises: [], bodyWeight: undefined };
   
-  const currentDate = workoutDates[currentWorkoutIndex];
-  const workout = workouts.find(w => w.date === currentDate) || { date: currentDate, exercises: [], bodyWeight: undefined };
-  
-  const isToday = currentDate === todayISO;
+  const isToday = selectedWorkoutDate === todayISO;
   const inProgress = isToday && isTodayInProgress(workout);
   
   // Update navigation buttons
-  document.getElementById('prevWorkout').disabled = currentWorkoutIndex >= workoutDates.length - 1;
-  document.getElementById('nextWorkout').disabled = currentWorkoutIndex <= 0;
+  const allDates = [...new Set([todayISO, ...workouts.map(w => w.date)])].sort().reverse();
+  const currentIndex = allDates.indexOf(selectedWorkoutDate);
   
+  document.getElementById('prevWorkout').disabled = currentIndex >= allDates.length - 1;
+  document.getElementById('nextWorkout').disabled = currentIndex <= 0;
+  
+  // Update button text
   const startBtn = document.getElementById('startToday');
   if (isToday) {
     startBtn.textContent = inProgress ? 'Continue Workout' : 'Start Today\'s Workout';
-    startBtn.style.display = 'block';
+  } else if (workout.exercises.length > 0) {
+    startBtn.textContent = 'View Workout';
   } else {
-    startBtn.style.display = 'none';
+    startBtn.textContent = 'Add Workout';
   }
 
   const title = document.getElementById('workoutPanelTitle');
-  title.textContent = isToday ? 'Today\'s Workout' : shortDate(workout.date);
+  title.textContent = isToday ? 'Today\'s Workout' : shortDate(selectedWorkoutDate);
 
-  document.getElementById('lastDate').textContent = shortDate(workout.date);
+  document.getElementById('lastDate').textContent = shortDate(selectedWorkoutDate);
   document.getElementById('lastVolume').textContent = totalVolume(workout).toLocaleString()+' lb';
   document.getElementById('lastMoves').textContent = workout.exercises.length;
   document.getElementById('lastSets').textContent = totalSets(workout);
@@ -457,12 +437,14 @@ function renderWorkoutPanel(){
     const left = totalSets(workout) - completedSets(workout);
     setsLeftWrap.style.display = 'inline-flex';
     document.getElementById('setsLeft').textContent = left;
-  } else setsLeftWrap.style.display = 'none';
+  } else {
+    setsLeftWrap.style.display = 'none';
+  }
 
-  // --- grouped list (no reps)
+  // Grouped list
   const exList = document.getElementById('exList');
   exList.innerHTML = '';
-  const groups = new Map(); // bodyPart -> Set(names)
+  const groups = new Map();
   workout.exercises.forEach(ex=>{
     const bp = ex.bodyPart || 'Other';
     const name = ex.name || 'Exercise';
@@ -507,7 +489,7 @@ function renderCalendar(){
   calGrid.innerHTML = '';
   const leadingBlanks = monthStart.getDay();
   
-  // Add previous month trailing dates
+  // Previous month dates
   for(let i = leadingBlanks - 1; i >= 0; i--){
     const prevDate = new Date(year, month, -i);
     const cell = document.createElement('div');
@@ -530,14 +512,15 @@ function renderCalendar(){
     const cellDateStr = cellDate.toISOString().slice(0,10);
     
     if(day===today.getDate() && month===today.getMonth() && year===today.getFullYear()) state += ' today';
+    if(cellDateStr === selectedWorkoutDate) state += ' selected';
     cell.className = `day ${state}`.trim();
     
-    // Make clickable if has workout data or is today/future
-    if(vol > 0 || cellDateStr >= todayISO) {
-      cell.addEventListener('click', () => {
-        window.location.href = `workout.html?date=${cellDateStr}`;
-      });
-    }
+    // Make all dates clickable (past, present, and future)
+    cell.addEventListener('click', () => {
+      selectedWorkoutDate = cellDateStr;
+      renderWorkoutPanel();
+      renderCalendar();
+    });
 
     const num = document.createElement('div'); num.className='num'; num.textContent = day;
     cell.appendChild(num);
@@ -561,8 +544,13 @@ function isTodayInProgress(todayW){
 
 /* Event Listeners */
 document.getElementById('startToday').addEventListener('click', ()=>{
-  localStorage.setItem('workoutInProgress', todayISO);
-  window.location.href = 'workout.html?start=today';
+  if(selectedWorkoutDate === todayISO) {
+    localStorage.setItem('workoutInProgress', todayISO);
+    window.location.href = 'workout.html?start=today';
+  } else {
+    // Navigate to the selected date
+    window.location.href = `workout.html?date=${selectedWorkoutDate}`;
+  }
 });
 
 document.getElementById('analytics').addEventListener('click', ()=>{
@@ -584,16 +572,24 @@ document.getElementById('logWeight').addEventListener('click', ()=>{
 
 // Workout navigation
 document.getElementById('prevWorkout').addEventListener('click', () => {
-  if (currentWorkoutIndex < workoutDates.length - 1) {
-    currentWorkoutIndex++;
+  const allDates = [...new Set([todayISO, ...workouts.map(w => w.date)])].sort().reverse();
+  const currentIndex = allDates.indexOf(selectedWorkoutDate);
+  
+  if (currentIndex < allDates.length - 1) {
+    selectedWorkoutDate = allDates[currentIndex + 1];
     renderWorkoutPanel();
+    renderCalendar();
   }
 });
 
 document.getElementById('nextWorkout').addEventListener('click', () => {
-  if (currentWorkoutIndex > 0) {
-    currentWorkoutIndex--;
+  const allDates = [...new Set([todayISO, ...workouts.map(w => w.date)])].sort().reverse();
+  const currentIndex = allDates.indexOf(selectedWorkoutDate);
+  
+  if (currentIndex > 0) {
+    selectedWorkoutDate = allDates[currentIndex - 1];
     renderWorkoutPanel();
+    renderCalendar();
   }
 });
 

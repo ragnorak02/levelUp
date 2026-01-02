@@ -1018,7 +1018,20 @@ function buildCalendar(anchorDate){
 (function init(){
   const legacy = localStorage.getItem('powerUp');
   if(legacy){ try{ const data = JSON.parse(legacy); if(data?.date){ localStorage.setItem(`powerUp:${data.date}`, legacy); } }catch{} }
-  current = new Date(); render();
+  
+  // Check for date parameter in URL
+  const params = new URLSearchParams(window.location.search);
+  const dateParam = params.get('date');
+  
+  if(dateParam) {
+    // Use the date from URL parameter
+    current = new Date(dateParam + 'T12:00:00');
+  } else {
+    // Default to today
+    current = new Date();
+  }
+  
+  render();
   window.addEventListener('resize', ()=>{ const day = loadDay(current); renderPowerCard(day); });
 })();
 </script>
