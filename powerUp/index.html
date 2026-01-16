@@ -118,7 +118,8 @@
   .day.muted:hover{background:#0f141b}
   .day.done{ background:#16a34a }
   .day.today{outline:2px solid var(--accent-2)}
-  .day.selected{outline:2px solid var(--accent); outline-offset:-2px}
+  /* FIX #1: Change .selected to use blue highlight instead of today */
+  .day.selected{outline:2px solid #3b82f6; outline-offset:-2px; background:#1a2f4a}
   .num{ position:absolute; top:6px; left:7px; font-size:var(--cal-font); line-height:1; color:var(--ink) }
   .count{ position:absolute; bottom:6px; right:7px; font-size:var(--cal-count); color:var(--muted) }
 
@@ -460,7 +461,7 @@ function renderWorkoutPanel(){
   });
 }
 
-/* Calendar */
+/* FIX #1: Calendar - properly highlight selected date */
 function renderCalendar(){
   const calTitle = document.getElementById('calTitle');
   const calGrid  = document.getElementById('calGrid');
@@ -511,8 +512,15 @@ function renderCalendar(){
     const cellDate = new Date(year, month, day);
     const cellDateStr = cellDate.toISOString().slice(0,10);
     
-    if(day===today.getDate() && month===today.getMonth() && year===today.getFullYear()) state += ' today';
-    if(cellDateStr === selectedWorkoutDate) state += ' selected';
+    // FIX #1: Highlight selected date, show today separately
+    if(cellDateStr === selectedWorkoutDate) {
+      state += ' selected';
+    }
+    // Only show "today" outline if it's NOT the selected date
+    if(day===today.getDate() && month===today.getMonth() && year===today.getFullYear() && cellDateStr !== selectedWorkoutDate) {
+      state += ' today';
+    }
+    
     cell.className = `day ${state}`.trim();
     
     // Make all dates clickable (past, present, and future)

@@ -40,7 +40,6 @@
   .card h3{margin:.1rem 0 .6rem; font-size:1rem; color:var(--muted); font-weight:600; display:flex; align-items:center; gap:8px}
   .card-icon{font-size:1.1rem}
 
-  /* Stats overview */
   .stat-card{grid-column: span 3; text-align:center; position:relative; overflow:hidden}
   .stat-card::before{content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gradient-primary)}
   .stat-value{font-size:2rem; font-weight:800; margin:.5rem 0 .2rem; background:var(--gradient-primary); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text}
@@ -48,7 +47,6 @@
   .stat-trend{font-size:.8rem; margin-top:.3rem; display:flex; align-items:center; justify-content:center; gap:4px}
   .trend-up{color:var(--good)} .trend-down{color:var(--bad)} .trend-neutral{color:var(--muted)}
 
-  /* Charts */
   .chart-card{grid-column: span 8; position:relative}
   .chart-controls{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap}
   .btn{all:unset; cursor:pointer; padding:.5rem .8rem; border-radius:8px; font-size:.85rem; font-weight:600; transition:all .2s}
@@ -59,48 +57,45 @@
   .chart-container{height:300px; position:relative}
   .chart{width:100%; height:100%}
 
-  /* Personal Records */
   .pr-card{grid-column: span 4}
   .pr-list{display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto}
-  .pr-item{background:#0f141b; border:1px solid var(--ring); border-radius:10px; padding:10px; display:flex; justify-content:space-between; align-items:center}
+  .pr-item{background:#0f141b; border:1px solid var(--ring); border-radius:10px; padding:10px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; transition:all .2s}
+  .pr-item:hover{background:#1a1f26; border-color:var(--accent)}
   .pr-exercise{font-weight:600; color:var(--ink)}
   .pr-weight{color:var(--accent-2); font-weight:700}
   .pr-date{font-size:.8rem; color:var(--muted)}
 
-  /* Exercise progression */
   .progression-card{grid-column: span 12}
   .exercise-selector{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap}
   .exercise-chip{all:unset; cursor:pointer; padding:.4rem .7rem; border-radius:20px; border:1px solid var(--ring); color:var(--muted); font-size:.85rem; transition:all .2s}
   .exercise-chip:hover{background:rgba(255,255,255,.05)}
   .exercise-chip.active{background:var(--accent); color:#04130a; border-color:var(--accent)}
+  
+  /* FIX #7: Muscle group filters */
+  .muscle-filters{display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; padding:10px; background:#0a0f14; border-radius:10px; border:1px solid var(--ring)}
+  .filter-btn{all:unset; cursor:pointer; padding:.35rem .65rem; border-radius:16px; border:1px solid var(--ring); color:var(--muted); font-size:.8rem; transition:all .2s; background:#0e141b}
+  .filter-btn:hover{background:rgba(255,255,255,.05)}
+  .filter-btn.active{background:var(--accent); color:#04130a; border-color:var(--accent); font-weight:600}
 
-  /* Progression stats */
   .progression-stat{text-align:center; padding:12px; background:#0f141b; border:1px solid var(--ring); border-radius:10px}
   .progression-stat .stat-value{font-size:1.2rem; font-weight:700; margin-bottom:4px}
   .progression-stat .stat-label{font-size:.8rem; color:var(--muted)}
 
-  /* No data message */
   .no-progression-data{
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
     text-align:center; color:var(--muted); font-size:1rem;
   }
 
-  /* Weekly overview */
-  .weekly-card{grid-column: span 6}
-  .week-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:8px}
-  .week-day{aspect-ratio:1; border:1px solid var(--ring); border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:.8rem; position:relative}
-  .week-day.today{border-color:var(--accent-2); box-shadow:0 0 0 1px var(--accent-2)}
-  .week-day.workout{background:#0e1a12}
-  .week-day.partial{background:#1a1e10}
-  .week-day-name{color:var(--muted); font-size:.7rem}
-  .week-day-vol{color:var(--ink); font-weight:600; font-size:.75rem}
+  /* FIX #6: Removed "This Week" section styles - no longer needed */
 
-  /* Responsive */
+  .popup{position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; padding:10px; z-index:100}
+  .sheet{width:min(700px, 96%); max-height:85vh; overflow:auto; background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:16px}
+  .x{all:unset; cursor:pointer; float:right; border:1px solid var(--ring); padding:.25rem .5rem; border-radius:8px; color:#9fb0c7}
+
   @media (max-width: 1024px){
     .stat-card{grid-column: span 6}
     .chart-card{grid-column: span 12}
     .pr-card{grid-column: span 12}
-    .weekly-card{grid-column: span 12}
   }
   @media (max-width: 640px){
     .stat-card{grid-column: span 12}
@@ -124,10 +119,8 @@
   </header>
 
   <div class="wrap">
-    <!-- Overview Tab -->
     <div id="overviewTab" class="tab-content">
       <section class="grid">
-        <!-- Stats Cards -->
         <article class="card stat-card">
           <div class="card-icon">💪</div>
           <div class="stat-value" id="totalVolume">0</div>
@@ -156,9 +149,9 @@
           <div class="stat-trend trend-up" id="avgTrend">↗ +156 lb/workout</div>
         </article>
 
-        <!-- Volume Trends Chart -->
+        <!-- FIX #4: Volume Trends as BAR CHART -->
         <article class="card chart-card">
-          <h3><span class="card-icon">📈</span>Volume Trends</h3>
+          <h3><span class="card-icon">📊</span>Volume Trends</h3>
           <div class="chart-controls">
             <button class="btn btn-ghost active" data-period="7d">7 Days</button>
             <button class="btn btn-ghost" data-period="30d">30 Days</button>
@@ -169,36 +162,25 @@
           </div>
         </article>
 
-        <!-- Personal Records -->
+        <!-- FIX #5: Clickable Personal Records -->
         <article class="card pr-card">
           <h3><span class="card-icon">🏆</span>Personal Records</h3>
-          <div class="pr-list" id="prList">
-            <!-- Dynamic content -->
-          </div>
+          <div class="pr-list" id="prList"></div>
         </article>
 
-        <!-- This Week -->
-        <article class="card weekly-card">
-          <h3><span class="card-icon">📅</span>This Week</h3>
-          <div class="week-grid" id="weekGrid">
-            <!-- Dynamic content -->
-          </div>
-        </article>
-
-        <!-- Exercise Progression -->
+        <!-- FIX #7: ALL exercises with filters -->
         <article class="card progression-card">
-          <h3><span class="card-icon">📊</span>Exercise Progression</h3>
-          <div class="exercise-selector" id="exerciseSelector">
-            <!-- Dynamic content -->
-          </div>
+          <h3><span class="card-icon">📈</span>Exercise Progression</h3>
+          <div class="muscle-filters" id="muscleFilters"></div>
+          <div class="exercise-selector" id="exerciseSelector"></div>
           <div class="chart-container">
             <canvas class="chart" id="progressionChart"></canvas>
           </div>
+          <div id="progression-info" style="margin-top:12px"></div>
         </article>
       </section>
     </div>
 
-    <!-- Trends Tab -->
     <div id="trendsTab" class="tab-content" style="display:none">
       <section class="grid">
         <article class="card chart-card" style="grid-column: span 12">
@@ -224,21 +206,30 @@
       </section>
     </div>
 
-    <!-- Records Tab -->
     <div id="recordsTab" class="tab-content" style="display:none">
       <section class="grid">
         <article class="card" style="grid-column: span 12">
           <h3><span class="card-icon">🏆</span>All Personal Records</h3>
-          <div id="allRecords">
-            <!-- Dynamic content -->
-          </div>
+          <div id="allRecords"></div>
         </article>
       </section>
     </div>
   </div>
 
+  <!-- FIX #5: PR Detail Popup -->
+  <div class="popup" id="prDetailPopup">
+    <div class="sheet">
+      <button class="x" onclick="document.getElementById('prDetailPopup').style.display='none'">✕</button>
+      <h2 id="prDetailTitle" style="margin:6px 0 10px; font-size:1.2rem; color:var(--ink)">Exercise Progression</h2>
+      <div id="prDetailInfo" style="margin:10px 0; padding:10px; background:#0e141b; border-radius:8px; border:1px solid var(--ring)"></div>
+      <canvas id="prDetailChart" style="width:100%; height:300px"></canvas>
+      <div style="margin-top:10px; font-size:.85rem; color:var(--muted); text-align:center">
+        💡 Yellow/orange bars indicate personal record sessions
+      </div>
+    </div>
+  </div>
+
 <script>
-/* ========= Data Loading ========= */
 function readLocalDays(){
   const out = [];
   for(let i=0; i<localStorage.length; i++){
@@ -271,11 +262,9 @@ const workouts = readLocalDays();
 const today = new Date();
 const todayISO = today.toISOString().slice(0,10);
 
-/* ========= Analytics Functions ========= */
 function totalVolume(workout){
   return workout.exercises.reduce((sum, ex) => {
     return sum + ex.sets.reduce((setSum, set) => {
-      // Count all sets if exercise is finished, or only completed sets if not
       if(ex.finished || set.completed) {
         return setSum + (set.weight * set.reps);
       }
@@ -317,29 +306,6 @@ function getPersonalRecords(){
   return Array.from(records.values()).sort((a,b) => b.weight - a.weight);
 }
 
-function getWeeklyData(){
-  const weekStart = new Date(today);
-  weekStart.setDate(today.getDate() - today.getDay());
-  weekStart.setHours(0,0,0,0);
-  
-  const weekData = [];
-  for(let i = 0; i < 7; i++){
-    const day = new Date(weekStart);
-    day.setDate(weekStart.getDate() + i);
-    const dateISO = day.toISOString().slice(0,10);
-    const workout = workouts.find(w => w.date === dateISO);
-    
-    weekData.push({
-      date: dateISO,
-      day: day.toLocaleDateString(undefined, {weekday: 'short'}),
-      volume: workout ? totalVolume(workout) : 0,
-      hasWorkout: !!workout && workout.exercises.length > 0,
-      isToday: dateISO === todayISO
-    });
-  }
-  return weekData;
-}
-
 function getPeriodStats(days = 7){
   const cutoff = new Date(today);
   cutoff.setDate(today.getDate() - days);
@@ -356,9 +322,8 @@ function getPeriodStats(days = 7){
   };
 }
 
-/* ========= Chart Functions ========= */
-// Original chart function (reverted for volume trends)
-function drawChart(canvasId, data, options = {}){
+/* FIX #4: Bar Chart with Y-axis labels */
+function drawBarChart(canvasId, data, options = {}){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
   
@@ -372,54 +337,158 @@ function drawChart(canvasId, data, options = {}){
   
   const width = rect.width;
   const height = rect.height;
-  const padding = 40;
+  const padding = 50;
+  const leftPadding = 60;
   
   ctx.clearRect(0, 0, width, height);
   
   if(!data || data.length === 0) return;
   
   const values = data.map(d => d.y);
-  const minY = Math.min(...values);
-  const maxY = Math.max(...values);
-  const rangeY = maxY - minY || 1;
+  const maxY = Math.max(...values, 1);
+  const barWidth = Math.max(8, (width - leftPadding - padding) / data.length - 4);
   
-  // Grid lines
-  ctx.strokeStyle = '#233446';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([2, 3]);
-  for(let i = 0; i <= 4; i++){
-    const y = padding + (i / 4) * (height - 2 * padding);
+  // Y-axis label
+  ctx.save();
+  ctx.translate(15, height/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillStyle = '#9fb0c7';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(options.yLabel || 'Total Volume (lb)', 0, 0);
+  ctx.restore();
+  
+  // Y-axis scale
+  ctx.fillStyle = '#9fb0c7';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'right';
+  
+  for(let i = 0; i <= 4; i++) {
+    const value = Math.round((maxY / 4) * i);
+    const y = height - padding - (i / 4) * (height - 2 * padding);
+    
+    // Grid line
+    ctx.strokeStyle = '#233446';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 3]);
     ctx.beginPath();
-    ctx.moveTo(padding, y);
+    ctx.moveTo(leftPadding, y);
     ctx.lineTo(width - padding, y);
     ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Label
+    ctx.fillText(value.toLocaleString(), leftPadding - 5, y + 3);
   }
-  ctx.setLineDash([]);
   
-  // Line
-  ctx.strokeStyle = options.color || '#2dd4bf';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  
+  // Draw bars
   data.forEach((point, index) => {
-    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
-    const y = height - padding - ((point.y - minY) / rangeY) * (height - 2 * padding);
+    const x = leftPadding + index * (barWidth + 4);
+    const barHeight = (point.y / maxY) * (height - 2 * padding);
+    const y = height - padding - barHeight;
     
-    if(index === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
+    // Gradient
+    const gradient = ctx.createLinearGradient(x, y, x, height - padding);
+    gradient.addColorStop(0, options.color || '#4CAF50');
+    gradient.addColorStop(1, options.color2 || '#22c55e');
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, y, barWidth, barHeight);
+    
+    // Show value on top if bar is tall enough
+    if(barHeight > 20) {
+      ctx.fillStyle = '#e8eef6';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(Math.round(point.y), x + barWidth/2, y - 3);
+    }
   });
-  ctx.stroke();
+}
+
+/* FIX #7: Get ALL exercises */
+function getAllExercisesFromWorkouts() {
+  const exerciseMap = new Map();
   
-  // Points
-  ctx.fillStyle = options.color || '#2dd4bf';
-  data.forEach((point, index) => {
-    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
-    const y = height - padding - ((point.y - minY) / rangeY) * (height - 2 * padding);
-    
-    ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
-    ctx.fill();
+  workouts.forEach(workout => {
+    workout.exercises.forEach(ex => {
+      const key = `${ex.name}|${ex.bodyPart}`;
+      if(!exerciseMap.has(key)) {
+        exerciseMap.set(key, {
+          name: ex.name,
+          bodyPart: ex.bodyPart,
+          workoutCount: 0
+        });
+      }
+      exerciseMap.get(key).workoutCount++;
+    });
   });
+  
+  return Array.from(exerciseMap.values())
+    .sort((a, b) => b.workoutCount - a.workoutCount);
+}
+
+/* FIX #7: Muscle group filters */
+function renderMuscleGroupFilters() {
+  const container = document.getElementById('muscleFilters');
+  const bodyParts = [...new Set(workouts.flatMap(w => 
+    w.exercises.map(ex => ex.bodyPart)
+  ))].sort();
+  
+  container.innerHTML = `
+    <button class="filter-btn active" data-filter="all">All Exercises</button>
+    ${bodyParts.map(bp => `
+      <button class="filter-btn" data-filter="${bp}">${bp}</button>
+    `).join('')}
+  `;
+  
+  container.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.filter-btn').forEach(b => 
+        b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const filter = btn.dataset.filter;
+      renderFilteredExercises(filter);
+    });
+  });
+}
+
+/* FIX #7: Render exercises with filter */
+function renderFilteredExercises(bodyPartFilter = 'all') {
+  const exercises = getAllExercisesFromWorkouts();
+  const filtered = bodyPartFilter === 'all' 
+    ? exercises 
+    : exercises.filter(ex => ex.bodyPart === bodyPartFilter);
+  
+  const selector = document.getElementById('exerciseSelector');
+  selector.innerHTML = '';
+  
+  if(filtered.length === 0) {
+    selector.innerHTML = '<p style="color:var(--muted); padding:20px; text-align:center">No exercises found for this muscle group</p>';
+    document.getElementById('progressionChart').getContext('2d').clearRect(0, 0, 1000, 1000);
+    return;
+  }
+  
+  filtered.forEach((exercise, index) => {
+    const chip = document.createElement('button');
+    chip.className = `exercise-chip ${index === 0 ? 'active' : ''}`;
+    chip.textContent = `${exercise.name} (${exercise.workoutCount})`;
+    chip.dataset.bodypart = exercise.bodyPart;
+    
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.exercise-chip').forEach(c => 
+        c.classList.remove('active'));
+      chip.classList.add('active');
+      
+      drawProgressionChart(exercise.name, exercise.bodyPart);
+    });
+    
+    selector.appendChild(chip);
+  });
+  
+  if(filtered.length > 0) {
+    drawProgressionChart(filtered[0].name, filtered[0].bodyPart);
+  }
 }
 
 function drawVolumeChart(period = '7d'){
@@ -438,35 +507,35 @@ function drawVolumeChart(period = '7d'){
     });
   }
   
-  drawChart('volumeChart', chartData, {color: '#4CAF50'});
+  drawBarChart('volumeChart', chartData, {
+    color: '#4CAF50',
+    color2: '#22c55e',
+    yLabel: 'Total Volume (lb)'
+  });
 }
 
-// Enhanced Exercise Progression Chart
-function drawProgressionChart(exerciseName){
-  if(!exerciseName) return;
+/* FIX #5: PR Detail with chart */
+function getExerciseHistory(exerciseName, bodyPart, maxWorkouts = 20) {
+  const history = [];
   
-  const progressionData = [];
-  
-  // Find all workouts that contain this exercise
   workouts.forEach(workout => {
     const exercise = workout.exercises.find(ex => 
-      ex.name.toLowerCase().trim() === exerciseName.toLowerCase().trim()
+      ex.name.toLowerCase().trim() === exerciseName.toLowerCase().trim() &&
+      ex.bodyPart === bodyPart
     );
     
     if(exercise && exercise.sets && exercise.sets.length > 0) {
-      // Get completed sets only
       const completedSets = exercise.sets.filter(set => {
         return exercise.finished || set.completed;
       });
       
       if(completedSets.length > 0) {
-        // Find the maximum weight from completed sets
         const maxWeight = Math.max(...completedSets
           .map(s => Number(s.weight) || 0)
           .filter(w => w > 0));
         
         if(maxWeight > 0) {
-          progressionData.push({
+          history.push({
             date: workout.date,
             y: maxWeight,
             workout: workout
@@ -476,31 +545,14 @@ function drawProgressionChart(exerciseName){
     }
   });
   
-  // Sort by date
-  progressionData.sort((a, b) => new Date(a.date) - new Date(b.date));
-  
-  // Clear previous chart and messages
-  const canvas = document.getElementById('progressionChart');
-  const container = canvas.parentElement;
-  const existingMessage = container.querySelector('.no-progression-data');
-  if(existingMessage) existingMessage.remove();
-  
-  if(progressionData.length === 0) {
-    renderNoProgressionData(exerciseName);
-    return;
-  }
-  
-  // Draw the progression chart with enhanced styling
-  drawProgressionChartEnhanced('progressionChart', progressionData, {color: '#2dd4bf'});
-  
-  // Update progression info
-  updateProgressionInfo(exerciseName, progressionData);
+  history.sort((a, b) => new Date(a.date) - new Date(b.date));
+  return history.slice(-maxWorkouts);
 }
 
-// Special enhanced chart function for progression only
-function drawProgressionChartEnhanced(canvasId, data, options = {}){
+/* FIX #5: Draw PR chart with yellow highlights */
+function drawPRChart(canvasId, data, prWeight, options = {}){
   const canvas = document.getElementById(canvasId);
-  if(!canvas) return;
+  if(!canvas || !data || data.length === 0) return;
   
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
@@ -513,27 +565,18 @@ function drawProgressionChartEnhanced(canvasId, data, options = {}){
   const width = rect.width;
   const height = rect.height;
   const padding = 40;
-  
-  ctx.clearRect(0, 0, width, height);
-  
-  if(!data || data.length === 0) return;
+  const barWidth = Math.max(20, (width - 2 * padding) / data.length - 10);
   
   const values = data.map(d => d.y);
-  const minY = Math.min(...values);
   const maxY = Math.max(...values);
-  const rangeY = maxY - minY || 1;
   
-  // Add some padding to Y range for better visualization
-  const yPadding = rangeY * 0.1;
-  const adjustedMinY = Math.max(0, minY - yPadding);
-  const adjustedMaxY = maxY + yPadding;
-  const adjustedRangeY = adjustedMaxY - adjustedMinY;
+  ctx.clearRect(0, 0, width, height);
   
   // Grid lines
   ctx.strokeStyle = '#233446';
   ctx.lineWidth = 1;
   ctx.setLineDash([2, 3]);
-  for(let i = 0; i <= 4; i++){
+  for(let i = 0; i <= 4; i++) {
     const y = padding + (i / 4) * (height - 2 * padding);
     ctx.beginPath();
     ctx.moveTo(padding, y);
@@ -542,40 +585,65 @@ function drawProgressionChartEnhanced(canvasId, data, options = {}){
   }
   ctx.setLineDash([]);
   
-  // Line
-  ctx.strokeStyle = options.color || '#2dd4bf';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  
-  data.forEach((point, index) => {
-    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
-    const y = height - padding - ((point.y - adjustedMinY) / adjustedRangeY) * (height - 2 * padding);
+  // Draw bars
+  data.forEach((item, i) => {
+    const x = padding + i * (barWidth + 10);
+    const barHeight = (item.y / maxY) * (height - 2 * padding);
+    const y = height - padding - barHeight;
     
-    if(index === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-  
-  // Points with enhanced styling
-  ctx.fillStyle = options.color || '#2dd4bf';
-  data.forEach((point, index) => {
-    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
-    const y = height - padding - ((point.y - adjustedMinY) / adjustedRangeY) * (height - 2 * padding);
+    // Highlight PRs in yellow/orange
+    let gradient;
+    if(item.y === prWeight) {
+      gradient = ctx.createLinearGradient(x, y, x, height - padding);
+      gradient.addColorStop(0, '#fbbf24');
+      gradient.addColorStop(1, '#f59e0b');
+    } else {
+      gradient = ctx.createLinearGradient(x, y, x, height - padding);
+      gradient.addColorStop(0, '#4CAF50');
+      gradient.addColorStop(1, '#22c55e');
+    }
     
-    ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, y, barWidth, barHeight);
     
-    // Highlight last point (most recent)
-    if(index === data.length - 1) {
-      ctx.shadowColor = options.color || '#2dd4bf';
-      ctx.shadowBlur = 10;
-      ctx.beginPath();
-      ctx.arc(x, y, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
+    // Weight label
+    ctx.fillStyle = item.y === prWeight ? '#fbbf24' : '#e8eef6';
+    ctx.font = item.y === prWeight ? 'bold 11px sans-serif' : '10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(item.y + 'lb', x + barWidth/2, y - 5);
+    
+    // Date label
+    if(data.length <= 10) {
+      ctx.fillStyle = '#9fb0c7';
+      ctx.font = '9px sans-serif';
+      const dateLabel = new Date(item.date).toLocaleDateString('en', {month:'short', day:'numeric'});
+      ctx.fillText(dateLabel, x + barWidth/2, height - padding + 15);
     }
   });
+}
+
+function drawProgressionChart(exerciseName, bodyPart) {
+  if(!exerciseName) return;
+  
+  const progressionData = getExerciseHistory(exerciseName, bodyPart);
+  
+  const canvas = document.getElementById('progressionChart');
+  const container = canvas.parentElement;
+  const existingMessage = container.querySelector('.no-progression-data');
+  if(existingMessage) existingMessage.remove();
+  
+  if(progressionData.length === 0) {
+    renderNoProgressionData(exerciseName);
+    return;
+  }
+  
+  drawBarChart('progressionChart', progressionData, {
+    color: '#2dd4bf',
+    color2: '#14b8a6',
+    yLabel: 'Max Weight (lb)'
+  });
+  
+  updateProgressionInfo(exerciseName, progressionData);
 }
 
 function renderNoProgressionData(exerciseName) {
@@ -593,8 +661,8 @@ function renderNoProgressionData(exerciseName) {
   container.appendChild(message);
 }
 
+/* FIX #8: Enhanced progression info */
 function updateProgressionInfo(exerciseName, data) {
-  // Create or update progression info panel
   let infoPanel = document.getElementById('progression-info');
   
   if(!infoPanel) {
@@ -615,7 +683,6 @@ function updateProgressionInfo(exerciseName, data) {
     chartContainer.appendChild(infoPanel);
   }
   
-  // Calculate stats
   const weights = data.map(d => d.y);
   const startWeight = weights[0];
   const currentWeight = weights[weights.length - 1];
@@ -625,20 +692,24 @@ function updateProgressionInfo(exerciseName, data) {
   
   infoPanel.innerHTML = `
     <div class="progression-stat">
+      <div style="font-size:1.5rem; margin-bottom:4px;">💪</div>
       <div class="stat-value" style="color: var(--accent)">${currentWeight} lb</div>
       <div class="stat-label">Current Max</div>
     </div>
     <div class="progression-stat">
+      <div style="font-size:1.5rem; margin-bottom:4px;">🏆</div>
       <div class="stat-value" style="color: var(--accent-2)">${maxWeight} lb</div>
       <div class="stat-label">All-Time PR</div>
     </div>
     <div class="progression-stat">
+      <div style="font-size:1.5rem; margin-bottom:4px;">${totalGain >= 0 ? '📈' : '📉'}</div>
       <div class="stat-value" style="color: ${totalGain >= 0 ? 'var(--accent)' : 'var(--bad)'}">
         ${totalGain >= 0 ? '+' : ''}${totalGain} lb
       </div>
       <div class="stat-label">Total Gain</div>
     </div>
     <div class="progression-stat">
+      <div style="font-size:1.5rem; margin-bottom:4px;">⚡</div>
       <div class="stat-value" style="color: ${percentGain >= 0 ? 'var(--accent)' : 'var(--bad)'}">
         ${percentGain >= 0 ? '+' : ''}${percentGain.toFixed(1)}%
       </div>
@@ -647,7 +718,6 @@ function updateProgressionInfo(exerciseName, data) {
   `;
 }
 
-/* ========= Render Functions ========= */
 function renderOverview(){
   const thisWeek = getPeriodStats(7);
   
@@ -656,7 +726,7 @@ function renderOverview(){
   document.getElementById('totalSets').textContent = thisWeek.sets;
   document.getElementById('avgVolume').textContent = thisWeek.avgVolume;
   
-  // Personal Records
+  // FIX #5: Clickable Personal Records
   const prs = getPersonalRecords().slice(0, 8);
   const prList = document.getElementById('prList');
   prList.innerHTML = '';
@@ -671,61 +741,49 @@ function renderOverview(){
       </div>
       <div class="pr-weight">${pr.weight} lb</div>
     `;
+    item.addEventListener('click', () => showPRDetail(pr));
     prList.appendChild(item);
   });
   
-  // This Week
-  const weekData = getWeeklyData();
-  const weekGrid = document.getElementById('weekGrid');
-  weekGrid.innerHTML = '';
+  // FIX #7: Render muscle filters and exercises
+  renderMuscleGroupFilters();
+  renderFilteredExercises('all');
   
-  weekData.forEach(day => {
-    const cell = document.createElement('div');
-    cell.className = `week-day ${day.isToday ? 'today' : ''} ${
-      day.volume > 2000 ? 'workout' : day.volume > 0 ? 'partial' : ''
-    }`;
-    cell.innerHTML = `
-      <div class="week-day-name">${day.day}</div>
-      <div class="week-day-vol">${day.volume ? Math.round(day.volume/1000) + 'k' : '—'}</div>
-    `;
-    weekGrid.appendChild(cell);
-  });
-  
-  // Exercise Selector for Progression
-  const exercises = [...new Set(workouts.flatMap(w => 
-    w.exercises.map(ex => ex.name)
-  ))].sort();
-  
-  const selector = document.getElementById('exerciseSelector');
-  selector.innerHTML = '';
-  
-  if(exercises.length === 0) {
-    selector.innerHTML = '<p style="color: var(--muted); text-align: center; padding: 20px;">No exercises found. Complete some workouts to see progression.</p>';
-    return;
-  }
-  
-  exercises.slice(0, 15).forEach((exercise, index) => {
-    const chip = document.createElement('button');
-    chip.className = `exercise-chip ${index === 0 ? 'active' : ''}`;
-    chip.textContent = exercise;
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.exercise-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      drawProgressionChart(exercise);
-    });
-    selector.appendChild(chip);
-  });
-  
-  // Draw initial charts
   drawVolumeChart('7d');
-  if(exercises.length > 0) drawProgressionChart(exercises[0]);
+}
+
+/* FIX #5: Show PR detail modal */
+function showPRDetail(pr) {
+  const history = getExerciseHistory(pr.exercise, pr.bodyPart, 20);
+  
+  document.getElementById('prDetailTitle').textContent = `${pr.exercise} - Progression`;
+  document.getElementById('prDetailInfo').innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; text-align:center">
+      <div>
+        <div style="font-size:1.5rem; font-weight:700; color:var(--accent-2)">${pr.weight} lb</div>
+        <div style="font-size:.85rem; color:var(--muted); margin-top:4px">Current PR</div>
+      </div>
+      <div>
+        <div style="font-size:1.5rem; font-weight:700; color:var(--accent)">${history.length}</div>
+        <div style="font-size:.85rem; color:var(--muted); margin-top:4px">Total Workouts</div>
+      </div>
+    </div>
+    <div style="margin-top:8px; font-size:.9rem; color:var(--muted); text-align:center">
+      ${new Date(pr.date).toLocaleDateString('en', {month:'long', day:'numeric', year:'numeric'})}
+    </div>
+  `;
+  
+  document.getElementById('prDetailPopup').style.display = 'flex';
+  
+  setTimeout(() => {
+    drawPRChart('prDetailChart', history, pr.weight);
+  }, 100);
 }
 
 function renderAllRecords(){
   const records = getPersonalRecords();
   const container = document.getElementById('allRecords');
   
-  // Group by body part
   const byBodyPart = records.reduce((acc, record) => {
     const part = record.bodyPart || 'Other';
     if(!acc[part]) acc[part] = [];
@@ -740,7 +798,7 @@ function renderAllRecords(){
       <h4 style="margin:1rem 0 .5rem; color:var(--accent); font-size:1.1rem">${bodyPart}</h4>
       <div style="display:grid; gap:8px">
         ${records.map(pr => `
-          <div class="pr-item">
+          <div class="pr-item" onclick="showPRDetail(${JSON.stringify(pr).replace(/"/g, '&quot;')})">
             <div>
               <div class="pr-exercise">${pr.exercise}</div>
               <div class="pr-date">${pr.reps} reps • ${new Date(pr.date).toLocaleDateString()}</div>
@@ -754,28 +812,22 @@ function renderAllRecords(){
   });
 }
 
-/* ========= Event Listeners ========= */
-// Tab switching
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     const view = tab.dataset.view;
     
-    // Update active tab
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     
-    // Show/hide content
     document.querySelectorAll('.tab-content').forEach(content => {
       content.style.display = 'none';
     });
     document.getElementById(view + 'Tab').style.display = 'block';
     
-    // Render content
     if(view === 'records') renderAllRecords();
   });
 });
 
-// Chart period buttons
 document.querySelectorAll('[data-period]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('[data-period]').forEach(b => {
@@ -791,15 +843,17 @@ document.querySelectorAll('[data-period]').forEach(btn => {
   });
 });
 
-// Initialize
 renderOverview();
 
-// Responsive chart redraw
 window.addEventListener('resize', () => {
   setTimeout(() => {
     drawVolumeChart(document.querySelector('[data-period].active')?.dataset.period || '7d');
     const activeExercise = document.querySelector('.exercise-chip.active')?.textContent;
-    if(activeExercise) drawProgressionChart(activeExercise);
+    if(activeExercise) {
+      const name = activeExercise.split(' (')[0];
+      const bodyPart = document.querySelector('.exercise-chip.active')?.dataset.bodypart;
+      if(name && bodyPart) drawProgressionChart(name, bodyPart);
+    }
   }, 100);
 });
 </script>
