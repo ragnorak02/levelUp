@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Tracking</title>
+  <style>
+    :root {
+      --bg: #080c11; --panel: #0d131a; --ink: #e8eef6; --muted: #9fb0c7;
+      --ring: #1c2a37; --accent: #4CAF50; --accent-2: #2dd4bf; --danger: #ef4444;
+      --warn: #f59e0b; --card-bg: #0e141b; --hover-bg: #1a1f26;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
+      background: linear-gradient(180deg, #070b10 0%, #0a1016 100%); color: var(--ink);
+      min-height: 100vh;
+    }
+    header {
+      background: #0b1118; border-bottom: 1px solid var(--ring); padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    }
+    .home-btn {
+      all: unset; cursor: pointer; border: 1px solid var(--ring); padding: .4rem .7rem;
+      border-radius: .6rem; font-size: .9rem; color: var(--muted); transition: background 0.2s;
+    }
+    .home-btn:hover { background: var(--hover-bg); }
+    h1 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+    .nav-pills {
+      display: flex; gap: 6px; background: var(--panel); padding: 4px;
+      border-radius: 10px; border: 1px solid var(--ring); flex-wrap: wrap;
+    }
+    .nav-pill {
+      all: unset; cursor: pointer; padding: .4rem .8rem; border-radius: 8px;
+      font-size: .85rem; color: var(--muted); transition: all .2s; white-space: nowrap;
+    }
+    .nav-pill.active {
+      background: linear-gradient(90deg, var(--accent), #22c55e);
+      color: #04130a; font-weight: 600;
+    }
+    .wrap {
+      width: min(1200px, 100%); margin: 0 auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .card {
+      background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
+      padding: 16px; box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
+    }
+    .card h3 { margin: 0 0 12px; font-size: 1rem; color: var(--muted); font-weight: 600; }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;
+    }
+    .stat-card {
+      background: var(--card-bg); border: 1px solid var(--ring); border-radius: 12px;
+      padding: 16px; text-align: center;
+    }
+    .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+    .stat-label { font-size: .85rem; color: var(--muted); }
+    .food-categories {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;
+    }
+    .food-cat {
+      background: var(--card-bg); border: 1px solid var(--ring); border-radius: 12px;
+      padding: 16px; cursor: pointer; transition: all 0.2s;
+    }
+    .food-cat:hover { background: var(--hover-bg); border-color: var(--accent); transform: translateY(-2px); }
+    .food-cat-icon { font-size: 2rem; margin-bottom: 8px; }
+    .food-cat-name { font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+    .food-cat-amount { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+    .food-cat-items { font-size: .85rem; color: var(--muted); }
+    .chart-container { position: relative; height: 250px; margin: 20px 0; }
+    canvas { max-width: 100%; max-height: 100%; }
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .food-categories { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="home-btn" onclick="location.href='index.html'">⟵ Dashboard</button>
+    <h1>Food Tracking</h1>
+    <nav class="nav-pills">
+      <button class="nav-pill" onclick="location.href='index.html'">Dashboard</button>
+      <button class="nav-pill active">Food</button>
+      <button class="nav-pill" onclick="location.href='search.html'">Search</button>
+      <button class="nav-pill" onclick="location.href='receipts.html'">Receipts</button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="foodTotal">$0</div>
+        <div class="stat-label">Food Spending</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="foodMonth">$0</div>
+        <div class="stat-label">This Month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="foodWeek">$0</div>
+        <div class="stat-label">This Week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="avgFood">$0</div>
+        <div class="stat-label">Avg per Trip</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🍎 Food Categories</h3>
+      <div class="food-categories" id="foodCategories">
+        <!-- Dynamic content -->
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📊 Category Breakdown</h3>
+      <div class="chart-container">
+        <canvas id="foodChart"></canvas>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const FOOD_CATEGORIES = {
+      'Produce': '🥬',
+      'Dairy': '🥛',
+      'Meat': '🥩',
+      'Snacks': '🍪',
+      'Drinks': '🥤',
+      'Pantry': '🥫',
+      'Frozen': '🧊',
+      'Bakery': '🍞'
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadFoodData();
+    });
+
+    function loadFoodData() {
+      const receipts = getReceipts();
+      const foodData = analyzeFoodSpending(receipts);
+      
+      updateFoodStats(foodData);
+      renderFoodCategories(foodData.categories);
+      drawFoodChart(foodData.categories);
+    }
+
+    function getReceipts() {
+      try {
+        return JSON.parse(localStorage.getItem('finances:receipts') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function analyzeFoodSpending(receipts) {
+      const categories = {};
+      let totalFood = 0;
+      let monthFood = 0;
+      let weekFood = 0;
+      let foodTrips = 0;
+
+      const now = new Date();
+      const thisMonth = now.getMonth();
+      const thisYear = now.getFullYear();
+      const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+
+      receipts.forEach(receipt => {
+        const date = new Date(receipt.date);
+        let hasFoodItems = false;
+
+        receipt.items.forEach(item => {
+          if (Object.keys(FOOD_CATEGORIES).includes(item.category)) {
+            const price = parseFloat(item.price) || 0;
+            hasFoodItems = true;
+
+            if (!categories[item.category]) {
+              categories[item.category] = { total: 0, count: 0 };
+            }
+
+            categories[item.category].total += price;
+            categories[item.category].count++;
+            totalFood += price;
+
+            if (date.getMonth() === thisMonth && date.getFullYear() === thisYear) {
+              monthFood += price;
+            }
+
+            if (date >= weekAgo) {
+              weekFood += price;
+            }
+          }
+        });
+
+        if (hasFoodItems) foodTrips++;
+      });
+
+      return {
+        total: totalFood,
+        month: monthFood,
+        week: weekFood,
+        avgPerTrip: foodTrips > 0 ? totalFood / foodTrips : 0,
+        categories
+      };
+    }
+
+    function updateFoodStats(data) {
+      document.getElementById('foodTotal').textContent = '$' + data.total.toFixed(2);
+      document.getElementById('foodMonth').textContent = '$' + data.month.toFixed(2);
+      document.getElementById('foodWeek').textContent = '$' + data.week.toFixed(2);
+      document.getElementById('avgFood').textContent = '$' + data.avgPerTrip.toFixed(2);
+    }
+
+    function renderFoodCategories(categories) {
+      const container = document.getElementById('foodCategories');
+      container.innerHTML = '';
+
+      Object.entries(categories)
+        .sort((a, b) => b[1].total - a[1].total)
+        .forEach(([name, data]) => {
+          const div = document.createElement('div');
+          div.className = 'food-cat';
+          div.onclick = () => viewCategory(name);
+
+          div.innerHTML = `
+            <div class="food-cat-icon">${FOOD_CATEGORIES[name] || '📦'}</div>
+            <div class="food-cat-name">${name}</div>
+            <div class="food-cat-amount">$${data.total.toFixed(2)}</div>
+            <div class="food-cat-items">${data.count} items</div>
+          `;
+
+          container.appendChild(div);
+        });
+    }
+
+    function drawFoodChart(categories) {
+      const canvas = document.getElementById('foodChart');
+      const ctx = canvas.getContext('2d');
+
+      const size = Math.min(canvas.parentElement.clientWidth, 300);
+      canvas.width = size;
+      canvas.height = size;
+
+      const centerX = size / 2;
+      const centerY = size / 2;
+      const radius = size / 3;
+      const innerRadius = radius * 0.6;
+
+      ctx.clearRect(0, 0, size, size);
+
+      const total = Object.values(categories).reduce((sum, cat) => sum + cat.total, 0);
+      if (total === 0) return;
+
+      const colors = ['#4CAF50', '#2dd4bf', '#f59e0b', '#ef4444', '#8b5cf6', '#3b82f6', '#ec4899', '#14b8a6'];
+
+      let currentAngle = -Math.PI / 2;
+
+      Object.values(categories).forEach((cat, i) => {
+        const sliceAngle = (cat.total / total) * 2 * Math.PI;
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+        ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
+        ctx.closePath();
+
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+
+        currentAngle += sliceAngle;
+      });
+
+      ctx.fillStyle = '#e8eef6';
+      ctx.font = 'bold 20px system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('$' + total.toFixed(0), centerX, centerY);
+
+      ctx.font = '12px system-ui';
+      ctx.fillStyle = '#9fb0c7';
+      ctx.fillText('Food Total', centerX, centerY + 20);
+    }
+
+    function viewCategory(category) {
+      location.href = `search.html?category=${encodeURIComponent(category)}`;
+    }
+  </script>
+</body>
+</html>

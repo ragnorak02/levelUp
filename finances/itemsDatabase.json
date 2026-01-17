@@ -1,0 +1,425 @@
+{
+  "items": {
+    "000000004011": {
+      "name": "Bananas",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "typical_price": 0.58,
+      "aliases": ["BANANA", "BANANAS", "BAN"],
+      "stores": {
+        "walmart": { "code": "000000004011", "last_price": 0.58, "last_date": "2026-01-10" },
+        "traderjoes": { "last_price": 0.19, "last_date": "2026-01-15" }
+      }
+    },
+    "085487700700": {
+      "name": "Strawberries 1lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "typical_price": 3.98,
+      "aliases": ["STRAWBERRY", "STRAWBERRIES", "STRWBRY"],
+      "stores": {
+        "walmart": { "code": "085487700700", "last_price": 3.98, "last_date": "2026-01-10" }
+      }
+    },
+    "bell-pepper": {
+      "name": "Bell Peppers",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "typical_price": 1.48,
+      "aliases": ["BELL PEPPER", "PEPPERS", "SWEET PEPPER"],
+      "stores": {
+        "traderjoes": { "last_price": 1.48, "last_date": "2026-01-15" },
+        "walmart": { "last_price": 1.28, "last_date": "2025-12-21" }
+      }
+    },
+    "onion": {
+      "name": "Yellow Onions",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "typical_price": 0.99,
+      "aliases": ["ONION", "ONIONS", "YELLOW ONION"],
+      "stores": {
+        "traderjoes": { "last_price": 0.99, "last_date": "2026-01-15" },
+        "walmart": { "last_price": 0.88, "last_date": "2025-11-29" }
+      }
+    },
+    "avocado": {
+      "name": "Avocados",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "typical_price": 1.69,
+      "aliases": ["AVOCADO", "AVOCADOS", "HASS AVOCADO"],
+      "stores": {
+        "traderjoes": { "last_price": 1.69, "last_date": "2026-01-15" },
+        "walmart": { "last_price": 0.98, "last_date": "2025-12-21" }
+      }
+    },
+    "tj-tomatoes": {
+      "name": "Organic Tomatoes",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "typical_price": 3.49,
+      "aliases": ["TOMATO", "TOMATOES", "ORGANIC TOMATOES"],
+      "stores": {
+        "traderjoes": { "last_price": 3.49, "last_date": "2026-01-15" },
+        "walmart": { "last_price": 2.98, "last_date": "2025-11-29" }
+      }
+    },
+    "tj-apples": {
+      "name": "Honeycrisp Apples",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "typical_price": 5.99,
+      "aliases": ["APPLE", "APPLES", "HONEYCRISP"],
+      "stores": {
+        "traderjoes": { "last_price": 5.99, "last_date": "2026-01-15" }
+      }
+    },
+    "007874225467": {
+      "name": "Great Value Fresh Parsley",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "typical_price": 0.98,
+      "aliases": ["PARSLEY", "GV PARSLEY", "FRESH PARSLEY"],
+      "stores": {
+        "walmart": { "code": "007874225467", "last_price": 0.98, "last_date": "2026-01-10" }
+      }
+    },
+    "007874225457": {
+      "name": "Great Value Fresh Basil",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "typical_price": 2.48,
+      "aliases": ["BASIL", "GV BASIL", "FRESH BASIL"],
+      "stores": {
+        "walmart": { "code": "007874225457", "last_price": 2.48, "last_date": "2026-01-10" }
+      }
+    },
+    "009396600998": {
+      "name": "Organic Valley Grassmilk Whole Milk Half Gallon",
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "typical_price": 4.68,
+      "aliases": ["ORGANIC VALLEY", "GRASSMILK", "ORG VLY MILK"],
+      "stores": {
+        "walmart": { "code": "009396600998", "last_price": 4.68, "last_date": "2026-01-10" }
+      }
+    },
+    "005215900001": {
+      "name": "Stonyfield Organic Whole Milk Yogurt Pouch",
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "typical_price": 1.24,
+      "aliases": ["STONYFIELD", "YOBABY", "YOGURT POUCH"],
+      "stores": {
+        "walmart": { "code": "005215900001", "last_price": 1.24, "last_date": "2026-01-10" }
+      }
+    },
+    "019064663008": {
+      "name": "Oatly Oat Milk Barista Edition",
+      "category": "Groceries",
+      "subcategory": "Dairy Alternative",
+      "typical_price": 4.98,
+      "aliases": ["OATLY", "OAT MILK", "OATLY BARISTA"],
+      "stores": {
+        "walmart": { "code": "019064663008", "last_price": 4.98, "last_date": "2025-12-21" }
+      }
+    },
+    "081829001960": {
+      "name": "Chobani Flip Greek Yogurt",
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "typical_price": 1.74,
+      "aliases": ["CHOBANI", "CHOBANI FLIP", "GREEK YOGURT"],
+      "stores": {
+        "walmart": { "code": "081829001960", "last_price": 1.74, "last_date": "2025-11-29" }
+      }
+    },
+    "tj-butter": {
+      "name": "Trader Joe's Salted Butter",
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "typical_price": 3.99,
+      "aliases": ["BUTTER", "TJ BUTTER"],
+      "stores": {
+        "traderjoes": { "last_price": 3.99, "last_date": "2026-01-15" }
+      }
+    },
+    "tj-eggs": {
+      "name": "Trader Joe's Large Eggs Dozen",
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "typical_price": 4.99,
+      "aliases": ["EGGS", "LARGE EGGS", "TJ EGGS"],
+      "stores": {
+        "traderjoes": { "last_price": 4.99, "last_date": "2026-01-15" }
+      }
+    },
+    "001200016345": {
+      "name": "Starbucks Doubleshot Energy Coffee Drink",
+      "category": "Groceries",
+      "subcategory": "Drinks",
+      "typical_price": 2.48,
+      "aliases": ["STARBUCKS", "DOUBLESHOT", "STARBUCKS ENERGY"],
+      "stores": {
+        "walmart": { "code": "001200016345", "last_price": 2.48, "last_date": "2026-01-10" }
+      }
+    },
+    "coca-cola": {
+      "name": "Coca-Cola 12 Pack Cans",
+      "category": "Groceries",
+      "subcategory": "Drinks",
+      "typical_price": 6.98,
+      "aliases": ["COKE", "COCA COLA", "COCA-COLA"],
+      "stores": {
+        "walmart": { "last_price": 6.98, "last_date": "2025-11-29" }
+      }
+    },
+    "004137651469": {
+      "name": "Frankford Gummy Candy",
+      "category": "Groceries",
+      "subcategory": "Kids/Snacks",
+      "typical_price": 1.00,
+      "aliases": ["FRANKFORD", "GUMMIES", "GUMMY CANDY"],
+      "stores": {
+        "walmart": { "code": "004137651469", "last_price": 1.00, "last_date": "2025-12-29" }
+      }
+    },
+    "teddy-grahams": {
+      "name": "Teddy Grahams Chocolate Graham Snacks",
+      "category": "Groceries",
+      "subcategory": "Kids/Snacks",
+      "typical_price": 3.24,
+      "aliases": ["TEDDY GRAHAM", "TEDDY GRAHAMS"],
+      "stores": {
+        "walmart": { "last_price": 3.24, "last_date": "2025-12-21" }
+      }
+    },
+    "tonys-chocolate": {
+      "name": "Tony's Chocolonely Dark Chocolate Bar",
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "typical_price": 5.98,
+      "aliases": ["TONY'S", "TONYS", "CHOCOLONELY"],
+      "stores": {
+        "walmart": { "last_price": 5.98, "last_date": "2025-12-21" }
+      }
+    },
+    "made-good-granola": {
+      "name": "Made Good Granola Bars",
+      "category": "Groceries",
+      "subcategory": "Kids/Snacks",
+      "typical_price": 5.98,
+      "aliases": ["MADE GOOD", "GRANOLA BARS"],
+      "stores": {
+        "walmart": { "last_price": 5.98, "last_date": "2025-12-21" }
+      }
+    },
+    "twix-ice-cream": {
+      "name": "Twix Ice Cream Bars",
+      "category": "Groceries",
+      "subcategory": "Frozen",
+      "typical_price": 4.48,
+      "aliases": ["TWIX", "TWIX ICE CREAM"],
+      "stores": {
+        "walmart": { "last_price": 4.48, "last_date": "2025-11-29" }
+      }
+    },
+    "tj-bread": {
+      "name": "Trader Joe's Multigrain Bread",
+      "category": "Groceries",
+      "subcategory": "Bakery",
+      "typical_price": 2.99,
+      "aliases": ["BREAD", "MULTIGRAIN", "TJ BREAD"],
+      "stores": {
+        "traderjoes": { "last_price": 2.99, "last_date": "2026-01-15" }
+      }
+    },
+    "tj-hummus": {
+      "name": "Trader Joe's Classic Hummus",
+      "category": "Groceries",
+      "subcategory": "Deli/Prepared",
+      "typical_price": 3.49,
+      "aliases": ["HUMMUS", "TJ HUMMUS"],
+      "stores": {
+        "traderjoes": { "last_price": 3.49, "last_date": "2026-01-15" }
+      }
+    },
+    "tj-chicken-sausage": {
+      "name": "Trader Joe's Chicken Sausage",
+      "category": "Groceries",
+      "subcategory": "Meat",
+      "typical_price": 4.99,
+      "aliases": ["CHICKEN SAUSAGE", "TJ SAUSAGE"],
+      "stores": {
+        "traderjoes": { "last_price": 4.99, "last_date": "2026-01-15" }
+      }
+    },
+    "tj-pasta": {
+      "name": "Trader Joe's Organic Pasta",
+      "category": "Groceries",
+      "subcategory": "Pantry",
+      "typical_price": 1.99,
+      "aliases": ["PASTA", "TJ PASTA", "ORGANIC PASTA"],
+      "stores": {
+        "traderjoes": { "last_price": 1.99, "last_date": "2026-01-15" }
+      }
+    },
+    "tj-marinara": {
+      "name": "Trader Joe's Marinara Sauce",
+      "category": "Groceries",
+      "subcategory": "Pantry",
+      "typical_price": 2.49,
+      "aliases": ["MARINARA", "PASTA SAUCE", "TJ MARINARA"],
+      "stores": {
+        "traderjoes": { "last_price": 2.49, "last_date": "2026-01-15" }
+      }
+    },
+    "tj-cheese": {
+      "name": "Trader Joe's Shredded Mozzarella",
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "typical_price": 3.99,
+      "aliases": ["CHEESE", "MOZZARELLA", "SHREDDED CHEESE"],
+      "stores": {
+        "traderjoes": { "last_price": 3.99, "last_date": "2026-01-15" }
+      }
+    },
+    "tj-frozen-veg": {
+      "name": "Trader Joe's Frozen Mixed Vegetables",
+      "category": "Groceries",
+      "subcategory": "Frozen",
+      "typical_price": 1.99,
+      "aliases": ["FROZEN VEG", "MIXED VEGETABLES"],
+      "stores": {
+        "traderjoes": { "last_price": 1.99, "last_date": "2026-01-15" }
+      }
+    },
+    "tj-orange-juice": {
+      "name": "Trader Joe's Orange Juice",
+      "category": "Groceries",
+      "subcategory": "Drinks",
+      "typical_price": 3.99,
+      "aliases": ["ORANGE JUICE", "OJ", "TJ OJ"],
+      "stores": {
+        "traderjoes": { "last_price": 3.99, "last_date": "2026-01-15" }
+      }
+    },
+    "walmart-chicken-breast": {
+      "name": "Boneless Skinless Chicken Breast",
+      "category": "Groceries",
+      "subcategory": "Meat",
+      "typical_price": 8.98,
+      "aliases": ["CHICKEN", "CHICKEN BREAST", "BONELESS CHICKEN"],
+      "stores": {
+        "walmart": { "last_price": 8.98, "last_date": "2025-12-21" }
+      }
+    },
+    "walmart-ground-beef": {
+      "name": "Ground Beef 80/20",
+      "category": "Groceries",
+      "subcategory": "Meat",
+      "typical_price": 5.98,
+      "aliases": ["GROUND BEEF", "BEEF", "HAMBURGER"],
+      "stores": {
+        "walmart": { "last_price": 5.98, "last_date": "2025-11-29" }
+      }
+    },
+    "walmart-rice": {
+      "name": "Great Value Long Grain White Rice",
+      "category": "Groceries",
+      "subcategory": "Pantry",
+      "typical_price": 4.98,
+      "aliases": ["RICE", "WHITE RICE", "GV RICE"],
+      "stores": {
+        "walmart": { "last_price": 4.98, "last_date": "2025-12-21" }
+      }
+    },
+    "walmart-beans": {
+      "name": "Great Value Black Beans Canned",
+      "category": "Groceries",
+      "subcategory": "Pantry",
+      "typical_price": 0.88,
+      "aliases": ["BEANS", "BLACK BEANS", "CANNED BEANS"],
+      "stores": {
+        "walmart": { "last_price": 0.88, "last_date": "2025-11-29" }
+      }
+    },
+    "walmart-tortillas": {
+      "name": "Mission Flour Tortillas",
+      "category": "Groceries",
+      "subcategory": "Bakery",
+      "typical_price": 3.48,
+      "aliases": ["TORTILLAS", "FLOUR TORTILLAS", "MISSION"],
+      "stores": {
+        "walmart": { "last_price": 3.48, "last_date": "2025-12-21" }
+      }
+    },
+    "walmart-salsa": {
+      "name": "Tostitos Salsa Medium",
+      "category": "Groceries",
+      "subcategory": "Pantry",
+      "typical_price": 3.98,
+      "aliases": ["SALSA", "TOSTITOS", "TOSTITOS SALSA"],
+      "stores": {
+        "walmart": { "last_price": 3.98, "last_date": "2025-11-29" }
+      }
+    },
+    "walmart-chips": {
+      "name": "Tostitos Tortilla Chips",
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "typical_price": 4.98,
+      "aliases": ["CHIPS", "TORTILLA CHIPS", "TOSTITOS CHIPS"],
+      "stores": {
+        "walmart": { "last_price": 4.98, "last_date": "2025-11-29" }
+      }
+    },
+    "walmart-paper-towels": {
+      "name": "Bounty Paper Towels",
+      "category": "Groceries",
+      "subcategory": "Household",
+      "typical_price": 19.98,
+      "aliases": ["PAPER TOWELS", "BOUNTY"],
+      "stores": {
+        "walmart": { "last_price": 19.98, "last_date": "2025-12-21" }
+      }
+    },
+    "walmart-dish-soap": {
+      "name": "Dawn Dish Soap",
+      "category": "Groceries",
+      "subcategory": "Household",
+      "typical_price": 3.98,
+      "aliases": ["DISH SOAP", "DAWN"],
+      "stores": {
+        "walmart": { "last_price": 3.98, "last_date": "2025-12-21" }
+      }
+    },
+    "walmart-diapers": {
+      "name": "Huggies Diapers Size 4",
+      "category": "Groceries",
+      "subcategory": "Baby",
+      "typical_price": 39.98,
+      "aliases": ["DIAPERS", "HUGGIES"],
+      "stores": {
+        "walmart": { "last_price": 39.98, "last_date": "2025-12-29" }
+      }
+    },
+    "walmart-wipes": {
+      "name": "Huggies Baby Wipes",
+      "category": "Groceries",
+      "subcategory": "Baby",
+      "typical_price": 12.98,
+      "aliases": ["WIPES", "BABY WIPES", "HUGGIES WIPES"],
+      "stores": {
+        "walmart": { "last_price": 12.98, "last_date": "2025-12-29" }
+      }
+    }
+  },
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2026-01-17",
+    "total_items": 40,
+    "notes": "Comprehensive database from user receipts (Walmart and Trader Joe's, Jan 2026 - Nov 2025)"
+  }
+}

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Analytics</title>
+  <style>
+    :root {
+      --bg: #080c11; --panel: #0d131a; --ink: #e8eef6; --muted: #9fb0c7;
+      --ring: #1c2a37; --accent: #4CAF50; --accent-2: #2dd4bf; --danger: #ef4444;
+      --card-bg: #0e141b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
+      background: linear-gradient(180deg, #070b10 0%, #0a1016 100%); color: var(--ink);
+      min-height: 100vh; padding-bottom: 80px;
+    }
+    header {
+      background: #0b1118; border-bottom: 1px solid var(--ring); padding: 16px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-row { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+    .home-btn {
+      all: unset; cursor: pointer; border: 1px solid var(--ring); padding: 12px 16px;
+      border-radius: 10px; font-size: 1rem; color: var(--muted); min-height: 48px;
+    }
+    h1 { margin: 0; font-size: 1.3rem; font-weight: 600; flex: 1; }
+    .nav-pills {
+      display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      padding: 4px; background: var(--panel); border-radius: 10px; border: 1px solid var(--ring);
+    }
+    .nav-pill {
+      all: unset; cursor: pointer; padding: 12px 20px; border-radius: 8px;
+      font-size: 1rem; color: var(--muted); white-space: nowrap; min-height: 48px;
+    }
+    .nav-pill.active {
+      background: linear-gradient(90deg, var(--accent), #22c55e);
+      color: #04130a; font-weight: 600;
+    }
+    .wrap { padding: 20px 16px; }
+    .card {
+      background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
+      padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
+    }
+    .card h3 { margin: 0 0 16px; font-size: 1.1rem; color: var(--muted); font-weight: 600; }
+    
+    /* Mobile Stats Grid */
+    .stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card-bg); border: 1px solid var(--ring); border-radius: 12px;
+      padding: 20px; text-align: center;
+    }
+    .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+    .stat-label { font-size: 0.9rem; color: var(--muted); }
+    .stat-change {
+      font-size: 0.85rem; margin-top: 8px; display: flex; align-items: center;
+      justify-content: center; gap: 4px;
+    }
+    .up { color: var(--danger); }
+    .down { color: var(--accent); }
+    
+    /* Mobile Chart Container */
+    .chart-container { height: 300px; position: relative; margin: 20px 0; }
+    canvas { width: 100% !important; height: 100% !important; }
+    
+    /* Period Selector */
+    .period-selector {
+      display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .period-btn {
+      all: unset; cursor: pointer; padding: 12px 20px; border-radius: 10px;
+      font-size: 1rem; font-weight: 600; border: 2px solid var(--ring);
+      background: var(--card-bg); color: var(--muted); white-space: nowrap; min-height: 48px;
+    }
+    .period-btn.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #04130a; border-color: var(--accent);
+    }
+    
+    /* Category Breakdown */
+    .category-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 0; border-bottom: 1px solid var(--ring);
+    }
+    .category-item:last-child { border-bottom: none; }
+    .category-info { flex: 1; }
+    .category-name { font-weight: 600; color: var(--ink); font-size: 1rem; margin-bottom: 4px; }
+    .category-percent { color: var(--muted); font-size: 0.9rem; }
+    .category-amount { font-weight: 700; color: var(--accent-2); font-size: 1.1rem; }
+    
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .empty-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-row">
+      <button class="home-btn" onclick="location.href='index.html'">⟵</button>
+      <h1>Analytics</h1>
+    </div>
+    <nav class="nav-pills">
+      <button class="nav-pill" onclick="location.href='index.html'">Dashboard</button>
+      <button class="nav-pill" onclick="location.href='food.html'">Food</button>
+      <button class="nav-pill" onclick="location.href='search.html'">Search</button>
+      <button class="nav-pill" onclick="location.href='receipts.html'">Receipts</button>
+      <button class="nav-pill active">Analytics</button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="monthTotal">$0</div>
+        <div class="stat-label">This Month</div>
+        <div class="stat-change up" id="monthChange">▲ +12%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="weekTotal">$0</div>
+        <div class="stat-label">This Week</div>
+        <div class="stat-change down" id="weekChange">▼ -5%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="avgDaily">$0</div>
+        <div class="stat-label">Daily Avg</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="receiptsCount">0</div>
+        <div class="stat-label">Receipts</div>
+      </div>
+    </div>
+
+    <!-- Spending Trend Chart -->
+    <div class="card">
+      <h3>📊 Spending Trend</h3>
+      <div class="period-selector">
+        <button class="period-btn active" data-period="week">7 Days</button>
+        <button class="period-btn" data-period="month">30 Days</button>
+        <button class="period-btn" data-period="quarter">90 Days</button>
+      </div>
+      <div class="chart-container">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Category Breakdown -->
+    <div class="card">
+      <h3>📂 By Category</h3>
+      <div id="categoryBreakdown"></div>
+    </div>
+
+    <!-- Store Comparison -->
+    <div class="card">
+      <h3>🏪 By Store</h3>
+      <div id="storeComparison"></div>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'finances:receipts';
+
+    function loadReceipts() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    const receipts = loadReceipts();
+
+    if (receipts.length === 0) {
+      document.querySelector('.wrap').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <p>No data yet. Add receipts to see analytics!</p>
+        </div>
+      `;
+    } else {
+      renderStats();
+      renderCategoryBreakdown();
+      renderStoreComparison();
+      drawChart('week');
+    }
+
+    function renderStats() {
+      const now = new Date();
+      const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+      
+      let monthTotal = 0, weekTotal = 0;
+      
+      receipts.forEach(r => {
+        const date = new Date(r.date);
+        const amount = parseFloat(r.total) || 0;
+        
+        if (date.getMonth() === now.getMonth()) monthTotal += amount;
+        if (date >= weekAgo) weekTotal += amount;
+      });
+      
+      document.getElementById('monthTotal').textContent = '$' + monthTotal.toFixed(2);
+      document.getElementById('weekTotal').textContent = '$' + weekTotal.toFixed(2);
+      document.getElementById('avgDaily').textContent = '$' + (weekTotal / 7).toFixed(2);
+      document.getElementById('receiptsCount').textContent = receipts.length;
+    }
+
+    function renderCategoryBreakdown() {
+      const categories = {};
+      let total = 0;
+      
+      receipts.forEach(r => {
+        r.items.forEach(item => {
+          const cat = item.category || 'Other';
+          const price = parseFloat(item.price) || 0;
+          categories[cat] = (categories[cat] || 0) + price;
+          total += price;
+        });
+      });
+      
+      const container = document.getElementById('categoryBreakdown');
+      const sorted = Object.entries(categories).sort((a, b) => b[1] - a[1]);
+      
+      container.innerHTML = sorted.map(([cat, amount]) => {
+        const percent = ((amount / total) * 100).toFixed(1);
+        return `
+          <div class="category-item">
+            <div class="category-info">
+              <div class="category-name">${cat}</div>
+              <div class="category-percent">${percent}% of total</div>
+            </div>
+            <div class="category-amount">$${amount.toFixed(2)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderStoreComparison() {
+      const stores = {};
+      
+      receipts.forEach(r => {
+        const amount = parseFloat(r.total) || 0;
+        stores[r.store] = (stores[r.store] || 0) + amount;
+      });
+      
+      const container = document.getElementById('storeComparison');
+      const sorted = Object.entries(stores).sort((a, b) => b[1] - a[1]);
+      
+      container.innerHTML = sorted.map(([store, amount]) => {
+        return `
+          <div class="category-item">
+            <div class="category-info">
+              <div class="category-name">${store}</div>
+            </div>
+            <div class="category-amount">$${amount.toFixed(2)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function drawChart(period) {
+      // Simple bar chart placeholder
+      const canvas = document.getElementById('trendChart');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      
+      const width = rect.width;
+      const height = rect.height;
+      
+      ctx.fillStyle = '#9fb0c7';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Chart coming soon!', width/2, height/2);
+    }
+
+    // Period selector
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        drawChart(btn.dataset.period);
+      });
+    });
+  </script>
+</body>
+</html>

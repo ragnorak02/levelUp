@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Budgets</title>
+  <style>
+    :root {
+      --bg: #080c11; --panel: #0d131a; --ink: #e8eef6; --muted: #9fb0c7;
+      --ring: #1c2a37; --accent: #4CAF50; --accent-2: #2dd4bf; --danger: #ef4444;
+      --warn: #f59e0b; --card-bg: #0e141b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
+      background: linear-gradient(180deg, #070b10 0%, #0a1016 100%); color: var(--ink);
+      min-height: 100vh; padding-bottom: 80px;
+    }
+    header {
+      background: #0b1118; border-bottom: 1px solid var(--ring); padding: 16px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-row { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+    .home-btn {
+      all: unset; cursor: pointer; border: 1px solid var(--ring); padding: 12px 16px;
+      border-radius: 10px; font-size: 1rem; color: var(--muted); min-height: 48px;
+    }
+    h1 { margin: 0; font-size: 1.3rem; font-weight: 600; flex: 1; }
+    .nav-pills {
+      display: flex; gap: 8px; overflow-x: auto; padding: 4px;
+      background: var(--panel); border-radius: 10px; border: 1px solid var(--ring);
+    }
+    .nav-pill {
+      all: unset; cursor: pointer; padding: 12px 20px; border-radius: 8px;
+      font-size: 1rem; color: var(--muted); white-space: nowrap; min-height: 48px;
+    }
+    .wrap { padding: 20px 16px; }
+    .card {
+      background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
+      padding: 20px; margin-bottom: 20px;
+    }
+    .card h3 { margin: 0 0 20px; font-size: 1.1rem; color: var(--muted); font-weight: 600; }
+    
+    /* Budget Card */
+    .budget-card {
+      background: var(--card-bg); border: 1px solid var(--ring); border-radius: 12px;
+      padding: 20px; margin-bottom: 16px;
+    }
+    .budget-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+    }
+    .budget-category { font-size: 1.2rem; font-weight: 700; color: var(--ink); }
+    .budget-status {
+      padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+    }
+    .status-good { background: rgba(76, 175, 80, 0.2); color: var(--accent); }
+    .status-warn { background: rgba(245, 158, 11, 0.2); color: var(--warn); }
+    .status-over { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    
+    .budget-amounts {
+      display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1rem;
+    }
+    .spent { color: var(--muted); }
+    .limit { font-weight: 700; color: var(--accent-2); }
+    
+    .progress-bar {
+      width: 100%; height: 12px; background: var(--ring); border-radius: 6px;
+      overflow: hidden; position: relative;
+    }
+    .progress-fill {
+      height: 100%; transition: width 0.3s; border-radius: 6px;
+    }
+    .fill-good { background: linear-gradient(90deg, var(--accent), #22c55e); }
+    .fill-warn { background: linear-gradient(90deg, var(--warn), #fb923c); }
+    .fill-over { background: linear-gradient(90deg, var(--danger), #f87171); }
+    
+    /* Add Budget Form */
+    .form-group { margin-bottom: 20px; }
+    .form-label {
+      display: block; font-weight: 600; color: var(--ink); margin-bottom: 8px; font-size: 1rem;
+    }
+    .form-input {
+      width: 100%; padding: 14px; background: var(--card-bg); border: 1px solid var(--ring);
+      border-radius: 10px; color: var(--ink); font-size: 1rem; min-height: 52px;
+    }
+    .form-input:focus { outline: none; border-color: var(--accent); }
+    
+    .btn {
+      all: unset; cursor: pointer; padding: 16px; border-radius: 12px;
+      font-size: 1.1rem; font-weight: 700; text-align: center; width: 100%;
+      min-height: 56px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-primary {
+      background: linear-gradient(90deg, var(--accent), #22c55e);
+      color: #04130a;
+    }
+    
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .empty-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-row">
+      <button class="home-btn" onclick="location.href='index.html'">⟵</button>
+      <h1>Budgets</h1>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Current Budgets -->
+    <div class="card">
+      <h3>💰 Monthly Budgets</h3>
+      <div id="budgetList"></div>
+    </div>
+
+    <!-- Add Budget Form -->
+    <div class="card">
+      <h3>➕ Set New Budget</h3>
+      <form id="budgetForm">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-input" id="categoryInput" required>
+            <option value="">Select category...</option>
+            <option value="Groceries">🛒 Groceries</option>
+            <option value="Restaurants">🍽️ Restaurants</option>
+            <option value="Medical">💊 Medical</option>
+            <option value="Home">🏠 Home</option>
+            <option value="Rental Property">🏘️ Rental Property</option>
+            <option value="Transportation">🚗 Transportation</option>
+            <option value="Utilities">💡 Utilities</option>
+            <option value="Other">📦 Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monthly Limit ($)</label>
+          <input type="number" step="0.01" class="form-input" id="limitInput" 
+                 placeholder="500.00" required>
+        </div>
+        <button type="submit" class="btn btn-primary">💾 Save Budget</button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE = {
+      RECEIPTS: 'finances:receipts',
+      BUDGETS: 'finances:budgets'
+    };
+
+    function loadBudgets() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE.BUDGETS) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function loadReceipts() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE.RECEIPTS) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function render() {
+      const budgets = loadBudgets();
+      const receipts = loadReceipts();
+      const container = document.getElementById('budgetList');
+      
+      if (budgets.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🎯</div>
+            <p>No budgets set yet. Create your first budget below!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Calculate spending per category this month
+      const now = new Date();
+      const spending = {};
+      
+      receipts.forEach(r => {
+        const date = new Date(r.date);
+        if (date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
+          r.items.forEach(item => {
+            const cat = item.category || 'Other';
+            spending[cat] = (spending[cat] || 0) + (parseFloat(item.price) || 0);
+          });
+        }
+      });
+      
+      container.innerHTML = budgets.map(budget => {
+        const spent = spending[budget.category] || 0;
+        const limit = budget.limit;
+        const percent = (spent / limit) * 100;
+        
+        let status, statusClass, fillClass;
+        if (percent < 80) {
+          status = 'On Track';
+          statusClass = 'status-good';
+          fillClass = 'fill-good';
+        } else if (percent < 100) {
+          status = 'Warning';
+          statusClass = 'status-warn';
+          fillClass = 'fill-warn';
+        } else {
+          status = 'Over Budget';
+          statusClass = 'status-over';
+          fillClass = 'fill-over';
+        }
+        
+        return `
+          <div class="budget-card">
+            <div class="budget-header">
+              <div class="budget-category">${budget.category}</div>
+              <div class="budget-status ${statusClass}">${status}</div>
+            </div>
+            <div class="budget-amounts">
+              <span class="spent">$${spent.toFixed(2)} spent</span>
+              <span class="limit">$${limit.toFixed(2)} limit</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill ${fillClass}" 
+                   style="width: ${Math.min(percent, 100)}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('budgetForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const category = document.getElementById('categoryInput').value;
+      const limit = parseFloat(document.getElementById('limitInput').value);
+      
+      if (!category || !limit) return;
+      
+      const budgets = loadBudgets();
+      
+      // Check if budget already exists
+      const existing = budgets.findIndex(b => b.category === category);
+      if (existing >= 0) {
+        budgets[existing].limit = limit;
+      } else {
+        budgets.push({ category, limit });
+      }
+      
+      localStorage.setItem(STORAGE.BUDGETS, JSON.stringify(budgets));
+      
+      document.getElementById('categoryInput').value = '';
+      document.getElementById('limitInput').value = '';
+      
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
