@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Receipts</title>
+  <style>
+    :root {
+      --bg: #080c11; --panel: #0d131a; --ink: #e8eef6; --muted: #9fb0c7;
+      --ring: #1c2a37; --accent: #4CAF50; --accent-2: #2dd4bf; --danger: #ef4444;
+      --card-bg: #0e141b; --hover-bg: #1a1f26;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
+      background: linear-gradient(180deg, #070b10 0%, #0a1016 100%); color: var(--ink);
+      min-height: 100vh; padding-bottom: 80px;
+    }
+    
+    /* Mobile-First Header */
+    header {
+      background: #0b1118; border-bottom: 1px solid var(--ring); padding: 16px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-row {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 12px;
+    }
+    .home-btn {
+      all: unset; cursor: pointer; border: 1px solid var(--ring); padding: 12px 16px;
+      border-radius: 10px; font-size: 1rem; color: var(--muted); min-height: 48px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    h1 { margin: 0; font-size: 1.3rem; font-weight: 600; flex: 1; }
+    
+    /* Mobile Nav Pills */
+    .nav-pills {
+      display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      padding: 4px; background: var(--panel); border-radius: 10px; border: 1px solid var(--ring);
+      scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .nav-pills::-webkit-scrollbar { display: none; }
+    .nav-pill {
+      all: unset; cursor: pointer; padding: 12px 20px; border-radius: 8px;
+      font-size: 1rem; color: var(--muted); white-space: nowrap; min-height: 48px;
+      display: flex; align-items: center;
+    }
+    .nav-pill.active {
+      background: linear-gradient(90deg, var(--accent), #22c55e);
+      color: #04130a; font-weight: 600;
+    }
+
+    .wrap { padding: 20px 16px; }
+    
+    /* Mobile Filter Bar */
+    .filter-bar {
+      background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
+      padding: 16px; margin-bottom: 20px;
+    }
+    .filter-row {
+      display: flex; gap: 12px; margin-bottom: 12px; overflow-x: auto;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      all: unset; cursor: pointer; padding: 12px 20px; border-radius: 10px;
+      font-size: 1rem; font-weight: 600; border: 2px solid var(--ring);
+      background: var(--card-bg); color: var(--muted); white-space: nowrap;
+      min-height: 48px; display: flex; align-items: center; gap: 8px;
+    }
+    .filter-btn.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #04130a; border-color: var(--accent);
+    }
+
+    /* Mobile Receipt Cards */
+    .receipt-card {
+      background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
+      padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
+    }
+    .receipt-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 16px; gap: 12px;
+    }
+    .store-name {
+      font-size: 1.2rem; font-weight: 700; color: var(--ink); flex: 1;
+    }
+    .receipt-total {
+      font-size: 1.3rem; font-weight: 700; color: var(--accent);
+    }
+    .receipt-meta {
+      display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .meta-badge {
+      background: var(--card-bg); border: 1px solid var(--ring);
+      padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; color: var(--muted);
+    }
+    .item-count {
+      font-size: 1rem; color: var(--muted); margin-bottom: 12px;
+    }
+    
+    /* Expandable Items */
+    .items-toggle {
+      all: unset; cursor: pointer; display: flex; align-items: center;
+      gap: 8px; padding: 12px 16px; background: var(--card-bg); border: 1px solid var(--ring);
+      border-radius: 10px; font-size: 1rem; font-weight: 600; color: var(--accent);
+      width: 100%; justify-content: center; min-height: 48px;
+    }
+    .items-list {
+      display: none; margin-top: 16px; padding-top: 16px;
+      border-top: 1px solid var(--ring);
+    }
+    .items-list.show { display: block; }
+    .item-row {
+      display: flex; justify-content: space-between; padding: 12px 0;
+      border-bottom: 1px solid rgba(28, 42, 55, 0.5); font-size: 1rem;
+    }
+    .item-row:last-child { border-bottom: none; }
+    .item-name { flex: 1; color: var(--ink); }
+    .item-price { font-weight: 700; color: var(--accent-2); margin-left: 12px; }
+
+    /* Action Buttons */
+    .receipt-actions {
+      display: flex; gap: 12px; margin-top: 16px;
+    }
+    .btn {
+      all: unset; cursor: pointer; padding: 14px 20px; border-radius: 10px;
+      font-size: 1rem; font-weight: 600; text-align: center; flex: 1;
+      min-height: 48px; display: flex; align-items: center; justify-content: center;
+    }
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3);
+      color: var(--danger);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .empty-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
+    .empty-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 12px; color: var(--ink); }
+    .add-btn {
+      all: unset; cursor: pointer; display: inline-flex; align-items: center;
+      gap: 8px; padding: 16px 32px; background: linear-gradient(90deg, var(--accent), #22c55e);
+      color: #04130a; border-radius: 12px; font-weight: 700; font-size: 1.1rem;
+      margin-top: 20px; min-height: 56px;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
+      padding: 16px; margin-bottom: 20px; display: flex; justify-content: space-around;
+      text-align: center;
+    }
+    .stat { flex: 1; }
+    .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-row">
+      <button class="home-btn" onclick="location.href='index.html'">⟵</button>
+      <h1>Receipts</h1>
+    </div>
+    <nav class="nav-pills">
+      <button class="nav-pill" onclick="location.href='index.html'">Dashboard</button>
+      <button class="nav-pill" onclick="location.href='food.html'">Food</button>
+      <button class="nav-pill" onclick="location.href='search.html'">Search</button>
+      <button class="nav-pill active">Receipts</button>
+      <button class="nav-pill" onclick="location.href='analytics.html'">Analytics</button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="filter-row" id="storeFilters">
+        <button class="filter-btn active" data-store="all">All Stores</button>
+      </div>
+      <div class="filter-row" id="dateFilters">
+        <button class="filter-btn active" data-period="all">All Time</button>
+        <button class="filter-btn" data-period="month">This Month</button>
+        <button class="filter-btn" data-period="week">This Week</button>
+      </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar" id="statsBar">
+      <div class="stat">
+        <div class="stat-value" id="totalReceipts">0</div>
+        <div class="stat-label">Receipts</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="totalSpent">$0</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="avgReceipt">$0</div>
+        <div class="stat-label">Average</div>
+      </div>
+    </div>
+
+    <!-- Receipts List -->
+    <div id="receiptsList"></div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'finances:receipts';
+
+    // Load receipts
+    function loadReceipts() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      } catch (e) {
+        console.error('Error loading receipts:', e);
+        return [];
+      }
+    }
+
+    // Initialize
+    let allReceipts = loadReceipts();
+    let filteredReceipts = allReceipts;
+
+    // Render everything
+    function render() {
+      if (allReceipts.length === 0) {
+        showEmptyState();
+        return;
+      }
+
+      renderStoreFilters();
+      renderReceipts();
+      updateStats();
+    }
+
+    // Empty state
+    function showEmptyState() {
+      document.getElementById('receiptsList').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🧾</div>
+          <div class="empty-title">No Receipts Yet</div>
+          <p>Start tracking your spending by adding your first receipt</p>
+          <button class="add-btn" onclick="location.href='addReceipt.html'">
+            📝 Add Receipt
+          </button>
+        </div>
+      `;
+      document.getElementById('statsBar').style.display = 'none';
+      document.querySelector('.filter-bar').style.display = 'none';
+    }
+
+    // Render store filters
+    function renderStoreFilters() {
+      const stores = [...new Set(allReceipts.map(r => r.store))];
+      const container = document.getElementById('storeFilters');
+      
+      container.innerHTML = `<button class="filter-btn active" data-store="all">All Stores</button>`;
+      
+      stores.forEach(store => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn';
+        btn.dataset.store = store;
+        btn.textContent = store;
+        btn.addEventListener('click', () => filterByStore(store));
+        container.appendChild(btn);
+      });
+    }
+
+    // Filter by store
+    function filterByStore(store) {
+      document.querySelectorAll('[data-store]').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      if (store === 'all') {
+        filteredReceipts = allReceipts;
+      } else {
+        filteredReceipts = allReceipts.filter(r => r.store === store);
+      }
+      
+      renderReceipts();
+      updateStats();
+    }
+
+    // Filter by date
+    document.querySelectorAll('[data-period]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        const period = btn.dataset.period;
+        const now = new Date();
+        
+        if (period === 'all') {
+          filteredReceipts = allReceipts;
+        } else if (period === 'month') {
+          filteredReceipts = allReceipts.filter(r => {
+            const date = new Date(r.date);
+            return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+          });
+        } else if (period === 'week') {
+          const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+          filteredReceipts = allReceipts.filter(r => new Date(r.date) >= weekAgo);
+        }
+        
+        renderReceipts();
+        updateStats();
+      });
+    });
+
+    // Render receipts
+    function renderReceipts() {
+      const container = document.getElementById('receiptsList');
+      container.innerHTML = '';
+      
+      // Sort by date (newest first)
+      const sorted = [...filteredReceipts].sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      sorted.forEach((receipt, index) => {
+        const card = createReceiptCard(receipt, index);
+        container.appendChild(card);
+      });
+    }
+
+    // Create receipt card
+    function createReceiptCard(receipt, index) {
+      const card = document.createElement('div');
+      card.className = 'receipt-card';
+      
+      const date = new Date(receipt.date).toLocaleDateString('en-US', { 
+        month: 'short', day: 'numeric', year: 'numeric' 
+      });
+      
+      card.innerHTML = `
+        <div class="receipt-header">
+          <div class="store-name">${receipt.store}</div>
+          <div class="receipt-total">$${parseFloat(receipt.total || 0).toFixed(2)}</div>
+        </div>
+        <div class="receipt-meta">
+          <span class="meta-badge">📅 ${date}</span>
+          <span class="meta-badge">🛒 ${receipt.items.length} items</span>
+          ${receipt.payment ? `<span class="meta-badge">💳 ${receipt.payment}</span>` : ''}
+        </div>
+        <button class="items-toggle" onclick="toggleItems(${index})">
+          <span id="toggle-icon-${index}">▼</span>
+          <span>View Items</span>
+        </button>
+        <div class="items-list" id="items-${index}">
+          ${receipt.items.map(item => `
+            <div class="item-row">
+              <span class="item-name">${item.name}</span>
+              <span class="item-price">$${parseFloat(item.price || 0).toFixed(2)}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="receipt-actions">
+          <button class="btn btn-danger" onclick="deleteReceipt(${index})">🗑️ Delete</button>
+        </div>
+      `;
+      
+      return card;
+    }
+
+    // Toggle items
+    function toggleItems(index) {
+      const list = document.getElementById(`items-${index}`);
+      const icon = document.getElementById(`toggle-icon-${index}`);
+      list.classList.toggle('show');
+      icon.textContent = list.classList.contains('show') ? '▲' : '▼';
+    }
+
+    // Delete receipt
+    function deleteReceipt(index) {
+      if (!confirm('Delete this receipt?')) return;
+      
+      const receipt = filteredReceipts[index];
+      const originalIndex = allReceipts.findIndex(r => 
+        r.store === receipt.store && r.date === receipt.date && r.total === receipt.total
+      );
+      
+      if (originalIndex >= 0) {
+        allReceipts.splice(originalIndex, 1);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(allReceipts));
+        filteredReceipts = allReceipts;
+        render();
+      }
+    }
+
+    // Update stats
+    function updateStats() {
+      const total = filteredReceipts.reduce((sum, r) => sum + parseFloat(r.total || 0), 0);
+      const avg = filteredReceipts.length > 0 ? total / filteredReceipts.length : 0;
+      
+      document.getElementById('totalReceipts').textContent = filteredReceipts.length;
+      document.getElementById('totalSpent').textContent = '$' + total.toFixed(2);
+      document.getElementById('avgReceipt').textContent = '$' + avg.toFixed(2);
+    }
+
+    // Initialize
+    render();
+  </script>
+</body>
+</html>
