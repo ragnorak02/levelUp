@@ -445,7 +445,8 @@
       }
     }
   </style>
-  <script src="dataLoader.js"></script>
+  <script src="receiptsData.js"></script>
+<script src="dataLoader.js"></script>
 </head>
 <body>
   <header>
@@ -656,7 +657,10 @@
     }
 
     // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (window.whenReceiptsReady) {
+        try { await window.whenReceiptsReady(); } catch (e) { console.warn('Receipts bootstrap failed', e); }
+      }
       initializeCategoryFilters();
       loadDashboard();
       setupSearch();

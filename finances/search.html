@@ -178,7 +178,8 @@
     let currentFilter = 'all';
     let currentSort = 'name';
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await (window.FinancesDataLoader?.ready || window.financesDataReady || Promise.resolve());
       loadAllItems();
       setupEventListeners();
       

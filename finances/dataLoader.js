@@ -1,226 +1,158 @@
 /**
- * dataLoader.js - Automatic Receipt Data Loader
- * Loads hardcoded receipts from receiptsData.json into localStorage on first visit
- * 
- * Usage: Just add this script tag to the <head> of your HTML files:
- * <script src="dataLoader.js"></script>
+ * dataLoader.js
+ * Reliable receipts loading across desktop/mobile and file://
  */
 
-(function() {
-  'use strict';
-  
-  const STORAGE_KEYS = {
-    RECEIPTS: 'finances:receipts',
-    DATA_LOADED: 'finances:dataLoaded',
-    DATA_VERSION: 'finances:dataVersion'
-  };
-  
-  const CURRENT_VERSION = '1.0';
-  
-  /**
-   * Check if hardcoded data has already been loaded
-   */
-  function isDataLoaded() {
-    const loaded = localStorage.getItem(STORAGE_KEYS.DATA_LOADED);
-    const version = localStorage.getItem(STORAGE_KEYS.DATA_VERSION);
-    return loaded === 'true' && version === CURRENT_VERSION;
+(function () {
+  const LS_USER_KEY = 'finances_receipts_user';
+  const LS_META_KEY = 'finances_receipts_meta';
+
+  // Legacy keys used across different pages / earlier iterations
+  const LEGACY_KEYS = [
+    'finances_receipts',
+    'finances:receipts'
+  ];
+
+  /** @type {Promise<{receipts:any[], metadata:any, source:string}>|null} */
+  let readyPromise = null;
+
+  function safeParseJSON(str, fallback) {
+    try { return JSON.parse(str); } catch { return fallback; }
   }
-  
-  /**
-   * Load receipts from JSON file and save to localStorage
-   */
-  async function loadHardcodedData() {
+
+  function loadUserReceipts() {
+    const raw = localStorage.getItem(LS_USER_KEY);
+    const arr = safeParseJSON(raw, []);
+    return Array.isArray(arr) ? arr : [];
+  }
+
+  function saveUserReceipts(receipts) {
     try {
-      console.log('🔄 Loading hardcoded receipt data...');
-      
-      const response = await fetch('receiptsData.json');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      localStorage.setItem(LS_USER_KEY, JSON.stringify(receipts));
+      localStorage.setItem(LS_META_KEY, JSON.stringify({ updatedAt: new Date().toISOString() }));
+    } catch {
+      // ignore quota/private mode
+    }
+  }
+
+  function syncLegacyLocalStorage(mergedReceipts, metadata) {
+    try {
+      for (const k of LEGACY_KEYS) {
+        localStorage.setItem(k, JSON.stringify(mergedReceipts));
       }
-      
-      const data = await response.json();
-      
-      if (!data.receipts || !Array.isArray(data.receipts)) {
-        throw new Error('Invalid receiptsData.json format');
-      }
-      
-      // Save receipts to localStorage
-      localStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify(data.receipts));
-      
-      // Mark as loaded
-      localStorage.setItem(STORAGE_KEYS.DATA_LOADED, 'true');
-      localStorage.setItem(STORAGE_KEYS.DATA_VERSION, CURRENT_VERSION);
-      
-      console.log(`✅ Loaded ${data.receipts.length} receipts from hardcoded data`);
-      console.log(`📊 Total: $${data.metadata.totalSpent.toFixed(2)} | Items: ${data.metadata.totalItems}`);
-      
-      return true;
-    } catch (error) {
-      console.error('❌ Error loading hardcoded data:', error);
-      return false;
+      localStorage.setItem(LS_META_KEY, JSON.stringify(metadata || {}));
+    } catch {
+      // ignore quota/private mode
     }
   }
-  
-  /**
-   * Initialize data loading on page load
-   */
-  function initialize() {
-    // Only run in browser environment
-    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-      return;
+
+  function normalizeReceipt(r) {
+    const out = Object.assign({}, r);
+
+    // Normalize date to ISO YYYY-MM-DD when possible
+    if (typeof out.date === 'string' && out.date.length >= 10) {
+      out.date = out.date.slice(0, 10);
     }
-    
-    // Check if data already loaded
-    if (isDataLoaded()) {
-      console.log('✅ Hardcoded receipt data already loaded');
-      return;
+
+    if (!out.id) {
+      const store = (out.store || 'Unknown').toString().trim();
+      const date = (out.date || '').toString().trim();
+      const total = (out.total ?? out.totalAmount ?? '').toString();
+      const items = Array.isArray(out.items) ? out.items : [];
+      const itemSig = items
+        .map(i => `${(i.name || i.item || '').toString().toLowerCase()}@${i.price ?? i.amount ?? ''}`)
+        .join('|');
+      out.id = `${store}|${date}|${total}|${itemSig}`;
     }
-    
-    // Load data automatically
-    loadHardcodedData();
+
+    return out;
   }
-  
-  /**
-   * Merge new hardcoded data with existing receipts
-   * (useful for adding more receipts without deleting user-entered ones)
-   */
-  async function mergeHardcodedData() {
+
+  function mergeReceipts(base, user) {
+    const map = new Map();
+    (base || []).forEach(r => {
+      const nr = normalizeReceipt(r);
+      map.set(nr.id, nr);
+    });
+    (user || []).forEach(r => {
+      const nr = normalizeReceipt(r);
+      if (!map.has(nr.id)) map.set(nr.id, nr);
+    });
+    return Array.from(map.values());
+  }
+
+  async function loadBaseData() {
+    // 1) Hardcoded JS object (works on file://)
+    if (window.RECEIPTS_DATA && typeof window.RECEIPTS_DATA === 'object') {
+      const data = window.RECEIPTS_DATA;
+      return {
+        receipts: Array.isArray(data.receipts) ? data.receipts : (Array.isArray(data) ? data : []),
+        metadata: data.metadata || {},
+        source: 'window.RECEIPTS_DATA'
+      };
+    }
+
+    // 2) Fetch JSON (works on http/https)
     try {
-      console.log('🔄 Merging hardcoded data with existing receipts...');
-      
-      const response = await fetch('receiptsData.json');
-      const data = await response.json();
-      
-      // Get existing receipts
-      const existing = JSON.parse(localStorage.getItem(STORAGE_KEYS.RECEIPTS) || '[]');
-      
-      // Create set of existing receipt IDs
-      const existingIds = new Set(existing.map(r => r.id));
-      
-      // Add only new receipts
-      let added = 0;
-      data.receipts.forEach(receipt => {
-        if (!existingIds.has(receipt.id)) {
-          existing.push(receipt);
-          added++;
-        }
-      });
-      
-      // Save merged receipts
-      localStorage.setItem(STORAGE_KEYS.RECEIPTS, JSON.stringify(existing));
-      
-      console.log(`✅ Merged data: ${added} new receipts added, ${existing.length} total`);
-      return true;
-    } catch (error) {
-      console.error('❌ Error merging data:', error);
-      return false;
-    }
-  }
-  
-  /**
-   * Force reload hardcoded data (clears existing and reloads)
-   * WARNING: This will delete all user-entered receipts!
-   */
-  async function forceReloadHardcodedData() {
-    const confirmed = confirm(
-      '⚠️ WARNING: This will DELETE all existing receipts and reload from hardcoded data.\n\n' +
-      'Are you sure you want to continue?'
-    );
-    
-    if (!confirmed) {
-      console.log('❌ Force reload cancelled');
-      return false;
-    }
-    
-    // Clear data loaded flag
-    localStorage.removeItem(STORAGE_KEYS.DATA_LOADED);
-    localStorage.removeItem(STORAGE_KEYS.DATA_VERSION);
-    localStorage.removeItem(STORAGE_KEYS.RECEIPTS);
-    
-    // Reload data
-    const success = await loadHardcodedData();
-    
-    if (success) {
-      console.log('✅ Data force reloaded successfully');
-      // Reload page to show new data
-      window.location.reload();
-    }
-    
-    return success;
-  }
-  
-  /**
-   * Get all receipts from localStorage
-   */
-  function getReceipts() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEYS.RECEIPTS) || '[]');
+      const bust = `v=${Date.now()}`;
+      const res = await fetch(`receiptsData.json?${bust}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      return {
+        receipts: Array.isArray(data.receipts) ? data.receipts : (Array.isArray(data) ? data : []),
+        metadata: data.metadata || {},
+        source: 'fetch:receiptsData.json'
+      };
     } catch (e) {
-      console.error('Error loading receipts:', e);
-      return [];
+      return { receipts: [], metadata: { loadError: String(e) }, source: 'none' };
     }
   }
-  
-  /**
-   * Get receipt statistics
-   */
-  function getReceiptStats() {
-    const receipts = getReceipts();
-    
-    const stats = {
-      totalReceipts: receipts.length,
-      totalItems: receipts.reduce((sum, r) => sum + r.items.length, 0),
-      totalSpent: receipts.reduce((sum, r) => sum + parseFloat(r.total || 0), 0),
-      stores: [...new Set(receipts.map(r => r.store))],
-      dateRange: {
-        earliest: receipts.length > 0 ? receipts.reduce((min, r) => r.date < min ? r.date : min, receipts[0].date) : null,
-        latest: receipts.length > 0 ? receipts.reduce((max, r) => r.date > max ? r.date : max, receipts[0].date) : null
-      }
-    };
-    
-    return stats;
+
+  async function init() {
+    const base = await loadBaseData();
+    const user = loadUserReceipts();
+    const merged = mergeReceipts(base.receipts, user);
+
+    // Make merged data available to pages that still read localStorage directly
+    syncLegacyLocalStorage(merged, base.metadata);
+
+    const payload = { receipts: merged, metadata: base.metadata, source: base.source };
+
+    // Notify pages that are waiting
+    try {
+      window.dispatchEvent(new CustomEvent('receiptsDataReady', { detail: payload }));
+    } catch {
+      // ignore
+    }
+
+    return payload;
   }
-  
-  /**
-   * Console helper to check data status
-   */
-  function printDataStatus() {
-    const loaded = isDataLoaded();
-    const stats = getReceiptStats();
-    
-    console.log('=====================================');
-    console.log('📊 FINANCES DATA STATUS');
-    console.log('=====================================');
-    console.log('Data Loaded:', loaded ? '✅ Yes' : '❌ No');
-    console.log('Version:', localStorage.getItem(STORAGE_KEYS.DATA_VERSION) || 'None');
-    console.log('Total Receipts:', stats.totalReceipts);
-    console.log('Total Items:', stats.totalItems);
-    console.log('Total Spent:', `$${stats.totalSpent.toFixed(2)}`);
-    console.log('Stores:', stats.stores.join(', '));
-    console.log('Date Range:', `${stats.dateRange.earliest || 'N/A'} to ${stats.dateRange.latest || 'N/A'}`);
-    console.log('=====================================');
-    console.log('🛠️ AVAILABLE COMMANDS:');
-    console.log('printDataStatus() - Show this status');
-    console.log('getReceipts() - Get all receipts');
-    console.log('getReceiptStats() - Get statistics');
-    console.log('mergeHardcodedData() - Add new receipts without deleting existing');
-    console.log('forceReloadHardcodedData() - Clear & reload (WARNING: deletes all receipts)');
-    console.log('=====================================');
+
+  function whenReceiptsReady() {
+    if (!readyPromise) readyPromise = init();
+    return readyPromise;
   }
-  
-  // Export functions to window for console access
-  window.initializeHardcodedData = loadHardcodedData;
-  window.mergeHardcodedData = mergeHardcodedData;
-  window.forceReloadHardcodedData = forceReloadHardcodedData;
-  window.getReceipts = getReceipts;
-  window.getReceiptStats = getReceiptStats;
-  window.printDataStatus = printDataStatus;
-  
-  // Auto-initialize when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initialize);
-  } else {
-    initialize();
+
+  async function getAllReceipts() {
+    const data = await whenReceiptsReady();
+    return data.receipts;
   }
-  
+
+  async function addUserReceipt(receipt) {
+    const r = normalizeReceipt(receipt);
+    const user = loadUserReceipts();
+    if (!user.some(x => normalizeReceipt(x).id === r.id)) {
+      user.push(r);
+      saveUserReceipts(user);
+    }
+    // Re-init to refresh merged + legacy keys
+    readyPromise = init();
+    await readyPromise;
+    return r;
+  }
+
+  // Expose global helpers
+  window.whenReceiptsReady = whenReceiptsReady;
+  window.getAllReceipts = getAllReceipts;
+  window.addUserReceipt = addUserReceipt;
 })();

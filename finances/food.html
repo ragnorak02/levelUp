@@ -123,6 +123,8 @@
     </div>
   </main>
 
+  <script src="receiptsData.js"></script>
+  <script src="dataLoader.js"></script>
   <script>
     const FOOD_CATEGORIES = {
       'Produce': '🥬',
@@ -135,7 +137,10 @@
       'Bakery': '🍞'
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (window.whenReceiptsReady) {
+        try { await window.whenReceiptsReady(); } catch (e) { console.warn('Receipts bootstrap failed', e); }
+      }
       loadFoodData();
     });
 

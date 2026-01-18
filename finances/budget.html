@@ -260,7 +260,10 @@
       render();
     });
 
-    render();
+    (async function initBudgetPage() {
+      await (window.FinancesDataLoader?.ready || window.financesDataReady || Promise.resolve());
+      render();
+    })();
   </script>
 </body>
 </html>

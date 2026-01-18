@@ -218,9 +218,16 @@
       }
     }
 
-    // Initialize
-    let allReceipts = loadReceipts();
-    let filteredReceipts = allReceipts;
+    // Initialize (after seeding hardcoded data on first load)
+    let allReceipts = [];
+    let filteredReceipts = [];
+
+    (async function initReceiptsPage() {
+      await (window.FinancesDataLoader?.ready || window.financesDataReady || Promise.resolve());
+      allReceipts = loadReceipts();
+      filteredReceipts = allReceipts;
+      render();
+    })();
 
     // Render everything
     function render() {
