@@ -85,12 +85,32 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
+
+    /* Month nav above the 2 stats */
+    .monthbar{
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      padding:12px 12px 0 12px;
+    }
+    .monthbtn{
+      width:40px; height:38px;
+      border-radius:12px;
+      border:1px solid rgba(42,53,67,.70);
+      background: rgba(11,15,20,.35);
+      color:var(--ink);
+      font-weight:900;
+      cursor:pointer;
+    }
+    .monthlabel{
+      font-weight:950;
+      color:var(--ink);
+      letter-spacing:.2px;
+      min-width: 160px;
+      text-align:center;
+    }
+
     .stats{
       display:grid; gap:12px; grid-template-columns: repeat(2, 1fr);
       padding:12px;
-    }
-    @media(min-width:860px){
-      .stats{grid-template-columns: repeat(4, 1fr)}
     }
     .stat{
       padding:12px 14px;
@@ -125,7 +145,6 @@
     }
     .card-b{padding:14px 16px}
 
-    .actions{display:flex; gap:10px; flex-wrap:wrap}
     .btn{
       padding:10px 14px;
       border-radius: 14px;
@@ -136,18 +155,11 @@
       display:inline-flex; align-items:center; gap:8px;
       cursor:pointer;
     }
-    .btn.primary{
-      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
-      border-color: transparent;
-      color:#0b0f14;
-    }
 
     .donut-top{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       flex-wrap:wrap;
     }
-    .donut-sub{color:var(--muted); font-size:12px; font-weight:800;}
-
     .tabs{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
     .tab{
       padding:8px 12px;
@@ -214,6 +226,16 @@
     .recent-left{display:flex; flex-direction:column; gap:2px; min-width:0}
     .recent-title{font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
     .recent-sub{font-size:12px; color:var(--muted); font-weight:800}
+    .recent-toggle{
+      margin-top:10px;
+      display:flex;
+      justify-content:center;
+    }
+    .chev{
+      width:100%;
+      justify-content:center;
+      gap:8px;
+    }
   </style>
 </head>
 
@@ -233,11 +255,21 @@
 
   <div class="wrap">
     <div class="card" style="margin-top:12px;">
+      <div class="monthbar">
+        <button class="monthbtn" id="monthPrev" type="button">◀</button>
+        <div class="monthlabel" id="monthLabel">Month</div>
+        <button class="monthbtn" id="monthNext" type="button">▶</button>
+      </div>
+
       <div class="stats">
-        <div class="stat"><div class="v" id="statTotal">$0.00</div><div class="k">Total Spent</div></div>
-        <div class="stat"><div class="v" id="statMonth">$0.00</div><div class="k">This Month</div></div>
-        <div class="stat"><div class="v" id="statWeek">$0.00</div><div class="k">This Week</div></div>
-        <div class="stat"><div class="v" id="statAvg">$0.00</div><div class="k">Avg Purchase</div></div>
+        <div class="stat">
+          <div class="v" id="statMonth">$0.00</div>
+          <div class="k">Month Total</div>
+        </div>
+        <div class="stat">
+          <div class="v" id="statWeek">$0.00</div>
+          <div class="k">This Week</div>
+        </div>
       </div>
     </div>
 
@@ -245,25 +277,16 @@
       <div class="card">
         <div class="card-h">
           <h3>📊 Spending by Category</h3>
-          <div class="actions">
-            <a class="btn primary" href="addReceipt.html">🧾 Add Receipt</a>
-            <a class="btn" href="food.html">🍎 Food Tracking</a>
-            <a class="btn" href="search.html">🔎 Price Lookup</a>
-            <a class="btn" href="budget.html">💰 Budgets</a>
+          <div>
+            <button class="btn" id="donutResetBtn" type="button">Reset</button>
           </div>
         </div>
 
         <div class="card-b">
           <div class="donut-top">
-            <div>
-              <div class="donut-sub">Tap a slice or a category row to highlight</div>
-              <div class="tabs" style="margin-top:10px;">
-                <div class="tab active" id="tabAll">All</div>
-                <div class="tab" id="tabGroceries">Groceries</div>
-              </div>
-            </div>
-            <div class="actions" style="gap:8px;">
-              <button class="btn" id="donutResetBtn" type="button">Reset</button>
+            <div class="tabs">
+              <div class="tab active" id="tabAll">All</div>
+              <div class="tab" id="tabGroceries">Groceries</div>
             </div>
           </div>
 
@@ -282,7 +305,7 @@
         <div class="card-b">
           <div class="empty">🎯 Set up budgets to track your spending goals.</div>
           <div style="display:flex; justify-content:center;">
-            <a class="btn primary" href="budget.html">Set Budgets</a>
+            <a class="btn" href="budget.html">Set Budgets</a>
           </div>
         </div>
       </div>
@@ -294,6 +317,9 @@
       </div>
       <div class="card-b">
         <div class="recent" id="recentPurchases"></div>
+        <div class="recent-toggle" id="recentToggleWrap" style="display:none;">
+          <button class="btn chev" id="recentToggleBtn" type="button">Show more ▼</button>
+        </div>
       </div>
     </div>
   </div>
@@ -348,7 +374,6 @@
     };
 
     function hashColor(str){
-      // deterministic fallback
       let h = 2166136261;
       for (let i=0;i<str.length;i++){
         h ^= str.charCodeAt(i);
@@ -357,7 +382,6 @@
       const hue = Math.abs(h) % 360;
       return `hsl(${hue} 70% 55%)`;
     }
-
     function getColor(name){
       const key = (name || "Unknown").trim();
       return FIXED_COLORS[key] || hashColor(key);
@@ -515,8 +539,6 @@
     function lookupFoodCategoryFromItemsDb(itemsDb, itemName){
       if (!itemsDb) return null;
 
-      // supports a few possible shapes
-      // 1) { map: { "oatly": "Dairy", ... } }
       if (itemsDb.map && typeof itemsDb.map === 'object'){
         const n = norm(itemName);
         for (const k of Object.keys(itemsDb.map)){
@@ -524,7 +546,6 @@
         }
       }
 
-      // 2) { items: [{ name, category }, ...] }
       if (Array.isArray(itemsDb.items)){
         const n = norm(itemName);
         for (const it of itemsDb.items){
@@ -537,10 +558,8 @@
       return null;
     }
 
-    // keyword rules (so Groceries receipts can be split even without item DB)
     function guessFoodCategory(itemName){
       const n = norm(itemName);
-
       const has = (...words) => words.some(w => n.includes(w));
 
       if (has('beef','steak','chicken','pork','turkey','lamb','salmon','tuna','shrimp','fish','meat','teres','teres major')) return 'Meat/Fish';
@@ -575,13 +594,11 @@
         .map(c => ({ ...c, color: getColor(c.name) }));
     }
 
-    // Groceries tab: break down *items* for receipts that are groceries-like
     async function aggregateGroceriesBreakdown(receipts){
       const itemsDb = await loadItemsDb();
 
       const groceryReceipts = receipts.filter(r => {
         const cat = (r.category||'').trim();
-        // include "Groceries" receipts + any explicit food subcategory receipts you already have
         return ['Groceries','Meat/Fish','Dairy','Produce','Snacks','Pantry','Bakery','Drinks','Grains'].includes(cat);
       });
 
@@ -590,7 +607,6 @@
       groceryReceipts.forEach(r=>{
         const cat = (r.category||'Other').trim();
 
-        // if receipt already *is* a food subcategory, keep it whole
         const directFood = ['Meat/Fish','Dairy','Produce','Snacks','Pantry','Bakery','Drinks','Grains'];
         if (directFood.includes(cat)){
           const prev = map.get(cat) || { name:cat, total:0, itemsCount:0 };
@@ -600,7 +616,6 @@
           return;
         }
 
-        // if it's "Groceries", split by items
         if (cat === 'Groceries' && Array.isArray(r.items) && r.items.length){
           r.items.forEach(it=>{
             const itemName = (it.name || it.item || it.title || it.description || '').trim();
@@ -618,7 +633,6 @@
           return;
         }
 
-        // if groceries receipt has no items array, we can't split it honestly—keep as Other
         const prev = map.get('Other') || { name:'Other', total:0, itemsCount:0 };
         prev.total += Number(r.total)||0;
         prev.itemsCount += sumReceiptItemsCount(r);
@@ -628,6 +642,24 @@
       return Array.from(map.values())
         .sort((a,b)=>b.total-a.total)
         .map(c => ({ ...c, color: getColor(c.name) }));
+    }
+
+    function monthKey(date){
+      const d = new Date(date.getFullYear(), date.getMonth(), 1);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    }
+
+    function getMonthRangeFromBase(now, offset){
+      const base = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+      const start = new Date(base.getFullYear(), base.getMonth(), 1, 0,0,0,0);
+      const end = new Date(base.getFullYear(), base.getMonth()+1, 0, 23,59,59,999);
+      return { start, end, labelDate: base };
+    }
+
+    function formatMonthLabel(d, now){
+      const sameYear = d.getFullYear() === now.getFullYear();
+      const m = d.toLocaleString('en-US', { month:'long' });
+      return sameYear ? m : `${m} ${d.getFullYear()}`;
     }
 
     async function main(){
@@ -641,28 +673,25 @@
         const r = await fetch('receiptsData.json', {cache:'no-store'});
         data = await r.json();
       }
-      const receipts = Array.isArray(data) ? data : (data.receipts || []);
+      const allReceipts = Array.isArray(data) ? data : (data.receipts || []);
       const now = new Date();
 
-      // stats
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59,999);
-      const weekStart = startOfWeekSunday(now);
-      const weekEnd = endOfWeekSaturday(now);
+      // ---- month selection state ----
+      let monthOffset = 0; // 0=current month, -1 previous, etc.
+      let tab = 'all';     // 'all' | 'groceries'
+      let selectedIndex = null;
+      let activeCategories = [];
 
-      const totalSpent = receipts.reduce((a,r)=>a+(Number(r.total)||0),0);
-      const monthSpent = receipts.filter(r => inRange(toDate(r.date), monthStart, monthEnd))
-        .reduce((a,r)=>a+(Number(r.total)||0),0);
-      const weekSpent = receipts.filter(r => inRange(toDate(r.date), weekStart, weekEnd))
-        .reduce((a,r)=>a+(Number(r.total)||0),0);
-      const avgPurchase = receipts.length ? (totalSpent / receipts.length) : 0;
+      const monthLabelEl = document.getElementById('monthLabel');
+      const monthPrevEl = document.getElementById('monthPrev');
+      const monthNextEl = document.getElementById('monthNext');
 
-      document.getElementById('statTotal').textContent = fmtMoney(totalSpent);
-      document.getElementById('statMonth').textContent = fmtMoney(monthSpent);
-      document.getElementById('statWeek').textContent = fmtMoney(weekSpent);
-      document.getElementById('statAvg').textContent = fmtMoney(avgPurchase);
+      const statMonthEl = document.getElementById('statMonth');
+      const statWeekEl = document.getElementById('statWeek');
 
-      // donut setup
+      const tabAllEl = document.getElementById('tabAll');
+      const tabGroEl = document.getElementById('tabGroceries');
+
       const canvas = document.getElementById('donutCanvas');
       const legend = document.getElementById('donutLegend');
       const ctx = canvas.getContext('2d');
@@ -676,27 +705,35 @@
       canvas.height = Math.round(cssH * dpr);
       ctx.setTransform(dpr,0,0,dpr,0,0);
 
-      let tab = 'all'; // 'all' | 'groceries'
-      let selectedIndex = null;
+      function getReceiptsForSelectedMonth(){
+        const { start, end } = getMonthRangeFromBase(now, monthOffset);
+        return allReceipts.filter(r => inRange(toDate(r.date), start, end));
+      }
 
-      const tabAllEl = document.getElementById('tabAll');
-      const tabGroEl = document.getElementById('tabGroceries');
+      function updateTopStats(){
+        const { start: mStart, end: mEnd, labelDate } = getMonthRangeFromBase(now, monthOffset);
+        monthLabelEl.textContent = formatMonthLabel(labelDate, now);
 
-      let activeCategories = aggregateByReceiptCategory(receipts);
+        const monthReceipts = allReceipts.filter(r => inRange(toDate(r.date), mStart, mEnd));
+        const monthSpent = monthReceipts.reduce((a,r)=>a+(Number(r.total)||0),0);
 
-      async function setTab(newTab){
-        tab = newTab;
-        selectedIndex = null;
+        const weekStart = startOfWeekSunday(now);
+        const weekEnd = endOfWeekSaturday(now);
+        const weekSpent = allReceipts
+          .filter(r => inRange(toDate(r.date), weekStart, weekEnd))
+          .reduce((a,r)=>a+(Number(r.total)||0),0);
 
-        tabAllEl.classList.toggle('active', tab === 'all');
-        tabGroEl.classList.toggle('active', tab === 'groceries');
+        statMonthEl.textContent = fmtMoney(monthSpent);
+        statWeekEl.textContent = fmtMoney(weekSpent);
+      }
 
+      async function computeCategories(){
+        const monthReceipts = getReceiptsForSelectedMonth();
         if (tab === 'groceries'){
-          activeCategories = await aggregateGroceriesBreakdown(receipts);
+          activeCategories = await aggregateGroceriesBreakdown(monthReceipts);
         } else {
-          activeCategories = aggregateByReceiptCategory(receipts);
+          activeCategories = aggregateByReceiptCategory(monthReceipts);
         }
-        redraw();
       }
 
       function redraw(){
@@ -705,6 +742,22 @@
           selectedIndex = (selectedIndex === idx) ? null : idx;
           redraw();
         });
+      }
+
+      async function refreshAll(){
+        updateTopStats();
+        selectedIndex = null;
+        await computeCategories();
+        redraw();
+      }
+
+      async function setTab(newTab){
+        tab = newTab;
+        selectedIndex = null;
+        tabAllEl.classList.toggle('active', tab === 'all');
+        tabGroEl.classList.toggle('active', tab === 'groceries');
+        await computeCategories();
+        redraw();
       }
 
       tabAllEl.addEventListener('click', ()=>setTab('all'));
@@ -725,26 +778,41 @@
         redraw();
       });
 
-      redraw();
+      monthPrevEl.addEventListener('click', async ()=>{
+        monthOffset -= 1;
+        await refreshAll();
+      });
+      monthNextEl.addEventListener('click', async ()=>{
+        monthOffset += 1;
+        await refreshAll();
+      });
 
-      // recent purchases (last 2 weeks)
+      // ---- recent purchases: show 3 by default with expand ----
       const recentWrap = document.getElementById('recentPurchases');
-      const twoWeeksAgo = new Date(now);
-      twoWeeksAgo.setDate(now.getDate() - 14);
+      const recentToggleWrap = document.getElementById('recentToggleWrap');
+      const recentToggleBtn = document.getElementById('recentToggleBtn');
+      let recentExpanded = false;
 
-      const recent = receipts
-        .filter(r => toDate(r.date) >= twoWeeksAgo)
-        .sort((a,b)=> toDate(b.date) - toDate(a.date))
-        .slice(0, 12);
+      function renderRecent(){
+        const sorted = [...allReceipts]
+          .sort((a,b)=> toDate(b.date) - toDate(a.date));
 
-      recentWrap.innerHTML = '';
-      if (!recent.length){
-        const empty = document.createElement('div');
-        empty.className = 'empty';
-        empty.textContent = 'No purchases in the last 2 weeks.';
-        recentWrap.appendChild(empty);
-      } else {
-        recent.forEach(r=>{
+        const maxCollapsed = 3;
+        const maxExpanded = 12;
+
+        const toShow = recentExpanded ? sorted.slice(0, maxExpanded) : sorted.slice(0, maxCollapsed);
+
+        recentWrap.innerHTML = '';
+        if (!toShow.length){
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.textContent = 'No purchases yet.';
+          recentWrap.appendChild(empty);
+          recentToggleWrap.style.display = 'none';
+          return;
+        }
+
+        toShow.forEach(r=>{
           const row = document.createElement('div');
           row.className = 'recent-item';
 
@@ -780,7 +848,24 @@
 
           recentWrap.appendChild(row);
         });
+
+        // show toggle only if there are more than 3 receipts total
+        if (sorted.length > maxCollapsed){
+          recentToggleWrap.style.display = 'flex';
+          recentToggleBtn.textContent = recentExpanded ? 'Show less ▲' : 'Show more ▼';
+        } else {
+          recentToggleWrap.style.display = 'none';
+        }
       }
+
+      recentToggleBtn.addEventListener('click', ()=>{
+        recentExpanded = !recentExpanded;
+        renderRecent();
+      });
+
+      // initial paint
+      await refreshAll();
+      renderRecent();
     }
 
     main().catch(console.error);
