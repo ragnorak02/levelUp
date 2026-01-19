@@ -111,11 +111,7 @@
     }
 
     /* Search Bar */
-    .search-bar {
-      position: relative;
-      margin-bottom: 20px;
-    }
-
+    .search-bar { position: relative; margin-bottom: 20px; }
     .search-input {
       width: 100%;
       padding: 12px 40px 12px 16px;
@@ -125,12 +121,7 @@
       color: var(--ink);
       font-size: 1rem;
     }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
+    .search-input:focus { outline: none; border-color: var(--accent); }
     .search-icon {
       position: absolute;
       right: 12px;
@@ -141,12 +132,7 @@
     }
 
     /* Category Filters */
-    .category-filters {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
+    .category-filters { display: flex; gap: 8px; flex-wrap: wrap; }
     .filter-btn {
       all: unset;
       cursor: pointer;
@@ -162,27 +148,14 @@
       align-items: center;
       gap: 6px;
     }
-
-    .filter-btn:hover {
-      background: var(--hover-bg);
-      border-color: var(--accent);
-    }
-
+    .filter-btn:hover { background: var(--hover-bg); border-color: var(--accent); }
     .filter-btn.active {
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: #04130a;
       border-color: var(--accent);
     }
-
-    .filter-btn:not(.active) {
-      opacity: 0.5;
-    }
-
-    .filter-btn-small {
-      padding: .4rem .7rem;
-      font-size: .85rem;
-      border: 1px solid var(--ring);
-    }
+    .filter-btn:not(.active) { opacity: 0.5; }
+    .filter-btn-small { padding: .4rem .7rem; font-size: .85rem; border: 1px solid var(--ring); }
 
     /* Stats Grid */
     .stats-grid {
@@ -191,7 +164,6 @@
       gap: 12px;
       margin-bottom: 20px;
     }
-
     .stat-card {
       background: var(--card-bg);
       border: 1px solid var(--ring);
@@ -199,26 +171,19 @@
       padding: 16px;
       text-align: center;
     }
-
     .stat-value {
       font-size: 1.8rem;
       font-weight: 700;
       color: var(--accent);
       margin-bottom: 4px;
     }
-
     .stat-label {
       font-size: .85rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: .5px;
     }
-
-    .stat-trend {
-      font-size: .8rem;
-      margin-top: 4px;
-    }
-
+    .stat-trend { font-size: .8rem; margin-top: 4px; }
     .trend-up { color: var(--danger); }
     .trend-down { color: var(--accent); }
 
@@ -227,20 +192,24 @@
       position: relative;
       height: 300px;
       margin: 20px 0;
+      display: grid;
+      place-items: center;
     }
+    canvas { max-width: 100%; max-height: 100%; }
 
-    canvas {
-      max-width: 100%;
-      max-height: 100%;
+    /* Click hint */
+    .chart-hint {
+      position: absolute;
+      bottom: 8px;
+      left: 10px;
+      font-size: .8rem;
+      color: var(--muted);
+      opacity: 0.9;
+      pointer-events: none;
     }
 
     /* Category List */
-    .category-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
+    .category-list { display: flex; flex-direction: column; gap: 12px; }
     .category-item {
       background: var(--card-bg);
       border: 1px solid var(--ring);
@@ -252,59 +221,28 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+    .category-item:hover { background: var(--hover-bg); border-color: var(--accent); }
+    .category-info { display: flex; align-items: center; gap: 12px; }
+    .category-icon { font-size: 1.5rem; }
+    .category-name { font-weight: 600; color: var(--ink); }
+    .category-count { font-size: .85rem; color: var(--muted); }
+    .category-amount { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
 
-    .category-item:hover {
-      background: var(--hover-bg);
-      border-color: var(--accent);
-    }
-
-    .category-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .category-icon {
-      font-size: 1.5rem;
-    }
-
-    .category-name {
-      font-weight: 600;
-      color: var(--ink);
-    }
-
-    .category-count {
-      font-size: .85rem;
-      color: var(--muted);
-    }
-
-    .category-amount {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--accent);
+    /* NEW: color swatch indicator */
+    .color-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.25);
+      flex: 0 0 auto;
     }
 
     /* Budget Progress */
-    .budget-item {
-      margin-bottom: 16px;
-    }
-
-    .budget-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .budget-name {
-      font-weight: 600;
-      color: var(--ink);
-    }
-
-    .budget-amounts {
-      font-size: .9rem;
-      color: var(--muted);
-    }
-
+    .budget-item { margin-bottom: 16px; }
+    .budget-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .budget-name { font-weight: 600; color: var(--ink); }
+    .budget-amounts { font-size: .9rem; color: var(--muted); }
     .budget-bar {
       width: 100%;
       height: 12px;
@@ -312,26 +250,16 @@
       border-radius: 6px;
       overflow: hidden;
     }
-
     .budget-progress {
       height: 100%;
       background: linear-gradient(90deg, var(--accent), var(--accent-2));
       border-radius: 6px;
       transition: width 0.3s ease;
     }
-
-    .budget-progress.over-budget {
-      background: linear-gradient(90deg, var(--danger), #dc2626);
-    }
+    .budget-progress.over-budget { background: linear-gradient(90deg, var(--danger), #dc2626); }
 
     /* Action Buttons */
-    .action-buttons {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-
+    .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
     .btn {
       all: unset;
       cursor: pointer;
@@ -344,22 +272,17 @@
       text-decoration: none;
       display: inline-block;
     }
-
     .btn-primary {
       background: linear-gradient(90deg, var(--accent), #22c55e);
       color: #04130a;
       box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
     }
-
     .btn-secondary {
       background: var(--card-bg);
       border: 1px solid var(--ring);
       color: var(--muted);
     }
-
-    .btn:hover {
-      transform: translateY(-2px);
-    }
+    .btn:hover { transform: translateY(-2px); }
 
     /* Grid Layout */
     .grid-2col {
@@ -369,12 +292,7 @@
     }
 
     /* Recent Items */
-    .recent-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
+    .recent-list { display: flex; flex-direction: column; gap: 8px; }
     .recent-item {
       background: var(--card-bg);
       border: 1px solid var(--ring);
@@ -385,64 +303,109 @@
       align-items: center;
       font-size: .9rem;
     }
-
-    .recent-date {
-      color: var(--muted);
-      font-size: .8rem;
-    }
-
-    .recent-store {
-      color: var(--accent-2);
-      font-weight: 600;
-    }
-
-    .recent-amount {
-      font-weight: 700;
-      color: var(--ink);
-    }
+    .recent-date { color: var(--muted); font-size: .8rem; }
+    .recent-store { color: var(--accent-2); font-weight: 600; }
+    .recent-amount { font-weight: 700; color: var(--ink); }
 
     /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--muted);
-    }
-
-    .empty-icon {
-      font-size: 3rem;
-      margin-bottom: 12px;
-      opacity: 0.5;
-    }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+    .empty-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
 
     /* Responsive */
     @media (max-width: 768px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .grid-2col {
-        grid-template-columns: 1fr;
-      }
-
-      .nav-pills {
-        width: 100%;
-        justify-content: center;
-      }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .grid-2col { grid-template-columns: 1fr; }
+      .nav-pills { width: 100%; justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .wrap { padding: 12px; gap: 12px; }
+      .card { padding: 12px; }
+      .stat-value { font-size: 1.4rem; }
     }
 
-    @media (max-width: 480px) {
-      .wrap {
-        padding: 12px;
-        gap: 12px;
-      }
+    /* ===== Fullscreen donut modal ===== */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 16px;
+    }
+    .modal.open { display: flex; }
 
-      .card {
-        padding: 12px;
-      }
+    .modal-panel {
+      width: min(920px, 100%);
+      height: min(920px, 92vh);
+      background: var(--panel);
+      border: 1px solid var(--ring);
+      border-radius: 16px;
+      box-shadow: 0 14px 60px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
 
-      .stat-value {
-        font-size: 1.4rem;
-      }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 12px;
+      border-bottom: 1px solid var(--ring);
+      background: rgba(0,0,0,0.12);
+      gap: 12px;
+    }
+
+    .modal-title {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-actions { display: flex; gap: 8px; align-items: center; }
+
+    .modal-btn {
+      all: unset;
+      cursor: pointer;
+      border: 1px solid var(--ring);
+      background: var(--card-bg);
+      color: var(--muted);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: transform 0.15s, background 0.15s, border-color 0.15s;
+    }
+    .modal-btn:hover { transform: translateY(-1px); border-color: var(--accent); }
+
+    .modal-body {
+      display: grid;
+      place-items: center;
+      padding: 10px;
+    }
+
+    #categoryChartFull {
+      width: 100%;
+      height: 100%;
+      max-width: 860px;
+      max-height: 860px;
+      touch-action: manipulation;
+    }
+
+    .modal-hint {
+      position: absolute;
+      left: 14px;
+      bottom: 10px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      opacity: 0.85;
+      pointer-events: none;
     }
   </style>
   <script src="dataLoader.js"></script>
@@ -473,9 +436,7 @@
         <h3 style="margin: 0;">📊 Category Filters</h3>
         <button class="filter-btn filter-btn-small" id="toggleAll" onclick="toggleAllFilters()">Toggle All</button>
       </div>
-      <div class="category-filters" id="categoryFilters">
-        <!-- Dynamic filter buttons -->
-      </div>
+      <div class="category-filters" id="categoryFilters"></div>
       <div style="margin-top: 12px; font-size: .85rem; color: var(--muted);">
         💡 Toggle categories OFF to exclude from spending calculations
       </div>
@@ -518,8 +479,9 @@
       <!-- Spending by Category -->
       <div class="card">
         <h3>📊 Spending by Category</h3>
-        <div class="chart-container">
+        <div class="chart-container" id="categoryChartContainer" role="button" tabindex="0" aria-label="Open full screen chart">
           <canvas id="categoryChart"></canvas>
+          <div class="chart-hint">Tap the chart to expand</div>
         </div>
         <div class="category-list" id="categoryList">
           <div class="empty-state">
@@ -554,6 +516,23 @@
     </div>
   </main>
 
+  <!-- Fullscreen Donut Modal -->
+  <div class="modal" id="donutModal" aria-hidden="true">
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-label="Spending by category chart">
+      <div class="modal-header">
+        <div class="modal-title">🧾 Spending by Category (tap a slice to highlight)</div>
+        <div class="modal-actions">
+          <button class="modal-btn" id="modalResetBtn" type="button">Reset</button>
+          <button class="modal-btn" id="modalCloseBtn" type="button">Close</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <canvas id="categoryChartFull"></canvas>
+      </div>
+      <div class="modal-hint">Tip: Tap a slice to “pop” it. Tap outside to close.</div>
+    </div>
+  </div>
+
   <script>
     // LocalStorage Keys
     const STORAGE_KEYS = {
@@ -567,7 +546,6 @@
     // Major Expense Categories
     const MAJOR_CATEGORIES = [
       { name: 'Groceries', icon: '🛒', color: '#4CAF50' },
-      { name: 'Cafe', icon: '☕️', color: '#22C55E' },
       { name: 'Restaurants', icon: '🍽️', color: '#FF9800' },
       { name: 'Medical', icon: '💊', color: '#EF4444' },
       { name: 'Home', icon: '🏠', color: '#3B82F6' },
@@ -577,31 +555,33 @@
       { name: 'Other', icon: '📦', color: '#6B7280' }
     ];
 
+    // ===== Donut state (used for fullscreen interactions) =====
+    const DONUT_COLORS = [
+      '#4CAF50', '#2dd4bf', '#f59e0b', '#ef4444',
+      '#8b5cf6', '#3b82f6', '#ec4899', '#14b8a6',
+      '#a3e635', '#fb7185', '#f97316', '#60a5fa'
+    ];
+    let lastCategoryOrder = [];      // [{name, total, count, color}]
+    let lastDonutTotal = 0;
+    let selectedSliceIndex = -1;
+
     // Get Active Filters from Storage
     function getActiveFilters() {
       try {
         const filters = localStorage.getItem(STORAGE_KEYS.FILTERS);
-        if (filters) {
-          return JSON.parse(filters);
-        }
+        if (filters) return JSON.parse(filters);
       } catch (e) {
         console.error('Error loading filters:', e);
       }
-      
-      // Default: all categories active
       const defaultFilters = {};
-      MAJOR_CATEGORIES.forEach(cat => {
-        defaultFilters[cat.name] = true;
-      });
+      MAJOR_CATEGORIES.forEach(cat => defaultFilters[cat.name] = true);
       return defaultFilters;
     }
 
-    // Save Active Filters
     function saveActiveFilters(filters) {
       localStorage.setItem(STORAGE_KEYS.FILTERS, JSON.stringify(filters));
     }
 
-    // Initialize Category Filters
     function initializeCategoryFilters() {
       const filters = getActiveFilters();
       const container = document.getElementById('categoryFilters');
@@ -617,104 +597,74 @@
           filters[cat.name] = !filters[cat.name];
           btn.classList.toggle('active');
           saveActiveFilters(filters);
-          loadDashboard(); // Refresh dashboard with new filters
+          loadDashboard();
         });
         
         container.appendChild(btn);
       });
     }
 
-    // Toggle All Filters
     function toggleAllFilters() {
       const filters = getActiveFilters();
       const allActive = Object.values(filters).every(v => v);
-      
-      MAJOR_CATEGORIES.forEach(cat => {
-        filters[cat.name] = !allActive;
-      });
-      
+      MAJOR_CATEGORIES.forEach(cat => filters[cat.name] = !allActive);
       saveActiveFilters(filters);
       initializeCategoryFilters();
       loadDashboard();
     }
 
-    // Filter Receipts by Active Categories
     function filterReceiptsByCategory(receipts) {
       const activeFilters = getActiveFilters();
-      
       return receipts.map(receipt => {
         const filteredItems = receipt.items.filter(item => {
           const category = item.category || 'Other';
           return activeFilters[category] !== false;
         });
-        
         return {
           ...receipt,
           items: filteredItems,
           total: filteredItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
         };
-      }).filter(receipt => receipt.items.length > 0); // Remove receipts with no items after filtering
+      }).filter(receipt => receipt.items.length > 0);
     }
 
-    // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       initializeCategoryFilters();
       loadDashboard();
       setupSearch();
+      setupDonutModal();
     });
 
-    // Load Dashboard Data
     function loadDashboard() {
       const receipts = getReceipts();
-      
-      if (receipts.length === 0) {
-        showEmptyState();
-        return;
-      }
+      if (receipts.length === 0) { showEmptyState(); return; }
 
-      // Apply category filters
       const filteredReceipts = filterReceiptsByCategory(receipts);
-
       updateStats(filteredReceipts);
       renderCategoryBreakdown(filteredReceipts);
       renderBudgets(filteredReceipts);
       renderRecentPurchases(filteredReceipts);
     }
 
-    // Get Receipts from Storage
     function getReceipts() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.RECEIPTS) || '[]');
-      } catch (e) {
-        console.error('Error loading receipts:', e);
-        return [];
-      }
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.RECEIPTS) || '[]'); }
+      catch (e) { console.error('Error loading receipts:', e); return []; }
     }
 
-    // Update Stats
     function updateStats(receipts) {
       const now = new Date();
       const thisMonth = now.getMonth();
       const thisYear = now.getFullYear();
       const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
 
-      let totalSpent = 0;
-      let monthSpent = 0;
-      let weekSpent = 0;
+      let totalSpent = 0, monthSpent = 0, weekSpent = 0;
 
       receipts.forEach(receipt => {
         const date = new Date(receipt.date);
         const amount = parseFloat(receipt.total) || 0;
-        
         totalSpent += amount;
-        
-        if (date.getMonth() === thisMonth && date.getFullYear() === thisYear) {
-          monthSpent += amount;
-        }
-        
-        if (date >= weekAgo) {
-          weekSpent += amount;
-        }
+        if (date.getMonth() === thisMonth && date.getFullYear() === thisYear) monthSpent += amount;
+        if (date >= weekAgo) weekSpent += amount;
       });
 
       const avgPurchase = receipts.length > 0 ? totalSpent / receipts.length : 0;
@@ -725,19 +675,13 @@
       document.getElementById('avgPurchase').textContent = '$' + avgPurchase.toFixed(2);
     }
 
-    // Render Category Breakdown
     function renderCategoryBreakdown(receipts) {
       const categories = {};
-      
       receipts.forEach(receipt => {
         receipt.items.forEach(item => {
           const category = item.category || 'Other';
           const price = parseFloat(item.price) || 0;
-          
-          if (!categories[category]) {
-            categories[category] = { total: 0, count: 0 };
-          }
-          
+          if (!categories[category]) categories[category] = { total: 0, count: 0 };
           categories[category].total += price;
           categories[category].count++;
         });
@@ -752,116 +696,256 @@
         'Dairy': '🥛',
         'Meat': '🥩',
         'Meat/Fish': '🥩',
-        'Grains': '🌾',
         'Snacks': '🍪',
         'Drinks': '🥤',
-        'Cafe': '☕️',
         'Household': '🧹',
         'Kids': '👶',
         'Health': '💊',
+        'Cafe': '☕',
         'Other': '📦'
       };
 
-      Object.entries(categories)
+      // Stable order for color mapping: sort by spend desc
+      const ordered = Object.entries(categories)
         .sort((a, b) => b[1].total - a[1].total)
-        .forEach(([name, data]) => {
-          const item = document.createElement('div');
-          item.className = 'category-item';
-          item.onclick = () => filterByCategory(name);
-          
-          item.innerHTML = `
-            <div class="category-info">
-              <span class="category-icon">${categoryIcons[name] || '📦'}</span>
-              <div>
-                <div class="category-name">${name}</div>
-                <div class="category-count">${data.count} items</div>
-              </div>
-            </div>
-            <div class="category-amount">$${data.total.toFixed(2)}</div>
-          `;
-          
-          categoryList.appendChild(item);
-        });
+        .map(([name, data], idx) => ({
+          name,
+          total: data.total,
+          count: data.count,
+          color: DONUT_COLORS[idx % DONUT_COLORS.length]
+        }));
 
-      drawDonutChart(categories);
+      // Save for fullscreen + swatches
+      lastCategoryOrder = ordered;
+      lastDonutTotal = ordered.reduce((s, c) => s + c.total, 0);
+      selectedSliceIndex = -1;
+
+      ordered.forEach((cat) => {
+        const item = document.createElement('div');
+        item.className = 'category-item';
+        item.onclick = () => filterByCategory(cat.name);
+        
+        item.innerHTML = `
+          <div class="category-info">
+            <span class="color-swatch" style="background:${cat.color}"></span>
+            <span class="category-icon">${categoryIcons[cat.name] || '📦'}</span>
+            <div>
+              <div class="category-name">${cat.name}</div>
+              <div class="category-count">${cat.count} items</div>
+            </div>
+          </div>
+          <div class="category-amount">$${cat.total.toFixed(2)}</div>
+        `;
+        categoryList.appendChild(item);
+      });
+
+      drawDonutChartSmall();
     }
 
-    // Draw Donut Chart
-    function drawDonutChart(categories) {
+    function drawDonutChartSmall() {
       const canvas = document.getElementById('categoryChart');
       const ctx = canvas.getContext('2d');
-      
-      // Set canvas size
+
       const size = Math.min(canvas.parentElement.clientWidth, 300);
       canvas.width = size;
       canvas.height = size;
-      
-      const centerX = size / 2;
-      const centerY = size / 2;
-      const radius = size / 3;
-      const innerRadius = radius * 0.6;
-      
-      // Clear canvas
-      ctx.clearRect(0, 0, size, size);
-      
-      // Calculate total
-      const total = Object.values(categories).reduce((sum, cat) => sum + cat.total, 0);
-      
-      if (total === 0) return;
-      
-      // Colors
-      const colors = [
-        '#4CAF50', '#2dd4bf', '#f59e0b', '#ef4444', 
-        '#8b5cf6', '#3b82f6', '#ec4899', '#14b8a6'
-      ];
-      
-      // Draw segments
+
+      drawDonut(ctx, size, size, {
+        showLabels: false,
+        selectedIndex: -1
+      });
+    }
+
+    function drawDonut(ctx, width, height, opts) {
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radius = Math.min(width, height) * 0.36;
+      const innerRadius = radius * 0.62;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const total = lastDonutTotal;
+      if (!total || total <= 0 || lastCategoryOrder.length === 0) return;
+
       let currentAngle = -Math.PI / 2;
-      
-      Object.values(categories).forEach((cat, i) => {
+
+      // Draw slices
+      lastCategoryOrder.forEach((cat, i) => {
         const sliceAngle = (cat.total / total) * 2 * Math.PI;
-        
+        const isSelected = (opts.selectedIndex === i);
+
+        const outerR = isSelected ? radius * 1.08 : radius;
+
         ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+        ctx.arc(centerX, centerY, outerR, currentAngle, currentAngle + sliceAngle);
         ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
         ctx.closePath();
-        
-        ctx.fillStyle = colors[i % colors.length];
+
+        ctx.fillStyle = cat.color;
         ctx.fill();
-        
+
+        // subtle separator
+        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Optional labels (fullscreen)
+        if (opts.showLabels) {
+          const mid = currentAngle + sliceAngle / 2;
+          const labelR = (innerRadius + outerR) / 2;
+          const lx = centerX + Math.cos(mid) * labelR;
+          const ly = centerY + Math.sin(mid) * labelR;
+
+          // draw name + value only if slice is big enough (avoid clutter)
+          const pct = (cat.total / total) * 100;
+          if (pct >= 4.0) {
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // text shadow for readability
+            ctx.shadowColor = 'rgba(0,0,0,0.65)';
+            ctx.shadowBlur = 6;
+
+            ctx.fillStyle = '#e8eef6';
+            ctx.font = '700 16px system-ui';
+            ctx.fillText(cat.name, lx, ly - 10);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 16px system-ui';
+            ctx.fillText(`$${cat.total.toFixed(2)}`, lx, ly + 12);
+
+            ctx.restore();
+          }
+        }
+
         currentAngle += sliceAngle;
       });
-      
-      // Draw center text
+
+      // Center text
       ctx.fillStyle = '#e8eef6';
-      ctx.font = 'bold 20px system-ui';
+      ctx.font = '800 26px system-ui';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('$' + total.toFixed(0), centerX, centerY);
-      
+
       ctx.font = '12px system-ui';
       ctx.fillStyle = '#9fb0c7';
-      ctx.fillText('Total', centerX, centerY + 20);
+      ctx.fillText('Total', centerX, centerY + 22);
+    }
+
+    // ===== Fullscreen modal logic =====
+    function setupDonutModal() {
+      const container = document.getElementById('categoryChartContainer');
+      const modal = document.getElementById('donutModal');
+      const closeBtn = document.getElementById('modalCloseBtn');
+      const resetBtn = document.getElementById('modalResetBtn');
+      const fullCanvas = document.getElementById('categoryChartFull');
+
+      // open on click/tap
+      container.addEventListener('click', openModal);
+      container.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') openModal();
+      });
+
+      // close on outside click
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      closeBtn.addEventListener('click', closeModal);
+      resetBtn.addEventListener('click', () => {
+        selectedSliceIndex = -1;
+        drawFull();
+      });
+
+      // slice selection
+      fullCanvas.addEventListener('click', (e) => {
+        if (!lastDonutTotal || lastCategoryOrder.length === 0) return;
+
+        const rect = fullCanvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left);
+        const y = (e.clientY - rect.top);
+
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+
+        const dx = x - cx;
+        const dy = y - cy;
+
+        const dist = Math.sqrt(dx*dx + dy*dy);
+
+        const radius = Math.min(rect.width, rect.height) * 0.36;
+        const innerRadius = radius * 0.62;
+
+        // only respond if clicked on ring (not center hole / outside)
+        if (dist < innerRadius || dist > radius * 1.12) return;
+
+        let angle = Math.atan2(dy, dx); // -PI..PI
+        // align to our start (-PI/2)
+        if (angle < -Math.PI/2) angle += 2*Math.PI;
+        const normalized = angle + Math.PI/2; // 0..2PI-ish
+
+        // find slice
+        let acc = 0;
+        let found = -1;
+        for (let i = 0; i < lastCategoryOrder.length; i++) {
+          const slice = (lastCategoryOrder[i].total / lastDonutTotal) * 2*Math.PI;
+          if (normalized >= acc && normalized < acc + slice) { found = i; break; }
+          acc += slice;
+        }
+
+        if (found === -1) return;
+        selectedSliceIndex = (selectedSliceIndex === found) ? -1 : found;
+        drawFull();
+      });
+
+      window.addEventListener('resize', () => {
+        if (modal.classList.contains('open')) drawFull();
+      });
+
+      function openModal() {
+        if (!lastDonutTotal || lastCategoryOrder.length === 0) return;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        drawFull();
+      }
+
+      function closeModal() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      function drawFull() {
+        const ctx = fullCanvas.getContext('2d');
+
+        // Make canvas match rendered size (with DPR)
+        const rect = fullCanvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        fullCanvas.width = Math.floor(rect.width * dpr);
+        fullCanvas.height = Math.floor(rect.height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        drawDonut(ctx, rect.width, rect.height, {
+          showLabels: true,
+          selectedIndex: selectedSliceIndex
+        });
+      }
     }
 
     // Render Budgets
     function renderBudgets(receipts) {
       const budgets = getBudgets();
       const budgetList = document.getElementById('budgetList');
-      
-      if (budgets.length === 0) {
-        return; // Keep empty state
-      }
-      
+      if (budgets.length === 0) return;
+
       budgetList.innerHTML = '';
-      
-      // Calculate spending by category for current month
+
       const now = new Date();
       const thisMonth = now.getMonth();
       const thisYear = now.getFullYear();
-      
+
       const spending = {};
-      
       receipts.forEach(receipt => {
         const date = new Date(receipt.date);
         if (date.getMonth() === thisMonth && date.getFullYear() === thisYear) {
@@ -871,15 +955,14 @@
           });
         }
       });
-      
+
       budgets.forEach(budget => {
         const spent = spending[budget.category] || 0;
         const percent = (spent / budget.amount) * 100;
         const isOver = spent > budget.amount;
-        
+
         const item = document.createElement('div');
         item.className = 'budget-item';
-        
         item.innerHTML = `
           <div class="budget-header">
             <span class="budget-name">${budget.category}</span>
@@ -889,35 +972,33 @@
             <div class="budget-progress ${isOver ? 'over-budget' : ''}" style="width: ${Math.min(percent, 100)}%"></div>
           </div>
         `;
-        
         budgetList.appendChild(item);
       });
     }
 
-    // Get Budgets
     function getBudgets() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.BUDGETS) || '[]');
-      } catch (e) {
-        return [];
-      }
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.BUDGETS) || '[]'); }
+      catch (e) { return []; }
     }
 
     // Render Recent Purchases
     function renderRecentPurchases(receipts) {
       const recentList = document.getElementById('recentList');
       recentList.innerHTML = '';
-      
-      const sorted = receipts.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
-      
+
+      const sorted = receipts
+        .slice()
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 10);
+
       sorted.forEach(receipt => {
         const item = document.createElement('div');
         item.className = 'recent-item';
         item.onclick = () => viewReceipt(receipt.id);
-        
+
         const date = new Date(receipt.date);
         const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        
+
         item.innerHTML = `
           <div>
             <div class="recent-store">${receipt.store || 'Store'}</div>
@@ -925,7 +1006,6 @@
           </div>
           <div class="recent-amount">$${parseFloat(receipt.total || 0).toFixed(2)}</div>
         `;
-        
         recentList.appendChild(item);
       });
     }
@@ -933,13 +1013,12 @@
     // Setup Search
     function setupSearch() {
       const searchInput = document.getElementById('searchInput');
+
       searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
-        if (query.length > 2) {
-          performSearch(query);
-        }
+        if (query.length > 2) performSearch(query);
       });
-      
+
       searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
           const query = e.target.value;
@@ -948,25 +1027,18 @@
       });
     }
 
-    // Perform Search (quick results)
     function performSearch(query) {
-      // Navigate to search page with query
-      if (query.length > 0) {
-        location.href = `search.html?q=${encodeURIComponent(query)}`;
-      }
+      if (query.length > 0) location.href = `search.html?q=${encodeURIComponent(query)}`;
     }
 
-    // View Receipt
     function viewReceipt(id) {
       location.href = `receipts.html?id=${id}`;
     }
 
-    // Filter by Category
     function filterByCategory(category) {
       location.href = `receipts.html?category=${encodeURIComponent(category)}`;
     }
 
-    // Show Empty State
     function showEmptyState() {
       // Empty states are already in HTML
     }
