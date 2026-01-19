@@ -24,7 +24,7 @@
     }
     a{color:inherit; text-decoration:none}
 
-    /* ---- top nav: single line, minimal height ---- */
+    /* ---- top nav: single line ---- */
     .topbar{
       position:sticky; top:0; z-index:20;
       background: linear-gradient(180deg, rgba(11,15,20,.92), rgba(11,15,20,.72));
@@ -38,7 +38,7 @@
     }
     .brand{
       display:flex; align-items:center; gap:8px;
-      font-weight:900; letter-spacing:.2px;
+      font-weight:900;
       padding:8px 10px;
       border-radius:999px;
       border:1px solid rgba(42,53,67,.75);
@@ -85,20 +85,6 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
-    .card-h{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:14px 16px;
-      border-bottom:1px solid rgba(42,53,67,.55);
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    .card-h h3{
-      margin:0; font-size:14px; color:var(--muted);
-      display:flex; align-items:center; gap:8px;
-      letter-spacing:.2px;
-    }
-    .card-b{padding:14px 16px}
-
     .stats{
       display:grid; gap:12px; grid-template-columns: repeat(2, 1fr);
       padding:12px;
@@ -119,10 +105,25 @@
     .grid{
       display:grid; gap:14px;
       grid-template-columns: 1fr;
+      margin-top:14px;
     }
     @media(min-width:860px){
       .grid{grid-template-columns: 1.35fr .85fr}
     }
+
+    .card-h{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px;
+      border-bottom:1px solid rgba(42,53,67,.55);
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .card-h h3{
+      margin:0; font-size:14px; color:var(--muted);
+      display:flex; align-items:center; gap:8px;
+      letter-spacing:.2px;
+    }
+    .card-b{padding:14px 16px}
 
     .actions{display:flex; gap:10px; flex-wrap:wrap}
     .btn{
@@ -145,15 +146,9 @@
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       flex-wrap:wrap;
     }
-    .donut-sub{
-      color:var(--muted); font-size:12px; font-weight:800;
-    }
+    .donut-sub{color:var(--muted); font-size:12px; font-weight:800;}
 
-    /* donut tabs */
-    .tabs{
-      display:flex; gap:8px; flex-wrap:wrap;
-      align-items:center;
-    }
+    .tabs{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
     .tab{
       padding:8px 12px;
       border-radius:999px;
@@ -172,10 +167,7 @@
 
     canvas{max-width:100%; width:100%}
 
-    .legend{
-      margin-top:12px;
-      display:flex; flex-direction:column; gap:8px;
-    }
+    .legend{margin-top:12px; display:flex; flex-direction:column; gap:8px;}
     .legend-row{
       display:flex; align-items:center; justify-content:space-between;
       padding:10px 12px;
@@ -209,9 +201,7 @@
       text-align:center;
     }
 
-    .recent{
-      display:flex; flex-direction:column; gap:10px;
-    }
+    .recent{display:flex; flex-direction:column; gap:10px;}
     .recent-item{
       display:flex; align-items:center; justify-content:space-between;
       padding:12px 12px;
@@ -242,7 +232,6 @@
   </div>
 
   <div class="wrap">
-
     <div class="card" style="margin-top:12px;">
       <div class="stats">
         <div class="stat"><div class="v" id="statTotal">$0.00</div><div class="k">Total Spent</div></div>
@@ -252,7 +241,7 @@
       </div>
     </div>
 
-    <div class="grid" style="margin-top:14px;">
+    <div class="grid">
       <div class="card">
         <div class="card-h">
           <h3>📊 Spending by Category</h3>
@@ -273,14 +262,13 @@
                 <div class="tab" id="tabGroceries">Groceries</div>
               </div>
             </div>
-
             <div class="actions" style="gap:8px;">
               <button class="btn" id="donutResetBtn" type="button">Reset</button>
             </div>
           </div>
 
           <div style="margin-top:12px;">
-            <canvas id="donutCanvas" width="620" height="360" aria-label="Spending Donut Chart"></canvas>
+            <canvas id="donutCanvas" width="620" height="360"></canvas>
           </div>
 
           <div class="legend" id="donutLegend"></div>
@@ -308,12 +296,10 @@
         <div class="recent" id="recentPurchases"></div>
       </div>
     </div>
-
   </div>
 
   <script src="dataLoader.js"></script>
   <script>
-    // ---------- helpers ----------
     const fmtMoney = (n) => `$${(Number(n)||0).toFixed(2)}`;
     const toDate = (d) => (d instanceof Date ? d : new Date(d));
 
@@ -336,13 +322,50 @@
       return t >= start.getTime() && t <= end.getTime();
     }
 
-    // stable palette
-    const palette = ['#4CAF50','#22c55e','#2dd4bf','#60a5fa','#a78bfa','#f59e0b','#fb7185','#f97316','#14b8a6','#94a3b8','#f472b6'];
+    // ---- stable color mapping by category NAME ----
+    const FIXED_COLORS = {
+      // top-level
+      "Groceries":"#4CAF50",
+      "Cafe":"#f59e0b",
+      "Restaurants":"#fb7185",
+      "Home":"#60a5fa",
+      "Rental Property":"#a78bfa",
+      "Transportation":"#14b8a6",
+      "Utilities":"#f97316",
+      "Medical":"#f472b6",
+      "Other":"#94a3b8",
+
+      // grocery breakdown
+      "Meat/Fish":"#2dd4bf",
+      "Dairy":"#60a5fa",
+      "Produce":"#22c55e",
+      "Snacks":"#fb7185",
+      "Pantry":"#a78bfa",
+      "Bakery":"#f59e0b",
+      "Drinks":"#14b8a6",
+      "Grains":"#f97316",
+      "Unknown":"#94a3b8"
+    };
+
+    function hashColor(str){
+      // deterministic fallback
+      let h = 2166136261;
+      for (let i=0;i<str.length;i++){
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      const hue = Math.abs(h) % 360;
+      return `hsl(${hue} 70% 55%)`;
+    }
+
+    function getColor(name){
+      const key = (name || "Unknown").trim();
+      return FIXED_COLORS[key] || hashColor(key);
+    }
 
     // ---------- donut drawing ----------
     function drawDonut(ctx, w, h, categories, selectedIndex){
       ctx.clearRect(0,0,w,h);
-
       const total = categories.reduce((a,c)=>a + (c.total||0), 0) || 0;
 
       const centerX = w/2;
@@ -350,7 +373,6 @@
       const radius = Math.min(w,h) * 0.34;
       const innerRadius = radius * 0.62;
 
-      // background glow
       ctx.save();
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius*1.35, 0, Math.PI*2);
@@ -395,7 +417,7 @@
       ctx.font = '800 14px system-ui';
       ctx.fillText('Total', centerX, centerY + 28);
 
-      // selected label ABOVE donut (not on slices)
+      // selected label ABOVE donut
       if (selectedIndex != null && categories[selectedIndex]) {
         const c = categories[selectedIndex];
         ctx.fillStyle = '#e8eef6';
@@ -475,6 +497,68 @@
       });
     }
 
+    // ---- OPTIONAL items DB load (safe if file missing) ----
+    async function loadItemsDb(){
+      try{
+        const r = await fetch('itemsDatabase.json', {cache:'no-store'});
+        if (!r.ok) return null;
+        return await r.json();
+      }catch(e){
+        return null;
+      }
+    }
+
+    function norm(s){
+      return String(s||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+    }
+
+    function lookupFoodCategoryFromItemsDb(itemsDb, itemName){
+      if (!itemsDb) return null;
+
+      // supports a few possible shapes
+      // 1) { map: { "oatly": "Dairy", ... } }
+      if (itemsDb.map && typeof itemsDb.map === 'object'){
+        const n = norm(itemName);
+        for (const k of Object.keys(itemsDb.map)){
+          if (n.includes(norm(k))) return itemsDb.map[k];
+        }
+      }
+
+      // 2) { items: [{ name, category }, ...] }
+      if (Array.isArray(itemsDb.items)){
+        const n = norm(itemName);
+        for (const it of itemsDb.items){
+          if (!it) continue;
+          const key = norm(it.name || it.item || it.title);
+          if (key && n.includes(key)) return it.category || it.foodCategory || null;
+        }
+      }
+
+      return null;
+    }
+
+    // keyword rules (so Groceries receipts can be split even without item DB)
+    function guessFoodCategory(itemName){
+      const n = norm(itemName);
+
+      const has = (...words) => words.some(w => n.includes(w));
+
+      if (has('beef','steak','chicken','pork','turkey','lamb','salmon','tuna','shrimp','fish','meat','teres','teres major')) return 'Meat/Fish';
+      if (has('milk','yogurt','cheese','butter','cream','oatly','half and half','egg','eggs')) return 'Dairy';
+      if (has('banana','apple','avocado','berries','strawberry','blueberry','raspberry','pepper','spinach','lettuce','tomato','onion','cucumber','carrot','produce')) return 'Produce';
+      if (has('bread','bagel','bun','muffin','croissant','bakery')) return 'Bakery';
+      if (has('rice','oats','oat','pasta','noodle','quinoa','grain','grains')) return 'Grains';
+      if (has('chips','cookie','cookies','chocolate','candy','snack','snacks','ice cream')) return 'Snacks';
+      if (has('soda','juice','water','coffee','tea','drink','drinks')) return 'Drinks';
+      if (has('sauce','spice','salt','pepper','oil','vinegar','pantry')) return 'Pantry';
+
+      return 'Other';
+    }
+
+    function sumReceiptItemsCount(r){
+      return Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
+    }
+
     // ---------- category builders ----------
     function aggregateByReceiptCategory(receipts){
       const map = new Map();
@@ -482,49 +566,70 @@
         const name = (r.category || 'Other').trim();
         const prev = map.get(name) || { name, total:0, itemsCount:0 };
         prev.total += Number(r.total)||0;
-        prev.itemsCount += Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
+        prev.itemsCount += sumReceiptItemsCount(r);
         map.set(name, prev);
       });
+
       return Array.from(map.values())
         .sort((a,b)=>b.total-a.total)
-        .map((c, idx)=>({ ...c, color: palette[idx % palette.length] }));
+        .map(c => ({ ...c, color: getColor(c.name) }));
     }
 
-    // Groceries breakdown: treat "food categories" as their own receipt.category set
-    // (This avoids the confusing "Groceries + Dairy/Produce/etc" mixed in one chart.)
-    function aggregateGroceriesBreakdown(receipts){
-      const FOOD_CATS = new Set([
-        'Meat/Fish','Dairy','Produce','Snacks','Pantry','Bakery','Drinks','Grains'
-      ]);
+    // Groceries tab: break down *items* for receipts that are groceries-like
+    async function aggregateGroceriesBreakdown(receipts){
+      const itemsDb = await loadItemsDb();
 
-      // Consider receipts that are groceries-like OR already categorized into food subcats
-      const groceryLike = new Set(['Groceries', ...Array.from(FOOD_CATS)]);
+      const groceryReceipts = receipts.filter(r => {
+        const cat = (r.category||'').trim();
+        // include "Groceries" receipts + any explicit food subcategory receipts you already have
+        return ['Groceries','Meat/Fish','Dairy','Produce','Snacks','Pantry','Bakery','Drinks','Grains'].includes(cat);
+      });
 
       const map = new Map();
-      receipts.forEach(r => {
-        const rc = (r.category || 'Other').trim();
 
-        // include only grocery-like receipts
-        if (!groceryLike.has(rc)) return;
+      groceryReceipts.forEach(r=>{
+        const cat = (r.category||'Other').trim();
 
-        // if receipt is "Groceries", we CAN’T reliably split without item metadata,
-        // so we keep it under "Other (Groceries)" to avoid lying.
-        // BUT: if your receipts already use Meat/Fish/Dairy/Produce/etc, they’ll show correctly.
-        let bucket = rc;
-        if (rc === 'Groceries') bucket = 'Other (Groceries)';
+        // if receipt already *is* a food subcategory, keep it whole
+        const directFood = ['Meat/Fish','Dairy','Produce','Snacks','Pantry','Bakery','Drinks','Grains'];
+        if (directFood.includes(cat)){
+          const prev = map.get(cat) || { name:cat, total:0, itemsCount:0 };
+          prev.total += Number(r.total)||0;
+          prev.itemsCount += sumReceiptItemsCount(r);
+          map.set(cat, prev);
+          return;
+        }
 
-        const prev = map.get(bucket) || { name: bucket, total:0, itemsCount:0 };
+        // if it's "Groceries", split by items
+        if (cat === 'Groceries' && Array.isArray(r.items) && r.items.length){
+          r.items.forEach(it=>{
+            const itemName = (it.name || it.item || it.title || it.description || '').trim();
+            const qty = Number(it.qty ?? it.quantity ?? 1) || 1;
+            const price = Number(it.total ?? it.price ?? it.amount ?? 0) || 0;
+
+            const fromDb = lookupFoodCategoryFromItemsDb(itemsDb, itemName);
+            const bucket = (fromDb || guessFoodCategory(itemName) || 'Other').trim();
+
+            const prev = map.get(bucket) || { name:bucket, total:0, itemsCount:0 };
+            prev.total += price;
+            prev.itemsCount += qty;
+            map.set(bucket, prev);
+          });
+          return;
+        }
+
+        // if groceries receipt has no items array, we can't split it honestly—keep as Other
+        const prev = map.get('Other') || { name:'Other', total:0, itemsCount:0 };
         prev.total += Number(r.total)||0;
-        prev.itemsCount += Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
-        map.set(bucket, prev);
+        prev.itemsCount += sumReceiptItemsCount(r);
+        map.set('Other', prev);
       });
 
       return Array.from(map.values())
         .sort((a,b)=>b.total-a.total)
-        .map((c, idx)=>({ ...c, color: palette[idx % palette.length] }));
+        .map(c => ({ ...c, color: getColor(c.name) }));
     }
 
-    // ---------- main ----------
     async function main(){
       let data = null;
       try{
@@ -571,29 +676,26 @@
       canvas.height = Math.round(cssH * dpr);
       ctx.setTransform(dpr,0,0,dpr,0,0);
 
-      // tabs data
       let tab = 'all'; // 'all' | 'groceries'
       let selectedIndex = null;
 
       const tabAllEl = document.getElementById('tabAll');
       const tabGroEl = document.getElementById('tabGroceries');
 
-      function getActiveCategories(){
-        return tab === 'groceries'
-          ? aggregateGroceriesBreakdown(receipts)
-          : aggregateByReceiptCategory(receipts);
-      }
+      let activeCategories = aggregateByReceiptCategory(receipts);
 
-      let activeCategories = getActiveCategories();
-
-      function setTab(newTab){
+      async function setTab(newTab){
         tab = newTab;
         selectedIndex = null;
 
         tabAllEl.classList.toggle('active', tab === 'all');
         tabGroEl.classList.toggle('active', tab === 'groceries');
 
-        activeCategories = getActiveCategories();
+        if (tab === 'groceries'){
+          activeCategories = await aggregateGroceriesBreakdown(receipts);
+        } else {
+          activeCategories = aggregateByReceiptCategory(receipts);
+        }
         redraw();
       }
 
@@ -657,7 +759,7 @@
           sub.className = 'recent-sub';
           const d = toDate(r.date);
           const ds = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
-          const count = Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
+          const count = sumReceiptItemsCount(r);
           sub.textContent = `${ds} • ${count} items`;
 
           left.appendChild(title);
