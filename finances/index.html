@@ -3,46 +3,72 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Finances Dashboard</title>
+  <title>Finances</title>
   <style>
     :root{
-      --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7; --accent:#4CAF50; --accent-2:#2dd4bf;
-      --ring:#2a3543; --warn:#f59e0b; --good:#22c55e; --bad:#ef4444;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius: 18px;
+      --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7;
+      --accent:#4CAF50; --accent2:#2dd4bf;
+      --ring:#2a3543; --good:#22c55e; --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;
-      background: radial-gradient(1200px 800px at 50% -200px, rgba(76,175,80,.20), transparent 55%),
-                  radial-gradient(900px 700px at 10% 0%, rgba(45,212,191,.12), transparent 60%),
-                  var(--bg);
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 800px at 50% -200px, rgba(76,175,80,.20), transparent 55%),
+        radial-gradient(900px 700px at 10% 0%, rgba(45,212,191,.12), transparent 60%),
+        var(--bg);
       color:var(--ink);
     }
     a{color:inherit; text-decoration:none}
-    .wrap{max-width:1120px; margin:0 auto; padding:16px}
+
+    /* ---- top nav: single line, minimal height ---- */
     .topbar{
       position:sticky; top:0; z-index:20;
       background: linear-gradient(180deg, rgba(11,15,20,.92), rgba(11,15,20,.72));
       backdrop-filter: blur(10px);
       border-bottom:1px solid rgba(42,53,67,.55);
     }
-    .topbar-inner{max-width:1120px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:12px}
+    .topbar-inner{
+      max-width:1120px; margin:0 auto;
+      padding:10px 12px;
+      display:flex; align-items:center; gap:10px;
+    }
     .brand{
-      display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px;
-      padding:8px 12px; border-radius:999px; border:1px solid rgba(42,53,67,.75);
+      display:flex; align-items:center; gap:8px;
+      font-weight:900; letter-spacing:.2px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
       background: rgba(19,26,34,.55);
       box-shadow: var(--shadow);
+      flex:0 0 auto;
+      white-space:nowrap;
     }
     .nav{
-      margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end;
+      margin-left:auto;
+      display:flex; gap:8px;
+      align-items:center;
+      flex:1 1 auto;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling: touch;
+      white-space:nowrap;
+      padding-bottom:2px;
     }
+    .nav::-webkit-scrollbar{height:6px}
+    .nav::-webkit-scrollbar-thumb{background:rgba(42,53,67,.6); border-radius:999px}
     .pill{
-      padding:8px 12px; border-radius:999px; border:1px solid rgba(42,53,67,.75);
+      flex:0 0 auto;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
       background: rgba(19,26,34,.55);
       color:var(--muted);
-      font-weight:600;
+      font-weight:800;
+      font-size:13px;
     }
     .pill.active{
       color:#0b0f14;
@@ -50,14 +76,7 @@
       border-color: transparent;
     }
 
-    .grid{
-      margin-top:16px;
-      display:grid; gap:14px;
-      grid-template-columns: 1fr;
-    }
-    @media(min-width:860px){
-      .grid{grid-template-columns: 1.35fr .85fr}
-    }
+    .wrap{max-width:1120px; margin:0 auto; padding:12px}
 
     .card{
       background: rgba(19,26,34,.72);
@@ -70,16 +89,19 @@
       display:flex; align-items:center; justify-content:space-between;
       padding:14px 16px;
       border-bottom:1px solid rgba(42,53,67,.55);
+      gap:12px;
+      flex-wrap:wrap;
     }
     .card-h h3{
-      margin:0; font-size:14px; letter-spacing:.2px; color:var(--muted);
+      margin:0; font-size:14px; color:var(--muted);
       display:flex; align-items:center; gap:8px;
-      text-transform:none;
+      letter-spacing:.2px;
     }
     .card-b{padding:14px 16px}
 
     .stats{
       display:grid; gap:12px; grid-template-columns: repeat(2, 1fr);
+      padding:12px;
     }
     @media(min-width:860px){
       .stats{grid-template-columns: repeat(4, 1fr)}
@@ -91,8 +113,16 @@
       border-radius: 14px;
       text-align:center;
     }
-    .stat .v{font-size:26px; font-weight:900; color:var(--good); line-height:1.1}
-    .stat .k{font-size:12px; color:var(--muted); margin-top:4px; font-weight:600}
+    .stat .v{font-size:24px; font-weight:900; color:var(--good); line-height:1.1}
+    .stat .k{font-size:12px; color:var(--muted); margin-top:4px; font-weight:800}
+
+    .grid{
+      display:grid; gap:14px;
+      grid-template-columns: 1fr;
+    }
+    @media(min-width:860px){
+      .grid{grid-template-columns: 1.35fr .85fr}
+    }
 
     .actions{display:flex; gap:10px; flex-wrap:wrap}
     .btn{
@@ -101,8 +131,9 @@
       border:1px solid rgba(42,53,67,.70);
       background: rgba(11,15,20,.35);
       color:var(--ink);
-      font-weight:700;
+      font-weight:900;
       display:inline-flex; align-items:center; gap:8px;
+      cursor:pointer;
     }
     .btn.primary{
       background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
@@ -110,21 +141,35 @@
       color:#0b0f14;
     }
 
-    .donut-wrap{
-      display:grid; gap:12px;
-      grid-template-columns: 1fr;
-    }
-    @media(min-width:860px){
-      .donut-wrap{grid-template-columns: 1fr}
-    }
-
     .donut-top{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       flex-wrap:wrap;
     }
     .donut-sub{
-      color:var(--muted); font-size:12px; font-weight:600;
+      color:var(--muted); font-size:12px; font-weight:800;
     }
+
+    /* donut tabs */
+    .tabs{
+      display:flex; gap:8px; flex-wrap:wrap;
+      align-items:center;
+    }
+    .tab{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(11,15,20,.35);
+      color:var(--muted);
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+    }
+    .tab.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
+    }
+
     canvas{max-width:100%; width:100%}
 
     .legend{
@@ -143,16 +188,25 @@
     .legend-left{display:flex; align-items:center; gap:10px}
     .dot{
       width:10px; height:10px; border-radius:999px;
-      background: #888;
+      background:#888;
       box-shadow: 0 0 0 3px rgba(255,255,255,.04);
+      flex:0 0 auto;
     }
-    .legend-name{font-weight:800}
-    .legend-meta{font-size:12px; color:var(--muted); font-weight:700}
+    .legend-name{font-weight:900}
+    .legend-meta{font-size:12px; color:var(--muted); font-weight:800}
     .legend-right{text-align:right}
     .legend-amt{font-weight:900; color:var(--good)}
     .legend-row.selected{
       outline: 2px solid rgba(76,175,80,.55);
       background: rgba(76,175,80,.08);
+    }
+
+    .empty{
+      color:var(--muted);
+      display:flex; align-items:center; justify-content:center;
+      padding:26px 10px;
+      gap:10px;
+      text-align:center;
     }
 
     .recent{
@@ -165,21 +219,11 @@
       border:1px solid rgba(42,53,67,.55);
       background: rgba(11,15,20,.35);
       gap:10px;
+      cursor:pointer;
     }
-    .recent-left{
-      display:flex; flex-direction:column; gap:2px;
-      min-width:0;
-    }
+    .recent-left{display:flex; flex-direction:column; gap:2px; min-width:0}
     .recent-title{font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-    .recent-sub{font-size:12px; color:var(--muted); font-weight:700}
-
-    .empty{
-      color:var(--muted);
-      display:flex; align-items:center; justify-content:center;
-      padding:26px 10px;
-      gap:10px;
-      text-align:center;
-    }
+    .recent-sub{font-size:12px; color:var(--muted); font-weight:800}
   </style>
 </head>
 
@@ -188,7 +232,7 @@
     <div class="topbar-inner">
       <div class="brand">🏠 <span>Finances</span></div>
       <div class="nav">
-        <a class="pill active" href="index.html">Dashboard</a>
+        <a class="pill active" href="index.html">Home</a>
         <a class="pill" href="food.html">Food</a>
         <a class="pill" href="search.html">Search</a>
         <a class="pill" href="receipts.html">Receipts</a>
@@ -198,21 +242,20 @@
   </div>
 
   <div class="wrap">
-    <div class="card" style="margin-top:14px;">
-      <div class="card-b">
-        <div class="stats" id="statsRow">
-          <div class="stat"><div class="v" id="statTotal">$0.00</div><div class="k">Total Spent</div></div>
-          <div class="stat"><div class="v" id="statMonth">$0.00</div><div class="k">This Month</div></div>
-          <div class="stat"><div class="v" id="statWeek">$0.00</div><div class="k">This Week</div></div>
-          <div class="stat"><div class="v" id="statAvg">$0.00</div><div class="k">Avg Purchase</div></div>
-        </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="stats">
+        <div class="stat"><div class="v" id="statTotal">$0.00</div><div class="k">Total Spent</div></div>
+        <div class="stat"><div class="v" id="statMonth">$0.00</div><div class="k">This Month</div></div>
+        <div class="stat"><div class="v" id="statWeek">$0.00</div><div class="k">This Week</div></div>
+        <div class="stat"><div class="v" id="statAvg">$0.00</div><div class="k">Avg Purchase</div></div>
       </div>
     </div>
 
-    <div class="grid">
+    <div class="grid" style="margin-top:14px;">
       <div class="card">
         <div class="card-h">
-          <h3>🧾 Spending by Category</h3>
+          <h3>📊 Spending by Category</h3>
           <div class="actions">
             <a class="btn primary" href="addReceipt.html">🧾 Add Receipt</a>
             <a class="btn" href="food.html">🍎 Food Tracking</a>
@@ -220,15 +263,23 @@
             <a class="btn" href="budget.html">💰 Budgets</a>
           </div>
         </div>
+
         <div class="card-b">
           <div class="donut-top">
-            <div class="donut-sub">Tap a slice or a category row to highlight</div>
+            <div>
+              <div class="donut-sub">Tap a slice or a category row to highlight</div>
+              <div class="tabs" style="margin-top:10px;">
+                <div class="tab active" id="tabAll">All</div>
+                <div class="tab" id="tabGroceries">Groceries</div>
+              </div>
+            </div>
+
             <div class="actions" style="gap:8px;">
               <button class="btn" id="donutResetBtn" type="button">Reset</button>
             </div>
           </div>
 
-          <div style="margin-top:10px;">
+          <div style="margin-top:12px;">
             <canvas id="donutCanvas" width="620" height="360" aria-label="Spending Donut Chart"></canvas>
           </div>
 
@@ -241,9 +292,7 @@
           <h3>🧠 Budget Status</h3>
         </div>
         <div class="card-b">
-          <div class="empty">
-            🎯 Set up budgets to track your spending goals.
-          </div>
+          <div class="empty">🎯 Set up budgets to track your spending goals.</div>
           <div style="display:flex; justify-content:center;">
             <a class="btn primary" href="budget.html">Set Budgets</a>
           </div>
@@ -259,6 +308,7 @@
         <div class="recent" id="recentPurchases"></div>
       </div>
     </div>
+
   </div>
 
   <script src="dataLoader.js"></script>
@@ -266,7 +316,6 @@
     // ---------- helpers ----------
     const fmtMoney = (n) => `$${(Number(n)||0).toFixed(2)}`;
     const toDate = (d) => (d instanceof Date ? d : new Date(d));
-    const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
 
     function startOfWeekSunday(date){
       const dt = new Date(date);
@@ -275,7 +324,6 @@
       dt.setDate(dt.getDate() - day);
       return dt;
     }
-
     function endOfWeekSaturday(date){
       const s = startOfWeekSunday(date);
       const e = new Date(s);
@@ -283,17 +331,16 @@
       e.setHours(23,59,59,999);
       return e;
     }
-
     function inRange(dt, start, end){
       const t = dt.getTime();
       return t >= start.getTime() && t <= end.getTime();
     }
 
-    // ---------- donut drawing ----------
-    function drawDonut(canvas, categories, opts={}){
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width, h = canvas.height;
+    // stable palette
+    const palette = ['#4CAF50','#22c55e','#2dd4bf','#60a5fa','#a78bfa','#f59e0b','#fb7185','#f97316','#14b8a6','#94a3b8','#f472b6'];
 
+    // ---------- donut drawing ----------
+    function drawDonut(ctx, w, h, categories, selectedIndex){
       ctx.clearRect(0,0,w,h);
 
       const total = categories.reduce((a,c)=>a + (c.total||0), 0) || 0;
@@ -311,12 +358,11 @@
       ctx.fill();
       ctx.restore();
 
-      // draw slices
       let currentAngle = -Math.PI/2;
+
       categories.forEach((cat, i) => {
         const sliceAngle = total === 0 ? 0 : (cat.total / total) * 2 * Math.PI;
-        const isSelected = (opts.selectedIndex === i);
-
+        const isSelected = (selectedIndex === i);
         const outerR = isSelected ? radius * 1.08 : radius;
 
         ctx.beginPath();
@@ -327,7 +373,6 @@
         ctx.fillStyle = cat.color;
         ctx.fill();
 
-        // subtle separator
         ctx.strokeStyle = 'rgba(0,0,0,0.35)';
         ctx.lineWidth = 1;
         ctx.stroke();
@@ -347,22 +392,20 @@
       ctx.fillText(total ? `$${Math.round(total)}` : '$0', centerX, centerY - 6);
 
       ctx.fillStyle = 'rgba(159,176,199,0.95)';
-      ctx.font = '700 14px system-ui';
+      ctx.font = '800 14px system-ui';
       ctx.fillText('Total', centerX, centerY + 28);
 
-      // Selected label (above donut)
-      if (opts.selectedIndex != null && categories[opts.selectedIndex]) {
-        const c = categories[opts.selectedIndex];
+      // selected label ABOVE donut (not on slices)
+      if (selectedIndex != null && categories[selectedIndex]) {
+        const c = categories[selectedIndex];
         ctx.fillStyle = '#e8eef6';
-        ctx.font = '800 18px system-ui';
+        ctx.font = '900 18px system-ui';
         ctx.fillText(`${c.name}: ${fmtMoney(c.total)}`, centerX, centerY - (radius + 36));
       }
-
       ctx.restore();
     }
 
-    function getSliceAtPoint(canvas, categories, x, y){
-      const w = canvas.width, h = canvas.height;
+    function getSliceAtPoint(w, h, categories, x, y){
       const centerX = w/2, centerY = h/2;
       const radius = Math.min(w,h) * 0.34;
       const innerRadius = radius * 0.62;
@@ -373,7 +416,6 @@
       if (dist < innerRadius || dist > radius*1.12) return null;
 
       let ang = Math.atan2(dy, dx);
-      // normalize to start at -pi/2
       ang = ang - (-Math.PI/2);
       if (ang < 0) ang += Math.PI*2;
 
@@ -401,6 +443,7 @@
         dot.style.background = c.color;
 
         const nameWrap = document.createElement('div');
+
         const name = document.createElement('div');
         name.className = 'legend-name';
         name.textContent = c.name;
@@ -432,28 +475,71 @@
       });
     }
 
-    // ---------- compute + render ----------
+    // ---------- category builders ----------
+    function aggregateByReceiptCategory(receipts){
+      const map = new Map();
+      receipts.forEach(r => {
+        const name = (r.category || 'Other').trim();
+        const prev = map.get(name) || { name, total:0, itemsCount:0 };
+        prev.total += Number(r.total)||0;
+        prev.itemsCount += Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
+        map.set(name, prev);
+      });
+      return Array.from(map.values())
+        .sort((a,b)=>b.total-a.total)
+        .map((c, idx)=>({ ...c, color: palette[idx % palette.length] }));
+    }
+
+    // Groceries breakdown: treat "food categories" as their own receipt.category set
+    // (This avoids the confusing "Groceries + Dairy/Produce/etc" mixed in one chart.)
+    function aggregateGroceriesBreakdown(receipts){
+      const FOOD_CATS = new Set([
+        'Meat/Fish','Dairy','Produce','Snacks','Pantry','Bakery','Drinks','Grains'
+      ]);
+
+      // Consider receipts that are groceries-like OR already categorized into food subcats
+      const groceryLike = new Set(['Groceries', ...Array.from(FOOD_CATS)]);
+
+      const map = new Map();
+      receipts.forEach(r => {
+        const rc = (r.category || 'Other').trim();
+
+        // include only grocery-like receipts
+        if (!groceryLike.has(rc)) return;
+
+        // if receipt is "Groceries", we CAN’T reliably split without item metadata,
+        // so we keep it under "Other (Groceries)" to avoid lying.
+        // BUT: if your receipts already use Meat/Fish/Dairy/Produce/etc, they’ll show correctly.
+        let bucket = rc;
+        if (rc === 'Groceries') bucket = 'Other (Groceries)';
+
+        const prev = map.get(bucket) || { name: bucket, total:0, itemsCount:0 };
+        prev.total += Number(r.total)||0;
+        prev.itemsCount += Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
+        map.set(bucket, prev);
+      });
+
+      return Array.from(map.values())
+        .sort((a,b)=>b.total-a.total)
+        .map((c, idx)=>({ ...c, color: palette[idx % palette.length] }));
+    }
+
+    // ---------- main ----------
     async function main(){
-      // dataLoader.js should provide a loader function; fall back to direct fetch
       let data = null;
       try{
-        if (window.loadAllData) {
-          data = await window.loadAllData();
-        } else if (window.loadReceiptsData) {
-          data = await window.loadReceiptsData();
-        }
+        if (window.loadAllData) data = await window.loadAllData();
+        else if (window.loadReceiptsData) data = await window.loadReceiptsData();
       }catch(e){}
 
       if (!data) {
-        // best effort direct fetch if loader is unavailable
         const r = await fetch('receiptsData.json', {cache:'no-store'});
         data = await r.json();
       }
-
       const receipts = Array.isArray(data) ? data : (data.receipts || []);
       const now = new Date();
 
-      // totals for stats
+      // stats
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
       const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59,999);
       const weekStart = startOfWeekSunday(now);
@@ -461,9 +547,9 @@
 
       const totalSpent = receipts.reduce((a,r)=>a+(Number(r.total)||0),0);
       const monthSpent = receipts.filter(r => inRange(toDate(r.date), monthStart, monthEnd))
-                                .reduce((a,r)=>a+(Number(r.total)||0),0);
+        .reduce((a,r)=>a+(Number(r.total)||0),0);
       const weekSpent = receipts.filter(r => inRange(toDate(r.date), weekStart, weekEnd))
-                               .reduce((a,r)=>a+(Number(r.total)||0),0);
+        .reduce((a,r)=>a+(Number(r.total)||0),0);
       const avgPurchase = receipts.length ? (totalSpent / receipts.length) : 0;
 
       document.getElementById('statTotal').textContent = fmtMoney(totalSpent);
@@ -471,72 +557,64 @@
       document.getElementById('statWeek').textContent = fmtMoney(weekSpent);
       document.getElementById('statAvg').textContent = fmtMoney(avgPurchase);
 
-      // category totals (top-level categories on receipts)
-      const catMap = new Map();
-      receipts.forEach(r => {
-        const cat = (r.category || 'Other').trim();
-        const prev = catMap.get(cat) || {name:cat, total:0, itemsCount:0};
-        prev.total += Number(r.total)||0;
-        prev.itemsCount += Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
-        catMap.set(cat, prev);
-      });
-
-      // stable colors
-      const palette = [
-        '#4CAF50','#22c55e','#2dd4bf','#60a5fa','#a78bfa','#f59e0b','#fb7185','#f97316','#14b8a6','#94a3b8'
-      ];
-      const cats = Array.from(catMap.values())
-        .sort((a,b)=>b.total-a.total)
-        .map((c, idx)=>({ ...c, color: palette[idx % palette.length] }));
-
       // donut setup
       const canvas = document.getElementById('donutCanvas');
       const legend = document.getElementById('donutLegend');
+      const ctx = canvas.getContext('2d');
 
-      // ensure crisp on high DPI
-      const dpr = Math.max(1, Math.round(window.devicePixelRatio || 1));
+      // crisp on mobile
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
       const cssW = canvas.clientWidth || 620;
       const cssH = 360;
+      canvas.style.height = cssH + 'px';
       canvas.width = Math.round(cssW * dpr);
       canvas.height = Math.round(cssH * dpr);
-      canvas.style.height = cssH + 'px';
-      const ctx = canvas.getContext('2d');
       ctx.setTransform(dpr,0,0,dpr,0,0);
 
+      // tabs data
+      let tab = 'all'; // 'all' | 'groceries'
       let selectedIndex = null;
 
-      function redraw(){
-        // draw on logical CSS pixels (we scale context)
-        const tmp = document.createElement('canvas');
-        tmp.width = Math.round(cssW);
-        tmp.height = Math.round(cssH);
+      const tabAllEl = document.getElementById('tabAll');
+      const tabGroEl = document.getElementById('tabGroceries');
 
-        // draw into a tmp canvas at CSS pixel size, then drawImage scaled by DPR
-        // but since we already scaled the context, just draw using a fake canvas wrapper
-        // easiest: temporarily swap width/height usage inside drawDonut by using a proxy
-        const proxy = {
-          width: Math.round(cssW),
-          height: Math.round(cssH),
-          getContext: () => ctx
-        };
-        ctx.clearRect(0,0,cssW,cssH);
-        drawDonut(proxy, cats, { selectedIndex });
-        buildLegend(legend, cats, selectedIndex, (idx)=>{
+      function getActiveCategories(){
+        return tab === 'groceries'
+          ? aggregateGroceriesBreakdown(receipts)
+          : aggregateByReceiptCategory(receipts);
+      }
+
+      let activeCategories = getActiveCategories();
+
+      function setTab(newTab){
+        tab = newTab;
+        selectedIndex = null;
+
+        tabAllEl.classList.toggle('active', tab === 'all');
+        tabGroEl.classList.toggle('active', tab === 'groceries');
+
+        activeCategories = getActiveCategories();
+        redraw();
+      }
+
+      function redraw(){
+        drawDonut(ctx, cssW, cssH, activeCategories, selectedIndex);
+        buildLegend(legend, activeCategories, selectedIndex, (idx)=>{
           selectedIndex = (selectedIndex === idx) ? null : idx;
           redraw();
         });
       }
 
+      tabAllEl.addEventListener('click', ()=>setTab('all'));
+      tabGroEl.addEventListener('click', ()=>setTab('groceries'));
+
       canvas.addEventListener('click', (ev) => {
         const rect = canvas.getBoundingClientRect();
         const x = ev.clientX - rect.left;
         const y = ev.clientY - rect.top;
-        const idx = getSliceAtPoint({width:cssW, height:cssH}, cats, x, y);
-        if (idx == null) {
-          selectedIndex = null;
-        } else {
-          selectedIndex = (selectedIndex === idx) ? null : idx;
-        }
+        const idx = getSliceAtPoint(cssW, cssH, activeCategories, x, y);
+        if (idx == null) selectedIndex = null;
+        else selectedIndex = (selectedIndex === idx) ? null : idx;
         redraw();
       });
 
@@ -573,7 +651,7 @@
 
           const title = document.createElement('div');
           title.className = 'recent-title';
-          title.textContent = `${r.store || 'Unknown Store'}`;
+          title.textContent = r.store || 'Unknown Store';
 
           const sub = document.createElement('div');
           sub.className = 'recent-sub';
@@ -593,11 +671,8 @@
           row.appendChild(left);
           row.appendChild(right);
 
-          // click to view receipt page (simple)
           row.addEventListener('click', ()=>{
-            try{
-              localStorage.setItem('selectedReceiptId', r.id || '');
-            }catch(e){}
+            try{ localStorage.setItem('selectedReceiptId', r.id || ''); }catch(e){}
             window.location.href = 'receipts.html';
           });
 
@@ -606,9 +681,7 @@
       }
     }
 
-    main().catch(err=>{
-      console.error(err);
-    });
+    main().catch(console.error);
   </script>
 </body>
 </html>
