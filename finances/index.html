@@ -445,8 +445,7 @@
       }
     }
   </style>
-  <script src="receiptsData.js"></script>
-<script src="dataLoader.js"></script>
+  <script src="dataLoader.js"></script>
 </head>
 <body>
   <header>
@@ -568,6 +567,7 @@
     // Major Expense Categories
     const MAJOR_CATEGORIES = [
       { name: 'Groceries', icon: '🛒', color: '#4CAF50' },
+      { name: 'Cafe', icon: '☕️', color: '#22C55E' },
       { name: 'Restaurants', icon: '🍽️', color: '#FF9800' },
       { name: 'Medical', icon: '💊', color: '#EF4444' },
       { name: 'Home', icon: '🏠', color: '#3B82F6' },
@@ -657,10 +657,7 @@
     }
 
     // Initialize
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (window.whenReceiptsReady) {
-        try { await window.whenReceiptsReady(); } catch (e) { console.warn('Receipts bootstrap failed', e); }
-      }
+    document.addEventListener('DOMContentLoaded', () => {
       initializeCategoryFilters();
       loadDashboard();
       setupSearch();
@@ -754,8 +751,11 @@
         'Produce': '🥬',
         'Dairy': '🥛',
         'Meat': '🥩',
+        'Meat/Fish': '🥩',
+        'Grains': '🌾',
         'Snacks': '🍪',
         'Drinks': '🥤',
+        'Cafe': '☕️',
         'Household': '🧹',
         'Kids': '👶',
         'Health': '💊',

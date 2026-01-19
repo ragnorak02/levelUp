@@ -300,6 +300,7 @@ STRAWBERRIE   085487700700 F      5.74</div>
                  onchange="currentItems[${index}].price = parseFloat(this.value)" required>
           <select class="form-input" onchange="currentItems[${index}].category = this.value">
             <option value="Groceries" ${item.category === 'Groceries' ? 'selected' : ''}>🛒 Groceries</option>
+            <option value="Cafe" ${item.category === 'Cafe' ? 'selected' : ''}>☕ Cafe</option>
             <option value="Restaurants" ${item.category === 'Restaurants' ? 'selected' : ''}>🍽️ Restaurants</option>
             <option value="Medical" ${item.category === 'Medical' ? 'selected' : ''}>💊 Medical</option>
             <option value="Home" ${item.category === 'Home' ? 'selected' : ''}>🏠 Home</option>

@@ -125,6 +125,7 @@
           <select class="form-input" id="categoryInput" required>
             <option value="">Select category...</option>
             <option value="Groceries">🛒 Groceries</option>
+            <option value="Cafe">☕ Cafe</option>
             <option value="Restaurants">🍽️ Restaurants</option>
             <option value="Medical">💊 Medical</option>
             <option value="Home">🏠 Home</option>
@@ -260,10 +261,7 @@
       render();
     });
 
-    (async function initBudgetPage() {
-      await (window.FinancesDataLoader?.ready || window.financesDataReady || Promise.resolve());
-      render();
-    })();
+    render();
   </script>
 </body>
 </html>

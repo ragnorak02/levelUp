@@ -123,24 +123,23 @@
     </div>
   </main>
 
-  <script src="receiptsData.js"></script>
-  <script src="dataLoader.js"></script>
   <script>
     const FOOD_CATEGORIES = {
       'Produce': '🥬',
       'Dairy': '🥛',
+      // Support both legacy and new naming
       'Meat': '🥩',
+      'Meat/Fish': '🥩',
+      'Grains': '🌾',
       'Snacks': '🍪',
       'Drinks': '🥤',
+      'Cafe': '☕️',
       'Pantry': '🥫',
       'Frozen': '🧊',
       'Bakery': '🍞'
     };
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (window.whenReceiptsReady) {
-        try { await window.whenReceiptsReady(); } catch (e) { console.warn('Receipts bootstrap failed', e); }
-      }
+    document.addEventListener('DOMContentLoaded', () => {
       loadFoodData();
     });
 

@@ -1645,11 +1645,196 @@
       "store": "Walmart",
       "storeLocation": "Walmart Glenmont, NY",
       "category": "Groceries",
-      "items": [],
-      "subtotal": null,
-      "tax": null,
+      "items": [
+        {
+          "name": "Oatly Full Fat Oatmilk, 64 fl oz",
+          "price": 5.27,
+          "qty": 1,
+          "category": "Dairy",
+          "subcategory": "Milk Alternatives"
+        },
+        {
+          "name": "Oatly Full Fat Oatmilk, 64 fl oz",
+          "price": 5.27,
+          "qty": 1,
+          "category": "Dairy",
+          "subcategory": "Milk Alternatives"
+        },
+        {
+          "name": "Organic Valley Grassmilk Whole Milk, 59 fl oz",
+          "price": 6.67,
+          "qty": 1,
+          "category": "Dairy",
+          "subcategory": "Milk"
+        },
+        {
+          "name": "Organic Valley Grassmilk Whole Milk, 59 fl oz",
+          "price": 6.67,
+          "qty": 1,
+          "category": "Dairy",
+          "subcategory": "Milk"
+        },
+        {
+          "name": "Chobani Flip Greek Yogurt Peanut Butter, 4-pack",
+          "price": 4.78,
+          "qty": 1,
+          "category": "Dairy",
+          "subcategory": "Yogurt"
+        },
+        {
+          "name": "King Brothers Dairy Chocolate Milk, 14 oz",
+          "price": 1.76,
+          "qty": 1,
+          "category": "Dairy",
+          "subcategory": "Milk"
+        },
+        {
+          "name": "Bananas",
+          "price": 1.46,
+          "qty": 1,
+          "category": "Produce",
+          "subcategory": "Fruit"
+        },
+        {
+          "name": "Green Bell Pepper",
+          "price": 0.82,
+          "qty": 1,
+          "category": "Produce",
+          "subcategory": "Vegetable"
+        },
+        {
+          "name": "Cosmic Crisp Apples",
+          "price": 4.92,
+          "qty": 1,
+          "category": "Produce",
+          "subcategory": "Fruit"
+        },
+        {
+          "name": "Avocados (5 ct)",
+          "price": 3.4,
+          "qty": 1,
+          "category": "Produce",
+          "subcategory": "Fruit"
+        },
+        {
+          "name": "Mandarin Oranges, 3 lb bag",
+          "price": 3.97,
+          "qty": 1,
+          "category": "Produce",
+          "subcategory": "Fruit"
+        },
+        {
+          "name": "Blueberries",
+          "price": 5.12,
+          "qty": 1,
+          "category": "Produce",
+          "subcategory": "Fruit"
+        },
+        {
+          "name": "Strawberries",
+          "price": 5.74,
+          "qty": 1,
+          "category": "Produce",
+          "subcategory": "Fruit"
+        },
+        {
+          "name": "Arnold Whole Grains Oatnut Bread, 24 oz",
+          "price": 3.98,
+          "qty": 1,
+          "category": "Grains",
+          "subcategory": "Bread"
+        },
+        {
+          "name": "Nellie's Free-Range Large Brown Eggs, 12 ct",
+          "price": 5.74,
+          "qty": 1,
+          "category": "Dairy",
+          "subcategory": "Eggs"
+        }
+      ],
+      "subtotal": 65.57,
+      "tax": 0.0,
       "total": 65.57,
-      "notes": "Walmart order (Jan 17, 2026) - total $65.57. Item details not yet parsed from screenshot."
+      "notes": "Walmart order (Jan 17, 2026) - total $65.57. Item details not yet parsed from screenshot.",
+      "itemCount": 15
+    },
+    {
+      "id": "receipt_barnesnoble_20260118",
+      "store": "Barnes & Noble Cafe",
+      "date": "2026-01-18",
+      "category": "Cafe",
+      "subtotal": 10.61,
+      "tax": 0.0,
+      "total": 10.61,
+      "items": [
+        {
+          "name": "Chocolate Cake Pop",
+          "price": 3.75,
+          "qty": 1,
+          "category": "Cafe",
+          "subcategory": "Snack"
+        },
+        {
+          "name": "Frappuccino",
+          "price": 6.86,
+          "qty": 1,
+          "category": "Cafe",
+          "subcategory": "Drink"
+        }
+      ]
+    },
+    {
+      "id": "receipt_primal_20260118",
+      "store": "Primal Your Local Butcher",
+      "location": "Albany, NY",
+      "date": "2026-01-18",
+      "category": "Groceries",
+      "subtotal": 137.9,
+      "discounts": 10.0,
+      "tax": 0.0,
+      "total": 127.9,
+      "payments": {
+        "giftCard": 22.0,
+        "card": 105.9,
+        "cardType": "AMEX",
+        "last4": "1007"
+      },
+      "items": [
+        {
+          "name": "Teres Major (bulk purchase)",
+          "price": 127.9,
+          "qty": 1,
+          "category": "Meat/Fish",
+          "subcategory": "Meat"
+        }
+      ]
+    },
+    {
+      "id": "receipt_wholefoods_20260118",
+      "store": "Whole Foods Market",
+      "location": "Albany, NY",
+      "date": "2026-01-18",
+      "category": "Groceries",
+      "subtotal": 8.88,
+      "discounts": 2.75,
+      "tax": 0.0,
+      "total": 6.13,
+      "items": [
+        {
+          "name": "Cranberry Orange Mini Muffins, 12 ct (promo applied)",
+          "price": 2.74,
+          "qty": 1,
+          "category": "Grains",
+          "subcategory": "Bakery"
+        },
+        {
+          "name": "La Fermiere Vanilla Bean Yogurt, 4.9 oz",
+          "price": 3.39,
+          "qty": 1,
+          "category": "Dairy",
+          "subcategory": "Yogurt"
+        }
+      ]
     }
   ],
   "metadata": {
