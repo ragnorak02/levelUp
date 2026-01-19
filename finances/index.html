@@ -771,56 +771,32 @@
 
       // Draw slices
       lastCategoryOrder.forEach((cat, i) => {
-        const sliceAngle = (cat.total / total) * 2 * Math.PI;
-        const isSelected = (opts.selectedIndex === i);
+      const sliceAngle = (cat.total / total) * 2 * Math.PI;
+      const isSelected = (opts.selectedIndex === i);
+      const hasSelection = (opts.selectedIndex !== -1);
 
-        const outerR = isSelected ? radius * 1.08 : radius;
+      const outerR = isSelected ? radius * 1.08 : radius;
 
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, outerR, currentAngle, currentAngle + sliceAngle);
-        ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
-        ctx.closePath();
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, outerR, currentAngle, currentAngle + sliceAngle);
+      ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
+      ctx.closePath();
 
-        ctx.fillStyle = cat.color;
-        ctx.fill();
+      // ✅ NEW: dim non-selected slices when a selection exists
+      ctx.save();
+      if (hasSelection && !isSelected) ctx.globalAlpha = 0.28;
+      ctx.fillStyle = cat.color;
+      ctx.fill();
+      ctx.restore();
 
-        // subtle separator
-        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+      // subtle separator
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
 
-        // Optional labels (fullscreen)
-        if (opts.showLabels) {
-          const mid = currentAngle + sliceAngle / 2;
-          const labelR = (innerRadius + outerR) / 2;
-          const lx = centerX + Math.cos(mid) * labelR;
-          const ly = centerY + Math.sin(mid) * labelR;
+      currentAngle += sliceAngle;
+    });
 
-          // draw name + value only if slice is big enough (avoid clutter)
-          const pct = (cat.total / total) * 100;
-          if (pct >= 4.0) {
-            ctx.save();
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            // text shadow for readability
-            ctx.shadowColor = 'rgba(0,0,0,0.65)';
-            ctx.shadowBlur = 6;
-
-            ctx.fillStyle = '#e8eef6';
-            ctx.font = '700 16px system-ui';
-            ctx.fillText(cat.name, lx, ly - 10);
-
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '800 16px system-ui';
-            ctx.fillText(`$${cat.total.toFixed(2)}`, lx, ly + 12);
-
-            ctx.restore();
-          }
-        }
-
-        currentAngle += sliceAngle;
-      });
 
       // Center text
       ctx.fillStyle = '#e8eef6';
