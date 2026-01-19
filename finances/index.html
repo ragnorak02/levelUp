@@ -191,11 +191,29 @@
     .chart-container {
       position: relative;
       height: 300px;
-      margin: 20px 0;
+      margin: 12px 0 8px;
       display: grid;
       place-items: center;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
     canvas { max-width: 100%; max-height: 100%; }
+
+    /* Donut selection label (above chart) */
+    .donut-selection {
+      text-align: center;
+      margin: 2px 0 6px;
+      min-height: 22px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .donut-selection .sub {
+      display: block;
+      margin-top: 2px;
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
 
     /* Click hint */
     .chart-hint {
@@ -228,7 +246,7 @@
     .category-count { font-size: .85rem; color: var(--muted); }
     .category-amount { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
 
-    /* NEW: color swatch indicator */
+    /* Color swatch indicator (matches donut slice color) */
     .color-swatch {
       width: 10px;
       height: 10px;
@@ -322,91 +340,6 @@
       .card { padding: 12px; }
       .stat-value { font-size: 1.4rem; }
     }
-
-    /* ===== Fullscreen donut modal ===== */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      padding: 16px;
-    }
-    .modal.open { display: flex; }
-
-    .modal-panel {
-      width: min(920px, 100%);
-      height: min(920px, 92vh);
-      background: var(--panel);
-      border: 1px solid var(--ring);
-      border-radius: 16px;
-      box-shadow: 0 14px 60px rgba(0,0,0,0.5);
-      position: relative;
-      overflow: hidden;
-      display: grid;
-      grid-template-rows: auto 1fr;
-    }
-
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 12px;
-      border-bottom: 1px solid var(--ring);
-      background: rgba(0,0,0,0.12);
-      gap: 12px;
-    }
-
-    .modal-title {
-      color: var(--muted);
-      font-weight: 700;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .modal-actions { display: flex; gap: 8px; align-items: center; }
-
-    .modal-btn {
-      all: unset;
-      cursor: pointer;
-      border: 1px solid var(--ring);
-      background: var(--card-bg);
-      color: var(--muted);
-      padding: 10px 12px;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      transition: transform 0.15s, background 0.15s, border-color 0.15s;
-    }
-    .modal-btn:hover { transform: translateY(-1px); border-color: var(--accent); }
-
-    .modal-body {
-      display: grid;
-      place-items: center;
-      padding: 10px;
-    }
-
-    #categoryChartFull {
-      width: 100%;
-      height: 100%;
-      max-width: 860px;
-      max-height: 860px;
-      touch-action: manipulation;
-    }
-
-    .modal-hint {
-      position: absolute;
-      left: 14px;
-      bottom: 10px;
-      color: var(--muted);
-      font-size: 0.85rem;
-      opacity: 0.85;
-      pointer-events: none;
-    }
   </style>
   <script src="dataLoader.js"></script>
 </head>
@@ -479,10 +412,17 @@
       <!-- Spending by Category -->
       <div class="card">
         <h3>📊 Spending by Category</h3>
-        <div class="chart-container" id="categoryChartContainer" role="button" tabindex="0" aria-label="Open full screen chart">
-          <canvas id="categoryChart"></canvas>
-          <div class="chart-hint">Tap the chart to expand</div>
+
+        <!-- Selection text above donut (no slice labels) -->
+        <div class="donut-selection" id="donutSelection">
+          <span class="sub">Tap a slice to highlight</span>
         </div>
+
+        <div class="chart-container" id="categoryChartContainer">
+          <canvas id="categoryChart"></canvas>
+          <div class="chart-hint">Tap a slice to “pop” it. Tap center/outside to reset.</div>
+        </div>
+
         <div class="category-list" id="categoryList">
           <div class="empty-state">
             <div class="empty-icon">📦</div>
@@ -516,23 +456,6 @@
     </div>
   </main>
 
-  <!-- Fullscreen Donut Modal -->
-  <div class="modal" id="donutModal" aria-hidden="true">
-    <div class="modal-panel" role="dialog" aria-modal="true" aria-label="Spending by category chart">
-      <div class="modal-header">
-        <div class="modal-title">🧾 Spending by Category (tap a slice to highlight)</div>
-        <div class="modal-actions">
-          <button class="modal-btn" id="modalResetBtn" type="button">Reset</button>
-          <button class="modal-btn" id="modalCloseBtn" type="button">Close</button>
-        </div>
-      </div>
-      <div class="modal-body">
-        <canvas id="categoryChartFull"></canvas>
-      </div>
-      <div class="modal-hint">Tip: Tap a slice to “pop” it. Tap outside to close.</div>
-    </div>
-  </div>
-
   <script>
     // LocalStorage Keys
     const STORAGE_KEYS = {
@@ -555,13 +478,15 @@
       { name: 'Other', icon: '📦', color: '#6B7280' }
     ];
 
-    // ===== Donut state (used for fullscreen interactions) =====
+    // Donut colors (rotates if more categories than colors)
     const DONUT_COLORS = [
       '#4CAF50', '#2dd4bf', '#f59e0b', '#ef4444',
       '#8b5cf6', '#3b82f6', '#ec4899', '#14b8a6',
       '#a3e635', '#fb7185', '#f97316', '#60a5fa'
     ];
-    let lastCategoryOrder = [];      // [{name, total, count, color}]
+
+    // Donut state (in-page only)
+    let lastCategoryOrder = [];  // [{name, total, count, color}]
     let lastDonutTotal = 0;
     let selectedSliceIndex = -1;
 
@@ -632,7 +557,7 @@
       initializeCategoryFilters();
       loadDashboard();
       setupSearch();
-      setupDonutModal();
+      setupDonutInteractions();
     });
 
     function loadDashboard() {
@@ -715,10 +640,11 @@
           color: DONUT_COLORS[idx % DONUT_COLORS.length]
         }));
 
-      // Save for fullscreen + swatches
       lastCategoryOrder = ordered;
       lastDonutTotal = ordered.reduce((s, c) => s + c.total, 0);
-      selectedSliceIndex = -1;
+
+      // If selection is now out of range (category count changed), clear it
+      if (selectedSliceIndex >= lastCategoryOrder.length) selectedSliceIndex = -1;
 
       ordered.forEach((cat) => {
         const item = document.createElement('div');
@@ -739,6 +665,7 @@
         categoryList.appendChild(item);
       });
 
+      updateDonutSelectionLabel();
       drawDonutChartSmall();
     }
 
@@ -751,8 +678,7 @@
       canvas.height = size;
 
       drawDonut(ctx, size, size, {
-        showLabels: false,
-        selectedIndex: -1
+        selectedIndex: selectedSliceIndex
       });
     }
 
@@ -769,67 +695,35 @@
 
       let currentAngle = -Math.PI / 2;
 
-     // Draw slices
-lastCategoryOrder.forEach((cat, i) => {
-  const sliceAngle = (cat.total / total) * 2 * Math.PI;
-  const isSelected = (opts.selectedIndex === i);
-  const hasSelection = (opts.selectedIndex !== -1);
+      // Draw slices (NO labels on slices)
+      lastCategoryOrder.forEach((cat, i) => {
+        const sliceAngle = (cat.total / total) * 2 * Math.PI;
+        const isSelected = (opts.selectedIndex === i);
+        const hasSelection = (opts.selectedIndex !== -1);
 
-  const outerR = isSelected ? radius * 1.08 : radius;
+        const outerR = isSelected ? radius * 1.08 : radius;
 
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, outerR, currentAngle, currentAngle + sliceAngle);
-  ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
-  ctx.closePath();
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, outerR, currentAngle, currentAngle + sliceAngle);
+        ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
+        ctx.closePath();
 
-  // ✅ dim non-selected slices when a selection exists
-  ctx.save();
-  if (hasSelection && !isSelected) ctx.globalAlpha = 0.28;
-  ctx.fillStyle = cat.color;
-  ctx.fill();
-  ctx.restore();
+        // Dim non-selected slices when selection exists
+        ctx.save();
+        if (hasSelection && !isSelected) ctx.globalAlpha = 0.28;
+        ctx.fillStyle = cat.color;
+        ctx.fill();
+        ctx.restore();
 
-  // subtle separator
-  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
+        // subtle separator
+        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
 
-  // Optional labels (fullscreen)
-  if (opts.showLabels) {
-    const mid = currentAngle + sliceAngle / 2;
-    const labelR = (innerRadius + outerR) / 2;
-    const lx = centerX + Math.cos(mid) * labelR;
-    const ly = centerY + Math.sin(mid) * labelR;
+        currentAngle += sliceAngle;
+      });
 
-    // draw name + value only if slice is big enough (avoid clutter)
-    const pct = (cat.total / total) * 100;
-    if (pct >= 4.0) {
-      ctx.save();
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      // text shadow for readability
-      ctx.shadowColor = 'rgba(0,0,0,0.65)';
-      ctx.shadowBlur = 6;
-
-      ctx.fillStyle = '#e8eef6';
-      ctx.font = '700 16px system-ui';
-      ctx.fillText(cat.name, lx, ly - 10);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '800 16px system-ui';
-      ctx.fillText(`$${cat.total.toFixed(2)}`, lx, ly + 12);
-
-      ctx.restore();
-    }
-  }
-
-  currentAngle += sliceAngle;
-});
-
-
-
-      // Center text
+      // Center total
       ctx.fillStyle = '#e8eef6';
       ctx.font = '800 26px system-ui';
       ctx.textAlign = 'center';
@@ -841,61 +735,65 @@ lastCategoryOrder.forEach((cat, i) => {
       ctx.fillText('Total', centerX, centerY + 22);
     }
 
-    // ===== Fullscreen modal logic =====
-    function setupDonutModal() {
-      const container = document.getElementById('categoryChartContainer');
-      const modal = document.getElementById('donutModal');
-      const closeBtn = document.getElementById('modalCloseBtn');
-      const resetBtn = document.getElementById('modalResetBtn');
-      const fullCanvas = document.getElementById('categoryChartFull');
+    function updateDonutSelectionLabel() {
+      const el = document.getElementById('donutSelection');
+      if (!el) return;
 
-      // open on click/tap
-      container.addEventListener('click', openModal);
-      container.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') openModal();
+      if (selectedSliceIndex === -1 || !lastCategoryOrder[selectedSliceIndex]) {
+        el.innerHTML = `<span class="sub">Tap a slice to highlight</span>`;
+        return;
+      }
+
+      const cat = lastCategoryOrder[selectedSliceIndex];
+      el.innerHTML = `
+        ${cat.name} • $${cat.total.toFixed(2)}
+        <span class="sub">Tap center/outside to reset</span>
+      `;
+    }
+
+    function setupDonutInteractions() {
+      const canvas = document.getElementById('categoryChart');
+      if (!canvas) return;
+
+      // Keep canvas crisp on resize
+      window.addEventListener('resize', () => {
+        drawDonutChartSmall();
       });
 
-      // close on outside click
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
-      });
-
-      closeBtn.addEventListener('click', closeModal);
-      resetBtn.addEventListener('click', () => {
-        selectedSliceIndex = -1;
-        drawFull();
-      });
-
-      // slice selection
-      fullCanvas.addEventListener('click', (e) => {
+      canvas.addEventListener('click', (e) => {
         if (!lastDonutTotal || lastCategoryOrder.length === 0) return;
 
-        const rect = fullCanvas.getBoundingClientRect();
-        const x = (e.clientX - rect.left);
-        const y = (e.clientY - rect.top);
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (e.clientY - rect.top) * (canvas.height / rect.height);
 
-        const cx = rect.width / 2;
-        const cy = rect.height / 2;
-
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
         const dx = x - cx;
         const dy = y - cy;
-
         const dist = Math.sqrt(dx*dx + dy*dy);
 
-        const radius = Math.min(rect.width, rect.height) * 0.36;
+        const radius = Math.min(canvas.width, canvas.height) * 0.36;
         const innerRadius = radius * 0.62;
 
-        // only respond if clicked on ring (not center hole / outside)
-        if (dist < innerRadius || dist > radius * 1.12) return;
+        // If tap in hole or outside ring, clear
+        if (dist < innerRadius || dist > radius * 1.12) {
+          if (selectedSliceIndex !== -1) {
+            selectedSliceIndex = -1;
+            updateDonutSelectionLabel();
+            drawDonutChartSmall();
+          }
+          return;
+        }
 
+        // Convert point to angle and map to slice
         let angle = Math.atan2(dy, dx); // -PI..PI
-        // align to our start (-PI/2)
         if (angle < -Math.PI/2) angle += 2*Math.PI;
-        const normalized = angle + Math.PI/2; // 0..2PI-ish
+        const normalized = angle + Math.PI/2; // align to start at top
 
-        // find slice
         let acc = 0;
         let found = -1;
+
         for (let i = 0; i < lastCategoryOrder.length; i++) {
           const slice = (lastCategoryOrder[i].total / lastDonutTotal) * 2*Math.PI;
           if (normalized >= acc && normalized < acc + slice) { found = i; break; }
@@ -903,41 +801,12 @@ lastCategoryOrder.forEach((cat, i) => {
         }
 
         if (found === -1) return;
+
+        // Toggle selection
         selectedSliceIndex = (selectedSliceIndex === found) ? -1 : found;
-        drawFull();
-      });
-
-      window.addEventListener('resize', () => {
-        if (modal.classList.contains('open')) drawFull();
-      });
-
-      function openModal() {
-        if (!lastDonutTotal || lastCategoryOrder.length === 0) return;
-        modal.classList.add('open');
-        modal.setAttribute('aria-hidden', 'false');
-        drawFull();
-      }
-
-      function closeModal() {
-        modal.classList.remove('open');
-        modal.setAttribute('aria-hidden', 'true');
-      }
-
-      function drawFull() {
-        const ctx = fullCanvas.getContext('2d');
-
-        // Make canvas match rendered size (with DPR)
-        const rect = fullCanvas.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
-        fullCanvas.width = Math.floor(rect.width * dpr);
-        fullCanvas.height = Math.floor(rect.height * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-        drawDonut(ctx, rect.width, rect.height, {
-          showLabels: true,
-          selectedIndex: selectedSliceIndex
-        });
-      }
+        updateDonutSelectionLabel();
+        drawDonutChartSmall();
+      }, { passive: true });
     }
 
     // Render Budgets
@@ -964,6 +833,7 @@ lastCategoryOrder.forEach((cat, i) => {
       });
 
       budgets.forEach(budget => {
+       a
         const spent = spending[budget.category] || 0;
         const percent = (spent / budget.amount) * 100;
         const isOver = spent > budget.amount;
