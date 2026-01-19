@@ -1,705 +1,321 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finances - Dashboard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finances Dashboard</title>
   <style>
-    :root {
-      --bg: #080c11;
-      --panel: #0d131a;
-      --ink: #e8eef6;
-      --muted: #9fb0c7;
-      --ring: #1c2a37;
-      --accent: #4CAF50;
-      --accent-2: #2dd4bf;
-      --danger: #ef4444;
-      --warn: #f59e0b;
-      --card-bg: #0e141b;
-      --hover-bg: #1a1f26;
+    :root{
+      --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7; --accent:#4CAF50; --accent-2:#2dd4bf;
+      --ring:#2a3543; --warn:#f59e0b; --good:#22c55e; --bad:#ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;
+      background: radial-gradient(1200px 800px at 50% -200px, rgba(76,175,80,.20), transparent 55%),
+                  radial-gradient(900px 700px at 10% 0%, rgba(45,212,191,.12), transparent 60%),
+                  var(--bg);
+      color:var(--ink);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:1120px; margin:0 auto; padding:16px}
+    .topbar{
+      position:sticky; top:0; z-index:20;
+      background: linear-gradient(180deg, rgba(11,15,20,.92), rgba(11,15,20,.72));
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(42,53,67,.55);
+    }
+    .topbar-inner{max-width:1120px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:12px}
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px;
+      padding:8px 12px; border-radius:999px; border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      box-shadow: var(--shadow);
+    }
+    .nav{
+      margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end;
+    }
+    .pill{
+      padding:8px 12px; border-radius:999px; border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      color:var(--muted);
+      font-weight:600;
+    }
+    .pill.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
     }
 
-    * { box-sizing: border-box; }
-    
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
-      background: linear-gradient(180deg, #070b10 0%, #0a1016 100%);
-      color: var(--ink);
-      min-height: 100vh;
+    .grid{
+      margin-top:16px;
+      display:grid; gap:14px;
+      grid-template-columns: 1fr;
+    }
+    @media(min-width:860px){
+      .grid{grid-template-columns: 1.35fr .85fr}
     }
 
-    header {
-      background: #0b1118;
-      border-bottom: 1px solid var(--ring);
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
+    .card{
+      background: rgba(19,26,34,.72);
+      border:1px solid rgba(42,53,67,.70);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
     }
-
-    .home-btn {
-      all: unset;
-      cursor: pointer;
-      border: 1px solid var(--ring);
-      padding: .4rem .7rem;
-      border-radius: .6rem;
-      font-size: .9rem;
-      color: var(--muted);
-      transition: background 0.2s;
+    .card-h{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px;
+      border-bottom:1px solid rgba(42,53,67,.55);
     }
-
-    .home-btn:hover { background: var(--hover-bg); }
-
-    h1 {
-      margin: 0;
-      font-size: 1.1rem;
-      font-weight: 600;
+    .card-h h3{
+      margin:0; font-size:14px; letter-spacing:.2px; color:var(--muted);
+      display:flex; align-items:center; gap:8px;
+      text-transform:none;
     }
+    .card-b{padding:14px 16px}
 
-    .nav-pills {
-      display: flex;
-      gap: 6px;
-      background: var(--panel);
-      padding: 4px;
-      border-radius: 10px;
-      border: 1px solid var(--ring);
-      flex-wrap: wrap;
+    .stats{
+      display:grid; gap:12px; grid-template-columns: repeat(2, 1fr);
     }
-
-    .nav-pill {
-      all: unset;
-      cursor: pointer;
-      padding: .4rem .8rem;
-      border-radius: 8px;
-      font-size: .85rem;
-      color: var(--muted);
-      transition: all .2s;
-      white-space: nowrap;
+    @media(min-width:860px){
+      .stats{grid-template-columns: repeat(4, 1fr)}
     }
-
-    .nav-pill.active {
-      background: linear-gradient(90deg, var(--accent), #22c55e);
-      color: #04130a;
-      font-weight: 600;
-    }
-
-    .wrap {
-      width: min(1200px, 100%);
-      margin: 0 auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--ring);
+    .stat{
+      padding:12px 14px;
+      background: rgba(11,15,20,.35);
+      border:1px solid rgba(42,53,67,.55);
       border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
+      text-align:center;
+    }
+    .stat .v{font-size:26px; font-weight:900; color:var(--good); line-height:1.1}
+    .stat .k{font-size:12px; color:var(--muted); margin-top:4px; font-weight:600}
+
+    .actions{display:flex; gap:10px; flex-wrap:wrap}
+    .btn{
+      padding:10px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(42,53,67,.70);
+      background: rgba(11,15,20,.35);
+      color:var(--ink);
+      font-weight:700;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
+      color:#0b0f14;
     }
 
-    .card h3 {
-      margin: 0 0 12px;
-      font-size: 1rem;
-      color: var(--muted);
-      font-weight: 600;
+    .donut-wrap{
+      display:grid; gap:12px;
+      grid-template-columns: 1fr;
+    }
+    @media(min-width:860px){
+      .donut-wrap{grid-template-columns: 1fr}
     }
 
-    /* Search Bar */
-    .search-bar { position: relative; margin-bottom: 20px; }
-    .search-input {
-      width: 100%;
-      padding: 12px 40px 12px 16px;
-      background: var(--card-bg);
-      border: 1px solid var(--ring);
-      border-radius: 10px;
-      color: var(--ink);
-      font-size: 1rem;
+    .donut-top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      flex-wrap:wrap;
     }
-    .search-input:focus { outline: none; border-color: var(--accent); }
-    .search-icon {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.2rem;
-      color: var(--muted);
+    .donut-sub{
+      color:var(--muted); font-size:12px; font-weight:600;
+    }
+    canvas{max-width:100%; width:100%}
+
+    .legend{
+      margin-top:12px;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .legend-row{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(42,53,67,.55);
+      background: rgba(11,15,20,.35);
+      cursor:pointer;
+      user-select:none;
+    }
+    .legend-left{display:flex; align-items:center; gap:10px}
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: #888;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.04);
+    }
+    .legend-name{font-weight:800}
+    .legend-meta{font-size:12px; color:var(--muted); font-weight:700}
+    .legend-right{text-align:right}
+    .legend-amt{font-weight:900; color:var(--good)}
+    .legend-row.selected{
+      outline: 2px solid rgba(76,175,80,.55);
+      background: rgba(76,175,80,.08);
     }
 
-    /* Category Filters */
-    .category-filters { display: flex; gap: 8px; flex-wrap: wrap; }
-    .filter-btn {
-      all: unset;
-      cursor: pointer;
-      padding: .6rem .9rem;
-      border-radius: 10px;
-      font-size: .9rem;
-      font-weight: 600;
-      border: 2px solid var(--ring);
-      background: var(--card-bg);
-      color: var(--muted);
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    .recent{
+      display:flex; flex-direction:column; gap:10px;
     }
-    .filter-btn:hover { background: var(--hover-bg); border-color: var(--accent); }
-    .filter-btn.active {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #04130a;
-      border-color: var(--accent);
+    .recent-item{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(42,53,67,.55);
+      background: rgba(11,15,20,.35);
+      gap:10px;
     }
-    .filter-btn:not(.active) { opacity: 0.5; }
-    .filter-btn-small { padding: .4rem .7rem; font-size: .85rem; border: 1px solid var(--ring); }
+    .recent-left{
+      display:flex; flex-direction:column; gap:2px;
+      min-width:0;
+    }
+    .recent-title{font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .recent-sub{font-size:12px; color:var(--muted); font-weight:700}
 
-    /* Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .stat-card {
-      background: var(--card-bg);
-      border: 1px solid var(--ring);
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-    }
-    .stat-value {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--accent);
-      margin-bottom: 4px;
-    }
-    .stat-label {
-      font-size: .85rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .5px;
-    }
-    .stat-trend { font-size: .8rem; margin-top: 4px; }
-    .trend-up { color: var(--danger); }
-    .trend-down { color: var(--accent); }
-
-    /* Charts */
-    .chart-container {
-      position: relative;
-      height: 300px;
-      margin: 12px 0 8px;
-      display: grid;
-      place-items: center;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    canvas { max-width: 100%; max-height: 100%; }
-
-    /* Donut selection label (above chart) */
-    .donut-selection {
-      text-align: center;
-      margin: 2px 0 6px;
-      min-height: 22px;
-      font-weight: 800;
-      color: var(--ink);
-    }
-    .donut-selection .sub {
-      display: block;
-      margin-top: 2px;
-      font-weight: 600;
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-
-    /* Click hint */
-    .chart-hint {
-      position: absolute;
-      bottom: 8px;
-      left: 10px;
-      font-size: .8rem;
-      color: var(--muted);
-      opacity: 0.9;
-      pointer-events: none;
-    }
-
-    /* Category List */
-    .category-list { display: flex; flex-direction: column; gap: 12px; }
-    .category-item {
-      background: var(--card-bg);
-      border: 1px solid var(--ring);
-      border-radius: 10px;
-      padding: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .category-item:hover { background: var(--hover-bg); border-color: var(--accent); }
-    .category-info { display: flex; align-items: center; gap: 12px; }
-    .category-icon { font-size: 1.5rem; }
-    .category-name { font-weight: 600; color: var(--ink); }
-    .category-count { font-size: .85rem; color: var(--muted); }
-    .category-amount { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
-
-    /* Color swatch indicator (matches donut slice color) */
-    .color-swatch {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.15);
-      box-shadow: 0 0 0 2px rgba(0,0,0,0.25);
-      flex: 0 0 auto;
-    }
-
-    /* Budget Progress */
-    .budget-item { margin-bottom: 16px; }
-    .budget-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
-    .budget-name { font-weight: 600; color: var(--ink); }
-    .budget-amounts { font-size: .9rem; color: var(--muted); }
-    .budget-bar {
-      width: 100%;
-      height: 12px;
-      background: var(--ring);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    .budget-progress {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      border-radius: 6px;
-      transition: width 0.3s ease;
-    }
-    .budget-progress.over-budget { background: linear-gradient(90deg, var(--danger), #dc2626); }
-
-    /* Action Buttons */
-    .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
-    .btn {
-      all: unset;
-      cursor: pointer;
-      padding: .7rem 1rem;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: .9rem;
-      text-align: center;
-      transition: all 0.2s;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn-primary {
-      background: linear-gradient(90deg, var(--accent), #22c55e);
-      color: #04130a;
-      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-    }
-    .btn-secondary {
-      background: var(--card-bg);
-      border: 1px solid var(--ring);
-      color: var(--muted);
-    }
-    .btn:hover { transform: translateY(-2px); }
-
-    /* Grid Layout */
-    .grid-2col {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 16px;
-    }
-
-    /* Recent Items */
-    .recent-list { display: flex; flex-direction: column; gap: 8px; }
-    .recent-item {
-      background: var(--card-bg);
-      border: 1px solid var(--ring);
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: .9rem;
-    }
-    .recent-date { color: var(--muted); font-size: .8rem; }
-    .recent-store { color: var(--accent-2); font-weight: 600; }
-    .recent-amount { font-weight: 700; color: var(--ink); }
-
-    /* Empty State */
-    .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
-    .empty-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .grid-2col { grid-template-columns: 1fr; }
-      .nav-pills { width: 100%; justify-content: center; }
-    }
-    @media (max-width: 480px) {
-      .wrap { padding: 12px; gap: 12px; }
-      .card { padding: 12px; }
-      .stat-value { font-size: 1.4rem; }
+    .empty{
+      color:var(--muted);
+      display:flex; align-items:center; justify-content:center;
+      padding:26px 10px;
+      gap:10px;
+      text-align:center;
     }
   </style>
-  <script src="dataLoader.js"></script>
 </head>
+
 <body>
-  <header>
-    <button class="home-btn" onclick="location.href='../main.html'">⟵ Home</button>
-    <h1>Finances</h1>
-    <nav class="nav-pills">
-      <button class="nav-pill active">Dashboard</button>
-      <button class="nav-pill" onclick="location.href='food.html'">Food</button>
-      <button class="nav-pill" onclick="location.href='search.html'">Search</button>
-      <button class="nav-pill" onclick="location.href='receipts.html'">Receipts</button>
-      <button class="nav-pill" onclick="location.href='analytics.html'">Analytics</button>
-    </nav>
-  </header>
-
-  <main class="wrap">
-    <!-- Search Bar -->
-    <div class="search-bar">
-      <input type="text" class="search-input" id="searchInput" placeholder="Search items, stores, or categories...">
-      <span class="search-icon">🔍</span>
-    </div>
-
-    <!-- Category Filters -->
-    <div class="card" style="padding: 16px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h3 style="margin: 0;">📊 Category Filters</h3>
-        <button class="filter-btn filter-btn-small" id="toggleAll" onclick="toggleAllFilters()">Toggle All</button>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">🏠 <span>Finances</span></div>
+      <div class="nav">
+        <a class="pill active" href="index.html">Dashboard</a>
+        <a class="pill" href="food.html">Food</a>
+        <a class="pill" href="search.html">Search</a>
+        <a class="pill" href="receipts.html">Receipts</a>
+        <a class="pill" href="analytics.html">Analytics</a>
       </div>
-      <div class="category-filters" id="categoryFilters"></div>
-      <div style="margin-top: 12px; font-size: .85rem; color: var(--muted);">
-        💡 Toggle categories OFF to exclude from spending calculations
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="card" style="margin-top:14px;">
+      <div class="card-b">
+        <div class="stats" id="statsRow">
+          <div class="stat"><div class="v" id="statTotal">$0.00</div><div class="k">Total Spent</div></div>
+          <div class="stat"><div class="v" id="statMonth">$0.00</div><div class="k">This Month</div></div>
+          <div class="stat"><div class="v" id="statWeek">$0.00</div><div class="k">This Week</div></div>
+          <div class="stat"><div class="v" id="statAvg">$0.00</div><div class="k">Avg Purchase</div></div>
+        </div>
       </div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-value" id="totalSpent">$0</div>
-        <div class="stat-label">Total Spent</div>
-        <div class="stat-trend trend-up" id="spentTrend">+12% vs last month</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="thisMonth">$0</div>
-        <div class="stat-label">This Month</div>
-        <div class="stat-trend" id="monthTrend">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="thisWeek">$0</div>
-        <div class="stat-label">This Week</div>
-        <div class="stat-trend" id="weekTrend">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="avgPurchase">$0</div>
-        <div class="stat-label">Avg Purchase</div>
-        <div class="stat-trend" id="avgTrend">—</div>
-      </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-      <a href="addReceipt.html" class="btn btn-primary">📝 Add Receipt</a>
-      <a href="food.html" class="btn btn-primary">🍎 Food Tracking</a>
-      <a href="search.html" class="btn btn-secondary">🔍 Price Lookup</a>
-      <a href="budget.html" class="btn btn-secondary">💰 Budgets</a>
-    </div>
-
-    <!-- Main Content Grid -->
-    <div class="grid-2col">
-      <!-- Spending by Category -->
+    <div class="grid">
       <div class="card">
-        <h3>📊 Spending by Category</h3>
-
-        <!-- Selection text above donut (no slice labels) -->
-        <div class="donut-selection" id="donutSelection">
-          <span class="sub">Tap a slice to highlight</span>
-        </div>
-
-        <div class="chart-container" id="categoryChartContainer">
-          <canvas id="categoryChart"></canvas>
-          <div class="chart-hint">Tap a slice to “pop” it. Tap center/outside to reset.</div>
-        </div>
-
-        <div class="category-list" id="categoryList">
-          <div class="empty-state">
-            <div class="empty-icon">📦</div>
-            <p>No receipts yet. Add your first receipt to see spending breakdown!</p>
+        <div class="card-h">
+          <h3>🧾 Spending by Category</h3>
+          <div class="actions">
+            <a class="btn primary" href="addReceipt.html">🧾 Add Receipt</a>
+            <a class="btn" href="food.html">🍎 Food Tracking</a>
+            <a class="btn" href="search.html">🔎 Price Lookup</a>
+            <a class="btn" href="budget.html">💰 Budgets</a>
           </div>
         </div>
-      </div>
-
-      <!-- Budget Tracker -->
-      <div class="card">
-        <h3>💰 Budget Status</h3>
-        <div id="budgetList">
-          <div class="empty-state">
-            <div class="empty-icon">🎯</div>
-            <p>Set up budgets to track your spending goals</p>
-            <a href="budget.html" class="btn btn-primary" style="margin-top: 12px;">Set Budgets</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Recent Purchases -->
-    <div class="card">
-      <h3>🛒 Recent Purchases</h3>
-      <div class="recent-list" id="recentList">
-        <div class="empty-state">
-          <div class="empty-icon">🧾</div>
-          <p>No purchases yet. Add receipts to track your spending!</p>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    // LocalStorage Keys
-    const STORAGE_KEYS = {
-      RECEIPTS: 'finances:receipts',
-      ITEMS: 'finances:items',
-      BUDGETS: 'finances:budgets',
-      CATEGORIES: 'finances:categories',
-      FILTERS: 'finances:categoryFilters'
-    };
-
-    // Major Expense Categories
-    const MAJOR_CATEGORIES = [
-      { name: 'Groceries', icon: '🛒', color: '#4CAF50' },
-      { name: 'Restaurants', icon: '🍽️', color: '#FF9800' },
-      { name: 'Medical', icon: '💊', color: '#EF4444' },
-      { name: 'Home', icon: '🏠', color: '#3B82F6' },
-      { name: 'Rental Property', icon: '🏘️', color: '#8B5CF6' },
-      { name: 'Transportation', icon: '🚗', color: '#10B981' },
-      { name: 'Utilities', icon: '💡', color: '#F59E0B' },
-      { name: 'Other', icon: '📦', color: '#6B7280' }
-    ];
-
-    // Donut colors (rotates if more categories than colors)
-    const DONUT_COLORS = [
-      '#4CAF50', '#2dd4bf', '#f59e0b', '#ef4444',
-      '#8b5cf6', '#3b82f6', '#ec4899', '#14b8a6',
-      '#a3e635', '#fb7185', '#f97316', '#60a5fa'
-    ];
-
-    // Donut state (in-page only)
-    let lastCategoryOrder = [];  // [{name, total, count, color}]
-    let lastDonutTotal = 0;
-    let selectedSliceIndex = -1;
-
-    // Get Active Filters from Storage
-    function getActiveFilters() {
-      try {
-        const filters = localStorage.getItem(STORAGE_KEYS.FILTERS);
-        if (filters) return JSON.parse(filters);
-      } catch (e) {
-        console.error('Error loading filters:', e);
-      }
-      const defaultFilters = {};
-      MAJOR_CATEGORIES.forEach(cat => defaultFilters[cat.name] = true);
-      return defaultFilters;
-    }
-
-    function saveActiveFilters(filters) {
-      localStorage.setItem(STORAGE_KEYS.FILTERS, JSON.stringify(filters));
-    }
-
-    function initializeCategoryFilters() {
-      const filters = getActiveFilters();
-      const container = document.getElementById('categoryFilters');
-      container.innerHTML = '';
-
-      MAJOR_CATEGORIES.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = 'filter-btn' + (filters[cat.name] ? ' active' : '');
-        btn.dataset.category = cat.name;
-        btn.innerHTML = `<span>${cat.icon}</span><span>${cat.name}</span>`;
-        
-        btn.addEventListener('click', () => {
-          filters[cat.name] = !filters[cat.name];
-          btn.classList.toggle('active');
-          saveActiveFilters(filters);
-          loadDashboard();
-        });
-        
-        container.appendChild(btn);
-      });
-    }
-
-    function toggleAllFilters() {
-      const filters = getActiveFilters();
-      const allActive = Object.values(filters).every(v => v);
-      MAJOR_CATEGORIES.forEach(cat => filters[cat.name] = !allActive);
-      saveActiveFilters(filters);
-      initializeCategoryFilters();
-      loadDashboard();
-    }
-
-    function filterReceiptsByCategory(receipts) {
-      const activeFilters = getActiveFilters();
-      return receipts.map(receipt => {
-        const filteredItems = receipt.items.filter(item => {
-          const category = item.category || 'Other';
-          return activeFilters[category] !== false;
-        });
-        return {
-          ...receipt,
-          items: filteredItems,
-          total: filteredItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
-        };
-      }).filter(receipt => receipt.items.length > 0);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      initializeCategoryFilters();
-      loadDashboard();
-      setupSearch();
-      setupDonutInteractions();
-    });
-
-    function loadDashboard() {
-      const receipts = getReceipts();
-      if (receipts.length === 0) { showEmptyState(); return; }
-
-      const filteredReceipts = filterReceiptsByCategory(receipts);
-      updateStats(filteredReceipts);
-      renderCategoryBreakdown(filteredReceipts);
-      renderBudgets(filteredReceipts);
-      renderRecentPurchases(filteredReceipts);
-    }
-
-    function getReceipts() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.RECEIPTS) || '[]'); }
-      catch (e) { console.error('Error loading receipts:', e); return []; }
-    }
-
-    function updateStats(receipts) {
-      const now = new Date();
-      const thisMonth = now.getMonth();
-      const thisYear = now.getFullYear();
-      const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
-
-      let totalSpent = 0, monthSpent = 0, weekSpent = 0;
-
-      receipts.forEach(receipt => {
-        const date = new Date(receipt.date);
-        const amount = parseFloat(receipt.total) || 0;
-        totalSpent += amount;
-        if (date.getMonth() === thisMonth && date.getFullYear() === thisYear) monthSpent += amount;
-        if (date >= weekAgo) weekSpent += amount;
-      });
-
-      const avgPurchase = receipts.length > 0 ? totalSpent / receipts.length : 0;
-
-      document.getElementById('totalSpent').textContent = '$' + totalSpent.toFixed(2);
-      document.getElementById('thisMonth').textContent = '$' + monthSpent.toFixed(2);
-      document.getElementById('thisWeek').textContent = '$' + weekSpent.toFixed(2);
-      document.getElementById('avgPurchase').textContent = '$' + avgPurchase.toFixed(2);
-    }
-
-    function renderCategoryBreakdown(receipts) {
-      const categories = {};
-      receipts.forEach(receipt => {
-        receipt.items.forEach(item => {
-          const category = item.category || 'Other';
-          const price = parseFloat(item.price) || 0;
-          if (!categories[category]) categories[category] = { total: 0, count: 0 };
-          categories[category].total += price;
-          categories[category].count++;
-        });
-      });
-
-      const categoryList = document.getElementById('categoryList');
-      categoryList.innerHTML = '';
-
-      const categoryIcons = {
-        'Food': '🍎',
-        'Produce': '🥬',
-        'Dairy': '🥛',
-        'Meat': '🥩',
-        'Meat/Fish': '🥩',
-        'Snacks': '🍪',
-        'Drinks': '🥤',
-        'Household': '🧹',
-        'Kids': '👶',
-        'Health': '💊',
-        'Cafe': '☕',
-        'Other': '📦'
-      };
-
-      // Stable order for color mapping: sort by spend desc
-      const ordered = Object.entries(categories)
-        .sort((a, b) => b[1].total - a[1].total)
-        .map(([name, data], idx) => ({
-          name,
-          total: data.total,
-          count: data.count,
-          color: DONUT_COLORS[idx % DONUT_COLORS.length]
-        }));
-
-      lastCategoryOrder = ordered;
-      lastDonutTotal = ordered.reduce((s, c) => s + c.total, 0);
-
-      // If selection is now out of range (category count changed), clear it
-      if (selectedSliceIndex >= lastCategoryOrder.length) selectedSliceIndex = -1;
-
-      ordered.forEach((cat) => {
-        const item = document.createElement('div');
-        item.className = 'category-item';
-        item.onclick = () => filterByCategory(cat.name);
-        
-        item.innerHTML = `
-          <div class="category-info">
-            <span class="color-swatch" style="background:${cat.color}"></span>
-            <span class="category-icon">${categoryIcons[cat.name] || '📦'}</span>
-            <div>
-              <div class="category-name">${cat.name}</div>
-              <div class="category-count">${cat.count} items</div>
+        <div class="card-b">
+          <div class="donut-top">
+            <div class="donut-sub">Tap a slice or a category row to highlight</div>
+            <div class="actions" style="gap:8px;">
+              <button class="btn" id="donutResetBtn" type="button">Reset</button>
             </div>
           </div>
-          <div class="category-amount">$${cat.total.toFixed(2)}</div>
-        `;
-        categoryList.appendChild(item);
-      });
 
-      updateDonutSelectionLabel();
-      drawDonutChartSmall();
+          <div style="margin-top:10px;">
+            <canvas id="donutCanvas" width="620" height="360" aria-label="Spending Donut Chart"></canvas>
+          </div>
+
+          <div class="legend" id="donutLegend"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+          <h3>🧠 Budget Status</h3>
+        </div>
+        <div class="card-b">
+          <div class="empty">
+            🎯 Set up budgets to track your spending goals.
+          </div>
+          <div style="display:flex; justify-content:center;">
+            <a class="btn primary" href="budget.html">Set Budgets</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="card-h">
+        <h3>🛒 Recent Purchases</h3>
+      </div>
+      <div class="card-b">
+        <div class="recent" id="recentPurchases"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="dataLoader.js"></script>
+  <script>
+    // ---------- helpers ----------
+    const fmtMoney = (n) => `$${(Number(n)||0).toFixed(2)}`;
+    const toDate = (d) => (d instanceof Date ? d : new Date(d));
+    const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
+
+    function startOfWeekSunday(date){
+      const dt = new Date(date);
+      dt.setHours(0,0,0,0);
+      const day = dt.getDay(); // 0=Sun
+      dt.setDate(dt.getDate() - day);
+      return dt;
     }
 
-    function drawDonutChartSmall() {
-      const canvas = document.getElementById('categoryChart');
+    function endOfWeekSaturday(date){
+      const s = startOfWeekSunday(date);
+      const e = new Date(s);
+      e.setDate(e.getDate()+6);
+      e.setHours(23,59,59,999);
+      return e;
+    }
+
+    function inRange(dt, start, end){
+      const t = dt.getTime();
+      return t >= start.getTime() && t <= end.getTime();
+    }
+
+    // ---------- donut drawing ----------
+    function drawDonut(canvas, categories, opts={}){
       const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
 
-      const size = Math.min(canvas.parentElement.clientWidth, 300);
-      canvas.width = size;
-      canvas.height = size;
+      ctx.clearRect(0,0,w,h);
 
-      drawDonut(ctx, size, size, {
-        selectedIndex: selectedSliceIndex
-      });
-    }
+      const total = categories.reduce((a,c)=>a + (c.total||0), 0) || 0;
 
-    function drawDonut(ctx, width, height, opts) {
-      const centerX = width / 2;
-      const centerY = height / 2;
-      const radius = Math.min(width, height) * 0.36;
+      const centerX = w/2;
+      const centerY = h/2;
+      const radius = Math.min(w,h) * 0.34;
       const innerRadius = radius * 0.62;
 
-      ctx.clearRect(0, 0, width, height);
+      // background glow
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius*1.35, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(76,175,80,0.06)';
+      ctx.fill();
+      ctx.restore();
 
-      const total = lastDonutTotal;
-      if (!total || total <= 0 || lastCategoryOrder.length === 0) return;
-
-      let currentAngle = -Math.PI / 2;
-
-      // Draw slices (NO labels on slices)
-      lastCategoryOrder.forEach((cat, i) => {
-        const sliceAngle = (cat.total / total) * 2 * Math.PI;
+      // draw slices
+      let currentAngle = -Math.PI/2;
+      categories.forEach((cat, i) => {
+        const sliceAngle = total === 0 ? 0 : (cat.total / total) * 2 * Math.PI;
         const isSelected = (opts.selectedIndex === i);
-        const hasSelection = (opts.selectedIndex !== -1);
 
         const outerR = isSelected ? radius * 1.08 : radius;
 
@@ -708,12 +324,8 @@
         ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
         ctx.closePath();
 
-        // Dim non-selected slices when selection exists
-        ctx.save();
-        if (hasSelection && !isSelected) ctx.globalAlpha = 0.28;
         ctx.fillStyle = cat.color;
         ctx.fill();
-        ctx.restore();
 
         // subtle separator
         ctx.strokeStyle = 'rgba(0,0,0,0.35)';
@@ -723,202 +335,280 @@
         currentAngle += sliceAngle;
       });
 
-      // Center total
-      ctx.fillStyle = '#e8eef6';
-      ctx.font = '800 26px system-ui';
+      // center text
+      ctx.save();
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('$' + total.toFixed(0), centerX, centerY);
+      ctx.shadowColor = 'rgba(0,0,0,0.65)';
+      ctx.shadowBlur = 8;
 
-      ctx.font = '12px system-ui';
-      ctx.fillStyle = '#9fb0c7';
-      ctx.fillText('Total', centerX, centerY + 22);
-    }
+      ctx.fillStyle = '#e8eef6';
+      ctx.font = '900 40px system-ui';
+      ctx.fillText(total ? `$${Math.round(total)}` : '$0', centerX, centerY - 6);
 
-    function updateDonutSelectionLabel() {
-      const el = document.getElementById('donutSelection');
-      if (!el) return;
+      ctx.fillStyle = 'rgba(159,176,199,0.95)';
+      ctx.font = '700 14px system-ui';
+      ctx.fillText('Total', centerX, centerY + 28);
 
-      if (selectedSliceIndex === -1 || !lastCategoryOrder[selectedSliceIndex]) {
-        el.innerHTML = `<span class="sub">Tap a slice to highlight</span>`;
-        return;
+      // Selected label (above donut)
+      if (opts.selectedIndex != null && categories[opts.selectedIndex]) {
+        const c = categories[opts.selectedIndex];
+        ctx.fillStyle = '#e8eef6';
+        ctx.font = '800 18px system-ui';
+        ctx.fillText(`${c.name}: ${fmtMoney(c.total)}`, centerX, centerY - (radius + 36));
       }
 
-      const cat = lastCategoryOrder[selectedSliceIndex];
-      el.innerHTML = `
-        ${cat.name} • $${cat.total.toFixed(2)}
-        <span class="sub">Tap center/outside to reset</span>
-      `;
+      ctx.restore();
     }
 
-    function setupDonutInteractions() {
-      const canvas = document.getElementById('categoryChart');
-      if (!canvas) return;
+    function getSliceAtPoint(canvas, categories, x, y){
+      const w = canvas.width, h = canvas.height;
+      const centerX = w/2, centerY = h/2;
+      const radius = Math.min(w,h) * 0.34;
+      const innerRadius = radius * 0.62;
 
-      // Keep canvas crisp on resize
-      window.addEventListener('resize', () => {
-        drawDonutChartSmall();
+      const dx = x - centerX;
+      const dy = y - centerY;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < innerRadius || dist > radius*1.12) return null;
+
+      let ang = Math.atan2(dy, dx);
+      // normalize to start at -pi/2
+      ang = ang - (-Math.PI/2);
+      if (ang < 0) ang += Math.PI*2;
+
+      const total = categories.reduce((a,c)=>a+(c.total||0),0) || 0;
+      let acc = 0;
+      for (let i=0;i<categories.length;i++){
+        const slice = total === 0 ? 0 : (categories[i].total/total) * Math.PI*2;
+        if (ang >= acc && ang < acc + slice) return i;
+        acc += slice;
+      }
+      return null;
+    }
+
+    function buildLegend(container, categories, selectedIndex, onPick){
+      container.innerHTML = '';
+      categories.forEach((c, idx) => {
+        const row = document.createElement('div');
+        row.className = 'legend-row' + (selectedIndex === idx ? ' selected' : '');
+
+        const left = document.createElement('div');
+        left.className = 'legend-left';
+
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.style.background = c.color;
+
+        const nameWrap = document.createElement('div');
+        const name = document.createElement('div');
+        name.className = 'legend-name';
+        name.textContent = c.name;
+
+        const meta = document.createElement('div');
+        meta.className = 'legend-meta';
+        meta.textContent = `${c.itemsCount} items`;
+
+        nameWrap.appendChild(name);
+        nameWrap.appendChild(meta);
+
+        left.appendChild(dot);
+        left.appendChild(nameWrap);
+
+        const right = document.createElement('div');
+        right.className = 'legend-right';
+
+        const amt = document.createElement('div');
+        amt.className = 'legend-amt';
+        amt.textContent = fmtMoney(c.total);
+
+        right.appendChild(amt);
+
+        row.appendChild(left);
+        row.appendChild(right);
+
+        row.addEventListener('click', () => onPick(idx));
+        container.appendChild(row);
       });
-
-      canvas.addEventListener('click', (e) => {
-        if (!lastDonutTotal || lastCategoryOrder.length === 0) return;
-
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-        const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-        const cx = canvas.width / 2;
-        const cy = canvas.height / 2;
-        const dx = x - cx;
-        const dy = y - cy;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-
-        const radius = Math.min(canvas.width, canvas.height) * 0.36;
-        const innerRadius = radius * 0.62;
-
-        // If tap in hole or outside ring, clear
-        if (dist < innerRadius || dist > radius * 1.12) {
-          if (selectedSliceIndex !== -1) {
-            selectedSliceIndex = -1;
-            updateDonutSelectionLabel();
-            drawDonutChartSmall();
-          }
-          return;
-        }
-
-        // Convert point to angle and map to slice
-        let angle = Math.atan2(dy, dx); // -PI..PI
-        if (angle < -Math.PI/2) angle += 2*Math.PI;
-        const normalized = angle + Math.PI/2; // align to start at top
-
-        let acc = 0;
-        let found = -1;
-
-        for (let i = 0; i < lastCategoryOrder.length; i++) {
-          const slice = (lastCategoryOrder[i].total / lastDonutTotal) * 2*Math.PI;
-          if (normalized >= acc && normalized < acc + slice) { found = i; break; }
-          acc += slice;
-        }
-
-        if (found === -1) return;
-
-        // Toggle selection
-        selectedSliceIndex = (selectedSliceIndex === found) ? -1 : found;
-        updateDonutSelectionLabel();
-        drawDonutChartSmall();
-      }, { passive: true });
     }
 
-    // Render Budgets
-    function renderBudgets(receipts) {
-      const budgets = getBudgets();
-      const budgetList = document.getElementById('budgetList');
-      if (budgets.length === 0) return;
+    // ---------- compute + render ----------
+    async function main(){
+      // dataLoader.js should provide a loader function; fall back to direct fetch
+      let data = null;
+      try{
+        if (window.loadAllData) {
+          data = await window.loadAllData();
+        } else if (window.loadReceiptsData) {
+          data = await window.loadReceiptsData();
+        }
+      }catch(e){}
 
-      budgetList.innerHTML = '';
+      if (!data) {
+        // best effort direct fetch if loader is unavailable
+        const r = await fetch('receiptsData.json', {cache:'no-store'});
+        data = await r.json();
+      }
 
+      const receipts = Array.isArray(data) ? data : (data.receipts || []);
       const now = new Date();
-      const thisMonth = now.getMonth();
-      const thisYear = now.getFullYear();
 
-      const spending = {};
-      receipts.forEach(receipt => {
-        const date = new Date(receipt.date);
-        if (date.getMonth() === thisMonth && date.getFullYear() === thisYear) {
-          receipt.items.forEach(item => {
-            const category = item.category || 'Other';
-            spending[category] = (spending[category] || 0) + (parseFloat(item.price) || 0);
+      // totals for stats
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59,999);
+      const weekStart = startOfWeekSunday(now);
+      const weekEnd = endOfWeekSaturday(now);
+
+      const totalSpent = receipts.reduce((a,r)=>a+(Number(r.total)||0),0);
+      const monthSpent = receipts.filter(r => inRange(toDate(r.date), monthStart, monthEnd))
+                                .reduce((a,r)=>a+(Number(r.total)||0),0);
+      const weekSpent = receipts.filter(r => inRange(toDate(r.date), weekStart, weekEnd))
+                               .reduce((a,r)=>a+(Number(r.total)||0),0);
+      const avgPurchase = receipts.length ? (totalSpent / receipts.length) : 0;
+
+      document.getElementById('statTotal').textContent = fmtMoney(totalSpent);
+      document.getElementById('statMonth').textContent = fmtMoney(monthSpent);
+      document.getElementById('statWeek').textContent = fmtMoney(weekSpent);
+      document.getElementById('statAvg').textContent = fmtMoney(avgPurchase);
+
+      // category totals (top-level categories on receipts)
+      const catMap = new Map();
+      receipts.forEach(r => {
+        const cat = (r.category || 'Other').trim();
+        const prev = catMap.get(cat) || {name:cat, total:0, itemsCount:0};
+        prev.total += Number(r.total)||0;
+        prev.itemsCount += Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
+        catMap.set(cat, prev);
+      });
+
+      // stable colors
+      const palette = [
+        '#4CAF50','#22c55e','#2dd4bf','#60a5fa','#a78bfa','#f59e0b','#fb7185','#f97316','#14b8a6','#94a3b8'
+      ];
+      const cats = Array.from(catMap.values())
+        .sort((a,b)=>b.total-a.total)
+        .map((c, idx)=>({ ...c, color: palette[idx % palette.length] }));
+
+      // donut setup
+      const canvas = document.getElementById('donutCanvas');
+      const legend = document.getElementById('donutLegend');
+
+      // ensure crisp on high DPI
+      const dpr = Math.max(1, Math.round(window.devicePixelRatio || 1));
+      const cssW = canvas.clientWidth || 620;
+      const cssH = 360;
+      canvas.width = Math.round(cssW * dpr);
+      canvas.height = Math.round(cssH * dpr);
+      canvas.style.height = cssH + 'px';
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+
+      let selectedIndex = null;
+
+      function redraw(){
+        // draw on logical CSS pixels (we scale context)
+        const tmp = document.createElement('canvas');
+        tmp.width = Math.round(cssW);
+        tmp.height = Math.round(cssH);
+
+        // draw into a tmp canvas at CSS pixel size, then drawImage scaled by DPR
+        // but since we already scaled the context, just draw using a fake canvas wrapper
+        // easiest: temporarily swap width/height usage inside drawDonut by using a proxy
+        const proxy = {
+          width: Math.round(cssW),
+          height: Math.round(cssH),
+          getContext: () => ctx
+        };
+        ctx.clearRect(0,0,cssW,cssH);
+        drawDonut(proxy, cats, { selectedIndex });
+        buildLegend(legend, cats, selectedIndex, (idx)=>{
+          selectedIndex = (selectedIndex === idx) ? null : idx;
+          redraw();
+        });
+      }
+
+      canvas.addEventListener('click', (ev) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = ev.clientX - rect.left;
+        const y = ev.clientY - rect.top;
+        const idx = getSliceAtPoint({width:cssW, height:cssH}, cats, x, y);
+        if (idx == null) {
+          selectedIndex = null;
+        } else {
+          selectedIndex = (selectedIndex === idx) ? null : idx;
+        }
+        redraw();
+      });
+
+      document.getElementById('donutResetBtn').addEventListener('click', ()=>{
+        selectedIndex = null;
+        redraw();
+      });
+
+      redraw();
+
+      // recent purchases (last 2 weeks)
+      const recentWrap = document.getElementById('recentPurchases');
+      const twoWeeksAgo = new Date(now);
+      twoWeeksAgo.setDate(now.getDate() - 14);
+
+      const recent = receipts
+        .filter(r => toDate(r.date) >= twoWeeksAgo)
+        .sort((a,b)=> toDate(b.date) - toDate(a.date))
+        .slice(0, 12);
+
+      recentWrap.innerHTML = '';
+      if (!recent.length){
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'No purchases in the last 2 weeks.';
+        recentWrap.appendChild(empty);
+      } else {
+        recent.forEach(r=>{
+          const row = document.createElement('div');
+          row.className = 'recent-item';
+
+          const left = document.createElement('div');
+          left.className = 'recent-left';
+
+          const title = document.createElement('div');
+          title.className = 'recent-title';
+          title.textContent = `${r.store || 'Unknown Store'}`;
+
+          const sub = document.createElement('div');
+          sub.className = 'recent-sub';
+          const d = toDate(r.date);
+          const ds = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
+          const count = Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
+          sub.textContent = `${ds} • ${count} items`;
+
+          left.appendChild(title);
+          left.appendChild(sub);
+
+          const right = document.createElement('div');
+          right.style.fontWeight = '900';
+          right.style.color = 'var(--good)';
+          right.textContent = fmtMoney(r.total);
+
+          row.appendChild(left);
+          row.appendChild(right);
+
+          // click to view receipt page (simple)
+          row.addEventListener('click', ()=>{
+            try{
+              localStorage.setItem('selectedReceiptId', r.id || '');
+            }catch(e){}
+            window.location.href = 'receipts.html';
           });
-        }
-      });
 
-      budgets.forEach(budget => {
-       a
-        const spent = spending[budget.category] || 0;
-        const percent = (spent / budget.amount) * 100;
-        const isOver = spent > budget.amount;
-
-        const item = document.createElement('div');
-        item.className = 'budget-item';
-        item.innerHTML = `
-          <div class="budget-header">
-            <span class="budget-name">${budget.category}</span>
-            <span class="budget-amounts">$${spent.toFixed(2)} / $${budget.amount.toFixed(2)}</span>
-          </div>
-          <div class="budget-bar">
-            <div class="budget-progress ${isOver ? 'over-budget' : ''}" style="width: ${Math.min(percent, 100)}%"></div>
-          </div>
-        `;
-        budgetList.appendChild(item);
-      });
+          recentWrap.appendChild(row);
+        });
+      }
     }
 
-    function getBudgets() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.BUDGETS) || '[]'); }
-      catch (e) { return []; }
-    }
-
-    // Render Recent Purchases
-    function renderRecentPurchases(receipts) {
-      const recentList = document.getElementById('recentList');
-      recentList.innerHTML = '';
-
-      const sorted = receipts
-        .slice()
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 10);
-
-      sorted.forEach(receipt => {
-        const item = document.createElement('div');
-        item.className = 'recent-item';
-        item.onclick = () => viewReceipt(receipt.id);
-
-        const date = new Date(receipt.date);
-        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-        item.innerHTML = `
-          <div>
-            <div class="recent-store">${receipt.store || 'Store'}</div>
-            <div class="recent-date">${dateStr} • ${receipt.items.length} items</div>
-          </div>
-          <div class="recent-amount">$${parseFloat(receipt.total || 0).toFixed(2)}</div>
-        `;
-        recentList.appendChild(item);
-      });
-    }
-
-    // Setup Search
-    function setupSearch() {
-      const searchInput = document.getElementById('searchInput');
-
-      searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        if (query.length > 2) performSearch(query);
-      });
-
-      searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          const query = e.target.value;
-          location.href = `search.html?q=${encodeURIComponent(query)}`;
-        }
-      });
-    }
-
-    function performSearch(query) {
-      if (query.length > 0) location.href = `search.html?q=${encodeURIComponent(query)}`;
-    }
-
-    function viewReceipt(id) {
-      location.href = `receipts.html?id=${id}`;
-    }
-
-    function filterByCategory(category) {
-      location.href = `receipts.html?category=${encodeURIComponent(category)}`;
-    }
-
-    function showEmptyState() {
-      // Empty states are already in HTML
-    }
+    main().catch(err=>{
+      console.error(err);
+    });
   </script>
 </body>
 </html>
