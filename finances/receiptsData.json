@@ -1836,7 +1836,61 @@
         }
       ]
     }
+  ],{
+  "id": "simones-kitchen-2026-01-19",
+  "store": "Simone's Kitchen",
+  "category": "Restaurants",
+  "date": "2026-01-19T11:30:00",
+  "total": 31.91,
+  "paymentMethod": "Visa",
+  "itemsCount": 3,
+  "items": [
+    {
+      "name": "Big Create Your Own - Chicken",
+      "qty": 2,
+      "total": 25.30
+    },
+    {
+      "name": "Almond Orange Cranberry Cake",
+      "qty": 1,
+      "total": 4.25
+    }
   ],
+  "meta": {
+    "address": "1475 Western Avenue, Suite 38, Albany, NY 12203",
+    "tax": 2.36,
+    "source": "photo"
+  }
+},{
+  "id": "whole-foods-2026-01-19",
+  "store": "Whole Foods Market",
+  "category": "Groceries",
+  "date": "2026-01-19T00:00:00",
+  "total": 18.97,
+  "paymentMethod": "Visa",
+  "itemsCount": 3,
+  "items": [
+    {
+      "name": "Sweet Batch Blueberries",
+      "qty": 1,
+      "total": 6.99
+    },
+    {
+      "name": "Ark Foods Shishito Peppers",
+      "qty": 1,
+      "total": 5.99
+    },
+    {
+      "name": "Organic Sweet Garlic",
+      "qty": 1,
+      "total": 4.99
+    }
+  ],
+  "meta": {
+    "address": "1425 Central Ave, Albany, NY 12205",
+    "source": "photo"
+  }
+},
   "metadata": {
     "version": "1.0",
     "lastUpdated": "2026-01-17",
