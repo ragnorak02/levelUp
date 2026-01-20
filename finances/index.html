@@ -24,7 +24,7 @@
     }
     a{color:inherit; text-decoration:none}
 
-    /* ---- top nav: single line, minimal height ---- */
+    /* ---- top nav: single line ---- */
     .topbar{
       position:sticky; top:0; z-index:20;
       background: linear-gradient(180deg, rgba(11,15,20,.92), rgba(11,15,20,.72));
@@ -38,7 +38,7 @@
     }
     .brand{
       display:flex; align-items:center; gap:8px;
-      font-weight:900; letter-spacing:.2px;
+      font-weight:900;
       padding:8px 10px;
       border-radius:999px;
       border:1px solid rgba(42,53,67,.75);
@@ -85,26 +85,32 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
-    .card-h{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:14px 16px;
-      border-bottom:1px solid rgba(42,53,67,.55);
-      gap:12px;
-      flex-wrap:wrap;
+
+    /* Month nav above the 2 stats */
+    .monthbar{
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      padding:12px 12px 0 12px;
     }
-    .card-h h3{
-      margin:0; font-size:14px; color:var(--muted);
-      display:flex; align-items:center; gap:8px;
+    .monthbtn{
+      width:40px; height:38px;
+      border-radius:12px;
+      border:1px solid rgba(42,53,67,.70);
+      background: rgba(11,15,20,.35);
+      color:var(--ink);
+      font-weight:900;
+      cursor:pointer;
+    }
+    .monthlabel{
+      font-weight:950;
+      color:var(--ink);
       letter-spacing:.2px;
+      min-width: 160px;
+      text-align:center;
     }
-    .card-b{padding:14px 16px}
 
     .stats{
       display:grid; gap:12px; grid-template-columns: repeat(2, 1fr);
       padding:12px;
-    }
-    @media(min-width:860px){
-      .stats{grid-template-columns: repeat(4, 1fr)}
     }
     .stat{
       padding:12px 14px;
@@ -119,12 +125,26 @@
     .grid{
       display:grid; gap:14px;
       grid-template-columns: 1fr;
+      margin-top:14px;
     }
     @media(min-width:860px){
       .grid{grid-template-columns: 1.35fr .85fr}
     }
 
-    .actions{display:flex; gap:10px; flex-wrap:wrap}
+    .card-h{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px;
+      border-bottom:1px solid rgba(42,53,67,.55);
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .card-h h3{
+      margin:0; font-size:14px; color:var(--muted);
+      display:flex; align-items:center; gap:8px;
+      letter-spacing:.2px;
+    }
+    .card-b{padding:14px 16px}
+
     .btn{
       padding:10px 14px;
       border-radius: 14px;
@@ -135,25 +155,12 @@
       display:inline-flex; align-items:center; gap:8px;
       cursor:pointer;
     }
-    .btn.primary{
-      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
-      border-color: transparent;
-      color:#0b0f14;
-    }
 
     .donut-top{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       flex-wrap:wrap;
     }
-    .donut-sub{
-      color:var(--muted); font-size:12px; font-weight:800;
-    }
-
-    /* donut tabs */
-    .tabs{
-      display:flex; gap:8px; flex-wrap:wrap;
-      align-items:center;
-    }
+    .tabs{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
     .tab{
       padding:8px 12px;
       border-radius:999px;
@@ -172,10 +179,7 @@
 
     canvas{max-width:100%; width:100%}
 
-    .legend{
-      margin-top:12px;
-      display:flex; flex-direction:column; gap:8px;
-    }
+    .legend{margin-top:12px; display:flex; flex-direction:column; gap:8px;}
     .legend-row{
       display:flex; align-items:center; justify-content:space-between;
       padding:10px 12px;
@@ -209,9 +213,7 @@
       text-align:center;
     }
 
-    .recent{
-      display:flex; flex-direction:column; gap:10px;
-    }
+    .recent{display:flex; flex-direction:column; gap:10px;}
     .recent-item{
       display:flex; align-items:center; justify-content:space-between;
       padding:12px 12px;
@@ -224,6 +226,16 @@
     .recent-left{display:flex; flex-direction:column; gap:2px; min-width:0}
     .recent-title{font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
     .recent-sub{font-size:12px; color:var(--muted); font-weight:800}
+    .recent-toggle{
+      margin-top:10px;
+      display:flex;
+      justify-content:center;
+    }
+    .chev{
+      width:100%;
+      justify-content:center;
+      gap:8px;
+    }
   </style>
 </head>
 
@@ -242,45 +254,44 @@
   </div>
 
   <div class="wrap">
-
     <div class="card" style="margin-top:12px;">
+      <div class="monthbar">
+        <button class="monthbtn" id="monthPrev" type="button">◀</button>
+        <div class="monthlabel" id="monthLabel">Month</div>
+        <button class="monthbtn" id="monthNext" type="button">▶</button>
+      </div>
+
       <div class="stats">
-        <div class="stat"><div class="v" id="statTotal">$0.00</div><div class="k">Total Spent</div></div>
-        <div class="stat"><div class="v" id="statMonth">$0.00</div><div class="k">This Month</div></div>
-        <div class="stat"><div class="v" id="statWeek">$0.00</div><div class="k">This Week</div></div>
-        <div class="stat"><div class="v" id="statAvg">$0.00</div><div class="k">Avg Purchase</div></div>
+        <div class="stat">
+          <div class="v" id="statMonth">$0.00</div>
+          <div class="k">Month Total</div>
+        </div>
+        <div class="stat">
+          <div class="v" id="statWeek">$0.00</div>
+          <div class="k">This Week</div>
+        </div>
       </div>
     </div>
 
-    <div class="grid" style="margin-top:14px;">
+    <div class="grid">
       <div class="card">
         <div class="card-h">
           <h3>📊 Spending by Category</h3>
-          <div class="actions">
-            <a class="btn primary" href="addReceipt.html">🧾 Add Receipt</a>
-            <a class="btn" href="food.html">🍎 Food Tracking</a>
-            <a class="btn" href="search.html">🔎 Price Lookup</a>
-            <a class="btn" href="budget.html">💰 Budgets</a>
+          <div>
+            <button class="btn" id="donutResetBtn" type="button">Reset</button>
           </div>
         </div>
 
         <div class="card-b">
           <div class="donut-top">
-            <div>
-              <div class="donut-sub">Tap a slice or a category row to highlight</div>
-              <div class="tabs" style="margin-top:10px;">
-                <div class="tab active" id="tabAll">All</div>
-                <div class="tab" id="tabGroceries">Groceries</div>
-              </div>
-            </div>
-
-            <div class="actions" style="gap:8px;">
-              <button class="btn" id="donutResetBtn" type="button">Reset</button>
+            <div class="tabs">
+              <div class="tab active" id="tabAll">All</div>
+              <div class="tab" id="tabGroceries">Groceries</div>
             </div>
           </div>
 
           <div style="margin-top:12px;">
-            <canvas id="donutCanvas" width="620" height="360" aria-label="Spending Donut Chart"></canvas>
+            <canvas id="donutCanvas" width="620" height="360"></canvas>
           </div>
 
           <div class="legend" id="donutLegend"></div>
@@ -294,7 +305,7 @@
         <div class="card-b">
           <div class="empty">🎯 Set up budgets to track your spending goals.</div>
           <div style="display:flex; justify-content:center;">
-            <a class="btn primary" href="budget.html">Set Budgets</a>
+            <a class="btn" href="budget.html">Set Budgets</a>
           </div>
         </div>
       </div>
@@ -306,14 +317,15 @@
       </div>
       <div class="card-b">
         <div class="recent" id="recentPurchases"></div>
+        <div class="recent-toggle" id="recentToggleWrap" style="display:none;">
+          <button class="btn chev" id="recentToggleBtn" type="button">Show more ▼</button>
+        </div>
       </div>
     </div>
-
   </div>
 
   <script src="dataLoader.js"></script>
   <script>
-    // ---------- helpers ----------
     const fmtMoney = (n) => `$${(Number(n)||0).toFixed(2)}`;
     const toDate = (d) => (d instanceof Date ? d : new Date(d));
 
@@ -336,13 +348,48 @@
       return t >= start.getTime() && t <= end.getTime();
     }
 
-    // stable palette
-    const palette = ['#4CAF50','#22c55e','#2dd4bf','#60a5fa','#a78bfa','#f59e0b','#fb7185','#f97316','#14b8a6','#94a3b8','#f472b6'];
+    // ---- stable color mapping by category NAME ----
+    const FIXED_COLORS = {
+      // top-level
+      "Groceries":"#4CAF50",
+      "Cafe":"#f59e0b",
+      "Restaurants":"#fb7185",
+      "Home":"#60a5fa",
+      "Rental Property":"#a78bfa",
+      "Transportation":"#14b8a6",
+      "Utilities":"#f97316",
+      "Medical":"#f472b6",
+      "Other":"#94a3b8",
+
+      // grocery breakdown
+      "Meat/Fish":"#2dd4bf",
+      "Dairy":"#60a5fa",
+      "Produce":"#22c55e",
+      "Snacks":"#fb7185",
+      "Pantry":"#a78bfa",
+      "Bakery":"#f59e0b",
+      "Drinks":"#14b8a6",
+      "Grains":"#f97316",
+      "Unknown":"#94a3b8"
+    };
+
+    function hashColor(str){
+      let h = 2166136261;
+      for (let i=0;i<str.length;i++){
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      const hue = Math.abs(h) % 360;
+      return `hsl(${hue} 70% 55%)`;
+    }
+    function getColor(name){
+      const key = (name || "Unknown").trim();
+      return FIXED_COLORS[key] || hashColor(key);
+    }
 
     // ---------- donut drawing ----------
     function drawDonut(ctx, w, h, categories, selectedIndex){
       ctx.clearRect(0,0,w,h);
-
       const total = categories.reduce((a,c)=>a + (c.total||0), 0) || 0;
 
       const centerX = w/2;
@@ -350,7 +397,6 @@
       const radius = Math.min(w,h) * 0.34;
       const innerRadius = radius * 0.62;
 
-      // background glow
       ctx.save();
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius*1.35, 0, Math.PI*2);
@@ -395,7 +441,7 @@
       ctx.font = '800 14px system-ui';
       ctx.fillText('Total', centerX, centerY + 28);
 
-      // selected label ABOVE donut (not on slices)
+      // selected label ABOVE donut
       if (selectedIndex != null && categories[selectedIndex]) {
         const c = categories[selectedIndex];
         ctx.fillStyle = '#e8eef6';
@@ -475,6 +521,63 @@
       });
     }
 
+    // ---- OPTIONAL items DB load (safe if file missing) ----
+    async function loadItemsDb(){
+      try{
+        const r = await fetch('itemsDatabase.json', {cache:'no-store'});
+        if (!r.ok) return null;
+        return await r.json();
+      }catch(e){
+        return null;
+      }
+    }
+
+    function norm(s){
+      return String(s||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+    }
+
+    function lookupFoodCategoryFromItemsDb(itemsDb, itemName){
+      if (!itemsDb) return null;
+
+      if (itemsDb.map && typeof itemsDb.map === 'object'){
+        const n = norm(itemName);
+        for (const k of Object.keys(itemsDb.map)){
+          if (n.includes(norm(k))) return itemsDb.map[k];
+        }
+      }
+
+      if (Array.isArray(itemsDb.items)){
+        const n = norm(itemName);
+        for (const it of itemsDb.items){
+          if (!it) continue;
+          const key = norm(it.name || it.item || it.title);
+          if (key && n.includes(key)) return it.category || it.foodCategory || null;
+        }
+      }
+
+      return null;
+    }
+
+    function guessFoodCategory(itemName){
+      const n = norm(itemName);
+      const has = (...words) => words.some(w => n.includes(w));
+
+      if (has('beef','steak','chicken','pork','turkey','lamb','salmon','tuna','shrimp','fish','meat','teres','teres major')) return 'Meat/Fish';
+      if (has('milk','yogurt','cheese','butter','cream','oatly','half and half','egg','eggs')) return 'Dairy';
+      if (has('banana','apple','avocado','berries','strawberry','blueberry','raspberry','pepper','spinach','lettuce','tomato','onion','cucumber','carrot','produce')) return 'Produce';
+      if (has('bread','bagel','bun','muffin','croissant','bakery')) return 'Bakery';
+      if (has('rice','oats','oat','pasta','noodle','quinoa','grain','grains')) return 'Grains';
+      if (has('chips','cookie','cookies','chocolate','candy','snack','snacks','ice cream')) return 'Snacks';
+      if (has('soda','juice','water','coffee','tea','drink','drinks')) return 'Drinks';
+      if (has('sauce','spice','salt','pepper','oil','vinegar','pantry')) return 'Pantry';
+
+      return 'Other';
+    }
+
+    function sumReceiptItemsCount(r){
+      return Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
+    }
+
     // ---------- category builders ----------
     function aggregateByReceiptCategory(receipts){
       const map = new Map();
@@ -482,49 +585,83 @@
         const name = (r.category || 'Other').trim();
         const prev = map.get(name) || { name, total:0, itemsCount:0 };
         prev.total += Number(r.total)||0;
-        prev.itemsCount += Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
+        prev.itemsCount += sumReceiptItemsCount(r);
         map.set(name, prev);
       });
+
       return Array.from(map.values())
         .sort((a,b)=>b.total-a.total)
-        .map((c, idx)=>({ ...c, color: palette[idx % palette.length] }));
+        .map(c => ({ ...c, color: getColor(c.name) }));
     }
 
-    // Groceries breakdown: treat "food categories" as their own receipt.category set
-    // (This avoids the confusing "Groceries + Dairy/Produce/etc" mixed in one chart.)
-    function aggregateGroceriesBreakdown(receipts){
-      const FOOD_CATS = new Set([
-        'Meat/Fish','Dairy','Produce','Snacks','Pantry','Bakery','Drinks','Grains'
-      ]);
+    async function aggregateGroceriesBreakdown(receipts){
+      const itemsDb = await loadItemsDb();
 
-      // Consider receipts that are groceries-like OR already categorized into food subcats
-      const groceryLike = new Set(['Groceries', ...Array.from(FOOD_CATS)]);
+      const groceryReceipts = receipts.filter(r => {
+        const cat = (r.category||'').trim();
+        return ['Groceries','Meat/Fish','Dairy','Produce','Snacks','Pantry','Bakery','Drinks','Grains'].includes(cat);
+      });
 
       const map = new Map();
-      receipts.forEach(r => {
-        const rc = (r.category || 'Other').trim();
 
-        // include only grocery-like receipts
-        if (!groceryLike.has(rc)) return;
+      groceryReceipts.forEach(r=>{
+        const cat = (r.category||'Other').trim();
 
-        // if receipt is "Groceries", we CAN’T reliably split without item metadata,
-        // so we keep it under "Other (Groceries)" to avoid lying.
-        // BUT: if your receipts already use Meat/Fish/Dairy/Produce/etc, they’ll show correctly.
-        let bucket = rc;
-        if (rc === 'Groceries') bucket = 'Other (Groceries)';
+        const directFood = ['Meat/Fish','Dairy','Produce','Snacks','Pantry','Bakery','Drinks','Grains'];
+        if (directFood.includes(cat)){
+          const prev = map.get(cat) || { name:cat, total:0, itemsCount:0 };
+          prev.total += Number(r.total)||0;
+          prev.itemsCount += sumReceiptItemsCount(r);
+          map.set(cat, prev);
+          return;
+        }
 
-        const prev = map.get(bucket) || { name: bucket, total:0, itemsCount:0 };
+        if (cat === 'Groceries' && Array.isArray(r.items) && r.items.length){
+          r.items.forEach(it=>{
+            const itemName = (it.name || it.item || it.title || it.description || '').trim();
+            const qty = Number(it.qty ?? it.quantity ?? 1) || 1;
+            const price = Number(it.total ?? it.price ?? it.amount ?? 0) || 0;
+
+            const fromDb = lookupFoodCategoryFromItemsDb(itemsDb, itemName);
+            const bucket = (fromDb || guessFoodCategory(itemName) || 'Other').trim();
+
+            const prev = map.get(bucket) || { name:bucket, total:0, itemsCount:0 };
+            prev.total += price;
+            prev.itemsCount += qty;
+            map.set(bucket, prev);
+          });
+          return;
+        }
+
+        const prev = map.get('Other') || { name:'Other', total:0, itemsCount:0 };
         prev.total += Number(r.total)||0;
-        prev.itemsCount += Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
-        map.set(bucket, prev);
+        prev.itemsCount += sumReceiptItemsCount(r);
+        map.set('Other', prev);
       });
 
       return Array.from(map.values())
         .sort((a,b)=>b.total-a.total)
-        .map((c, idx)=>({ ...c, color: palette[idx % palette.length] }));
+        .map(c => ({ ...c, color: getColor(c.name) }));
     }
 
-    // ---------- main ----------
+    function monthKey(date){
+      const d = new Date(date.getFullYear(), date.getMonth(), 1);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    }
+
+    function getMonthRangeFromBase(now, offset){
+      const base = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+      const start = new Date(base.getFullYear(), base.getMonth(), 1, 0,0,0,0);
+      const end = new Date(base.getFullYear(), base.getMonth()+1, 0, 23,59,59,999);
+      return { start, end, labelDate: base };
+    }
+
+    function formatMonthLabel(d, now){
+      const sameYear = d.getFullYear() === now.getFullYear();
+      const m = d.toLocaleString('en-US', { month:'long' });
+      return sameYear ? m : `${m} ${d.getFullYear()}`;
+    }
+
     async function main(){
       let data = null;
       try{
@@ -536,28 +673,25 @@
         const r = await fetch('receiptsData.json', {cache:'no-store'});
         data = await r.json();
       }
-      const receipts = Array.isArray(data) ? data : (data.receipts || []);
+      const allReceipts = Array.isArray(data) ? data : (data.receipts || []);
       const now = new Date();
 
-      // stats
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59,999);
-      const weekStart = startOfWeekSunday(now);
-      const weekEnd = endOfWeekSaturday(now);
+      // ---- month selection state ----
+      let monthOffset = 0; // 0=current month, -1 previous, etc.
+      let tab = 'all';     // 'all' | 'groceries'
+      let selectedIndex = null;
+      let activeCategories = [];
 
-      const totalSpent = receipts.reduce((a,r)=>a+(Number(r.total)||0),0);
-      const monthSpent = receipts.filter(r => inRange(toDate(r.date), monthStart, monthEnd))
-        .reduce((a,r)=>a+(Number(r.total)||0),0);
-      const weekSpent = receipts.filter(r => inRange(toDate(r.date), weekStart, weekEnd))
-        .reduce((a,r)=>a+(Number(r.total)||0),0);
-      const avgPurchase = receipts.length ? (totalSpent / receipts.length) : 0;
+      const monthLabelEl = document.getElementById('monthLabel');
+      const monthPrevEl = document.getElementById('monthPrev');
+      const monthNextEl = document.getElementById('monthNext');
 
-      document.getElementById('statTotal').textContent = fmtMoney(totalSpent);
-      document.getElementById('statMonth').textContent = fmtMoney(monthSpent);
-      document.getElementById('statWeek').textContent = fmtMoney(weekSpent);
-      document.getElementById('statAvg').textContent = fmtMoney(avgPurchase);
+      const statMonthEl = document.getElementById('statMonth');
+      const statWeekEl = document.getElementById('statWeek');
 
-      // donut setup
+      const tabAllEl = document.getElementById('tabAll');
+      const tabGroEl = document.getElementById('tabGroceries');
+
       const canvas = document.getElementById('donutCanvas');
       const legend = document.getElementById('donutLegend');
       const ctx = canvas.getContext('2d');
@@ -571,30 +705,35 @@
       canvas.height = Math.round(cssH * dpr);
       ctx.setTransform(dpr,0,0,dpr,0,0);
 
-      // tabs data
-      let tab = 'all'; // 'all' | 'groceries'
-      let selectedIndex = null;
-
-      const tabAllEl = document.getElementById('tabAll');
-      const tabGroEl = document.getElementById('tabGroceries');
-
-      function getActiveCategories(){
-        return tab === 'groceries'
-          ? aggregateGroceriesBreakdown(receipts)
-          : aggregateByReceiptCategory(receipts);
+      function getReceiptsForSelectedMonth(){
+        const { start, end } = getMonthRangeFromBase(now, monthOffset);
+        return allReceipts.filter(r => inRange(toDate(r.date), start, end));
       }
 
-      let activeCategories = getActiveCategories();
+      function updateTopStats(){
+        const { start: mStart, end: mEnd, labelDate } = getMonthRangeFromBase(now, monthOffset);
+        monthLabelEl.textContent = formatMonthLabel(labelDate, now);
 
-      function setTab(newTab){
-        tab = newTab;
-        selectedIndex = null;
+        const monthReceipts = allReceipts.filter(r => inRange(toDate(r.date), mStart, mEnd));
+        const monthSpent = monthReceipts.reduce((a,r)=>a+(Number(r.total)||0),0);
 
-        tabAllEl.classList.toggle('active', tab === 'all');
-        tabGroEl.classList.toggle('active', tab === 'groceries');
+        const weekStart = startOfWeekSunday(now);
+        const weekEnd = endOfWeekSaturday(now);
+        const weekSpent = allReceipts
+          .filter(r => inRange(toDate(r.date), weekStart, weekEnd))
+          .reduce((a,r)=>a+(Number(r.total)||0),0);
 
-        activeCategories = getActiveCategories();
-        redraw();
+        statMonthEl.textContent = fmtMoney(monthSpent);
+        statWeekEl.textContent = fmtMoney(weekSpent);
+      }
+
+      async function computeCategories(){
+        const monthReceipts = getReceiptsForSelectedMonth();
+        if (tab === 'groceries'){
+          activeCategories = await aggregateGroceriesBreakdown(monthReceipts);
+        } else {
+          activeCategories = aggregateByReceiptCategory(monthReceipts);
+        }
       }
 
       function redraw(){
@@ -603,6 +742,22 @@
           selectedIndex = (selectedIndex === idx) ? null : idx;
           redraw();
         });
+      }
+
+      async function refreshAll(){
+        updateTopStats();
+        selectedIndex = null;
+        await computeCategories();
+        redraw();
+      }
+
+      async function setTab(newTab){
+        tab = newTab;
+        selectedIndex = null;
+        tabAllEl.classList.toggle('active', tab === 'all');
+        tabGroEl.classList.toggle('active', tab === 'groceries');
+        await computeCategories();
+        redraw();
       }
 
       tabAllEl.addEventListener('click', ()=>setTab('all'));
@@ -623,26 +778,41 @@
         redraw();
       });
 
-      redraw();
+      monthPrevEl.addEventListener('click', async ()=>{
+        monthOffset -= 1;
+        await refreshAll();
+      });
+      monthNextEl.addEventListener('click', async ()=>{
+        monthOffset += 1;
+        await refreshAll();
+      });
 
-      // recent purchases (last 2 weeks)
+      // ---- recent purchases: show 3 by default with expand ----
       const recentWrap = document.getElementById('recentPurchases');
-      const twoWeeksAgo = new Date(now);
-      twoWeeksAgo.setDate(now.getDate() - 14);
+      const recentToggleWrap = document.getElementById('recentToggleWrap');
+      const recentToggleBtn = document.getElementById('recentToggleBtn');
+      let recentExpanded = false;
 
-      const recent = receipts
-        .filter(r => toDate(r.date) >= twoWeeksAgo)
-        .sort((a,b)=> toDate(b.date) - toDate(a.date))
-        .slice(0, 12);
+      function renderRecent(){
+        const sorted = [...allReceipts]
+          .sort((a,b)=> toDate(b.date) - toDate(a.date));
 
-      recentWrap.innerHTML = '';
-      if (!recent.length){
-        const empty = document.createElement('div');
-        empty.className = 'empty';
-        empty.textContent = 'No purchases in the last 2 weeks.';
-        recentWrap.appendChild(empty);
-      } else {
-        recent.forEach(r=>{
+        const maxCollapsed = 3;
+        const maxExpanded = 12;
+
+        const toShow = recentExpanded ? sorted.slice(0, maxExpanded) : sorted.slice(0, maxCollapsed);
+
+        recentWrap.innerHTML = '';
+        if (!toShow.length){
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.textContent = 'No purchases yet.';
+          recentWrap.appendChild(empty);
+          recentToggleWrap.style.display = 'none';
+          return;
+        }
+
+        toShow.forEach(r=>{
           const row = document.createElement('div');
           row.className = 'recent-item';
 
@@ -657,7 +827,7 @@
           sub.className = 'recent-sub';
           const d = toDate(r.date);
           const ds = `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
-          const count = Array.isArray(r.items) ? r.items.length : (Number(r.itemsCount)||0);
+          const count = sumReceiptItemsCount(r);
           sub.textContent = `${ds} • ${count} items`;
 
           left.appendChild(title);
@@ -678,7 +848,24 @@
 
           recentWrap.appendChild(row);
         });
+
+        // show toggle only if there are more than 3 receipts total
+        if (sorted.length > maxCollapsed){
+          recentToggleWrap.style.display = 'flex';
+          recentToggleBtn.textContent = recentExpanded ? 'Show less ▲' : 'Show more ▼';
+        } else {
+          recentToggleWrap.style.display = 'none';
+        }
       }
+
+      recentToggleBtn.addEventListener('click', ()=>{
+        recentExpanded = !recentExpanded;
+        renderRecent();
+      });
+
+      // initial paint
+      await refreshAll();
+      renderRecent();
     }
 
     main().catch(console.error);
