@@ -258,11 +258,16 @@
       const total = Object.values(categories).reduce((sum, cat) => sum + cat.total, 0);
       if (total === 0) return;
 
-      const colors = ['#4CAF50', '#2dd4bf', '#f59e0b', '#ef4444', '#8b5cf6', '#3b82f6', '#ec4899', '#14b8a6'];
+      const colors = ['#4CAF50', '#8b5cf6', '#f59e0b', '#ef4444', '#8b5cf6', '#3b82f6', '#ec4899', '#14b8a6'];
+
+      const CATEGORY_COLORS = {'Groceries': '#4CAF50', 'Cafe': '#f59e0b', 'Restaurant': '#ef4444' };
+
 
       let currentAngle = -Math.PI / 2;
 
-      Object.values(categories).forEach((cat, i) => {
+      Object.entries(categories).forEach(([name, cat], i) => {
+
+
         const sliceAngle = (cat.total / total) * 2 * Math.PI;
 
         ctx.beginPath();
@@ -270,7 +275,8 @@
         ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
         ctx.closePath();
 
-        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillStyle = CATEGORY_COLORS[name] || colors[i % colors.length];
+
         ctx.fill();
 
         currentAngle += sliceAngle;

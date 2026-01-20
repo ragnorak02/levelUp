@@ -1835,7 +1835,114 @@
           "subcategory": "Yogurt"
         }
       ]
+    },
+    {
+  "id": "receipt_starbucks_20260119",
+  "date": "2026-01-19",
+  "store": "Starbucks",
+  "storeLocation": "Stuyvesant Plaza, Albany, NY",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Caramel Macchiato (Grande)",
+      "price": 5.75,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee"
+    },
+    {
+      "name": "Pike Place Roast (Grande)",
+      "price": 2.95,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee"
+    },
+    {
+      "name": "Hot Chocolate (Kids)",
+      "price": 2.65,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Hot Drinks"
+    },
+    {
+      "name": "Chocolate Cake Pop",
+      "price": 3.25,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Bakery",
+      "discount": 3.25,
+      "notes": "Reward 100 Stars"
     }
+  ],
+  "subtotal": 11.35,
+  "tax": 0.91,
+  "total": 12.26,
+  "notes": "Starbucks in-store order"
+},
+{
+  "id": "receipt_wholefoods_20260119",
+  "date": "2026-01-19",
+  "store": "Whole Foods Market",
+  "storeLocation": "1425 Central Ave, Albany, NY",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Blueberries",
+      "price": 6.99,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce"
+    },
+    {
+      "name": "Shishito Peppers",
+      "price": 5.99,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce"
+    },
+    {
+      "name": "Organic Sweet Garlic",
+      "price": 4.99,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce"
+    }
+  ],
+  "subtotal": 18.97,
+  "tax": 0.0,
+  "total": 18.97,
+  "notes": "Whole Foods Market Albany"
+},
+{
+  "id": "receipt_simones_kitchen_20260119",
+  "date": "2026-01-19",
+  "store": "Simone's Kitchen",
+  "storeLocation": "1475 Western Ave Suite 38, Albany, NY",
+  "category": "Restaurant",
+  "items": [
+    {
+      "name": "Create Your Own Bowl (Chicken)",
+      "price": 12.65,
+      "quantity": 2,
+      "category": "Restaurant",
+      "subcategory": "Entree"
+    },
+    {
+      "name": "Almond Orange Cranberry Cake",
+      "price": 4.25,
+      "quantity": 1,
+      "category": "Restaurant",
+      "subcategory": "Dessert"
+    }
+  ],
+  "subtotal": 29.55,
+  "tax": 2.36,
+  "total": 31.91,
+  "notes": "For here – Chase Visa contactless"
+}
+
+
+
   ],
   "metadata": {
     "version": "1.0",
