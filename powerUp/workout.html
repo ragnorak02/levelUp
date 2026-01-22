@@ -461,19 +461,48 @@ function drawExerciseHistoryChart(canvasId, history) {
 
 function compareWeight(c,p){ c=Number(c)||0; p=Number(p)||0; if(c>p) return 'better'; if(c===p && c>0) return 'same'; if(c<p) return 'worse'; return ''; }
 function calculateStrengthChange(cw,cr,pw,pr){
-  const current=(Number(cw)||0)*(Number(cr)||0), prev=(Number(pw)||0)*(Number(pr)||0);
-  if(prev===0) return {type:'new',percentage:0,label:'NEW'};
-  const diff=current-prev, pct=Math.min(Math.abs(diff/prev)*100,100);
-  return diff>0 ? {type:'better',percentage:pct,label:`+${Math.round(pct)}%`} :
-         diff<0 ? {type:'worse',percentage:pct,label:`-${Math.round(pct)}%`} :
-                  {type:'same',percentage:0,label:'='};
+  const cW = Number(cw) || 0, cR = Number(cr) || 0;
+  const pW = Number(pw) || 0, pR = Number(pr) || 0;
+
+  // Primary metric: weight. Reps are secondary and should not "penalize" a heavier set.
+  if (pW === 0 && pR === 0) return {type:'new', percentage:0, label:'NEW'};
+
+  if (cW > pW){
+    const diff = cW - pW;
+    const pct = (pW > 0) ? Math.min((diff / pW) * 100, 100) : 100;
+    return {type:'better', percentage:pct, label:`+${diff} lb`};
+  }
+  if (cW < pW){
+    const diff = pW - cW;
+    const pct = (pW > 0) ? Math.min((diff / pW) * 100, 100) : 100;
+    return {type:'worse', percentage:pct, label:`-${diff} lb`};
+  }
+
+  // Same weight → compare reps
+  if (cR > pR){
+    const diff = cR - pR;
+    const pct = (pR > 0) ? Math.min((diff / pR) * 100, 100) : 100;
+    return {type:'better', percentage:pct, label:`+${diff} rep`};
+  }
+  if (cR < pR){
+    const diff = pR - cR;
+    const pct = (pR > 0) ? Math.min((diff / pR) * 100, 100) : 100;
+    return {type:'worse', percentage:pct, label:`-${diff} rep`};
+  }
+  return {type:'same', percentage:0, label:'='};
 }
 function calculateDifference(cw,cr,pw,pr){
-  const w=(Number(cw)||0)-(Number(pw)||0);
-  const r=(Number(cr)||0)-(Number(pr)||0);
-  const ws = w>0?`+${w}`: w<0?`${w}`: (Number(cw)||0)>0?'=':'—';
-  const rs = r>0?`+${r}`: r<0?`${r}`: (Number(cr)||0)>0?'=':'—';
-  return `${ws} × ${rs}`;
+  const cW = Number(cw) || 0, cR = Number(cr) || 0;
+  const pW = Number(pw) || 0, pR = Number(pr) || 0;
+
+  const w = cW - pW;
+  const r = cR - pR;
+
+  const wStr = (pW === 0 && cW === 0) ? '—' : (w > 0 ? `+${w} lb` : w < 0 ? `${w} lb` : '0 lb');
+  const rStr = (pR === 0 && cR === 0) ? '—' : (r > 0 ? `+${r} rep` : r < 0 ? `${r} rep` : '0 rep');
+
+  // Keep it readable; weight first.
+  return `${wStr}, ${rStr}`;
 }
 function getPreviousWorkouts(limit=5){
   const workouts=[]; const today=new Date(); const cur=current.toISOString().slice(0,10);
@@ -689,8 +718,9 @@ function renderExercise(ex){
         </div>
       </div>
       <div class="ex-actions-bottom">
-        <div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
           <button class="btn" style="padding:.6rem 1.2rem; background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a" data-act="markComplete">${ex.completed?'Completed ✓':'Complete'}</button>
+          <button class="btn-ghost btn-small" data-act="viewHistory">📊 History</button>
         </div>
       </div>
     `;

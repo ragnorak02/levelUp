@@ -312,20 +312,23 @@ function downloadJSON(filename, dataObj){
 }
 
 function totalVolume(workout){
+  // Count ALL logged sets (even if not explicitly marked 'done'),
+  // so analytics matches the index/calendar totals.
   return workout.exercises.reduce((sum, ex) => {
     return sum + ex.sets.reduce((setSum, set) => {
-      if(ex.finished || set.completed) {
-        return setSum + (set.weight * set.reps);
-      }
+      const w = Number(set.weight) || 0;
+      const r = Number(set.reps) || 0;
+      if(w > 0 && r > 0) return setSum + (w * r);
       return setSum;
     }, 0);
   }, 0);
 }
 
 function totalSets(workout){
+  // Count ALL sets that have any entered weight or reps.
   return workout.exercises.reduce((sum, ex) => {
-    if(ex.finished) return sum + ex.sets.length;
-    return sum + ex.sets.filter(s => s.completed).length;
+    const count = ex.sets.filter(s => (Number(s.weight)||0) > 0 || (Number(s.reps)||0) > 0).length;
+    return sum + count;
   }, 0);
 }
 
@@ -335,7 +338,7 @@ function getPersonalRecords(){
   workouts.forEach(workout => {
     workout.exercises.forEach(ex => {
       ex.sets.forEach(set => {
-        if((ex.finished || set.completed) && set.weight > 0) {
+        if(set.weight > 0) {
           const key = ex.name.toLowerCase();
           const currentPR = records.get(key);
           if(!currentPR || set.weight > currentPR.weight) {
@@ -485,7 +488,7 @@ function drawBarChart(canvasId, data, options = {}){
 }
 
 /* FIX #7: Get ALL exercises */
-: Get ALL exercises */
+/* Get ALL exercises */
 function getAllExercisesFromWorkouts() {
   const exerciseMap = new Map();
   
@@ -630,7 +633,7 @@ function drawVolumeChart(period = '7d'){
 }
 
 /* FIX #5: PR Detail with chart */
- with chart */
+ /*with chart */
 function getExerciseHistory(exerciseName, bodyPart, maxWorkouts = 20) {
   const history = [];
   
@@ -641,9 +644,7 @@ function getExerciseHistory(exerciseName, bodyPart, maxWorkouts = 20) {
     );
     
     if(exercise && exercise.sets && exercise.sets.length > 0) {
-      const completedSets = exercise.sets.filter(set => {
-        return exercise.finished || set.completed;
-      });
+      const completedSets = exercise.sets.filter(set => (Number(set.weight)||0) > 0 && (Number(set.reps)||0) > 0);
       
       if(completedSets.length > 0) {
         const maxWeight = Math.max(...completedSets
@@ -750,7 +751,7 @@ function getExerciseProgressionHistory(exerciseName, bodyPart, maxWorkouts = 20)
 
     if(!exercise || !exercise.sets || exercise.sets.length === 0) return;
 
-    const completedSets = exercise.sets.filter(set => exercise.finished || set.completed);
+    const completedSets = exercise.sets.filter(set => (Number(set.weight)||0) > 0 && (Number(set.reps)||0) > 0);
     if(completedSets.length === 0) return;
 
     // Find max weight for that day, then max reps at that weight
