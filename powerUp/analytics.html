@@ -20,6 +20,32 @@
     display:flex; flex-direction:column; overflow-x:hidden;
   }
 
+  
+  .download-btn{
+    all:unset; 
+    cursor:pointer; 
+    padding:.5rem .9rem; 
+    border-radius:8px; 
+    background:linear-gradient(135deg, #3b82f6, #2563eb); 
+    color:#fff; 
+    font-size:.9rem; 
+    font-weight:600;
+    box-shadow:0 4px 12px rgba(59, 130, 246, 0.25);
+    transition:all .2s;
+    display:inline-block;
+  }
+  .download-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 6px 16px rgba(59, 130, 246, 0.35);
+  }
+  .download-btn:active{transform:translateY(0)}
+  
+  .header-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
   header{
     display:flex; align-items:center; justify-content:space-between;
     padding:.6rem .9rem; border-bottom:1px solid var(--ring); background:#0e141b;
@@ -40,28 +66,12 @@
   .card h3{margin:.1rem 0 .6rem; font-size:1rem; color:var(--muted); font-weight:600; display:flex; align-items:center; gap:8px}
   .card-icon{font-size:1.1rem}
 
-  .stat-card{grid-column: span 3; text-align:center; position:relative; overflow:hidden}
+  .stat-card{grid-column: span 3; text-align:center; position:relative; overflow:hidden; padding:10px}
   .stat-card::before{content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gradient-primary)}
-  .stat-value{font-size:2rem; font-weight:800; margin:.5rem 0 .2rem; background:var(--gradient-primary); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text}
+  .stat-value{font-size:1.5rem; font-weight:800; margin:.5rem 0 .2rem; background:var(--gradient-primary); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text}
   .stat-label{font-size:.85rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
   .stat-trend{font-size:.8rem; margin-top:.3rem; display:flex; align-items:center; justify-content:center; gap:4px}
   .trend-up{color:var(--good)} .trend-down{color:var(--bad)} .trend-neutral{color:var(--muted)}
-
-  /* Compact summary row + top actions */
-  .top-actions{display:flex; align-items:center; gap:10px}
-  .download-btn{all:unset; cursor:pointer; padding:.5rem .85rem; border-radius:10px; font-size:.85rem; font-weight:700;
-    background:var(--gradient-primary); color:#04130a; box-shadow:0 6px 18px rgba(34,197,94,.18)}
-  .download-btn:active{transform:translateY(1px)}
-  .stats-row{grid-column: span 12; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px}
-  .stats-row .stat-card{grid-column: auto; padding:10px}
-  .stats-row .stat-value{font-size:1.35rem; margin:.35rem 0 .15rem}
-  .stats-row .stat-label{font-size:.75rem}
-  .stats-row .stat-trend{font-size:.74rem; margin-top:.2rem}
-  .stats-row .card-icon{font-size:1rem}
-  @media (max-width: 640px){
-    .stats-row{grid-template-columns:repeat(2, minmax(0, 1fr))}
-  }
-
 
   .chart-card{grid-column: span 8; position:relative}
   .chart-controls{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap}
@@ -125,7 +135,10 @@
 </head>
 <body>
   <header>
-    <button class="home" onclick="location.href='index.html'">⟵ Back</button>
+    <div class="header-actions">
+      <button class="home" onclick="location.href='index.html'">⟵ Back</button>
+      <button class="download-btn" id="downloadData">⬇ Download Data</button>
+    </div>
     <h1>Power Up! — Analytics</h1>
     <div class="nav-tabs">
       <button class="tab active" data-view="overview">Overview</button>
@@ -135,14 +148,9 @@
   </header>
 
   <div class="wrap">
-    <div class="top-actions">
-      <button class="download-btn" id="downloadDataBtn">Download Data</button>
-    </div>
-
     <div id="overviewTab" class="tab-content">
       <section class="grid">
-        <div class="stats-row">
-<article class="card stat-card">
+        <article class="card stat-card">
           <div class="card-icon">💪</div>
           <div class="stat-value" id="totalVolume">0</div>
           <div class="stat-label">Total Volume (lb)</div>
@@ -169,16 +177,14 @@
           <div class="stat-label">Avg Volume</div>
           <div class="stat-trend trend-up" id="avgTrend">↗ +156 lb/workout</div>
         </article>
-</div>
-
 
         <!-- FIX #4: Volume Trends as BAR CHART -->
         <article class="card chart-card">
           <h3><span class="card-icon">📊</span>Volume Trends</h3>
           <div class="chart-controls">
             <button class="btn btn-ghost active" data-period="7d">7 Days</button>
-            <button class="btn btn-ghost" data-period="14d">14 Days</button>
-            <button class="btn btn-ghost" data-period="28d">28 Days</button>
+            <button class="btn btn-ghost" data-period="30d">30 Days</button>
+            <button class="btn btn-ghost" data-period="90d">90 Days</button>
           </div>
           <div class="chart-container">
             <canvas class="chart" id="volumeChart"></canvas>
@@ -242,7 +248,7 @@
   <!-- FIX #5: PR Detail Popup -->
   <div class="popup" id="prDetailPopup">
     <div class="sheet">
-      <button class="x" onclick="document.getElementById('prDetailPopup').style.display='none'">✕</button>
+      <button class="x" onclick="document.getElementById('prDetailPopup').style.display='none'">âœ•</button>
       <h2 id="prDetailTitle" style="margin:6px 0 10px; font-size:1.2rem; color:var(--ink)">Exercise Progression</h2>
       <div id="prDetailInfo" style="margin:10px 0; padding:10px; background:#0e141b; border-radius:8px; border:1px solid var(--ring)"></div>
       <canvas id="prDetailChart" style="width:100%; height:300px"></canvas>
@@ -285,60 +291,31 @@ const workouts = readLocalDays();
 const today = new Date();
 const todayISO = today.toISOString().slice(0,10);
 
-function exportAllWorkoutData(){
-  const all = [];
-  for(let i=0; i<localStorage.length; i++){
-    const k = localStorage.key(i);
-    if(!/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
-    try{
-      const day = JSON.parse(localStorage.getItem(k));
-      if(day && day.date) all.push(day);
-    }catch(e){}
-  }
-  all.sort((a,b)=> new Date(a.date) - new Date(b.date));
-  return all;
-}
-
-function downloadJSON(filename, dataObj){
-  const blob = new Blob([JSON.stringify(dataObj, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url), 250);
-}
-
 function totalVolume(workout){
-  // Count ALL logged sets (even if not explicitly marked 'done'),
-  // so analytics matches the index/calendar totals.
   return workout.exercises.reduce((sum, ex) => {
     return sum + ex.sets.reduce((setSum, set) => {
-      const w = Number(set.weight) || 0;
-      const r = Number(set.reps) || 0;
-      if(w > 0 && r > 0) return setSum + (w * r);
+      if(ex.finished || set.completed) {
+        return setSum + (set.weight * set.reps);
+      }
       return setSum;
     }, 0);
   }, 0);
 }
 
 function totalSets(workout){
-  // Count ALL sets that have any entered weight or reps.
   return workout.exercises.reduce((sum, ex) => {
-    const count = ex.sets.filter(s => (Number(s.weight)||0) > 0 || (Number(s.reps)||0) > 0).length;
-    return sum + count;
+    if(ex.finished) return sum + ex.sets.length;
+    return sum + ex.sets.filter(s => s.completed).length;
   }, 0);
 }
 
-function getPersonalRecords(){(){
+function getPersonalRecords(){
   const records = new Map();
   
   workouts.forEach(workout => {
     workout.exercises.forEach(ex => {
       ex.sets.forEach(set => {
-        if(set.weight > 0) {
+        if((ex.finished || set.completed) && set.weight > 0) {
           const key = ex.name.toLowerCase();
           const currentPR = records.get(key);
           if(!currentPR || set.weight > currentPR.weight) {
@@ -375,125 +352,100 @@ function getPeriodStats(days = 7){
 }
 
 /* FIX #4: Bar Chart with Y-axis labels */
-
 function drawBarChart(canvasId, data, options = {}){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
-
+  
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
-
+  
   canvas.width = rect.width * dpr;
   canvas.height = rect.height * dpr;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
+  ctx.scale(dpr, dpr);
+  
   const width = rect.width;
   const height = rect.height;
-
-  const paddingTop = 22;
-  const paddingBottom = 34;
-  const leftPadding = 64;
-  const rightPadding = 18;
-
+  const padding = 50;
+  const leftPadding = 60;
+  
   ctx.clearRect(0, 0, width, height);
-
+  
   if(!data || data.length === 0) return;
-
-  const values = data.map(d => Number(d.y) || 0);
+  
+  const values = data.map(d => d.y);
   const maxY = Math.max(...values, 1);
-
-  const plotW = width - leftPadding - rightPadding;
-  const plotH = height - paddingTop - paddingBottom;
-  const gap = Math.max(2, Math.floor(plotW / Math.max(1, data.length) * 0.15));
-  const barW = Math.max(2, Math.floor((plotW - gap * (data.length - 1)) / data.length));
-
+  const barWidth = Math.max(8, (width - leftPadding - padding) / data.length - 4);
+  
   // Y-axis label
   ctx.save();
-  ctx.translate(18, paddingTop + plotH/2);
+  ctx.translate(15, height/2);
   ctx.rotate(-Math.PI/2);
   ctx.fillStyle = '#9fb0c7';
   ctx.font = 'bold 12px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText(options.yLabel || 'Total Volume (lb)', 0, 0);
   ctx.restore();
-
-  // Y grid + labels
+  
+  // Y-axis scale
   ctx.fillStyle = '#9fb0c7';
   ctx.font = '10px sans-serif';
   ctx.textAlign = 'right';
-
+  
   for(let i = 0; i <= 4; i++) {
     const value = Math.round((maxY / 4) * i);
-    const y = paddingTop + plotH - (i / 4) * plotH;
-
+    const y = height - padding - (i / 4) * (height - 2 * padding);
+    
     // Grid line
     ctx.strokeStyle = '#233446';
     ctx.lineWidth = 1;
     ctx.setLineDash([2, 3]);
     ctx.beginPath();
     ctx.moveTo(leftPadding, y);
-    ctx.lineTo(width - rightPadding, y);
+    ctx.lineTo(width - padding, y);
     ctx.stroke();
     ctx.setLineDash([]);
-
-    ctx.fillText(value.toLocaleString(), leftPadding - 6, y + 3);
+    
+    // Label
+    ctx.fillText(value.toLocaleString(), leftPadding - 5, y + 3);
   }
-
-  // Bars + optional top labels
+  
+  // Draw bars
   data.forEach((point, index) => {
-    const x = leftPadding + index * (barW + gap);
-    const barH = (Number(point.y) / maxY) * plotH;
-    const y = paddingTop + plotH - barH;
-
-    const gradient = ctx.createLinearGradient(x, y, x, paddingTop + plotH);
+    const x = leftPadding + index * (barWidth + 4);
+    const barHeight = (point.y / maxY) * (height - 2 * padding);
+    const y = height - padding - barHeight;
+    
+    // Gradient
+    const gradient = ctx.createLinearGradient(x, y, x, height - padding);
     gradient.addColorStop(0, options.color || '#4CAF50');
     gradient.addColorStop(1, options.color2 || '#22c55e');
-
+    
     ctx.fillStyle = gradient;
-    ctx.fillRect(x, y, barW, barH);
-
-    const topLabel = point.label || options.valueLabel?.(point, index);
-    if(topLabel && barH > 14){
+    ctx.fillRect(x, y, barWidth, barHeight);
+    
+    // Show value on top if bar is tall enough
+    if(barHeight > 20) {
       ctx.fillStyle = '#e8eef6';
       ctx.font = 'bold 9px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(String(topLabel), x + barW/2, Math.max(10, y - 4));
+      // Show custom label (e.g., "40 × 8") if available and showBarLabels is true
+      const labelText = (options.showBarLabels && point.label) ? point.label : Math.round(point.y);
+      ctx.fillText(labelText, x + barWidth/2, y - 3);
     }
-
-    // Consistency dot near baseline (workout / no-workout)
-    if(options.showWorkoutDots){
-      const dotY = paddingTop + plotH + 8; // slightly below baseline
-      ctx.beginPath();
-      ctx.arc(x + barW/2, dotY, 3, 0, Math.PI*2);
-      ctx.fillStyle = point.didWorkout ? (options.dotOnColor || '#22c55e') : (options.dotOffColor || '#233446');
-      ctx.fill();
+    
+    // X-axis labels (if enabled)
+    if(options.showXLabels && point.label) {
+      ctx.fillStyle = '#9fb0c7';
+      ctx.font = '9px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.save();
+      ctx.translate(x + barWidth/2, height - padding + 15);
+      ctx.rotate(-Math.PI/4);
+      ctx.fillText(point.label, 0, 0);
+      ctx.restore();
     }
   });
-
-  // X-axis labels
-  const labels = options.xLabels || data.map(d => d.xLabel).filter(Boolean);
-  if(labels && labels.length){
-    const many = labels.length > 10;
-    ctx.fillStyle = '#9fb0c7';
-    ctx.font = '9px sans-serif';
-    ctx.textAlign = 'center';
-
-    labels.forEach((lab, i) => {
-      const x = leftPadding + i * (barW + gap) + barW/2;
-      const y = height - 10;
-
-      if(many){
-        ctx.save();
-        ctx.translate(x, height - 6);
-        ctx.rotate(-Math.PI/4);
-        ctx.fillText(String(lab), 0, 0);
-        ctx.restore();
-      } else {
-        ctx.fillText(String(lab), x, y);
-      }
-    });
-  }
 }
 
 /* FIX #7: Get ALL exercises */
@@ -582,47 +534,46 @@ function renderFilteredExercises(bodyPartFilter = 'all') {
   }
 }
 
-
 function drawVolumeChart(period = '7d'){
-  // Daily bars for consistency view (includes 0-volume days)
-  const volByDate = new Map();
-  workouts.forEach(w => volByDate.set(w.date, totalVolume(w)));
-
-  const days =
-    period === '7d'  ? 7  :
-    period === '14d' ? 14 :
-    28;
-
-  const start = new Date(today);
-  start.setDate(today.getDate() - (days - 1));
-
-  const data = [];
-  for(let i=0; i<days; i++){
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    const iso = d.toISOString().slice(0,10);
-
-    const vol = volByDate.get(iso) || 0;
-
-    data.push({
-      date: iso,
-      y: vol,
-      xLabel: d.toLocaleDateString(undefined, { month:'short', day:'numeric' }),
-      didWorkout: vol > 0,
-      label: vol ? Math.round(vol).toLocaleString() : ''
-    });
-  }
-
-  drawBarChart('volumeChart', data, {
+  const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+  
+  // Get actual workouts within the period
+  const cutoffDate = new Date(today);
+  cutoffDate.setDate(today.getDate() - days);
+  
+  const chartData = workouts
+    .filter(w => new Date(w.date) >= cutoffDate)
+    .map(w => ({
+      date: w.date,
+      y: totalVolume(w),
+      label: formatDateLabel(w.date, period)
+    }))
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  drawBarChart('volumeChart', chartData, {
     color: '#4CAF50',
     color2: '#22c55e',
     yLabel: 'Total Volume (lb)',
-    xLabels: data.map(d => d.xLabel),
-    showWorkoutDots: true
+    showXLabels: true
   });
 }
 
-/* FIX #5: PR Detail with chart */
+function formatDateLabel(dateISO, period) {
+  const date = new Date(dateISO);
+  
+  if(period === '7d') {
+    // Show day of week for 7-day view
+    return date.toLocaleDateString('en', {weekday: 'short'});
+  } else if(period === '30d') {
+    // Show month/day for 30-day view
+    return date.toLocaleDateString('en', {month: 'short', day: 'numeric'});
+  } else {
+    // Show month/day for 90-day view
+    return date.toLocaleDateString('en', {month: 'short', day: 'numeric'});
+  }
+}
+
+/* FIX #5: PR Detail with chart - Enhanced to track weight AND reps */
 function getExerciseHistory(exerciseName, bodyPart, maxWorkouts = 20) {
   const history = [];
   
@@ -633,17 +584,25 @@ function getExerciseHistory(exerciseName, bodyPart, maxWorkouts = 20) {
     );
     
     if(exercise && exercise.sets && exercise.sets.length > 0) {
-      const completedSets = exercise.sets.filter(set => (Number(set.weight)||0) > 0 && (Number(set.reps)||0) > 0);
+      const completedSets = exercise.sets.filter(set => {
+        return exercise.finished || set.completed;
+      });
       
       if(completedSets.length > 0) {
         const maxWeight = Math.max(...completedSets
           .map(s => Number(s.weight) || 0)
           .filter(w => w > 0));
         
+        // Find the highest reps performed at the max weight
+        const maxWeightSets = completedSets.filter(s => Number(s.weight) === maxWeight);
+        const maxReps = Math.max(...maxWeightSets.map(s => Number(s.reps) || 0));
+        
         if(maxWeight > 0) {
           history.push({
             date: workout.date,
             y: maxWeight,
+            reps: maxReps,
+            label: `${maxWeight} × ${maxReps}`,
             workout: workout
           });
         }
@@ -728,69 +687,28 @@ function drawPRChart(canvasId, data, prWeight, options = {}){
   });
 }
 
-
-function getExerciseProgressionHistory(exerciseName, bodyPart, maxWorkouts = 20) {
-  const history = [];
-
-  workouts.forEach(workout => {
-    const exercise = workout.exercises.find(ex =>
-      ex.name.toLowerCase().trim() === exerciseName.toLowerCase().trim() &&
-      ex.bodyPart === bodyPart
-    );
-
-    if(!exercise || !exercise.sets || exercise.sets.length === 0) return;
-
-    const completedSets = exercise.sets.filter(set => (Number(set.weight)||0) > 0 && (Number(set.reps)||0) > 0);
-    if(completedSets.length === 0) return;
-
-    // Find max weight for that day, then max reps at that weight
-    const maxW = Math.max(...completedSets.map(s => Number(s.weight) || 0));
-    if(!maxW || maxW <= 0) return;
-
-    const maxR = Math.max(...completedSets
-      .filter(s => (Number(s.weight) || 0) === maxW)
-      .map(s => Number(s.reps) || 0));
-
-    history.push({
-      date: workout.date,
-      y: maxW,          // keep bar height based on weight
-      weight: maxW,
-      reps: maxR || 0,
-      label: `${maxW}×${maxR||0}`
-    });
-  });
-
-  history.sort((a, b) => new Date(a.date) - new Date(b.date));
-  return history.slice(-maxWorkouts);
-}
-
 function drawProgressionChart(exerciseName, bodyPart) {
   if(!exerciseName) return;
-
-  const progressionData = getExerciseProgressionHistory(exerciseName, bodyPart);
-
+  
+  const progressionData = getExerciseHistory(exerciseName, bodyPart);
+  
   const canvas = document.getElementById('progressionChart');
   const container = canvas.parentElement;
   const existingMessage = container.querySelector('.no-progression-data');
   if(existingMessage) existingMessage.remove();
-
+  
   if(progressionData.length === 0) {
     renderNoProgressionData(exerciseName);
     return;
   }
-
-  const xLabels = progressionData.map(d =>
-    new Date(d.date).toLocaleDateString(undefined, {month:'short', day:'numeric'})
-  );
-
+  
   drawBarChart('progressionChart', progressionData, {
     color: '#2dd4bf',
     color2: '#14b8a6',
     yLabel: 'Max Weight (lb)',
-    xLabels,
-    valueLabel: (p)=> `${p.weight}×${p.reps||0}`
+    showBarLabels: true
   });
-
+  
   updateProgressionInfo(exerciseName, progressionData);
 }
 
@@ -810,72 +728,58 @@ function renderNoProgressionData(exerciseName) {
 }
 
 /* FIX #8: Enhanced progression info */
-
 function updateProgressionInfo(exerciseName, data) {
   let infoPanel = document.getElementById('progression-info');
-
+  
   if(!infoPanel) {
     infoPanel = document.createElement('div');
     infoPanel.id = 'progression-info';
     infoPanel.style.cssText = `
-      margin-top: 12px;
-      padding: 10px;
-      background: #0f141b;
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--card);
       border: 1px solid var(--ring);
       border-radius: 12px;
-      display: flex;
-      gap: 10px;
-      align-items: stretch;
-      justify-content: space-between;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
     `;
-
+    
     const chartContainer = document.getElementById('progressionChart').parentElement;
     chartContainer.appendChild(infoPanel);
   }
-
-  const first = data[0];
-  const last = data[data.length - 1];
-
-  const best = data.reduce((m, d) => (d.weight > m.weight ? d : m), data[0]);
-  // For PR, if there are multiple entries with same weight, prefer the highest reps at that weight.
-  const prCandidates = data.filter(d => d.weight === best.weight);
-  const pr = prCandidates.reduce((m, d) => (d.reps > m.reps ? d : m), prCandidates[0]);
-
-  const weightGain = (last.weight || 0) - (first.weight || 0);
-  const repGain = (last.reps || 0) - (first.reps || 0);
-
-  const firstStrength = (first.weight || 0) * (first.reps || 0);
-  const lastStrength = (last.weight || 0) * (last.reps || 0);
-  const pctGain = firstStrength > 0 ? ((lastStrength - firstStrength) / firstStrength) * 100 : 0;
-
-  const gainW = (weightGain > 0 ? `+${weightGain}` : `${weightGain}`);
-  const gainR = (repGain > 0 ? `+${repGain}` : `${repGain}`);
-
+  
+  const weights = data.map(d => d.y);
+  const startWeight = weights[0];
+  const currentWeight = weights[weights.length - 1];
+  const maxWeight = Math.max(...weights);
+  const totalGain = currentWeight - startWeight;
+  const percentGain = startWeight > 0 ? ((totalGain / startWeight) * 100) : 0;
+  
   infoPanel.innerHTML = `
-    <div class="progression-stat" style="flex:1 1 150px; padding:10px">
-      <div style="font-size:1.2rem; margin-bottom:2px;">💪</div>
-      <div class="stat-value" style="font-size:1.05rem; font-weight:800; margin:0; -webkit-text-fill-color:unset; background:none; color:var(--accent)">${last.weight} × ${last.reps||0}</div>
-      <div class="stat-label" style="font-size:.75rem">Current Max</div>
+    <div class="progression-stat">
+      <div style="font-size:1.5rem; margin-bottom:4px;">💪</div>
+      <div class="stat-value" style="color: var(--accent)">${currentWeight} lb</div>
+      <div class="stat-label">Current Max</div>
     </div>
-
-    <div class="progression-stat" style="flex:1 1 150px; padding:10px">
-      <div style="font-size:1.2rem; margin-bottom:2px;">🏆</div>
-      <div class="stat-value" style="font-size:1.05rem; font-weight:800; margin:0; -webkit-text-fill-color:unset; background:none; color:var(--accent-2)">${pr.weight} × ${pr.reps||0}</div>
-      <div class="stat-label" style="font-size:.75rem">All-Time PR</div>
+    <div class="progression-stat">
+      <div style="font-size:1.5rem; margin-bottom:4px;">🏆</div>
+      <div class="stat-value" style="color: var(--accent-2)">${maxWeight} lb</div>
+      <div class="stat-label">All-Time PR</div>
     </div>
-
-    <div class="progression-stat" style="flex:1 1 150px; padding:10px">
-      <div style="font-size:1.2rem; margin-bottom:2px;">📈</div>
-      <div class="stat-value" style="font-size:1.05rem; font-weight:800; margin:0; -webkit-text-fill-color:unset; background:none; color:var(--good)">${gainW} × ${gainR}</div>
-      <div class="stat-label" style="font-size:.75rem">Total Gain</div>
+    <div class="progression-stat">
+      <div style="font-size:1.5rem; margin-bottom:4px;">${totalGain >= 0 ? '📈' : '📉'}</div>
+      <div class="stat-value" style="color: ${totalGain >= 0 ? 'var(--accent)' : 'var(--bad)'}">
+        ${totalGain >= 0 ? '+' : ''}${totalGain} lb
+      </div>
+      <div class="stat-label">Total Gain</div>
     </div>
-
-    <div class="progression-stat" style="flex:1 1 150px; padding:10px">
-      <div style="font-size:1.2rem; margin-bottom:2px;">⚡</div>
-      <div class="stat-value" style="font-size:1.05rem; font-weight:800; margin:0; -webkit-text-fill-color:unset; background:none; color:var(--warn)">${last.weight} × ${last.reps||0}</div>
-      <div class="stat-label" style="font-size:.75rem">Percent Gain</div>
-      <div style="margin-top:4px; font-size:.75rem; color:var(--muted)">${pctGain >= 0 ? '+' : ''}${pctGain.toFixed(1)}%</div>
+    <div class="progression-stat">
+      <div style="font-size:1.5rem; margin-bottom:4px;">⚡</div>
+      <div class="stat-value" style="color: ${percentGain >= 0 ? 'var(--accent)' : 'var(--bad)'}">
+        ${percentGain >= 0 ? '+' : ''}${percentGain.toFixed(1)}%
+      </div>
+      <div class="stat-label">Percent Gain</div>
     </div>
   `;
 }
@@ -909,13 +813,6 @@ function renderOverview(){
   
   // FIX #7: Render muscle filters and exercises
   renderMuscleGroupFilters();
-
-// Download button
-document.getElementById('downloadDataBtn')?.addEventListener('click', ()=>{
-  const data = exportAllWorkoutData();
-  const stamp = new Date().toISOString().slice(0,10).replace(/-/g,'');
-  downloadJSON(`powerup-workouts-${stamp}.json`, data);
-});
   renderFilteredExercises('all');
   
   drawVolumeChart('7d');
@@ -1010,6 +907,21 @@ document.querySelectorAll('[data-period]').forEach(btn => {
     
     drawVolumeChart(btn.dataset.period);
   });
+});
+
+
+// ✅ Download Data Button
+document.getElementById('downloadData').addEventListener('click', () => {
+  const dataStr = JSON.stringify(workouts, null, 2);
+  const dataBlob = new Blob([dataStr], {type: 'application/json'});
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `workout-data-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 });
 
 renderOverview();
