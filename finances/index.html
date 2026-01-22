@@ -122,6 +122,46 @@
     .stat .v{font-size:24px; font-weight:900; color:var(--good); line-height:1.1}
     .stat .k{font-size:12px; color:var(--muted); margin-top:4px; font-weight:800}
 
+    /* Week navigation inside the week stat */
+    .weekbar{
+      margin-top:6px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .weekbtn{
+      width:34px; height:30px;
+      border-radius:12px;
+      border:1px solid rgba(42,53,67,.70);
+      background: rgba(11,15,20,.35);
+      color:var(--ink);
+      font-weight:950;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .weekbtn:disabled{
+      opacity:.35;
+      cursor:not-allowed;
+    }
+    .weeklabel{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:900;
+      letter-spacing:.2px;
+      min-width: 92px;
+      text-align:center;
+    }
+
+    /* Toggle button state */
+    .btn.toggle-on{
+      outline: 2px solid rgba(76,175,80,.55);
+      background: rgba(76,175,80,.10);
+      border-color: rgba(76,175,80,.55);
+    }
+
     .grid{
       display:grid; gap:14px;
       grid-template-columns: 1fr;
@@ -268,7 +308,11 @@
         </div>
         <div class="stat">
           <div class="v" id="statWeek">$0.00</div>
-          <div class="k">This Week</div>
+          <div class="weekbar">
+            <button class="weekbtn" id="weekPrev" type="button" aria-label="Previous week">◀</button>
+            <div class="weeklabel" id="weekLabel">--/--–--/--</div>
+            <button class="weekbtn" id="weekNext" type="button" aria-label="Next week">▶</button>
+          </div>
         </div>
       </div>
     </div>
@@ -278,6 +322,7 @@
         <div class="card-h">
           <h3>📊 Spending by Category</h3>
           <div>
+	            <button class="btn" id="mortgageToggleBtn" type="button" title="Hide or show mortgage payments in charts">Hide Mortgage</button>
             <button class="btn" id="donutResetBtn" type="button">Reset</button>
           </div>
         </div>
@@ -328,6 +373,12 @@
   <script>
     const fmtMoney = (n) => `$${(Number(n)||0).toFixed(2)}`;
     const toDate = (d) => (d instanceof Date ? d : new Date(d));
+
+    function pad2(n){ return String(n).padStart(2,'0'); }
+    function fmtMD(date){
+      const d = new Date(date);
+      return `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}`;
+    }
 
     function startOfWeekSunday(date){
       const dt = new Date(date);
@@ -656,6 +707,49 @@
       return { start, end, labelDate: base };
     }
 
+    // Week windows inside a month: [monthStart..monthStart+6], [monthStart+7..+13], ...
+    function getWeeksWithinMonth(monthStart, monthEnd){
+      const weeks = [];
+      const s0 = new Date(monthStart);
+      s0.setHours(0,0,0,0);
+      const eMonth = new Date(monthEnd);
+      eMonth.setHours(23,59,59,999);
+
+      let cursor = new Date(s0);
+      while (cursor.getTime() <= eMonth.getTime()){
+        const s = new Date(cursor);
+        const e = new Date(cursor);
+        e.setDate(e.getDate()+6);
+        e.setHours(23,59,59,999);
+        if (e.getTime() > eMonth.getTime()) e.setTime(eMonth.getTime());
+        weeks.push({ start: s, end: e });
+
+        cursor = new Date(cursor);
+        cursor.setDate(cursor.getDate()+7);
+        cursor.setHours(0,0,0,0);
+      }
+      return weeks;
+    }
+
+    function defaultWeekIndexForMonth(now, monthStart){
+      // If we're viewing the current month, land on the current 7-day window; otherwise start at the first week.
+      const n = new Date(now); n.setHours(0,0,0,0);
+      const ms = new Date(monthStart); ms.setHours(0,0,0,0);
+      const diffDays = Math.floor((n.getTime() - ms.getTime()) / (1000*60*60*24));
+      return diffDays >= 0 ? Math.floor(diffDays / 7) : 0;
+    }
+
+    function isMortgageReceipt(r){
+      if (!r) return false;
+      const store = String(r.store || '').toLowerCase();
+      const cat = String(r.category || '').toLowerCase();
+      const notes = String(r.notes || '').toLowerCase();
+      if (store.includes('mortgage') || notes.includes('mortgage')) return true;
+      if (cat === 'housing') return true;
+      if (Array.isArray(r.items) && r.items.some(it => String(it.subcategory||'').toLowerCase() === 'mortgage')) return true;
+      return false;
+    }
+
     function formatMonthLabel(d, now){
       const sameYear = d.getFullYear() === now.getFullYear();
       const m = d.toLocaleString('en-US', { month:'long' });
@@ -682,9 +776,65 @@
       let selectedIndex = null;
       let activeCategories = [];
 
+      // ---- filters & week selection state ----
+      let hideMortgage = false;
+      let weekIndex = 0; // 0=first week window inside the selected month
+
+      function isMortgageReceipt(r){
+        const cat = String(r.category||'').trim().toLowerCase();
+        const store = String(r.store||'').trim().toLowerCase();
+        if (cat === 'housing') return true;
+        if (store.includes('mortgage')) return true;
+        if (Array.isArray(r.items) && r.items.some(it => String(it.subcategory||'').toLowerCase() === 'mortgage')) return true;
+        return false;
+      }
+
+      function applyMortgageFilter(list){
+        return hideMortgage ? list.filter(r => !isMortgageReceipt(r)) : list;
+      }
+
+      function buildMonthWeeks(mStart, mEnd){
+        // Weeks are 7-day windows that never cross the selected month boundaries.
+        const weeks = [];
+        const start = new Date(mStart);
+        start.setHours(0,0,0,0);
+        const end = new Date(mEnd);
+        end.setHours(23,59,59,999);
+
+        let cur = new Date(start);
+        while (cur.getTime() <= end.getTime()){
+          const wStart = new Date(cur);
+          wStart.setHours(0,0,0,0);
+          const wEnd = new Date(wStart);
+          wEnd.setDate(wEnd.getDate() + 6);
+          if (wEnd.getTime() > end.getTime()) wEnd.setTime(end.getTime());
+          wEnd.setHours(23,59,59,999);
+          weeks.push({ start: wStart, end: wEnd });
+          cur.setDate(cur.getDate() + 7);
+        }
+        return weeks;
+      }
+
+      function defaultWeekIndexForMonth(mStart){
+        // If the selected month is the current month, default to the week containing "now".
+        if (monthOffset === 0){
+          const ms = new Date(mStart);
+          ms.setHours(0,0,0,0);
+          const diffDays = Math.floor((now.getTime() - ms.getTime()) / (1000*60*60*24));
+          return Math.max(0, Math.floor(diffDays / 7));
+        }
+        return 0;
+      }
+
       const monthLabelEl = document.getElementById('monthLabel');
       const monthPrevEl = document.getElementById('monthPrev');
       const monthNextEl = document.getElementById('monthNext');
+
+      const weekPrevEl = document.getElementById('weekPrev');
+      const weekNextEl = document.getElementById('weekNext');
+      const weekLabelEl = document.getElementById('weekLabel');
+
+      const mortgageToggleBtn = document.getElementById('mortgageToggleBtn');
 
       const statMonthEl = document.getElementById('statMonth');
       const statWeekEl = document.getElementById('statWeek');
@@ -707,21 +857,42 @@
 
       function getReceiptsForSelectedMonth(){
         const { start, end } = getMonthRangeFromBase(now, monthOffset);
-        return allReceipts.filter(r => inRange(toDate(r.date), start, end));
+        return applyMortgageFilter(allReceipts.filter(r => inRange(toDate(r.date), start, end)));
       }
 
       function updateTopStats(){
         const { start: mStart, end: mEnd, labelDate } = getMonthRangeFromBase(now, monthOffset);
         monthLabelEl.textContent = formatMonthLabel(labelDate, now);
 
-        const monthReceipts = allReceipts.filter(r => inRange(toDate(r.date), mStart, mEnd));
+        // month total (respects mortgage toggle)
+        const monthReceipts = applyMortgageFilter(allReceipts.filter(r => inRange(toDate(r.date), mStart, mEnd)));
         const monthSpent = monthReceipts.reduce((a,r)=>a+(Number(r.total)||0),0);
 
-        const weekStart = startOfWeekSunday(now);
-        const weekEnd = endOfWeekSaturday(now);
-        const weekSpent = allReceipts
-          .filter(r => inRange(toDate(r.date), weekStart, weekEnd))
+        // "This week" becomes a selectable week window within the selected month.
+        const weeks = buildMonthWeeks(mStart, mEnd);
+        if (!weeks.length){
+          weekIndex = 0;
+          weekLabelEl.textContent = '--/--–--/--';
+          weekPrevEl.disabled = true;
+          weekNextEl.disabled = true;
+          statMonthEl.textContent = fmtMoney(monthSpent);
+          statWeekEl.textContent = fmtMoney(0);
+          return;
+        }
+
+        // initialize / clamp weekIndex
+        const maxIdx = weeks.length - 1;
+        if (weekIndex == null || Number.isNaN(weekIndex)) weekIndex = 0;
+        if (weekIndex < 0) weekIndex = 0;
+        if (weekIndex > maxIdx) weekIndex = maxIdx;
+
+        const wk = weeks[weekIndex];
+        const weekSpent = applyMortgageFilter(allReceipts.filter(r => inRange(toDate(r.date), wk.start, wk.end)))
           .reduce((a,r)=>a+(Number(r.total)||0),0);
+
+        weekLabelEl.textContent = `${fmtMD(wk.start)}–${fmtMD(wk.end)}`;
+        weekPrevEl.disabled = (weekIndex <= 0);
+        weekNextEl.disabled = (weekIndex >= maxIdx);
 
         statMonthEl.textContent = fmtMoney(monthSpent);
         statWeekEl.textContent = fmtMoney(weekSpent);
@@ -780,12 +951,34 @@
 
       monthPrevEl.addEventListener('click', async ()=>{
         monthOffset -= 1;
+        const { start: mStart } = getMonthRangeFromBase(now, monthOffset);
+        weekIndex = defaultWeekIndexForMonth(mStart);
         await refreshAll();
       });
       monthNextEl.addEventListener('click', async ()=>{
         monthOffset += 1;
+        const { start: mStart } = getMonthRangeFromBase(now, monthOffset);
+        weekIndex = defaultWeekIndexForMonth(mStart);
         await refreshAll();
       });
+
+      weekPrevEl.addEventListener('click', ()=>{
+        weekIndex = Math.max(0, (weekIndex||0) - 1);
+        updateTopStats();
+      });
+      weekNextEl.addEventListener('click', ()=>{
+        weekIndex = (weekIndex||0) + 1;
+        updateTopStats();
+      });
+
+      if (mortgageToggleBtn){
+        mortgageToggleBtn.addEventListener('click', async ()=>{
+          hideMortgage = !hideMortgage;
+          mortgageToggleBtn.classList.toggle('toggle-on', hideMortgage);
+          mortgageToggleBtn.textContent = hideMortgage ? 'Show Mortgage' : 'Hide Mortgage';
+          await refreshAll();
+        });
+      }
 
       // ---- recent purchases: show 3 by default with expand ----
       const recentWrap = document.getElementById('recentPurchases');
@@ -864,6 +1057,10 @@
       });
 
       // initial paint
+      {
+        const { start: mStart } = getMonthRangeFromBase(now, monthOffset);
+        weekIndex = defaultWeekIndexForMonth(mStart);
+      }
       await refreshAll();
       renderRecent();
     }
