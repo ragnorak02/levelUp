@@ -1988,6 +1988,68 @@
   "total": 26.99,
   "notes": "AMEX • Chip Card Tap"
 }
+,
+{
+  "id": "receipt_mortgage_glenmont_20260119",
+  "date": "2026-01-19",
+  "store": "WF Home Mortgage",
+  "storeLocation": "Glenmont House",
+  "category": "Housing",
+  "items": [
+    {
+      "name": "Mortgage Payment",
+      "price": 4147.29,
+      "quantity": 1,
+      "category": "Housing",
+      "subcategory": "Mortgage"
+    }
+  ],
+  "subtotal": 4147.29,
+  "tax": 0.0,
+  "total": 4147.29,
+  "notes": "One-time mortgage payment – Glenmont House"
+},
+{
+  "id": "receipt_mortgage_glenmont_20251228",
+  "date": "2025-12-28",
+  "store": "WF Home Mortgage",
+  "storeLocation": "Glenmont House",
+  "category": "Housing",
+  "items": [
+    {
+      "name": "Mortgage Payment",
+      "price": 3766.99,
+      "quantity": 1,
+      "category": "Housing",
+      "subcategory": "Mortgage"
+    }
+  ],
+  "subtotal": 3766.99,
+  "tax": 0.0,
+  "total": 3766.99,
+  "notes": "One-time mortgage payment – Glenmont House"
+},
+{
+  "id": "receipt_mortgage_glenmont_20251126",
+  "date": "2025-11-26",
+  "store": "WF Home Mortgage",
+  "storeLocation": "Glenmont House",
+  "category": "Housing",
+  "items": [
+    {
+      "name": "Mortgage Payment",
+      "price": 3766.99,
+      "quantity": 1,
+      "category": "Housing",
+      "subcategory": "Mortgage"
+    }
+  ],
+  "subtotal": 3766.99,
+  "tax": 0.0,
+  "total": 3766.99,
+  "notes": "One-time mortgage payment – Glenmont House"
+}
+
   ],
   "metadata": {
     "version": "1.0",
