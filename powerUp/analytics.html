@@ -177,8 +177,8 @@
           <h3><span class="card-icon">📊</span>Volume Trends</h3>
           <div class="chart-controls">
             <button class="btn btn-ghost active" data-period="7d">7 Days</button>
-            <button class="btn btn-ghost" data-period="30d">30 Days</button>
-            <button class="btn btn-ghost" data-period="90d">90 Days</button>
+            <button class="btn btn-ghost" data-period="14d">14 Days</button>
+            <button class="btn btn-ghost" data-period="28d">28 Days</button>
           </div>
           <div class="chart-container">
             <canvas class="chart" id="volumeChart"></canvas>
@@ -332,7 +332,7 @@ function totalSets(workout){
   }, 0);
 }
 
-function getPersonalRecords(){
+function getPersonalRecords(){(){
   const records = new Map();
   
   workouts.forEach(workout => {
@@ -460,6 +460,15 @@ function drawBarChart(canvasId, data, options = {}){
       ctx.textAlign = 'center';
       ctx.fillText(String(topLabel), x + barW/2, Math.max(10, y - 4));
     }
+
+    // Consistency dot near baseline (workout / no-workout)
+    if(options.showWorkoutDots){
+      const dotY = paddingTop + plotH + 8; // slightly below baseline
+      ctx.beginPath();
+      ctx.arc(x + barW/2, dotY, 3, 0, Math.PI*2);
+      ctx.fillStyle = point.didWorkout ? (options.dotOnColor || '#22c55e') : (options.dotOffColor || '#233446');
+      ctx.fill();
+    }
   });
 
   // X-axis labels
@@ -488,7 +497,6 @@ function drawBarChart(canvasId, data, options = {}){
 }
 
 /* FIX #7: Get ALL exercises */
-/* Get ALL exercises */
 function getAllExercisesFromWorkouts() {
   const exerciseMap = new Map();
   
@@ -576,64 +584,45 @@ function renderFilteredExercises(bodyPartFilter = 'all') {
 
 
 function drawVolumeChart(period = '7d'){
-  // Build a volume lookup by date for O(1) reads
+  // Daily bars for consistency view (includes 0-volume days)
   const volByDate = new Map();
   workouts.forEach(w => volByDate.set(w.date, totalVolume(w)));
 
+  const days =
+    period === '7d'  ? 7  :
+    period === '14d' ? 14 :
+    28;
+
   const start = new Date(today);
-  const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
   start.setDate(today.getDate() - (days - 1));
 
-  const dayList = [];
+  const data = [];
   for(let i=0; i<days; i++){
     const d = new Date(start);
     d.setDate(start.getDate() + i);
     const iso = d.toISOString().slice(0,10);
-    dayList.push({date:d, iso, vol: volByDate.get(iso) || 0});
-  }
 
-  let buckets = [];
-  if(period === '7d'){
-    buckets = dayList.map(it => ({
-      date: it.iso,
-      y: it.vol,
-      xLabel: it.date.toLocaleDateString(undefined,{weekday:'short'}),
-      label: it.vol ? Math.round(it.vol).toLocaleString() : ''
-    }));
-    drawBarChart('volumeChart', buckets, {
-      color: '#4CAF50',
-      color2: '#22c55e',
-      yLabel: 'Total Volume (lb)',
-      xLabels: buckets.map(b => b.xLabel)
-    });
-    return;
-  }
+    const vol = volByDate.get(iso) || 0;
 
-  // 30d => weekly buckets, 90d => 14-day buckets
-  const bucketSize = (period === '30d') ? 7 : 14;
-
-  for(let i=0; i<dayList.length; i += bucketSize){
-    const slice = dayList.slice(i, i + bucketSize);
-    const sum = slice.reduce((s,x)=>s+x.vol,0);
-    const labelDate = slice[0].date.toLocaleDateString(undefined,{month:'short', day:'numeric'});
-    buckets.push({
-      date: slice[0].iso,
-      y: sum,
-      xLabel: labelDate,
-      label: sum ? Math.round(sum).toLocaleString() : ''
+    data.push({
+      date: iso,
+      y: vol,
+      xLabel: d.toLocaleDateString(undefined, { month:'short', day:'numeric' }),
+      didWorkout: vol > 0,
+      label: vol ? Math.round(vol).toLocaleString() : ''
     });
   }
 
-  drawBarChart('volumeChart', buckets, {
+  drawBarChart('volumeChart', data, {
     color: '#4CAF50',
     color2: '#22c55e',
     yLabel: 'Total Volume (lb)',
-    xLabels: buckets.map(b => b.xLabel)
+    xLabels: data.map(d => d.xLabel),
+    showWorkoutDots: true
   });
 }
 
 /* FIX #5: PR Detail with chart */
- /*with chart */
 function getExerciseHistory(exerciseName, bodyPart, maxWorkouts = 20) {
   const history = [];
   
