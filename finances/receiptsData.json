@@ -1939,10 +1939,55 @@
   "tax": 2.36,
   "total": 31.91,
   "notes": "For here – Chase Visa contactless"
+},
+{
+  "id": "receipt_walmart_20260120_coke",
+  "date": "2026-01-20",
+  "store": "Walmart",
+  "storeLocation": "Glenmont, NY",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Coke",
+      "price": 1.98,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Drinks"
+    },
+    {
+      "name": "NY Bottle Deposit",
+      "price": 0.05,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Fees"
+    }
+  ],
+  "subtotal": 2.03,
+  "tax": 0.16,
+  "total": 2.19,
+  "notes": "AMEX Credit • Glenmont Walmart"
 }
-
-
-
+,
+{
+  "id": "receipt_barnes_noble_20260121",
+  "date": "2026-01-21",
+  "store": "Barnes & Noble Booksellers",
+  "storeLocation": "131 Colonie Center, Albany, NY",
+  "category": "Education",
+  "items": [
+    {
+      "name": "Kids First: Science Kit",
+      "price": 24.99,
+      "quantity": 1,
+      "category": "Education",
+      "subcategory": "Learning Toys"
+    }
+  ],
+  "subtotal": 24.99,
+  "tax": 2.00,
+  "total": 26.99,
+  "notes": "AMEX • Chip Card Tap"
+}
   ],
   "metadata": {
     "version": "1.0",
