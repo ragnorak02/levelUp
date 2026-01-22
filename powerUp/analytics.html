@@ -47,6 +47,22 @@
   .stat-trend{font-size:.8rem; margin-top:.3rem; display:flex; align-items:center; justify-content:center; gap:4px}
   .trend-up{color:var(--good)} .trend-down{color:var(--bad)} .trend-neutral{color:var(--muted)}
 
+  /* Compact summary row + top actions */
+  .top-actions{display:flex; align-items:center; gap:10px}
+  .download-btn{all:unset; cursor:pointer; padding:.5rem .85rem; border-radius:10px; font-size:.85rem; font-weight:700;
+    background:var(--gradient-primary); color:#04130a; box-shadow:0 6px 18px rgba(34,197,94,.18)}
+  .download-btn:active{transform:translateY(1px)}
+  .stats-row{grid-column: span 12; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px}
+  .stats-row .stat-card{grid-column: auto; padding:10px}
+  .stats-row .stat-value{font-size:1.35rem; margin:.35rem 0 .15rem}
+  .stats-row .stat-label{font-size:.75rem}
+  .stats-row .stat-trend{font-size:.74rem; margin-top:.2rem}
+  .stats-row .card-icon{font-size:1rem}
+  @media (max-width: 640px){
+    .stats-row{grid-template-columns:repeat(2, minmax(0, 1fr))}
+  }
+
+
   .chart-card{grid-column: span 8; position:relative}
   .chart-controls{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap}
   .btn{all:unset; cursor:pointer; padding:.5rem .8rem; border-radius:8px; font-size:.85rem; font-weight:600; transition:all .2s}
@@ -119,9 +135,14 @@
   </header>
 
   <div class="wrap">
+    <div class="top-actions">
+      <button class="download-btn" id="downloadDataBtn">Download Data</button>
+    </div>
+
     <div id="overviewTab" class="tab-content">
       <section class="grid">
-        <article class="card stat-card">
+        <div class="stats-row">
+<article class="card stat-card">
           <div class="card-icon">💪</div>
           <div class="stat-value" id="totalVolume">0</div>
           <div class="stat-label">Total Volume (lb)</div>
@@ -148,6 +169,8 @@
           <div class="stat-label">Avg Volume</div>
           <div class="stat-trend trend-up" id="avgTrend">↗ +156 lb/workout</div>
         </article>
+</div>
+
 
         <!-- FIX #4: Volume Trends as BAR CHART -->
         <article class="card chart-card">
@@ -262,6 +285,32 @@ const workouts = readLocalDays();
 const today = new Date();
 const todayISO = today.toISOString().slice(0,10);
 
+function exportAllWorkoutData(){
+  const all = [];
+  for(let i=0; i<localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(!/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+    try{
+      const day = JSON.parse(localStorage.getItem(k));
+      if(day && day.date) all.push(day);
+    }catch(e){}
+  }
+  all.sort((a,b)=> new Date(a.date) - new Date(b.date));
+  return all;
+}
+
+function downloadJSON(filename, dataObj){
+  const blob = new Blob([JSON.stringify(dataObj, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 250);
+}
+
 function totalVolume(workout){
   return workout.exercises.reduce((sum, ex) => {
     return sum + ex.sets.reduce((setSum, set) => {
@@ -323,89 +372,120 @@ function getPeriodStats(days = 7){
 }
 
 /* FIX #4: Bar Chart with Y-axis labels */
+
 function drawBarChart(canvasId, data, options = {}){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
-  
+
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
-  
+
   canvas.width = rect.width * dpr;
   canvas.height = rect.height * dpr;
-  ctx.scale(dpr, dpr);
-  
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
   const width = rect.width;
   const height = rect.height;
-  const padding = 50;
-  const leftPadding = 60;
-  
+
+  const paddingTop = 22;
+  const paddingBottom = 34;
+  const leftPadding = 64;
+  const rightPadding = 18;
+
   ctx.clearRect(0, 0, width, height);
-  
+
   if(!data || data.length === 0) return;
-  
-  const values = data.map(d => d.y);
+
+  const values = data.map(d => Number(d.y) || 0);
   const maxY = Math.max(...values, 1);
-  const barWidth = Math.max(8, (width - leftPadding - padding) / data.length - 4);
-  
+
+  const plotW = width - leftPadding - rightPadding;
+  const plotH = height - paddingTop - paddingBottom;
+  const gap = Math.max(2, Math.floor(plotW / Math.max(1, data.length) * 0.15));
+  const barW = Math.max(2, Math.floor((plotW - gap * (data.length - 1)) / data.length));
+
   // Y-axis label
   ctx.save();
-  ctx.translate(15, height/2);
+  ctx.translate(18, paddingTop + plotH/2);
   ctx.rotate(-Math.PI/2);
   ctx.fillStyle = '#9fb0c7';
   ctx.font = 'bold 12px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText(options.yLabel || 'Total Volume (lb)', 0, 0);
   ctx.restore();
-  
-  // Y-axis scale
+
+  // Y grid + labels
   ctx.fillStyle = '#9fb0c7';
   ctx.font = '10px sans-serif';
   ctx.textAlign = 'right';
-  
+
   for(let i = 0; i <= 4; i++) {
     const value = Math.round((maxY / 4) * i);
-    const y = height - padding - (i / 4) * (height - 2 * padding);
-    
+    const y = paddingTop + plotH - (i / 4) * plotH;
+
     // Grid line
     ctx.strokeStyle = '#233446';
     ctx.lineWidth = 1;
     ctx.setLineDash([2, 3]);
     ctx.beginPath();
     ctx.moveTo(leftPadding, y);
-    ctx.lineTo(width - padding, y);
+    ctx.lineTo(width - rightPadding, y);
     ctx.stroke();
     ctx.setLineDash([]);
-    
-    // Label
-    ctx.fillText(value.toLocaleString(), leftPadding - 5, y + 3);
+
+    ctx.fillText(value.toLocaleString(), leftPadding - 6, y + 3);
   }
-  
-  // Draw bars
+
+  // Bars + optional top labels
   data.forEach((point, index) => {
-    const x = leftPadding + index * (barWidth + 4);
-    const barHeight = (point.y / maxY) * (height - 2 * padding);
-    const y = height - padding - barHeight;
-    
-    // Gradient
-    const gradient = ctx.createLinearGradient(x, y, x, height - padding);
+    const x = leftPadding + index * (barW + gap);
+    const barH = (Number(point.y) / maxY) * plotH;
+    const y = paddingTop + plotH - barH;
+
+    const gradient = ctx.createLinearGradient(x, y, x, paddingTop + plotH);
     gradient.addColorStop(0, options.color || '#4CAF50');
     gradient.addColorStop(1, options.color2 || '#22c55e');
-    
+
     ctx.fillStyle = gradient;
-    ctx.fillRect(x, y, barWidth, barHeight);
-    
-    // Show value on top if bar is tall enough
-    if(barHeight > 20) {
+    ctx.fillRect(x, y, barW, barH);
+
+    const topLabel = point.label || options.valueLabel?.(point, index);
+    if(topLabel && barH > 14){
       ctx.fillStyle = '#e8eef6';
       ctx.font = 'bold 9px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(Math.round(point.y), x + barWidth/2, y - 3);
+      ctx.fillText(String(topLabel), x + barW/2, Math.max(10, y - 4));
     }
   });
+
+  // X-axis labels
+  const labels = options.xLabels || data.map(d => d.xLabel).filter(Boolean);
+  if(labels && labels.length){
+    const many = labels.length > 10;
+    ctx.fillStyle = '#9fb0c7';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'center';
+
+    labels.forEach((lab, i) => {
+      const x = leftPadding + i * (barW + gap) + barW/2;
+      const y = height - 10;
+
+      if(many){
+        ctx.save();
+        ctx.translate(x, height - 6);
+        ctx.rotate(-Math.PI/4);
+        ctx.fillText(String(lab), 0, 0);
+        ctx.restore();
+      } else {
+        ctx.fillText(String(lab), x, y);
+      }
+    });
+  }
 }
 
 /* FIX #7: Get ALL exercises */
+: Get ALL exercises */
 function getAllExercisesFromWorkouts() {
   const exerciseMap = new Map();
   
@@ -491,30 +571,66 @@ function renderFilteredExercises(bodyPartFilter = 'all') {
   }
 }
 
+
 function drawVolumeChart(period = '7d'){
+  // Build a volume lookup by date for O(1) reads
+  const volByDate = new Map();
+  workouts.forEach(w => volByDate.set(w.date, totalVolume(w)));
+
+  const start = new Date(today);
   const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
-  const chartData = [];
-  
-  for(let i = days - 1; i >= 0; i--){
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    const dateISO = date.toISOString().slice(0,10);
-    const workout = workouts.find(w => w.date === dateISO);
-    
-    chartData.push({
-      date: dateISO,
-      y: workout ? totalVolume(workout) : 0
+  start.setDate(today.getDate() - (days - 1));
+
+  const dayList = [];
+  for(let i=0; i<days; i++){
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const iso = d.toISOString().slice(0,10);
+    dayList.push({date:d, iso, vol: volByDate.get(iso) || 0});
+  }
+
+  let buckets = [];
+  if(period === '7d'){
+    buckets = dayList.map(it => ({
+      date: it.iso,
+      y: it.vol,
+      xLabel: it.date.toLocaleDateString(undefined,{weekday:'short'}),
+      label: it.vol ? Math.round(it.vol).toLocaleString() : ''
+    }));
+    drawBarChart('volumeChart', buckets, {
+      color: '#4CAF50',
+      color2: '#22c55e',
+      yLabel: 'Total Volume (lb)',
+      xLabels: buckets.map(b => b.xLabel)
+    });
+    return;
+  }
+
+  // 30d => weekly buckets, 90d => 14-day buckets
+  const bucketSize = (period === '30d') ? 7 : 14;
+
+  for(let i=0; i<dayList.length; i += bucketSize){
+    const slice = dayList.slice(i, i + bucketSize);
+    const sum = slice.reduce((s,x)=>s+x.vol,0);
+    const labelDate = slice[0].date.toLocaleDateString(undefined,{month:'short', day:'numeric'});
+    buckets.push({
+      date: slice[0].iso,
+      y: sum,
+      xLabel: labelDate,
+      label: sum ? Math.round(sum).toLocaleString() : ''
     });
   }
-  
-  drawBarChart('volumeChart', chartData, {
+
+  drawBarChart('volumeChart', buckets, {
     color: '#4CAF50',
     color2: '#22c55e',
-    yLabel: 'Total Volume (lb)'
+    yLabel: 'Total Volume (lb)',
+    xLabels: buckets.map(b => b.xLabel)
   });
 }
 
 /* FIX #5: PR Detail with chart */
+ with chart */
 function getExerciseHistory(exerciseName, bodyPart, maxWorkouts = 20) {
   const history = [];
   
@@ -622,27 +738,69 @@ function drawPRChart(canvasId, data, prWeight, options = {}){
   });
 }
 
+
+function getExerciseProgressionHistory(exerciseName, bodyPart, maxWorkouts = 20) {
+  const history = [];
+
+  workouts.forEach(workout => {
+    const exercise = workout.exercises.find(ex =>
+      ex.name.toLowerCase().trim() === exerciseName.toLowerCase().trim() &&
+      ex.bodyPart === bodyPart
+    );
+
+    if(!exercise || !exercise.sets || exercise.sets.length === 0) return;
+
+    const completedSets = exercise.sets.filter(set => exercise.finished || set.completed);
+    if(completedSets.length === 0) return;
+
+    // Find max weight for that day, then max reps at that weight
+    const maxW = Math.max(...completedSets.map(s => Number(s.weight) || 0));
+    if(!maxW || maxW <= 0) return;
+
+    const maxR = Math.max(...completedSets
+      .filter(s => (Number(s.weight) || 0) === maxW)
+      .map(s => Number(s.reps) || 0));
+
+    history.push({
+      date: workout.date,
+      y: maxW,          // keep bar height based on weight
+      weight: maxW,
+      reps: maxR || 0,
+      label: `${maxW}×${maxR||0}`
+    });
+  });
+
+  history.sort((a, b) => new Date(a.date) - new Date(b.date));
+  return history.slice(-maxWorkouts);
+}
+
 function drawProgressionChart(exerciseName, bodyPart) {
   if(!exerciseName) return;
-  
-  const progressionData = getExerciseHistory(exerciseName, bodyPart);
-  
+
+  const progressionData = getExerciseProgressionHistory(exerciseName, bodyPart);
+
   const canvas = document.getElementById('progressionChart');
   const container = canvas.parentElement;
   const existingMessage = container.querySelector('.no-progression-data');
   if(existingMessage) existingMessage.remove();
-  
+
   if(progressionData.length === 0) {
     renderNoProgressionData(exerciseName);
     return;
   }
-  
+
+  const xLabels = progressionData.map(d =>
+    new Date(d.date).toLocaleDateString(undefined, {month:'short', day:'numeric'})
+  );
+
   drawBarChart('progressionChart', progressionData, {
     color: '#2dd4bf',
     color2: '#14b8a6',
-    yLabel: 'Max Weight (lb)'
+    yLabel: 'Max Weight (lb)',
+    xLabels,
+    valueLabel: (p)=> `${p.weight}×${p.reps||0}`
   });
-  
+
   updateProgressionInfo(exerciseName, progressionData);
 }
 
@@ -662,58 +820,72 @@ function renderNoProgressionData(exerciseName) {
 }
 
 /* FIX #8: Enhanced progression info */
+
 function updateProgressionInfo(exerciseName, data) {
   let infoPanel = document.getElementById('progression-info');
-  
+
   if(!infoPanel) {
     infoPanel = document.createElement('div');
     infoPanel.id = 'progression-info';
     infoPanel.style.cssText = `
-      margin-top: 16px;
-      padding: 16px;
-      background: var(--card);
+      margin-top: 12px;
+      padding: 10px;
+      background: #0f141b;
       border: 1px solid var(--ring);
       border-radius: 12px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      justify-content: space-between;
+      flex-wrap: wrap;
     `;
-    
+
     const chartContainer = document.getElementById('progressionChart').parentElement;
     chartContainer.appendChild(infoPanel);
   }
-  
-  const weights = data.map(d => d.y);
-  const startWeight = weights[0];
-  const currentWeight = weights[weights.length - 1];
-  const maxWeight = Math.max(...weights);
-  const totalGain = currentWeight - startWeight;
-  const percentGain = startWeight > 0 ? ((totalGain / startWeight) * 100) : 0;
-  
+
+  const first = data[0];
+  const last = data[data.length - 1];
+
+  const best = data.reduce((m, d) => (d.weight > m.weight ? d : m), data[0]);
+  // For PR, if there are multiple entries with same weight, prefer the highest reps at that weight.
+  const prCandidates = data.filter(d => d.weight === best.weight);
+  const pr = prCandidates.reduce((m, d) => (d.reps > m.reps ? d : m), prCandidates[0]);
+
+  const weightGain = (last.weight || 0) - (first.weight || 0);
+  const repGain = (last.reps || 0) - (first.reps || 0);
+
+  const firstStrength = (first.weight || 0) * (first.reps || 0);
+  const lastStrength = (last.weight || 0) * (last.reps || 0);
+  const pctGain = firstStrength > 0 ? ((lastStrength - firstStrength) / firstStrength) * 100 : 0;
+
+  const gainW = (weightGain > 0 ? `+${weightGain}` : `${weightGain}`);
+  const gainR = (repGain > 0 ? `+${repGain}` : `${repGain}`);
+
   infoPanel.innerHTML = `
-    <div class="progression-stat">
-      <div style="font-size:1.5rem; margin-bottom:4px;">💪</div>
-      <div class="stat-value" style="color: var(--accent)">${currentWeight} lb</div>
-      <div class="stat-label">Current Max</div>
+    <div class="progression-stat" style="flex:1 1 150px; padding:10px">
+      <div style="font-size:1.2rem; margin-bottom:2px;">💪</div>
+      <div class="stat-value" style="font-size:1.05rem; font-weight:800; margin:0; -webkit-text-fill-color:unset; background:none; color:var(--accent)">${last.weight} × ${last.reps||0}</div>
+      <div class="stat-label" style="font-size:.75rem">Current Max</div>
     </div>
-    <div class="progression-stat">
-      <div style="font-size:1.5rem; margin-bottom:4px;">🏆</div>
-      <div class="stat-value" style="color: var(--accent-2)">${maxWeight} lb</div>
-      <div class="stat-label">All-Time PR</div>
+
+    <div class="progression-stat" style="flex:1 1 150px; padding:10px">
+      <div style="font-size:1.2rem; margin-bottom:2px;">🏆</div>
+      <div class="stat-value" style="font-size:1.05rem; font-weight:800; margin:0; -webkit-text-fill-color:unset; background:none; color:var(--accent-2)">${pr.weight} × ${pr.reps||0}</div>
+      <div class="stat-label" style="font-size:.75rem">All-Time PR</div>
     </div>
-    <div class="progression-stat">
-      <div style="font-size:1.5rem; margin-bottom:4px;">${totalGain >= 0 ? '📈' : '📉'}</div>
-      <div class="stat-value" style="color: ${totalGain >= 0 ? 'var(--accent)' : 'var(--bad)'}">
-        ${totalGain >= 0 ? '+' : ''}${totalGain} lb
-      </div>
-      <div class="stat-label">Total Gain</div>
+
+    <div class="progression-stat" style="flex:1 1 150px; padding:10px">
+      <div style="font-size:1.2rem; margin-bottom:2px;">📈</div>
+      <div class="stat-value" style="font-size:1.05rem; font-weight:800; margin:0; -webkit-text-fill-color:unset; background:none; color:var(--good)">${gainW} × ${gainR}</div>
+      <div class="stat-label" style="font-size:.75rem">Total Gain</div>
     </div>
-    <div class="progression-stat">
-      <div style="font-size:1.5rem; margin-bottom:4px;">⚡</div>
-      <div class="stat-value" style="color: ${percentGain >= 0 ? 'var(--accent)' : 'var(--bad)'}">
-        ${percentGain >= 0 ? '+' : ''}${percentGain.toFixed(1)}%
-      </div>
-      <div class="stat-label">Percent Gain</div>
+
+    <div class="progression-stat" style="flex:1 1 150px; padding:10px">
+      <div style="font-size:1.2rem; margin-bottom:2px;">⚡</div>
+      <div class="stat-value" style="font-size:1.05rem; font-weight:800; margin:0; -webkit-text-fill-color:unset; background:none; color:var(--warn)">${last.weight} × ${last.reps||0}</div>
+      <div class="stat-label" style="font-size:.75rem">Percent Gain</div>
+      <div style="margin-top:4px; font-size:.75rem; color:var(--muted)">${pctGain >= 0 ? '+' : ''}${pctGain.toFixed(1)}%</div>
     </div>
   `;
 }
@@ -747,6 +919,13 @@ function renderOverview(){
   
   // FIX #7: Render muscle filters and exercises
   renderMuscleGroupFilters();
+
+// Download button
+document.getElementById('downloadDataBtn')?.addEventListener('click', ()=>{
+  const data = exportAllWorkoutData();
+  const stamp = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  downloadJSON(`powerup-workouts-${stamp}.json`, data);
+});
   renderFilteredExercises('all');
   
   drawVolumeChart('7d');

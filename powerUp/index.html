@@ -26,12 +26,12 @@
   header .home{all:unset; cursor:pointer; padding:.35rem .6rem; border-radius:.6rem; border:1px solid var(--ring)}
   header .home:focus-visible{outline:2px solid var(--accent-2)}
 
-  .wrap{width:min(1100px, 100%); margin-inline:auto; padding:10px 12px 18px; flex:1; display:flex; flex-direction:column; gap:10px}
+  .wrap{width:min(1100px, 100%); margin-inline:auto; padding:8px 12px 12px; flex:1; display:flex; flex-direction:column; gap:8px}
 
   .grid{display:grid; gap:10px; grid-template-columns: repeat(12, 1fr)}
   .card{
     background:var(--card); border:1px solid var(--ring); border-radius:14px;
-    padding:12px; box-shadow:0 8px 30px rgba(0,0,0,.25);
+    padding:10px; box-shadow:0 8px 30px rgba(0,0,0,.25);
   }
   .card h3{margin:.1rem 0 .45rem; font-size:.95rem; color:var(--muted); font-weight:600}
 
@@ -55,9 +55,22 @@
   .ghost{all:unset; cursor:pointer; color:var(--muted); padding:.5rem .7rem; border-radius:9px; border:1px solid var(--ring)}
   .small-btn{all:unset; cursor:pointer; color:var(--muted); padding:.4rem .6rem; border-radius:8px; border:1px solid var(--ring); font-size:.85rem}
 
+
+  /* Compact power card spacing */
+  #powerCard{padding:10px}
+  #powerCard h3{margin:0 0 .35rem; font-size:.9rem}
+  #powerCard .val{font-size:1.35rem; gap:6px}
+  .power-level{font-size:1.35rem}
+  .trend{font-size:.78rem}
+  .level-progress{height:7px; margin:6px 0}
+  .weight-row{display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-top:6px}
+  .weight-label{font-size:.78rem; color:var(--muted); margin-bottom:2px}
+  .weight-value{font-size:1rem; font-weight:650}
+  #logWeight{margin-left:auto}
+
   /* Power level styling */
   .power-level{
-    font-size:1.8rem; 
+    font-size:1.35rem; 
     font-weight:800; 
     background:linear-gradient(45deg, #fbbf24, #f59e0b, #d97706);
     -webkit-background-clip:text;
@@ -204,11 +217,13 @@
         <div class="level-progress">
           <div class="level-bar" id="levelBar" style="width: 0%"></div>
         </div>
-        <div style="margin-top:8px; margin-bottom:6px;">
-          <div style="font-size:.85rem; color:var(--muted); margin-bottom:2px;">Current Weight</div>
-          <div style="font-size:1.1rem; font-weight:600;" id="currentWeight">—</div>
-        </div>
-        <button class="small-btn" id="logWeight">Log Weight</button>
+        <div class="weight-row">
+  <div class="weight-block">
+    <div class="weight-label">Current Weight</div>
+    <div class="weight-value" id="currentWeight">—</div>
+  </div>
+  <button class="small-btn" id="logWeight">Log Weight</button>
+</div>
       </article>
 
       <article class="card" id="lastWorkoutCard">
