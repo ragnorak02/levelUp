@@ -17,7 +17,7 @@
       min-height: 100vh; padding-bottom: 80px;
     }
     
-    /* Mobile-First Header */
+    /* Header */
     header {
       background: #0b1118; border-bottom: 1px solid var(--ring); padding: 16px;
       position: sticky; top: 0; z-index: 100;
@@ -32,16 +32,15 @@
     }
     h1 { margin: 0; font-size: 1.3rem; font-weight: 600; flex: 1; }
     
-    /* Mobile Nav Pills */
+    /* Nav pills: no horizontal scrolling; wrap instead */
     .nav-pills {
-      display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      display: flex; gap: 8px;
       padding: 4px; background: var(--panel); border-radius: 10px; border: 1px solid var(--ring);
-      scrollbar-width: none; -ms-overflow-style: none;
+      flex-wrap: wrap;
     }
-    .nav-pills::-webkit-scrollbar { display: none; }
     .nav-pill {
-      all: unset; cursor: pointer; padding: 12px 20px; border-radius: 8px;
-      font-size: 1rem; color: var(--muted); white-space: nowrap; min-height: 48px;
+      all: unset; cursor: pointer; padding: 8px 12px; border-radius: 8px;
+      font-size: 0.92rem; color: var(--muted); white-space: nowrap; min-height: 40px;
       display: flex; align-items: center;
     }
     .nav-pill.active {
@@ -51,7 +50,7 @@
 
     .wrap { padding: 20px 16px; }
     
-    /* Mobile Filter Bar */
+    /* Filter Bar */
     .filter-bar {
       background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
       padding: 16px; margin-bottom: 20px;
@@ -62,75 +61,115 @@
     }
     .filter-row::-webkit-scrollbar { display: none; }
     .filter-btn {
-      all: unset; cursor: pointer; padding: 12px 20px; border-radius: 10px;
-      font-size: 1rem; font-weight: 600; border: 2px solid var(--ring);
+      all: unset; cursor: pointer; padding: 8px 12px; border-radius: 10px;
+      font-size: 0.92rem; font-weight: 600; border: 1px solid var(--ring);
       background: var(--card-bg); color: var(--muted); white-space: nowrap;
-      min-height: 48px; display: flex; align-items: center; gap: 8px;
+      min-height: 40px; display: flex; align-items: center; gap: 8px;
     }
     .filter-btn.active {
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: #04130a; border-color: var(--accent);
     }
 
-    /* Mobile Receipt Cards */
-    .receipt-card {
-      background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
-      padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
+    /* Compact Receipt Rows (tap to expand) */
+    .receipt-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      background: var(--panel);
+      border: 1px solid var(--ring);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
     }
-    .receipt-header {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      margin-bottom: 16px; gap: 12px;
+    .receipt-main {
+      all: unset;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 10px;
+      border-radius: 12px;
+      background: rgba(14, 20, 27, 0.35);
+      border: 1px solid rgba(28, 42, 55, 0.7);
+      min-height: 56px;
     }
-    .store-name {
-      font-size: 1.2rem; font-weight: 700; color: var(--ink); flex: 1;
+    .receipt-main:active { transform: translateY(1px); }
+    .receipt-left { flex: 1; min-width: 0; }
+    .receipt-store {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--ink);
+      line-height: 1.1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    .receipt-total {
-      font-size: 1.3rem; font-weight: 700; color: var(--accent);
+    .receipt-sub {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    .receipt-meta {
-      display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;
+    .receipt-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
     }
-    .meta-badge {
-      background: var(--card-bg); border: 1px solid var(--ring);
-      padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; color: var(--muted);
+    .receipt-amount {
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: var(--accent);
     }
-    .item-count {
-      font-size: 1rem; color: var(--muted); margin-bottom: 12px;
+    .receipt-chevron {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid rgba(28, 42, 55, 0.9);
+      color: var(--muted);
+      background: rgba(14, 20, 27, 0.45);
+      font-weight: 900;
     }
-    
-    /* Expandable Items */
-    .items-toggle {
-      all: unset; cursor: pointer; display: flex; align-items: center;
-      gap: 8px; padding: 12px 16px; background: var(--card-bg); border: 1px solid var(--ring);
-      border-radius: 10px; font-size: 1rem; font-weight: 600; color: var(--accent);
-      width: 100%; justify-content: center; min-height: 48px;
+    .receipt-delete {
+      all: unset;
+      cursor: pointer;
+      width: 46px;
+      height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.08);
+      color: var(--danger);
+      font-size: 1.05rem;
     }
-    .items-list {
-      display: none; margin-top: 16px; padding-top: 16px;
-      border-top: 1px solid var(--ring);
+    .receipt-delete:active { transform: translateY(1px); }
+    .receipt-details {
+      grid-column: 1 / -1;
+      display: none;
+      padding: 6px 10px 10px;
+      border-top: 1px solid rgba(28, 42, 55, 0.7);
+      margin-top: 2px;
     }
-    .items-list.show { display: block; }
+    .receipt-details.show { display: block; }
     .item-row {
-      display: flex; justify-content: space-between; padding: 12px 0;
-      border-bottom: 1px solid rgba(28, 42, 55, 0.5); font-size: 1rem;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(28, 42, 55, 0.5);
+      font-size: 0.98rem;
     }
     .item-row:last-child { border-bottom: none; }
     .item-name { flex: 1; color: var(--ink); }
-    .item-price { font-weight: 700; color: var(--accent-2); margin-left: 12px; }
-
-    /* Action Buttons */
-    .receipt-actions {
-      display: flex; gap: 12px; margin-top: 16px;
-    }
-    .btn {
-      all: unset; cursor: pointer; padding: 14px 20px; border-radius: 10px;
-      font-size: 1rem; font-weight: 600; text-align: center; flex: 1;
-      min-height: 48px; display: flex; align-items: center; justify-content: center;
-    }
-    .btn-danger {
-      background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3);
-      color: var(--danger);
-    }
+    .item-price { font-weight: 800; color: var(--accent-2); margin-left: 12px; }
 
     /* Empty State */
     .empty-state {
@@ -154,6 +193,14 @@
     .stat { flex: 1; }
     .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
     .stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+    /* Small screens: tighten paddings a bit */
+    @media (max-width: 420px) {
+      .home-btn { padding: 10px 12px; min-height: 44px; }
+      .nav-pill { padding: 8px 10px; min-height: 40px; font-size: 0.9rem; }
+      .filter-bar { padding: 14px; }
+      .receipt-row { padding: 10px; }
+    }
   </style>
   <script src="dataLoader.js"></script>
 </head>
@@ -222,12 +269,38 @@
     let allReceipts = [];
     let filteredReceipts = [];
 
+    let activeStore = 'all';
+    let activePeriod = 'all';
+
     (async function initReceiptsPage() {
-      await (window.FinancesDataLoader?.ready || window.financesDataReady || Promise.resolve());
+      // IMPORTANT: wait for dataLoader.js to finish seeding/merging
+      await (window.FinancesDataLoader?.ready || Promise.resolve());
+
       allReceipts = loadReceipts();
-      filteredReceipts = allReceipts;
+      applyFilters();
       render();
     })();
+
+    function applyFilters() {
+      const now = new Date();
+      let out = [...allReceipts];
+
+      if (activeStore !== 'all') {
+        out = out.filter(r => r.store === activeStore);
+      }
+
+      if (activePeriod === 'month') {
+        out = out.filter(r => {
+          const d = new Date(r.date);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        });
+      } else if (activePeriod === 'week') {
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        out = out.filter(r => new Date(r.date) >= weekAgo);
+      }
+
+      filteredReceipts = out;
+    }
 
     // Render everything
     function render() {
@@ -262,29 +335,28 @@
       const stores = [...new Set(allReceipts.map(r => r.store))];
       const container = document.getElementById('storeFilters');
       
-      container.innerHTML = `<button class="filter-btn active" data-store="all">All Stores</button>`;
+      container.innerHTML = `<button class="filter-btn ${activeStore==='all' ? 'active' : ''}" data-store="all">All Stores</button>`;
+      container.querySelector('[data-store="all"]').addEventListener('click', (e) => {
+        onStoreSelected('all', e);
+      });
       
       stores.forEach(store => {
         const btn = document.createElement('button');
-        btn.className = 'filter-btn';
+        btn.className = 'filter-btn' + (store === activeStore ? ' active' : '');
         btn.dataset.store = store;
         btn.textContent = store;
-        btn.addEventListener('click', () => filterByStore(store));
+        btn.addEventListener('click', (e) => onStoreSelected(store, e));
         container.appendChild(btn);
       });
     }
 
-    // Filter by store
-    function filterByStore(store) {
+    // Store selection handler (fixes event.target bug)
+    function onStoreSelected(store, e) {
+      activeStore = store;
       document.querySelectorAll('[data-store]').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      
-      if (store === 'all') {
-        filteredReceipts = allReceipts;
-      } else {
-        filteredReceipts = allReceipts.filter(r => r.store === store);
-      }
-      
+      e.currentTarget.classList.add('active');
+
+      applyFilters();
       renderReceipts();
       updateStats();
     }
@@ -295,20 +367,8 @@
         document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
-        const period = btn.dataset.period;
-        const now = new Date();
-        
-        if (period === 'all') {
-          filteredReceipts = allReceipts;
-        } else if (period === 'month') {
-          filteredReceipts = allReceipts.filter(r => {
-            const date = new Date(r.date);
-            return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-          });
-        } else if (period === 'week') {
-          const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
-          filteredReceipts = allReceipts.filter(r => new Date(r.date) >= weekAgo);
-        }
+        activePeriod = btn.dataset.period;
+        applyFilters();
         
         renderReceipts();
         updateStats();
@@ -323,36 +383,37 @@
       // Sort by date (newest first)
       const sorted = [...filteredReceipts].sort((a, b) => new Date(b.date) - new Date(a.date));
       
-      sorted.forEach((receipt, index) => {
-        const card = createReceiptCard(receipt, index);
-        container.appendChild(card);
+      sorted.forEach((receipt) => {
+        const row = createReceiptRow(receipt);
+        container.appendChild(row);
       });
     }
 
-    // Create receipt card
-    function createReceiptCard(receipt, index) {
-      const card = document.createElement('div');
-      card.className = 'receipt-card';
-      
-      const date = new Date(receipt.date).toLocaleDateString('en-US', { 
-        month: 'short', day: 'numeric', year: 'numeric' 
+    // Create compact row (tap row to expand; delete on the right)
+    function createReceiptRow(receipt) {
+      const row = document.createElement('div');
+      row.className = 'receipt-row';
+
+      const id = String(receipt.id || `${receipt.store}_${receipt.date}_${receipt.total}`)
+        .replace(/[^a-zA-Z0-9_-]/g, '_');
+
+      const dateStr = new Date(receipt.date).toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric'
       });
-      
-      card.innerHTML = `
-        <div class="receipt-header">
-          <div class="store-name">${receipt.store}</div>
-          <div class="receipt-total">$${parseFloat(receipt.total || 0).toFixed(2)}</div>
-        </div>
-        <div class="receipt-meta">
-          <span class="meta-badge">📅 ${date}</span>
-          <span class="meta-badge">🛒 ${receipt.items.length} items</span>
-          ${receipt.payment ? `<span class="meta-badge">💳 ${receipt.payment}</span>` : ''}
-        </div>
-        <button class="items-toggle" onclick="toggleItems(${index})">
-          <span id="toggle-icon-${index}">▼</span>
-          <span>View Items</span>
+
+      row.innerHTML = `
+        <button class="receipt-main" type="button" onclick="toggleReceiptDetails('${id}')" aria-expanded="false" aria-controls="details_${id}">
+          <div class="receipt-left">
+            <div class="receipt-store">${receipt.store}</div>
+            <div class="receipt-sub">${dateStr} • ${receipt.items.length} items</div>
+          </div>
+          <div class="receipt-right">
+            <div class="receipt-amount">$${parseFloat(receipt.total || 0).toFixed(2)}</div>
+            <div class="receipt-chevron" id="chev_${id}">▾</div>
+          </div>
         </button>
-        <div class="items-list" id="items-${index}">
+        <button class="receipt-delete" type="button" onclick="deleteReceiptById('${receipt.id || ''}')" aria-label="Delete receipt">🗑️</button>
+        <div class="receipt-details" id="details_${id}">
           ${receipt.items.map(item => `
             <div class="item-row">
               <span class="item-name">${item.name}</span>
@@ -360,37 +421,37 @@
             </div>
           `).join('')}
         </div>
-        <div class="receipt-actions">
-          <button class="btn btn-danger" onclick="deleteReceipt(${index})">🗑️ Delete</button>
-        </div>
       `;
-      
-      return card;
+
+      return row;
     }
 
-    // Toggle items
-    function toggleItems(index) {
-      const list = document.getElementById(`items-${index}`);
-      const icon = document.getElementById(`toggle-icon-${index}`);
-      list.classList.toggle('show');
-      icon.textContent = list.classList.contains('show') ? '▲' : '▼';
+    // Toggle details by safe DOM id
+    function toggleReceiptDetails(safeId) {
+      const details = document.getElementById(`details_${safeId}`);
+      const chev = document.getElementById(`chev_${safeId}`);
+      if (!details) return;
+      details.classList.toggle('show');
+      const expanded = details.classList.contains('show');
+      chev.textContent = expanded ? '▴' : '▾';
     }
 
-    // Delete receipt
-    function deleteReceipt(index) {
+    // Delete by receipt.id (fixes mismatch caused by sorting + filtering)
+    function deleteReceiptById(receiptId) {
       if (!confirm('Delete this receipt?')) return;
-      
-      const receipt = filteredReceipts[index];
-      const originalIndex = allReceipts.findIndex(r => 
-        r.store === receipt.store && r.date === receipt.date && r.total === receipt.total
-      );
-      
-      if (originalIndex >= 0) {
-        allReceipts.splice(originalIndex, 1);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(allReceipts));
-        filteredReceipts = allReceipts;
-        render();
+      if (!receiptId) {
+        alert('This receipt is missing an id and cannot be safely deleted.');
+        return;
       }
+
+      const idx = allReceipts.findIndex(r => r.id === receiptId);
+      if (idx === -1) return;
+
+      allReceipts.splice(idx, 1);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(allReceipts));
+
+      applyFilters();
+      render();
     }
 
     // Update stats
@@ -403,8 +464,7 @@
       document.getElementById('avgReceipt').textContent = '$' + avg.toFixed(2);
     }
 
-    // Initialize
-    render();
+    // NOTE: do not call render() here — initReceiptsPage() runs after data loader is ready.
   </script>
 </body>
 </html>

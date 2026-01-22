@@ -2048,6 +2048,70 @@
   "tax": 0.0,
   "total": 3766.99,
   "notes": "One-time mortgage payment – Glenmont House"
+},
+
+{
+  "id": "receipt_traderjoes_20260121_1621",
+  "date": "2026-01-21",
+  "store": "Trader Joe's",
+  "storeLocation": "Trader Joe's Glenmont, NY (Store #0579) - 388 Feura Bush Rd, Glenmont, NY 12077",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Romaine Hearts",
+      "price": 2.99,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Trader Joe's",
+      "storePrice": 2.99,
+      "pricePerUnit": 2.99
+    },
+    {
+      "name": "King Oyster Mushrooms",
+      "price": 3.49,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Trader Joe's",
+      "storePrice": 3.49,
+      "pricePerUnit": 3.49
+    },
+    {
+      "name": "Greek Yogurt Plain (5.3 oz)",
+      "price": 0.99,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Trader Joe's",
+      "storePrice": 0.99,
+      "pricePerUnit": 0.99
+    },
+    {
+      "name": "Peeled Garlic (Whole Cloves)",
+      "price": 2.49,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Trader Joe's",
+      "storePrice": 2.49,
+      "pricePerUnit": 2.49
+    },
+    {
+      "name": "Green Onions (6 oz)",
+      "price": 1.29,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Trader Joe's",
+      "storePrice": 1.29,
+      "pricePerUnit": 1.29
+    }
+  ],
+  "subtotal": 11.25,
+  "tax": 0.0,
+  "total": 11.25,
+  "notes": "Trader Joe's receipt - 01/21/26 16:21 - AMEX"
 }
 
   ],
