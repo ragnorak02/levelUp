@@ -1,362 +1,1017 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Main Page</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Level Up — Dashboard</title>
   <style>
-    
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #bfefff;
-      overflow: hidden;
+    :root{
+      --bg0:#bfefff;
+      --bg1:#aee6ff;
+      --card:#ffffffcc;
+      --card2:#ffffffee;
+      --ink:#0b1b2a;
+      --muted:#335b78;
+      --ring:rgba(0,0,0,.18);
+
+      --accent:#2563eb;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+
+      --ex:#ef4444;     /* exercise */
+      --study:#3b82f6;  /* study */
+      --fin:#f59e0b;    /* finance */
+
+      --shadow: 0 14px 40px rgba(0,0,0,.16);
+      --radius: 16px;
     }
 
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 10px;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
+      color:var(--ink);
+      background: linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 100%);
+      overflow-x:hidden;
     }
 
-    .banner {
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 10px;
-      background-color: #66a3ff;
-      /* Blue banner background */
-      color: #fff;
-      /* White text */
-      padding: 10px 20px;
-      border-radius: 10px;
+    /* --- Top Header --- */
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter: blur(8px) saturate(1.2);
+      background: rgba(191,239,255,.65);
+      border-bottom: 1px solid rgba(0,0,0,.12);
+    }
+    .topbar-inner{
+      width:min(1200px, 100%);
+      margin:0 auto;
+      padding:12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand-title{
+      font-size:22px;
+      font-weight:900;
+      letter-spacing:.5px;
+      padding:10px 16px;
+      border-radius:14px;
+      background: linear-gradient(90deg, #4f8cff, #2b6cff);
+      color:white;
+      box-shadow: 0 10px 24px rgba(37,99,235,.28);
+    }
+    .meta{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.15);
+      background: rgba(255,255,255,.65);
+      box-shadow: 0 8px 18px rgba(0,0,0,.10);
+      font-weight:800;
+    }
+    .pill small{font-weight:700; color:var(--muted)}
+    .ghost-btn{
+      all:unset;
+      cursor:pointer;
+      padding:9px 12px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.18);
+      background: rgba(255,255,255,.55);
+      font-weight:850;
+      box-shadow: 0 8px 18px rgba(0,0,0,.10);
+    }
+    .ghost-btn:hover{background: rgba(255,255,255,.75)}
+    .ghost-btn:active{transform: translateY(1px)}
+
+    /* --- Layout Grid --- */
+    .wrap{
+      width:min(1200px, 100%);
+      margin:0 auto;
+      padding:14px;
+      display:grid;
+      gap:14px;
+      grid-template-columns: 1.15fr .95fr 1.2fr; /* character | modules | history */
+      align-items:start;
     }
 
-    .yellow-box {
-  width: 300px; /* Widened yellow box */
-  height: 180px; /* Increased height */
-  border-radius: 10px;
-  margin-right: 20px; /* Adjusted margin */
-  border: 1px solid #000; /* Black border */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden; /* Hide any overflow */
-}
-
-.yellow-box img {
-  width: auto; /* Let the image adjust its width according to its aspect ratio */
-  height: 100%; /* Set the height of the image to 100% */
-}
-
-    .progress-bars {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-end;
-      width: 100%;
-      margin-bottom: 5px;
-      margin-right: 0;
-      /* Reset margin */
+    /* Cards */
+    .card{
+      background: var(--card);
+      border: 1px solid var(--ring);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card-inner{padding:14px}
+    .card h2{
+      margin:0 0 10px;
+      font-size:16px;
+      letter-spacing:.2px;
+      color:rgba(0,0,0,.68);
     }
 
-    .progress-bar-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      margin-right: 5px;
+    /* --- Character Panel --- */
+    .character{
+      position:relative;
+      overflow:hidden;
+      min-height: 520px;
+      background:
+        radial-gradient(1200px 600px at 30% 20%, rgba(37,99,235,.25), transparent 55%),
+        radial-gradient(1000px 520px at 70% 30%, rgba(34,197,94,.20), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.45));
+    }
+    .character .card-inner{padding:12px}
+    .character-frame{
+      position:relative;
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,.18);
+      background: rgba(255,255,255,.6);
+      box-shadow: 0 14px 36px rgba(0,0,0,.16);
+      overflow:hidden;
+    }
+    .character-gif{
+      width:100%;
+      height: 430px;
+      display:block;
+      object-fit: cover;
+    }
+    .avatar-badge{
+      position:absolute;
+      top:10px; left:10px;
+      width:54px; height:54px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.22);
+      background: rgba(255,255,255,.72);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:28px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.14);
+      user-select:none;
+    }
+    .aura{
+      position:absolute;
+      inset:-40px;
+      opacity:.0;
+      pointer-events:none;
+      background:
+        radial-gradient(closest-side, rgba(255,255,255,.8), transparent 60%),
+        radial-gradient(closest-side, rgba(37,99,235,.55), transparent 62%),
+        radial-gradient(closest-side, rgba(34,197,94,.35), transparent 62%);
+      filter: blur(10px);
+      transform: scale(.98);
+    }
+    .transforming .aura{
+      animation: auraPulse 900ms ease-out;
+    }
+    @keyframes auraPulse{
+      0%{opacity:0; transform:scale(.98)}
+      25%{opacity:.55}
+      55%{opacity:.95; transform:scale(1.02)}
+      100%{opacity:0; transform:scale(1.06)}
     }
 
-    .progress-bar {
-      width: 55px;
-      height: 150px;
-      margin-bottom: 0px;
-      background-color: white;
-      /* White background */
-      border: 1px solid #000;
-      /* Black border */
-      border-radius: 5px;
-      position: relative;
+    .character-footer{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .stat{
+      flex:1 1 140px;
+      background: rgba(255,255,255,.70);
+      border:1px solid rgba(0,0,0,.15);
+      border-radius:14px;
+      padding:10px 12px;
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .stat .k{color:var(--muted); font-weight:800; font-size:12px}
+    .stat .v{font-weight:950; font-size:18px}
+    .sub{margin-top:10px; color:rgba(0,0,0,.55); font-weight:700; font-size:12px}
+
+    /* --- Module Power Panel --- */
+    .modules .card-inner{padding:14px}
+    .module{
+      background: rgba(255,255,255,.70);
+      border:1px solid rgba(0,0,0,.15);
+      border-radius:16px;
+      padding:12px;
+      display:grid;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    .module:last-child{margin-bottom:0}
+
+    .module-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .module-title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:950;
+      letter-spacing:.2px;
+    }
+    .icon{
+      width:44px; height:44px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:22px;
+      border:1px solid rgba(0,0,0,.16);
+      box-shadow: 0 10px 24px rgba(0,0,0,.10);
+      user-select:none;
+    }
+    .icon.ex{background: rgba(239,68,68,.15)}
+    .icon.study{background: rgba(59,130,246,.15)}
+    .icon.fin{background: rgba(245,158,11,.18)}
+
+    .module-meta{
+      display:flex;
+      align-items:baseline;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      text-align:right;
+    }
+    .module-meta .num{
+      font-weight:950;
+      font-size:14px;
+    }
+    .module-meta .cap{
+      color:rgba(0,0,0,.55);
+      font-weight:800;
+      font-size:12px;
     }
 
-    .progress {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background-color: inherit;
-      border-radius: inherit;
+    .bar{
+      height:12px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.16);
+      background: rgba(0,0,0,.06);
+      overflow:hidden;
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      transition: width .35s ease;
+    }
+    .fill.ex{background: linear-gradient(90deg, rgba(239,68,68,.85), rgba(239,68,68,.55))}
+    .fill.study{background: linear-gradient(90deg, rgba(59,130,246,.9), rgba(59,130,246,.55))}
+    .fill.fin{background: linear-gradient(90deg, rgba(245,158,11,.92), rgba(245,158,11,.60))}
+
+    .module-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .link-btn{
+      all:unset;
+      cursor:pointer;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.18);
+      background: rgba(255,255,255,.55);
+      font-weight:950;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .link-btn:hover{background: rgba(255,255,255,.78)}
+    .link-btn:active{transform: translateY(1px)}
+    .transform-btn{
+      all:unset;
+      cursor:not-allowed;
+      opacity:.55;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.18);
+      background: rgba(255,255,255,.50);
+      font-weight:950;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .transform-btn.ready{
+      cursor:pointer;
+      opacity:1;
+      background: linear-gradient(90deg, rgba(34,197,94,.95), rgba(34,197,94,.72));
+      border-color: rgba(0,0,0,.16);
+      color: rgba(0,0,0,.85);
+      box-shadow: 0 10px 26px rgba(34,197,94,.25);
+    }
+    .transform-btn.ready:hover{filter: brightness(1.03)}
+    .transform-btn.ready:active{transform: translateY(1px)}
+
+    .hint{
+      color:rgba(0,0,0,.55);
+      font-weight:800;
+      font-size:12px;
+      line-height:1.35;
+      margin-top:8px;
     }
 
-    .strength {
-      background-color: red;
-      height: 79px;
-      /* Adjusted height for 66% completion */
+    /* --- Portals (Below Character / or separate) --- */
+    .portals{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    .portal{
+      background: rgba(255,255,255,.72);
+      border:1px solid rgba(0,0,0,.16);
+      border-radius:16px;
+      padding:12px;
+      text-decoration:none;
+      color:inherit;
+      box-shadow: 0 12px 28px rgba(0,0,0,.12);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      transition: transform .15s ease, filter .15s ease;
+    }
+    .portal:hover{transform: translateY(-2px); filter: brightness(1.02)}
+    .portal:active{transform: translateY(0px)}
+    .portal .left{
+      display:flex; align-items:center; gap:10px;
+    }
+    .portal .picon{
+      width:44px; height:44px;
+      border-radius:14px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px;
+      border:1px solid rgba(0,0,0,.16);
+    }
+    .picon.ex{background: rgba(239,68,68,.15)}
+    .picon.study{background: rgba(59,130,246,.15)}
+    .picon.fin{background: rgba(245,158,11,.18)}
+    .portal .name{font-weight:950}
+    .portal .subtxt{font-weight:800; font-size:12px; color:rgba(0,0,0,.55)}
+
+    /* --- Exercise History Panel --- */
+    .history{
+      background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.58));
+    }
+    .history-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .history-title{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .history-title b{font-size:18px}
+    .history-title span{color:rgba(0,0,0,.55); font-weight:800; font-size:12px}
+    .history-cta{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .mini{
+      all:unset;
+      cursor:pointer;
+      padding:9px 10px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.18);
+      background: rgba(255,255,255,.55);
+      font-weight:950;
+    }
+    .mini:hover{background: rgba(255,255,255,.78)}
+    .mini:active{transform: translateY(1px)}
+
+    .summary{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:12px 0;
+    }
+    .chip{
+      background: rgba(255,255,255,.75);
+      border:1px solid rgba(0,0,0,.15);
+      border-radius:999px;
+      padding:8px 10px;
+      font-weight:950;
+      display:flex;
+      gap:6px;
+      align-items:baseline;
+    }
+    .chip small{color:rgba(0,0,0,.55); font-weight:800}
+
+    .exercise-list{
+      display:grid;
+      gap:10px;
+      margin-top:6px;
+    }
+    .ex-row{
+      background: rgba(255,255,255,.70);
+      border:1px solid rgba(0,0,0,.15);
+      border-radius:14px;
+      padding:10px 12px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .ex-row .n{
+      font-weight:950;
+      line-height:1.2;
+    }
+    .ex-row .m{
+      color:rgba(0,0,0,.55);
+      font-weight:850;
+      font-size:12px;
+      margin-top:2px;
+    }
+    .ex-row .r{
+      text-align:right;
+      font-weight:950;
+      min-width: 120px;
+    }
+    .ex-row .r small{
+      display:block;
+      color:rgba(0,0,0,.55);
+      font-weight:850;
+      margin-top:2px;
     }
 
-    .strength-label {
-      background-color: #ffcccc;
-      /* Lighter red background */
+    .empty{
+      padding:12px;
+      border-radius:14px;
+      border:1px dashed rgba(0,0,0,.22);
+      background: rgba(255,255,255,.5);
+      color:rgba(0,0,0,.6);
+      font-weight:850;
+      line-height:1.4;
     }
 
-    .wisdom {
-      background-color: green;
-      height: 84px;
-      /* Adjusted height for 70% completion */
+    /* Responsive */
+    @media (max-width: 1050px){
+      .wrap{
+        grid-template-columns: 1fr;
+      }
+      .character{min-height: unset}
+      .character-gif{height: 380px}
+      .portals{grid-template-columns: 1fr}
     }
-
-    .wisdom-label {
-      background-color: #ccffcc;
-      /* Lighter green background */
-    }
-
-    .health {
-      background-color: orange;
-      height: 48px;
-      /* Adjusted height for 40% completion */
-    }
-
-    .health-label {
-      background-color: #ffe0b3;
-      /* Lighter orange background */
-    }
-
-    .progress-label {
-      margin-top: 5px;
-      font-size: 12px;
-      font-weight: bold;
-      padding: 3px;
-      border-radius: 5px;
-    }
-
-    .box {
-      width: 180px;
-      height: 110px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      color: #000; /* Black text */
-      font-size: 18px;
-      font-weight: bold;
-      text-align: center;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .box img {
-      max-width: 100%; /* Ensure the image is not wider than the box */
-      max-height: 100%; /* Ensure the image is not taller than the box */
-      object-fit: cover; /* Cover the box area without distorting aspect ratio */
-    }
-
-    .box:hover {
-      opacity: 0.8;
-    }
-
-    .box.workout {
-    }
-
-    .box.study {
-    }
-
-    .box.recipe {
-    }
-
-    .exercise-history {
-      flex-grow: 1;
-      /* Expand history div to fill remaining space */
-      padding: 10px;
-      border: 1px solid #000;
-      border-radius: 10px;
-      margin-left: 10px;
-      /* Added margin between history and colored boxes */
-    }
-
-    .history-header {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    .date {
-      text-decoration: underline;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .exercise {
-      margin-bottom: 10px;
-    }
-
-    .exercise-name {
-      font-weight: bold;
-    }
-
-    .weights {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      margin-bottom: 5px;
-    }
-
-    .weight,
-    .reps {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-    }
-
-    .weight-label,
-    .reps-label {
-      font-size: 12px;
-      margin-left: 5px;
-    }
-
-    .column {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-around;
-      width: 100%; /* Ensure column takes up full container width */
-    }
-
-    .body-column {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 50%; /* Each body-column takes up 50% of the column width */
-    }
-
-    .row {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center; /* Center content in the row */
-      width: 100%; /* Row takes up full width of its parent (body-column) */
-      margin-bottom: 10px;
-    }
-
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <div class="banner">LEVEL UP!</div>
-    <div class="row">
-      <div class="yellow-box">
-        <img src="https://giffiles.alphacoders.com/220/220162.gif" alt="Goku SSJ GIF">
+  <!-- Header -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-title">LEVEL UP!</div>
       </div>
-      <div class="progress-bars">
-        <div class="progress-bar-container">
-          <div class="progress-bar">
-            <div class="progress strength" style="height: 79%;"></div> <!-- 66% completion -->
-          </div>
-          <span class="progress-label strength-label">Strength</span>
-        </div>
-        <div class="progress-bar-container">
-          <div class="progress-bar">
-            <div class="progress wisdom" style="height: 84%;"></div> <!-- 70% completion -->
-          </div>
-          <span class="progress-label wisdom-label">Wisdom</span>
-        </div>
-        <div class="progress-bar-container">
-          <div class="progress-bar">
-            <div class="progress health" style="height: 48%;"></div> <!-- 40% completion -->
-          </div>
-          <span class="progress-label health-label">Health</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="container">
-    <div class="column">
-      <div class="body-column">
-        <div class="row">
-          <a href="./powerUp/index.html" class="box workout">
-          <img src="https://qph.cf2.quoracdn.net/main-qimg-4027d128a604c47448e3cca96814020d" alt="Workout">
-          </a>
-        </div>
-        <div class="row">
-          <a href="./study/studyHome.html" class="box study">
-            <img src="https://miro.medium.com/v2/resize:fit:1080/1*vBi4Ycgdn5t3lu2SvQXuog.gif" alt="Workout">
-          </a>
-        </div>        
-        <div class="row">
-          <div class="box recipe">
-            <a href="./finances/index.html" class="box recipe">
-              <img src="https://i.pinimg.com/originals/99/bb/d0/99bbd0dadbb29ef6eef32389e25227fd.gif" alt="Workout">
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="body-column">
-        <div class="exercise-history">
-          <div class="history-header">History</div>
-          <div class="date">February 10, 2024</div>
-          <div class="exercise">
-            <div class="exercise-name">Bench Press</div>
-            <div class="weights">
-              <div class="weight">135<span class="weight-label">lbs</span></div>
-              <div class="reps">12<span class="reps-label">reps</span></div>
-            </div>
-            <div class="weights">
-              <div class="weight">140<span class="weight-label">lbs</span></div>
-              <div class="reps">10<span class="reps-label">reps</span></div>
-            </div>
-            <div class="weights">
-              <div class="weight">150<span class="weight-label">lbs</span></div>
-              <div class="reps">8<span class="reps-label">reps</span></div>
-            </div>
-          </div>
-          <div class="exercise">
-            <div class="exercise-name">Squats</div>
-            <div class="weights">
-              <div class="weight">185<span class="weight-label">lbs</span></div>
-              <div class="reps">12<span class="reps-label">reps</span></div>
-            </div>
-            <div class="weights">
-              <div class="weight">200<span class="weight-label">lbs</span></div>
-              <div class="reps">10<span class="reps-label">reps</span></div>
-            </div>
-            <div class="weights">
-              <div class="weight">215<span class="weight-label">lbs</span></div>
-              <div class="reps">8<span class="reps-label">reps</span></div>
-            </div>
-          </div>
-          <div class="exercise">
-            <div class="exercise-name">Deadlifts</div>
-            <div class="weights">
-              <div class="weight">225<span class="weight-label">lbs</span></div>
-              <div class="reps">12<span class="reps-label">reps</span></div>
-            </div>
-            <div class="weights">
-              <div class="weight">240<span class="weight-label">lbs</span></div>
-              <div class="reps">10<span class="reps-label">reps</span></div>
-            </div>
-            <div class="weights">
-              <div class="weight">255<span class="weight-label">lbs</span></div>
-              <div class="reps">8<span class="reps-label">reps</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
-<script>
-  // Sample data to store in local storage
-  var userData = {
-    username: 'example_user',
-    level: 5,
-    experience: 200,
-    // Add more data as needed
-  };
 
-  // Store user data in local storage under 'levelUpData' key
-  localStorage.setItem('levelUpData', JSON.stringify(userData));
-</script>
+      <div class="meta">
+        <div class="pill" title="Overall character level (increases on transform)">
+          <small>Overall</small>
+          <span id="overallLevel">Lv 1</span>
+        </div>
+        <div class="pill" title="Transforms completed (all modules)">
+          <small>Transforms</small>
+          <span id="transformCount">0</span>
+        </div>
+        <button class="ghost-btn" id="goHome" title="Reload dashboard">↻ Refresh</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="wrap">
+    <!-- Character Panel -->
+    <section class="card character" id="characterCard">
+      <div class="card-inner">
+        <h2>Character</h2>
+
+        <div class="character-frame" id="characterFrame">
+          <div class="avatar-badge" title="Character icon (replace later)">⚡</div>
+          <div class="aura" aria-hidden="true"></div>
+          <!-- Keep your current GIF as placeholder -->
+          <img
+            class="character-gif"
+            src="https://giffiles.alphacoders.com/220/220162.gif"
+            alt="Character GIF"
+          />
+        </div>
+
+        <div class="character-footer">
+          <div class="stat">
+            <div class="k">Status</div>
+            <div class="v" id="statusText">Charging</div>
+          </div>
+          <div class="stat">
+            <div class="k">Next Transform</div>
+            <div class="v" id="nextTransformHint">Exercise</div>
+          </div>
+        </div>
+
+        <!-- Module portals (icon-based, cohesive) -->
+        <div class="portals" aria-label="Module portals">
+          <a class="portal" href="./powerUp/index.html" title="Open Exercise module">
+            <div class="left">
+              <div class="picon ex">💪</div>
+              <div>
+                <div class="name">Exercise</div>
+                <div class="subtxt">Power Up</div>
+              </div>
+            </div>
+            <div>→</div>
+          </a>
+
+          <a class="portal" href="./study/studyHome.html" title="Open Study module">
+            <div class="left">
+              <div class="picon study">📘</div>
+              <div>
+                <div class="name">Study</div>
+                <div class="subtxt">Flash Cards</div>
+              </div>
+            </div>
+            <div>→</div>
+          </a>
+
+          <a class="portal" href="./finances/index.html" title="Open Finances module">
+            <div class="left">
+              <div class="picon fin">💰</div>
+              <div>
+                <div class="name">Finances</div>
+                <div class="subtxt">Budgeting</div>
+              </div>
+            </div>
+            <div>→</div>
+          </a>
+        </div>
+
+        <div class="sub">
+          Tip: The “Transform” button unlocks when a module hits its max threshold.
+          Exercise power is driven by your real workout logs.
+        </div>
+      </div>
+    </section>
+
+    <!-- Module Power Bars -->
+    <section class="card modules">
+      <div class="card-inner">
+        <h2>Power Levels</h2>
+
+        <!-- Exercise -->
+        <div class="module" data-module="exercise">
+          <div class="module-top">
+            <div class="module-title">
+              <div class="icon ex">💪</div>
+              <div>
+                <div>Exercise</div>
+                <div class="hint" style="margin:2px 0 0">Real data (workout volume)</div>
+              </div>
+            </div>
+            <div class="module-meta">
+              <div class="num"><span id="exPowerNow">0</span> / <span id="exPowerMax">50000</span></div>
+              <div class="cap">Power</div>
+            </div>
+          </div>
+          <div class="bar"><div class="fill ex" id="exFill"></div></div>
+          <div class="module-actions">
+            <button class="link-btn" onclick="location.href='./powerUp/index.html'">Open 💥</button>
+            <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform ⚡</button>
+          </div>
+        </div>
+
+        <!-- Study -->
+        <div class="module" data-module="study">
+          <div class="module-top">
+            <div class="module-title">
+              <div class="icon study">📘</div>
+              <div>
+                <div>Study</div>
+                <div class="hint" style="margin:2px 0 0">Hook up later (flash cards)</div>
+              </div>
+            </div>
+            <div class="module-meta">
+              <div class="num"><span id="studyPowerNow">0</span> / <span id="studyPowerMax">1000</span></div>
+              <div class="cap">Power</div>
+            </div>
+          </div>
+          <div class="bar"><div class="fill study" id="studyFill"></div></div>
+          <div class="module-actions">
+            <button class="link-btn" onclick="location.href='./study/studyHome.html'">Open 📚</button>
+            <button class="transform-btn" id="studyTransform" title="Not connected yet">Transform ⚡</button>
+          </div>
+        </div>
+
+        <!-- Finances -->
+        <div class="module" data-module="finances">
+          <div class="module-top">
+            <div class="module-title">
+              <div class="icon fin">💰</div>
+              <div>
+                <div>Finances</div>
+                <div class="hint" style="margin:2px 0 0">Hook up later (budgeting)</div>
+              </div>
+            </div>
+            <div class="module-meta">
+              <div class="num"><span id="finPowerNow">0</span> / <span id="finPowerMax">1000</span></div>
+              <div class="cap">Power</div>
+            </div>
+          </div>
+          <div class="bar"><div class="fill fin" id="finFill"></div></div>
+          <div class="module-actions">
+            <button class="link-btn" onclick="location.href='./finances/index.html'">Open 📈</button>
+            <button class="transform-btn" id="finTransform" title="Not connected yet">Transform ⚡</button>
+          </div>
+        </div>
+
+        <div class="hint">
+          Exercise Transform resets only the dashboard “since last transform” meter.
+          Your workout history stays unchanged.
+        </div>
+      </div>
+    </section>
+
+    <!-- Exercise History -->
+    <section class="card history">
+      <div class="card-inner">
+        <div class="history-head">
+          <div class="history-title">
+            <b>Exercise History</b>
+            <span id="historySub">Most recent workout</span>
+          </div>
+          <div class="history-cta">
+            <button class="mini" id="openExercise">Open Workout</button>
+            <button class="mini" id="openAnalytics">Analytics</button>
+          </div>
+        </div>
+
+        <div class="summary" id="historySummary" style="display:none;">
+          <div class="chip"><small>Date</small> <span id="hDate">—</span></div>
+          <div class="chip"><small>Exercises</small> <span id="hMoves">—</span></div>
+          <div class="chip"><small>Sets</small> <span id="hSets">—</span></div>
+          <div class="chip"><small>Volume</small> <span id="hVol">—</span></div>
+        </div>
+
+        <div id="historyBody">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /* -------------------------------
+       Storage Keys (no new schema)
+    --------------------------------*/
+    const KEY_LEVEL = 'levelUp:characterLevel';
+    const KEY_TRANSFORMS = 'levelUp:transformCount';
+    const KEY_EX_RESET_AT = 'levelUp:exerciseResetAt'; // ISO date; used only for dashboard meter
+
+    const todayISO = new Date().toISOString().slice(0,10);
+
+    /* -------------------------------
+       Workout Data Reader (existing schema)
+       - reads powerUp:YYYY-MM-DD
+    --------------------------------*/
+    function listWorkoutKeys(){
+      const keys = [];
+      for(let i=0; i<localStorage.length; i++){
+        const k = localStorage.key(i);
+        if(/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) keys.push(k);
+      }
+      return keys;
+    }
+
+    function safeParse(key){
+      try { return JSON.parse(localStorage.getItem(key)); }
+      catch { return null; }
+    }
+
+    function normalizeDay(raw){
+      // Expect: { date:'YYYY-MM-DD', exercises:[{name, bodyPart, sets:[{weight,reps,done}]}] }
+      if(!raw || !raw.date) return null;
+      const exercises = Array.isArray(raw.exercises) ? raw.exercises : [];
+      return {
+        date: String(raw.date),
+        exercises: exercises.map(ex => ({
+          name: String(ex.name || ex.exercise || 'Exercise'),
+          bodyPart: String(ex.bodyPart || ex.muscle || ex.group || 'Other'),
+          sets: Array.isArray(ex.sets) ? ex.sets.map(s => ({
+            weight: Number(s.weight) || 0,
+            reps: Number(s.reps) || 0,
+            done: !!s.done || !!s.completed
+          })) : []
+        }))
+      };
+    }
+
+    function dayTotals(day){
+      let sets = 0;
+      let volume = 0;
+      let moves = 0;
+
+      (day.exercises || []).forEach(ex => {
+        if(ex.sets && ex.sets.length) moves++;
+        (ex.sets || []).forEach(s => {
+          // We count a set if it has any meaningful value
+          if((s.weight > 0) || (s.reps > 0)) sets++;
+          if(s.weight > 0 && s.reps > 0) volume += (s.weight * s.reps);
+        });
+      });
+
+      return { sets, volume, moves };
+    }
+
+    function getAllWorkouts(){
+      const days = [];
+      listWorkoutKeys().forEach(k => {
+        const raw = safeParse(k);
+        const day = normalizeDay(raw);
+        if(!day) return;
+        // Consider "logged" if at least one exercise exists OR any set has values
+        const totals = dayTotals(day);
+        const logged = (day.exercises && day.exercises.length) || totals.sets > 0 || totals.volume > 0;
+        if(logged) days.push(day);
+      });
+
+      days.sort((a,b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+      return days;
+    }
+
+    function getLatestWorkout(){
+      const all = getAllWorkouts();
+      return all.length ? all[all.length - 1] : null;
+    }
+
+    /* -------------------------------
+       Exercise Power (real activity)
+       - power = total volume since last dashboard transform reset
+       - does NOT modify workout schema
+    --------------------------------*/
+    function getExerciseResetAt(){
+      const v = localStorage.getItem(KEY_EX_RESET_AT);
+      // If never set, default far in past so you start accumulating immediately
+      return (v && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? v : '1900-01-01';
+    }
+
+    function volumeSince(isoDate){
+      const all = getAllWorkouts();
+      let total = 0;
+      all.forEach(day => {
+        if(day.date > isoDate){
+          total += dayTotals(day).volume;
+        }
+      });
+      return Math.round(total);
+    }
+
+    /* -------------------------------
+       Character Level + Transform Counts
+    --------------------------------*/
+    function getLevel(){
+      const v = Number(localStorage.getItem(KEY_LEVEL));
+      return (Number.isFinite(v) && v > 0) ? Math.floor(v) : 1;
+    }
+    function setLevel(n){
+      localStorage.setItem(KEY_LEVEL, String(Math.max(1, Math.floor(n))));
+    }
+    function getTransformCount(){
+      const v = Number(localStorage.getItem(KEY_TRANSFORMS));
+      return (Number.isFinite(v) && v >= 0) ? Math.floor(v) : 0;
+    }
+    function setTransformCount(n){
+      localStorage.setItem(KEY_TRANSFORMS, String(Math.max(0, Math.floor(n))));
+    }
+
+    /* -------------------------------
+       UI Render
+    --------------------------------*/
+    const EX_MAX = 50000; // you can tune this later
+    const STUDY_MAX = 1000;
+    const FIN_MAX = 1000;
+
+    function pct(now, max){
+      if(max <= 0) return 0;
+      return Math.max(0, Math.min(100, (now / max) * 100));
+    }
+
+    function setFill(id, percent){
+      const el = document.getElementById(id);
+      if(el) el.style.width = percent.toFixed(1) + '%';
+    }
+
+    function setText(id, text){
+      const el = document.getElementById(id);
+      if(el) el.textContent = text;
+    }
+
+    function flashTransform(){
+      const frame = document.getElementById('characterFrame');
+      if(!frame) return;
+      frame.classList.remove('transforming');
+      // force reflow
+      void frame.offsetWidth;
+      frame.classList.add('transforming');
+      setTimeout(()=>frame.classList.remove('transforming'), 950);
+    }
+
+    function renderTop(){
+      setText('overallLevel', 'Lv ' + getLevel());
+      setText('transformCount', String(getTransformCount()));
+    }
+
+    function renderModules(){
+      // Exercise (real)
+      const resetAt = getExerciseResetAt();
+      const exPower = volumeSince(resetAt);
+
+      setText('exPowerNow', exPower.toLocaleString());
+      setText('exPowerMax', EX_MAX.toLocaleString());
+      setFill('exFill', pct(exPower, EX_MAX));
+
+      const exBtn = document.getElementById('exTransform');
+      if(exBtn){
+        const ready = exPower >= EX_MAX && EX_MAX > 0;
+        exBtn.classList.toggle('ready', ready);
+        exBtn.disabled = !ready;
+        exBtn.style.cursor = ready ? 'pointer' : 'not-allowed';
+        exBtn.title = ready
+          ? 'Transform now! Resets Exercise power meter and increases overall level.'
+          : 'Keep training to charge the bar.';
+      }
+
+      // Study + Finances (placeholders; not connected yet)
+      setText('studyPowerNow', '0');
+      setText('studyPowerMax', STUDY_MAX.toLocaleString());
+      setFill('studyFill', 0);
+
+      setText('finPowerNow', '0');
+      setText('finPowerMax', FIN_MAX.toLocaleString());
+      setFill('finFill', 0);
+
+      // Character status hints
+      const status = document.getElementById('statusText');
+      const nextHint = document.getElementById('nextTransformHint');
+      if(status && nextHint){
+        if(exPower >= EX_MAX){
+          status.textContent = 'READY';
+          nextHint.textContent = 'Exercise';
+        } else {
+          status.textContent = 'Charging';
+          nextHint.textContent = 'Exercise';
+        }
+      }
+    }
+
+    function renderHistory(){
+      const container = document.getElementById('historyBody');
+      const summary = document.getElementById('historySummary');
+
+      const latest = getLatestWorkout();
+      if(!latest){
+        if(summary) summary.style.display = 'none';
+        container.innerHTML = `
+          <div class="empty">
+            No workout data found yet.<br/>
+            Start logging workouts in <b>Power Up</b> and your latest workout will appear here automatically.
+          </div>
+        `;
+        return;
+      }
+
+      const totals = dayTotals(latest);
+
+      if(summary) summary.style.display = 'flex';
+      setText('hDate', new Date(latest.date + 'T12:00:00').toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'}));
+      setText('hMoves', String(totals.moves));
+      setText('hSets', String(totals.sets));
+      setText('hVol', totals.volume.toLocaleString() + ' lb');
+
+      // Per-exercise summary rows
+      const rows = [];
+      latest.exercises.forEach(ex => {
+        const sets = (ex.sets || []).filter(s => (s.weight > 0 || s.reps > 0)).length;
+        const vol = (ex.sets || []).reduce((sum, s) => sum + ((s.weight>0 && s.reps>0) ? (s.weight*s.reps) : 0), 0);
+        if(sets === 0 && vol === 0) return;
+
+        rows.push(`
+          <div class="ex-row">
+            <div>
+              <div class="n">${escapeHtml(ex.name)}</div>
+              <div class="m">${escapeHtml(ex.bodyPart)} • ${sets} set(s)</div>
+            </div>
+            <div class="r">
+              ${Math.round(vol).toLocaleString()} lb
+              <small>volume</small>
+            </div>
+          </div>
+        `);
+      });
+
+      container.innerHTML = `
+        <div class="exercise-list">
+          ${rows.length ? rows.join('') : `<div class="empty">Workout found, but sets are empty.</div>`}
+        </div>
+      `;
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+    /* -------------------------------
+       Transform Handling (Exercise)
+    --------------------------------*/
+    function doExerciseTransform(){
+      // Re-check ready state
+      const exPower = volumeSince(getExerciseResetAt());
+      if(exPower < EX_MAX) return;
+
+      // Increment overall level + transform count
+      setLevel(getLevel() + 1);
+      setTransformCount(getTransformCount() + 1);
+
+      // Reset the DASHBOARD meter only
+      localStorage.setItem(KEY_EX_RESET_AT, todayISO);
+
+      // Animation
+      flashTransform();
+
+      // Re-render
+      renderAll();
+    }
+
+    /* -------------------------------
+       Wiring
+    --------------------------------*/
+    document.getElementById('goHome').addEventListener('click', ()=>location.reload());
+
+    document.getElementById('openExercise').addEventListener('click', ()=>{
+      // Open latest workout date if present, otherwise today
+      const latest = getLatestWorkout();
+      if(latest) location.href = `./powerUp/workout.html?date=${latest.date}`;
+      else location.href = './powerUp/index.html';
+    });
+
+    document.getElementById('openAnalytics').addEventListener('click', ()=>{
+      location.href = './powerUp/analytics.html';
+    });
+
+    document.getElementById('exTransform').addEventListener('click', doExerciseTransform);
+
+    // Study/Finance transforms are intentionally disabled until those modules are connected.
+    ['studyTransform','finTransform'].forEach(id=>{
+      const btn = document.getElementById(id);
+      if(btn){
+        btn.addEventListener('click', ()=>{
+          alert('This module is not connected to real activity yet.\nWhen Study/Finances data is wired, this will transform the same way as Exercise.');
+        });
+      }
+    });
+
+    function renderAll(){
+      renderTop();
+      renderModules();
+      renderHistory();
+    }
+    renderAll();
+  </script>
+</body>
 </html>
