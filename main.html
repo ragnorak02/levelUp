@@ -20,11 +20,10 @@
 
       --good:#22c55e;
       --warn:#f59e0b;
-      --bad:#ef4444;
 
-      --ex:#ef4444;     /* exercise */
-      --study:#3b82f6;  /* study */
-      --fin:#22c55e;    /* finances */
+      --ex:#ef4444;     /* Str */
+      --study:#3b82f6;  /* Wis */
+      --fin:#22c55e;    /* Fin */
     }
 
     *{box-sizing:border-box}
@@ -185,7 +184,7 @@
       100%{opacity:0; transform:scale(1.06)}
     }
 
-    /* Status only (expanded) */
+    /* Status expanded */
     .character-bottom{
       margin-top:8px;
       display:grid;
@@ -217,7 +216,7 @@
       text-overflow:ellipsis;
     }
 
-    /* Power block (help text removed) */
+    /* Power block */
     .power-block{
       margin-top:8px;
       background: rgba(0,0,0,.08);
@@ -298,18 +297,29 @@
     .transform-btn.ready:hover{filter: brightness(1.03)}
     .transform-btn.ready:active{transform: translateY(1px)}
 
-    /* Right side: modules as 3 vertical bars side-by-side */
+    /* RIGHT: 3 bars side-by-side, FULL HEIGHT to bottom */
     .modules-card{
       flex: 1;
       min-width: 0;
+      display:flex;
     }
+    .modules-card .card-inner{
+      display:flex;
+      flex:1;
+      /* make sure inner uses full height so the bars can stretch */
+      height: 100%;
+    }
+
     .modules-grid{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
       gap:10px;
       align-items:stretch;
+      width:100%;
+      flex:1;
     }
 
+    /* Each column stretches to fill the whole card height */
     .modv{
       background: rgba(255,255,255,.80);
       border:1px solid rgba(0,0,0,.15);
@@ -320,16 +330,18 @@
       box-shadow: 0 10px 18px rgba(0,0,0,.10);
       display:flex;
       flex-direction:column;
-      gap:8px;
+      gap:10px;
       min-width:0;
+      height: 100%;
     }
     .modv:active{transform: translateY(1px)}
     .modv:hover{filter: brightness(1.02)}
 
+    /* Top is icon only (no names, no power text) */
     .modv-top{
       display:flex;
+      justify-content:center;
       align-items:center;
-      gap:8px;
       min-width:0;
     }
     .micon{
@@ -340,41 +352,22 @@
       justify-content:center;
       font-size:18px;
       border:1px solid rgba(0,0,0,.16);
-      flex:0 0 auto;
       background: rgba(255,255,255,.80);
     }
     .micon.ex{ background: rgba(239,68,68,.16); }
     .micon.study{ background: rgba(59,130,246,.16); }
     .micon.fin{ background: rgba(34,197,94,.16); }
 
-    .mname{
-      font-weight:950;
-      line-height:1.05;
-      font-size:14px;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-
-    .mpower{
-      margin-top:2px;
-      color: rgba(0,0,0,.60);
-      font-weight:900;
-      font-size:12px;
-      display:flex;
-      justify-content:space-between;
-      gap:6px;
-      white-space:nowrap;
-    }
-
+    /* Vertical bar grows to consume remaining height */
     .vbar{
-      flex:1;
-      min-height:110px;
+      flex: 1;
+      width:100%;
       border-radius:14px;
       border:1px solid rgba(0,0,0,.12);
       background: rgba(0,0,0,.08);
       position:relative;
       overflow:hidden;
+      min-height: 160px; /* ensures tall feel even if layout compresses */
     }
     .vfill{
       position:absolute;
@@ -387,6 +380,17 @@
     .vfill.ex{ background: linear-gradient(180deg, rgba(239,68,68,.65), rgba(239,68,68,.92)); }
     .vfill.study{ background: linear-gradient(180deg, rgba(59,130,246,.65), rgba(59,130,246,.92)); }
     .vfill.fin{ background: linear-gradient(180deg, rgba(34,197,94,.65), rgba(34,197,94,.92)); }
+
+    /* Abbrev label at bottom */
+    .abbr{
+      text-align:center;
+      font-weight:1000;
+      letter-spacing:.6px;
+      font-size:13px;
+      color: rgba(0,0,0,.85);
+      padding-top:2px;
+      user-select:none;
+    }
 
     /* Exercise History Section */
     .history{
@@ -489,14 +493,12 @@
       line-height:1.4;
     }
 
-    /* Keep the "half screen" module section compact */
+    /* Mobile */
     @media (max-width: 360px){
       .dash-top{flex-direction:column;}
       .character-gif{height: 190px}
       .modules-grid{gap:8px}
-      .vbar{min-height: 96px}
-      .mname{font-size:13px}
-      .mpower{font-size:11px}
+      .vbar{min-height: 150px}
     }
   </style>
 </head>
@@ -534,7 +536,6 @@
             />
           </div>
 
-          <!-- Status expanded (Next Transform removed) -->
           <div class="character-bottom">
             <div class="mini-card">
               <div class="k">Status</div>
@@ -554,7 +555,6 @@
             </div>
             <div class="bar"><div class="fill ex" id="exFill"></div></div>
 
-            <!-- Help text removed -->
             <div class="transform-row">
               <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform</button>
             </div>
@@ -562,53 +562,41 @@
         </div>
       </div>
 
-      <!-- RIGHT: 3 modules side-by-side with vertical bars -->
+      <!-- RIGHT: icon-only + full-height vertical bars + abbrev labels -->
       <div class="card modules-card">
         <div class="card-inner">
           <div class="modules-grid" aria-label="Modules">
-            <!-- Exercise -->
+            <!-- Strength (Exercise) -->
             <div class="modv" id="modExercise" role="button" tabindex="0" title="Open Exercise module">
               <div class="modv-top">
                 <div class="micon ex">💪</div>
-                <div class="mname">Exercise</div>
-              </div>
-              <div class="mpower">
-                <span>Power</span>
-                <span><span id="modExNow">0</span>/<span id="modExMax">50000</span></span>
               </div>
               <div class="vbar">
                 <div class="vfill ex" id="modExFill"></div>
               </div>
+              <div class="abbr">Str</div>
             </div>
 
-            <!-- Study -->
+            <!-- Wisdom (Study) -->
             <div class="modv" id="modStudy" role="button" tabindex="0" title="Open Study module">
               <div class="modv-top">
                 <div class="micon study">📘</div>
-                <div class="mname">Study</div>
-              </div>
-              <div class="mpower">
-                <span>Power</span>
-                <span><span id="modStudyNow">0</span>/<span id="modStudyMax">1000</span></span>
               </div>
               <div class="vbar">
                 <div class="vfill study" id="modStudyFill"></div>
               </div>
+              <div class="abbr">Wis</div>
             </div>
 
             <!-- Finances -->
             <div class="modv" id="modFin" role="button" tabindex="0" title="Open Finances module">
               <div class="modv-top">
                 <div class="micon fin">💰</div>
-                <div class="mname">Finances</div>
-              </div>
-              <div class="mpower">
-                <span>Power</span>
-                <span><span id="modFinNow">0</span>/<span id="modFinMax">1000</span></span>
               </div>
               <div class="vbar">
                 <div class="vfill fin" id="modFinFill"></div>
               </div>
+              <div class="abbr">Fin</div>
             </div>
           </div>
         </div>
@@ -648,7 +636,6 @@
     const KEY_LEVEL = 'levelUp:characterLevel';
     const KEY_TRANSFORMS = 'levelUp:transformCount';
     const KEY_EX_RESET_AT = 'levelUp:exerciseResetAt'; // ISO date; dashboard-only meter reset
-
     const todayISO = new Date().toISOString().slice(0,10);
 
     /* -------------------------------
@@ -745,7 +732,7 @@
     }
 
     /* -------------------------------
-       Character Level + Transform Counts
+       Character Level
     --------------------------------*/
     function getLevel(){
       const v = Number(localStorage.getItem(KEY_LEVEL));
@@ -766,8 +753,6 @@
        UI Helpers
     --------------------------------*/
     const EX_MAX = 50000; // tune later
-    const STUDY_MAX = 1000;
-    const FIN_MAX = 1000;
 
     function pct(now, max){
       if(max <= 0) return 0;
@@ -786,15 +771,6 @@
       if(el) el.style.height = percent.toFixed(1) + '%';
     }
 
-    function escapeHtml(str){
-      return String(str)
-        .replaceAll('&','&amp;')
-        .replaceAll('<','&lt;')
-        .replaceAll('>','&gt;')
-        .replaceAll('"','&quot;')
-        .replaceAll("'","&#039;");
-    }
-
     function flashTransform(){
       const frame = document.getElementById('characterFrame');
       if(!frame) return;
@@ -804,38 +780,36 @@
       setTimeout(()=>frame.classList.remove('transforming'), 950);
     }
 
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
     /* -------------------------------
-       Render: Top / Modules / History
+       Render
     --------------------------------*/
     function renderTop(){
       setText('overallLevel', 'Lv ' + getLevel());
     }
 
     function renderModulesAndCharacter(){
-      const resetAt = getExerciseResetAt();
-      const exPower = volumeSince(resetAt);
+      const exPower = volumeSince(getExerciseResetAt());
 
-      // Character power numbers + horizontal bar
+      // left character power
       setText('exPowerNow', exPower.toLocaleString());
       setText('exPowerMax', EX_MAX.toLocaleString());
       setWidth('exFill', pct(exPower, EX_MAX));
 
-      // Right modules: numbers
-      setText('modExNow', exPower.toLocaleString());
-      setText('modExMax', EX_MAX.toLocaleString());
-
-      setText('modStudyNow', '0');
-      setText('modStudyMax', STUDY_MAX.toLocaleString());
-
-      setText('modFinNow', '0');
-      setText('modFinMax', FIN_MAX.toLocaleString());
-
-      // Right modules: VERTICAL fills
+      // right: vertical fills only (no labels/numbers)
       setHeight('modExFill', pct(exPower, EX_MAX));
       setHeight('modStudyFill', 0);
       setHeight('modFinFill', 0);
 
-      // Status + transform readiness
+      // status + transform readiness
       const ready = exPower >= EX_MAX && EX_MAX > 0;
       const statusText = document.getElementById('statusText');
       const dot = document.getElementById('statusDot');
@@ -848,9 +822,6 @@
         btn.classList.toggle('ready', ready);
         btn.disabled = !ready;
         btn.style.cursor = ready ? 'pointer' : 'not-allowed';
-        btn.title = ready
-          ? 'Transform now! Resets Exercise power meter and increases overall level.'
-          : 'Keep training to charge the bar.';
       }
     }
 
@@ -974,7 +945,6 @@
       renderHistory();
     }
 
-    // Init
     bindNav();
     bindButtons();
     renderAll();
