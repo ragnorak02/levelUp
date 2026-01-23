@@ -13,7 +13,6 @@
       --muted:#335b78;
 
       --card: rgba(255,255,255,.78);
-      --card2: rgba(255,255,255,.88);
       --ring: rgba(0,0,0,.18);
 
       --shadow: 0 14px 40px rgba(0,0,0,.16);
@@ -25,7 +24,7 @@
 
       --ex:#ef4444;     /* exercise */
       --study:#3b82f6;  /* study */
-      --fin:#22c55e;    /* finances (green in your mockup) */
+      --fin:#22c55e;    /* finances */
     }
 
     *{box-sizing:border-box}
@@ -38,7 +37,7 @@
       overflow-x:hidden;
     }
 
-    /* Header row (mockup) */
+    /* Header row */
     .topbar{
       position:sticky;
       top:0;
@@ -110,7 +109,7 @@
       gap:10px;
     }
 
-    /* Top dashboard row (mockup) */
+    /* Top dashboard row */
     .dash-top{
       display:flex;
       gap:10px;
@@ -126,7 +125,7 @@
     }
     .card-inner{padding:10px}
 
-    /* Left side: Character + power + status + transform */
+    /* Left side: Character */
     .character-card{
       flex: 1.35;
       min-width: 0;
@@ -186,11 +185,12 @@
       100%{opacity:0; transform:scale(1.06)}
     }
 
+    /* Status only (expanded) */
     .character-bottom{
       margin-top:8px;
       display:grid;
       gap:8px;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
     }
     .mini-card{
       background: rgba(255,255,255,.75);
@@ -217,6 +217,7 @@
       text-overflow:ellipsis;
     }
 
+    /* Power block (help text removed) */
     .power-block{
       margin-top:8px;
       background: rgba(0,0,0,.08);
@@ -271,16 +272,14 @@
     .fill.ex{ background: linear-gradient(90deg, rgba(239,68,68,.92), rgba(239,68,68,.55)); }
 
     .transform-row{
-      margin-top:8px;
+      margin-top:10px;
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
+      justify-content:flex-end;
     }
     .transform-btn{
       all:unset;
-      padding:8px 10px;
+      padding:10px 12px;
       border-radius:12px;
       border:1px solid rgba(0,0,0,.18);
       font-weight:950;
@@ -299,44 +298,47 @@
     .transform-btn.ready:hover{filter: brightness(1.03)}
     .transform-btn.ready:active{transform: translateY(1px)}
 
-    .hint{
-      font-size:11px;
-      color: rgba(0,0,0,.55);
-      font-weight:850;
-      line-height:1.3;
-    }
-
-    /* Right side: stacked modules */
+    /* Right side: modules as 3 vertical bars side-by-side */
     .modules-card{
       flex: 1;
       min-width: 0;
     }
-    .modules-stack{
-      display:flex;
-      flex-direction:column;
+    .modules-grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
       gap:10px;
+      align-items:stretch;
     }
-    .module{
+
+    .modv{
       background: rgba(255,255,255,.80);
       border:1px solid rgba(0,0,0,.15);
       border-radius:14px;
-      padding:10px;
-      display:flex;
-      gap:10px;
-      align-items:center;
+      padding:10px 8px;
       cursor:pointer;
       user-select:none;
       box-shadow: 0 10px 18px rgba(0,0,0,.10);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width:0;
     }
-    .module:active{transform: translateY(1px)}
-    .module:hover{filter: brightness(1.02)}
+    .modv:active{transform: translateY(1px)}
+    .modv:hover{filter: brightness(1.02)}
+
+    .modv-top{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+    }
     .micon{
-      width:42px; height:42px;
+      width:38px; height:38px;
       border-radius:12px;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:20px;
+      font-size:18px;
       border:1px solid rgba(0,0,0,.16);
       flex:0 0 auto;
       background: rgba(255,255,255,.80);
@@ -345,42 +347,48 @@
     .micon.study{ background: rgba(59,130,246,.16); }
     .micon.fin{ background: rgba(34,197,94,.16); }
 
-    .mtext{
-      flex:1;
-      min-width:0;
-    }
     .mname{
       font-weight:950;
-      line-height:1.1;
+      line-height:1.05;
+      font-size:14px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
+
     .mpower{
-      margin-top:3px;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      color: rgba(0,0,0,.62);
+      margin-top:2px;
+      color: rgba(0,0,0,.60);
       font-weight:900;
       font-size:12px;
+      display:flex;
+      justify-content:space-between;
+      gap:6px;
+      white-space:nowrap;
     }
-    .mbar{
-      margin-top:6px;
-      height:10px;
-      border-radius:999px;
+
+    .vbar{
+      flex:1;
+      min-height:110px;
+      border-radius:14px;
       border:1px solid rgba(0,0,0,.12);
       background: rgba(0,0,0,.08);
+      position:relative;
       overflow:hidden;
     }
-    .mfill{
-      height:100%;
-      width:0%;
-      border-radius:999px;
-      transition: width .35s ease;
+    .vfill{
+      position:absolute;
+      left:0; right:0;
+      bottom:0;
+      height:0%;
+      transition: height .35s ease;
+      border-radius:14px;
     }
-    .mfill.ex{ background: linear-gradient(90deg, rgba(239,68,68,.92), rgba(239,68,68,.55)); }
-    .mfill.study{ background: linear-gradient(90deg, rgba(59,130,246,.92), rgba(59,130,246,.55)); }
-    .mfill.fin{ background: linear-gradient(90deg, rgba(34,197,94,.92), rgba(34,197,94,.55)); }
+    .vfill.ex{ background: linear-gradient(180deg, rgba(239,68,68,.65), rgba(239,68,68,.92)); }
+    .vfill.study{ background: linear-gradient(180deg, rgba(59,130,246,.65), rgba(59,130,246,.92)); }
+    .vfill.fin{ background: linear-gradient(180deg, rgba(34,197,94,.65), rgba(34,197,94,.92)); }
 
-    /* Exercise History Section (unchanged behavior) */
+    /* Exercise History Section */
     .history{
       background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.62));
     }
@@ -481,16 +489,19 @@
       line-height:1.4;
     }
 
-    /* Mobile: keep the top area compact; stack only if extremely narrow */
+    /* Keep the "half screen" module section compact */
     @media (max-width: 360px){
       .dash-top{flex-direction:column;}
       .character-gif{height: 190px}
+      .modules-grid{gap:8px}
+      .vbar{min-height: 96px}
+      .mname{font-size:13px}
+      .mpower{font-size:11px}
     }
   </style>
 </head>
 
 <body>
-  <!-- Header (mockup style) -->
   <div class="topbar">
     <div class="topbar-inner">
       <div class="title">Journal</div>
@@ -506,9 +517,9 @@
   </div>
 
   <main class="wrap">
-    <!-- TOP DASHBOARD ROW (single row like mockup) -->
+    <!-- TOP DASHBOARD ROW -->
     <section class="dash-top">
-      <!-- LEFT: Character + power + status + transform -->
+      <!-- LEFT -->
       <div class="card character-card">
         <div class="card-inner">
           <div class="section-label">Character</div>
@@ -523,14 +534,11 @@
             />
           </div>
 
+          <!-- Status expanded (Next Transform removed) -->
           <div class="character-bottom">
             <div class="mini-card">
               <div class="k">Status</div>
               <div class="v" id="statusText">Charging</div>
-            </div>
-            <div class="mini-card">
-              <div class="k">Next Transform</div>
-              <div class="v" id="nextTransformHint">Exercise</div>
             </div>
           </div>
 
@@ -546,56 +554,60 @@
             </div>
             <div class="bar"><div class="fill ex" id="exFill"></div></div>
 
+            <!-- Help text removed -->
             <div class="transform-row">
-              <div class="hint" id="transformHint">
-                Train to fill the bar. When it hits max, Transform unlocks.
-              </div>
               <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT: stacked module panels (navigation) -->
+      <!-- RIGHT: 3 modules side-by-side with vertical bars -->
       <div class="card modules-card">
         <div class="card-inner">
-          <div class="modules-stack" aria-label="Modules">
+          <div class="modules-grid" aria-label="Modules">
             <!-- Exercise -->
-            <div class="module" id="modExercise" role="button" tabindex="0" title="Open Exercise module">
-              <div class="micon ex">💪</div>
-              <div class="mtext">
+            <div class="modv" id="modExercise" role="button" tabindex="0" title="Open Exercise module">
+              <div class="modv-top">
+                <div class="micon ex">💪</div>
                 <div class="mname">Exercise</div>
-                <div class="mpower">
-                  <span>Power</span>
-                  <span><span id="modExNow">0</span> / <span id="modExMax">50000</span></span>
-                </div>
-                <div class="mbar"><div class="mfill ex" id="modExFill"></div></div>
+              </div>
+              <div class="mpower">
+                <span>Power</span>
+                <span><span id="modExNow">0</span>/<span id="modExMax">50000</span></span>
+              </div>
+              <div class="vbar">
+                <div class="vfill ex" id="modExFill"></div>
               </div>
             </div>
 
             <!-- Study -->
-            <div class="module" id="modStudy" role="button" tabindex="0" title="Open Study module">
-              <div class="micon study">📘</div>
-              <div class="mtext">
+            <div class="modv" id="modStudy" role="button" tabindex="0" title="Open Study module">
+              <div class="modv-top">
+                <div class="micon study">📘</div>
                 <div class="mname">Study</div>
-                <div class="mpower">
-                  <span>Power</span>
-                  <span><span id="modStudyNow">0</span> / <span id="modStudyMax">1000</span></span>
-                </div>
-                <div class="mbar"><div class="mfill study" id="modStudyFill"></div></div>
+              </div>
+              <div class="mpower">
+                <span>Power</span>
+                <span><span id="modStudyNow">0</span>/<span id="modStudyMax">1000</span></span>
+              </div>
+              <div class="vbar">
+                <div class="vfill study" id="modStudyFill"></div>
               </div>
             </div>
 
             <!-- Finances -->
-            <div class="module" id="modFin" role="button" tabindex="0" title="Open Finances module">
-              <div class="micon fin">💰</div>
-              <div class="mtext">
+            <div class="modv" id="modFin" role="button" tabindex="0" title="Open Finances module">
+              <div class="modv-top">
+                <div class="micon fin">💰</div>
                 <div class="mname">Finances</div>
-                <div class="mpower">
-                  <span>Power</span>
-                  <span><span id="modFinNow">0</span> / <span id="modFinMax">1000</span></span>
-                </div>
-                <div class="mbar"><div class="mfill fin" id="modFinFill"></div></div>
+              </div>
+              <div class="mpower">
+                <span>Power</span>
+                <span><span id="modFinNow">0</span>/<span id="modFinMax">1000</span></span>
+              </div>
+              <div class="vbar">
+                <div class="vfill fin" id="modFinFill"></div>
               </div>
             </div>
           </div>
@@ -603,7 +615,7 @@
       </div>
     </section>
 
-    <!-- Exercise History Section (below; behavior preserved) -->
+    <!-- Exercise History Section (below; logic preserved) -->
     <section class="card history">
       <div class="card-inner">
         <div class="history-head">
@@ -769,6 +781,10 @@
       const el = document.getElementById(id);
       if(el) el.style.width = percent.toFixed(1) + '%';
     }
+    function setHeight(id, percent){
+      const el = document.getElementById(id);
+      if(el) el.style.height = percent.toFixed(1) + '%';
+    }
 
     function escapeHtml(str){
       return String(str)
@@ -799,45 +815,34 @@
       const resetAt = getExerciseResetAt();
       const exPower = volumeSince(resetAt);
 
-      // Character power display
+      // Character power numbers + horizontal bar
       setText('exPowerNow', exPower.toLocaleString());
       setText('exPowerMax', EX_MAX.toLocaleString());
       setWidth('exFill', pct(exPower, EX_MAX));
 
-      // Right-side exercise module mirrors same values
+      // Right modules: numbers
       setText('modExNow', exPower.toLocaleString());
       setText('modExMax', EX_MAX.toLocaleString());
-      setWidth('modExFill', pct(exPower, EX_MAX));
 
-      // Study / Fin placeholders (wired later)
       setText('modStudyNow', '0');
       setText('modStudyMax', STUDY_MAX.toLocaleString());
-      setWidth('modStudyFill', 0);
 
       setText('modFinNow', '0');
       setText('modFinMax', FIN_MAX.toLocaleString());
-      setWidth('modFinFill', 0);
+
+      // Right modules: VERTICAL fills
+      setHeight('modExFill', pct(exPower, EX_MAX));
+      setHeight('modStudyFill', 0);
+      setHeight('modFinFill', 0);
 
       // Status + transform readiness
       const ready = exPower >= EX_MAX && EX_MAX > 0;
       const statusText = document.getElementById('statusText');
-      const nextTransformHint = document.getElementById('nextTransformHint');
       const dot = document.getElementById('statusDot');
-      const hint = document.getElementById('transformHint');
       const btn = document.getElementById('exTransform');
 
       if(statusText) statusText.textContent = ready ? 'READY' : 'Charging';
-      if(nextTransformHint) nextTransformHint.textContent = 'Exercise';
-
-      if(dot){
-        dot.classList.toggle('ready', ready);
-      }
-
-      if(hint){
-        hint.textContent = ready
-          ? 'Transformation ready. Tap Transform!'
-          : 'Train to fill the bar. When it hits max, Transform unlocks.';
-      }
+      if(dot) dot.classList.toggle('ready', ready);
 
       if(btn){
         btn.classList.toggle('ready', ready);
@@ -941,9 +946,6 @@
       }
     }
 
-    /* -------------------------------
-       Buttons
-    --------------------------------*/
     function bindButtons(){
       const refreshBtn = document.getElementById('refreshBtn');
       if(refreshBtn) refreshBtn.addEventListener('click', ()=>location.reload());
