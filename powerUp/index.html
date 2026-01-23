@@ -9,13 +9,11 @@
     --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7; --accent:#4CAF50; --accent-2:#2dd4bf;
     --ring:#2a3543; --warn:#f59e0b; --good:#22c55e; --bad:#ef4444;
     --cal-gap:4px; --cal-radius:10px; --cal-font:.9rem; --cal-count:.8rem;
-    --mg-chest: rgba(239, 68, 68, .26);
-    --mg-back: rgba(59, 130, 246, .24);
-    --mg-legs: rgba(34, 197, 94, .22);
-    --mg-shoulders: rgba(168, 85, 247, .22);
-    --mg-arms: rgba(249, 115, 22, .22);
-    --mg-other: rgba(148, 163, 184, .18);
-  }
+    --mg-chest: rgba(255, 59, 48, .72); /* bright red */
+    --mg-back: rgba(0, 122, 255, .72); /* strong blue */
+    --mg-legs: rgba(52, 199, 89, .72); /* vibrant green */
+    --mg-shoulders: rgba(175, 82, 222, .72); /* rich purple */
+}
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
@@ -48,7 +46,27 @@
   .trend{font-size:.8rem; color:var(--muted)}
   .spark{width:100%; height:45px; display:block}
   .meta{display:flex; gap:10px; flex-wrap:wrap}
-  .badge{background:#0f1720; border:1px solid var(--ring); color:var(--muted); padding:.3rem .55rem; border-radius:999px; font-size:.82rem}
+.badge{background:#0f1720; border:1px solid var(--ring); color:var(--muted); padding:.3rem .55rem; border-radius:999px; font-size:.82rem}
+
+/* Today's Workout tiles (compact, square-ish) */
+.meta-tiles{display:flex; gap:8px; flex-wrap:wrap; align-items:stretch; margin-top:6px}
+.tile{
+  background:#0f1720;
+  border:1px solid var(--ring);
+  border-radius:12px;
+  padding:8px 10px;
+  min-width:84px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  justify-content:center;
+  text-align:center;
+  color:var(--muted);
+  font-size:.82rem;
+}
+.tile b{color:var(--ink); font-size:1rem}
+.tile .t-label{font-size:.72rem; letter-spacing:.02em}
+.tile.tile-date{min-width:120px; text-align:left; justify-content:center}
   .ex-list{display:grid; gap:6px}
   .ex{display:flex; justify-content:space-between; background:#0f141b; border:1px dashed #213043; border-radius:10px; padding:6px 8px; font-size:.95rem}
   .ex b{font-weight:700}
@@ -69,10 +87,22 @@
   .power-level{font-size:1.35rem}
   .trend{font-size:.78rem}
   .level-progress{height:7px; margin:6px 0}
-  .weight-row{display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-top:6px}
-  .weight-label{font-size:.78rem; color:var(--muted); margin-bottom:2px}
-  .weight-value{font-size:1rem; font-weight:650}
-  #logWeight{margin-left:auto}
+  /* Inline power row (Title + Level + Progress + Weight) */
+.power-inline{display:flex; align-items:center; gap:10px}
+.power-title{margin:0; font-size:.88rem; color:var(--muted); font-weight:650; white-space:nowrap}
+.power-level-wrap{display:flex; align-items:baseline; gap:6px; white-space:nowrap}
+.level-progress.inline{flex:1; margin:0; height:8px; min-width:70px}
+.weight-pill{
+  all:unset; cursor:pointer;
+  padding:.35rem .6rem;
+  border-radius:999px;
+  border:1px solid var(--ring);
+  background:#0f1720;
+  color:var(--ink);
+  font-weight:750;
+  white-space:nowrap;
+}
+.weight-pill:hover{background:#15202c}
 
   /* Power level styling */
   .power-level{
@@ -231,6 +261,36 @@
 
   #lastWorkoutCard { overflow-x: hidden; }
 
+
+/* Weight history modal */
+.modal{position:fixed; inset:0; display:none; z-index:50}
+.modal.open{display:block}
+.modal-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55)}
+.modal-card{
+  position:relative;
+  max-width:760px;
+  margin:10vh auto;
+  background:linear-gradient(180deg,#101823 0%, #0e151f 100%);
+  border:1px solid var(--ring);
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+.modal-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px}
+.modal-title{font-weight:800; letter-spacing:.02em}
+.modal-close{
+  all:unset; cursor:pointer; padding:.35rem .55rem;
+  border-radius:10px; border:1px solid var(--ring); color:var(--muted)
+}
+.modal-close:hover{background:#142033}
+#weightChart{width:100%; height:220px; display:block; background:#0b121a; border:1px solid #203041; border-radius:12px}
+.modal-actions{display:flex; gap:8px; align-items:center; margin:10px 0}
+.cta.small{padding:.5rem .75rem; font-size:.9rem}
+.weight-list{max-height:180px; overflow:auto; border:1px dashed #213043; border-radius:12px; padding:8px; background:#0b121a}
+.weight-item{display:flex; justify-content:space-between; padding:6px 8px; border-bottom:1px solid rgba(255,255,255,.06); color:var(--muted); font-size:.9rem}
+.weight-item:last-child{border-bottom:0}
+.weight-item b{color:var(--ink)}
+
 </style>
 </head>
 <body>
@@ -243,22 +303,18 @@
   <div class="wrap">
     <section class="grid">
       <article class="card" id="powerCard">
-        <h3>Power Level</h3>
-        <div class="val">
-          <span class="power-level" id="powerLevel">Lv 1</span>
-          <span class="trend" id="powerTrend">Novice</span>
-        </div>
-        <div class="level-progress">
-          <div class="level-bar" id="levelBar" style="width: 0%"></div>
-        </div>
-        <div class="weight-row">
-  <div class="weight-block">
-    <div class="weight-label">Current Weight</div>
-    <div class="weight-value" id="currentWeight">—</div>
+<div class="power-inline">
+  <h3 class="power-title">Power Level</h3>
+  <div class="power-level-wrap">
+    <span class="power-level" id="powerLevel">Lv 1</span>
+    <span class="trend" id="powerTrend">Novice</span>
   </div>
-  <button class="small-btn" id="logWeight">Log Weight</button>
+  <div class="level-progress inline" aria-label="Level progress">
+    <div class="level-bar" id="levelBar" style="width: 0%"></div>
+  </div>
+  <button class="weight-pill" id="currentWeightBtn" type="button" title="View weight history">—</button>
 </div>
-      </article>
+        </article>
 
       <article class="card" id="lastWorkoutCard">
         <div>
@@ -267,14 +323,14 @@
             <h3 id="workoutPanelTitle">Today's Workout</h3>
             <button class="nav-btn" id="nextWorkout">→</button>
           </div>
-          <div class="meta">
-            <span class="badge" id="lastDate">—</span>
-            <span class="badge">Total Volume: <b id="lastVolume">—</b></span>
-            <span class="badge">Exercises: <b id="lastMoves">—</b></span>
-            <span class="badge">Sets: <b id="lastSets">—</b></span>
-            <span class="badge" id="setsLeftBadge" style="display:none;">Sets Left: <b id="setsLeft">—</b></span>
-          </div>
-          <div class="ex-list" id="exList"></div>
+          <div class="meta-tiles">
+  <div class="tile tile-date" id="lastDate">—</div>
+  <div class="tile"><div class="t-label">Total</div><b id="lastVolume">—</b></div>
+  <div class="tile"><div class="t-label">Exercises</div><b id="lastMoves">—</b></div>
+  <div class="tile"><div class="t-label">Sets</div><b id="lastSets">—</b></div>
+  <div class="tile" id="setsLeftTile" style="display:none;"><div class="t-label">Left</div><b id="setsLeft">—</b></div>
+</div>
+<div class="ex-list" id="exList"></div>
         </div>
         <div class="cta-row">
           <button class="cta" id="startToday">Start Today's Workout</button>
@@ -297,8 +353,7 @@
           <span><i class="swatch" style="background:var(--mg-back)"></i> Back</span>
           <span><i class="swatch" style="background:var(--mg-legs)"></i> Legs</span>
           <span><i class="swatch" style="background:var(--mg-shoulders)"></i> Shoulders</span>
-          <span><i class="swatch" style="background:var(--mg-arms)"></i> Arms</span>
-        </div>
+</div>
         <div class="cal-grid" id="calDOW"></div>
         <div class="cal-grid" id="calGrid"></div>
       </section>
@@ -446,7 +501,7 @@ function renderPowerLevel(){
     .filter(w=>typeof w.bodyWeight==='number' && !isNaN(w.bodyWeight))
     .at(-1);
   
-  const weightEl = document.getElementById('currentWeight');
+  const weightEl = document.getElementById('currentWeightBtn');
   if(lastWeight){
     weightEl.textContent = `${lastWeight.bodyWeight.toFixed(1)} lb`;
   } else {
@@ -486,7 +541,7 @@ function renderWorkoutPanel(){
   document.getElementById('lastMoves').textContent = workout.exercises.length;
   document.getElementById('lastSets').textContent = totalSets(workout);
 
-  const setsLeftWrap = document.getElementById('setsLeftBadge');
+  const setsLeftWrap = document.getElementById('setsLeftTile');
   if(isToday && workout.exercises.length > 0){
     const left = totalSets(workout) - completedSets(workout);
     setsLeftWrap.style.display = 'inline-flex';
@@ -535,25 +590,25 @@ function renderCalendar(){
 
   // --- Muscle mapping ---
   const muscleKey = (raw)=>{
-    const s = String(raw||'').toLowerCase();
-    if(s.includes('chest') || s.includes('pec')) return 'Chest';
-    if(s.includes('back') || s.includes('lat') || s.includes('row')) return 'Back';
-    if(s.includes('leg') || s.includes('quad') || s.includes('ham') || s.includes('glute') || s.includes('calf')) return 'Legs';
-    if(s.includes('shoulder') || s.includes('delt')) return 'Shoulders';
-    if(s.includes('bicep') || s.includes('tricep') || s.includes('forearm') || s.includes('arm')) return 'Arms';
-    return 'Other';
-  };
+  const s = String(raw||'').toLowerCase();
+  if(s.includes('chest') || s.includes('pec')) return 'Chest';
+  if(s.includes('back') || s.includes('lat') || s.includes('row')) return 'Back';
+  if(s.includes('leg') || s.includes('quad') || s.includes('ham') || s.includes('glute') || s.includes('calf')) return 'Legs';
+  if(s.includes('shoulder') || s.includes('delt')) return 'Shoulders';
+  return null; // ignore Arms/Other (per new spec)
+};
+
 
   const muscleBg = (key)=>{
-    switch(key){
-      case 'Chest': return 'var(--mg-chest)';
-      case 'Back': return 'var(--mg-back)';
-      case 'Legs': return 'var(--mg-legs)';
-      case 'Shoulders': return 'var(--mg-shoulders)';
-      case 'Arms': return 'var(--mg-arms)';
-      default: return 'var(--mg-other)';
-    }
-  };
+  switch(key){
+    case 'Chest': return 'var(--mg-chest)';
+    case 'Back': return 'var(--mg-back)';
+    case 'Legs': return 'var(--mg-legs)';
+    case 'Shoulders': return 'var(--mg-shoulders)';
+    default: return '';
+  }
+};
+
 
   // day -> { hasWorkout:boolean, vols: Map(muscle->volume) }
   const byDay = new Map();
@@ -573,6 +628,7 @@ function renderCalendar(){
 
     (w.exercises||[]).forEach(ex=>{
       const mk = muscleKey(ex.bodyPart);
+      if(!mk) return;
       (ex.sets||[]).forEach(st=>{
         const reps = Number(st.reps)||0;
         const weight = Number(st.weight)||0;
@@ -628,18 +684,13 @@ function renderCalendar(){
 
     cell.className = `day ${state}`.trim();
 
-    // Background tint based on muscle(s)
-    if(info.hasWorkout && top.length){
-      if(top.length === 1){
-        cell.style.background = muscleBg(top[0]);
-      } else {
-        const c1 = muscleBg(top[0]);
-        const c2 = muscleBg(top[1]);
-        cell.style.background = `linear-gradient(135deg, ${c1} 0 50%, ${c2} 50% 100%)`;
-      }
-    } else {
-      cell.style.background = '';
-    }
+    // Background tint based on PRIMARY muscle group (solid color)
+if(info.hasWorkout && top.length){
+  cell.style.background = muscleBg(top[0]);
+} else {
+  cell.style.background = '';
+}
+
 
     // Click behavior (same as before)
     cell.addEventListener('click', () => {
@@ -697,18 +748,6 @@ document.getElementById('analytics').addEventListener('click', ()=>{
   window.location.href = 'analytics.html';
 });
 
-document.getElementById('logWeight').addEventListener('click', ()=>{
-  const w = prompt('Enter today\'s weight (lb):');
-  if(!w) return;
-  const k = `powerUp:${todayISO}`;
-  const existing = localStorage.getItem(k);
-  if(existing){
-    const d = JSON.parse(existing); d.bodyWeight = parseFloat(w); localStorage.setItem(k, JSON.stringify(d));
-  }else{
-    localStorage.setItem(k, JSON.stringify({date: todayISO, bodyWeight:parseFloat(w), exercises:[]}));
-  }
-  location.reload();
-});
 
 // Workout navigation
 document.getElementById('prevWorkout').addEventListener('click', () => {
@@ -752,6 +791,233 @@ function renderAll(){
 }
 renderAll();
 
+
+/* ---------------- Weight History (stored historically) ---------------- */
+const WEIGHT_KEY = 'powerUp:weights';
+
+function getWeightHistory(){
+  try{
+    const raw = localStorage.getItem(WEIGHT_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){
+    return [];
+  }
+}
+
+function setWeightHistory(arr){
+  localStorage.setItem(WEIGHT_KEY, JSON.stringify(arr));
+}
+
+function upsertWeightEntry(dateISO, weight){
+  const arr = getWeightHistory();
+  const idx = arr.findIndex(x => x && x.date === dateISO);
+  if(idx >= 0){
+    arr[idx].weight = weight;
+  }else{
+    arr.push({ date: dateISO, weight });
+  }
+  arr.sort((a,b)=> String(a.date).localeCompare(String(b.date)));
+  setWeightHistory(arr);
+
+  // Keep backward compatibility: also store in today's workout object if it exists
+  const k = `powerUp:${dateISO}`;
+  const existing = localStorage.getItem(k);
+  if(existing){
+    const d = JSON.parse(existing);
+    d.bodyWeight = weight;
+    localStorage.setItem(k, JSON.stringify(d));
+  }
+  return arr;
+}
+
+function latestWeight(){
+  const arr = getWeightHistory();
+  if(arr.length){
+    const last = arr[arr.length-1];
+    return Number(last.weight) || null;
+  }
+  // fallback: try today's record
+  const k = `powerUp:${todayISO}`;
+  const existing = localStorage.getItem(k);
+  if(existing){
+    try{
+      const d = JSON.parse(existing);
+      if(d && d.bodyWeight) return Number(d.bodyWeight) || null;
+    }catch(e){}
+  }
+  return null;
+}
+
+function openWeightModal(){
+  const m = document.getElementById('weightModal');
+  m.classList.add('open');
+  m.setAttribute('aria-hidden','false');
+  renderWeightModal();
+}
+
+function closeWeightModal(){
+  const m = document.getElementById('weightModal');
+  m.classList.remove('open');
+  m.setAttribute('aria-hidden','true');
+}
+
+function renderWeightModal(){
+  const list = document.getElementById('weightList');
+  const hist = getWeightHistory();
+  list.innerHTML = '';
+
+  // Newest first
+  [...hist].reverse().forEach(item=>{
+    const row = document.createElement('div');
+    row.className = 'weight-item';
+    const d = new Date(item.date + 'T00:00:00');
+    row.innerHTML = `<span>${d.toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'})}</span><b>${Number(item.weight).toFixed(1)} lb</b>`;
+    list.appendChild(row);
+  });
+
+  drawWeightChart(hist);
+}
+
+function drawWeightChart(hist){
+  const canvas = document.getElementById('weightChart');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // handle device pixel ratio
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = canvas.clientWidth || 760;
+  const cssH = canvas.clientHeight || 220;
+  canvas.width = Math.floor(cssW * dpr);
+  canvas.height = Math.floor(cssH * dpr);
+  ctx.scale(dpr, dpr);
+
+  // clear
+  ctx.clearRect(0,0,cssW,cssH);
+
+  const pad = {l:44, r:14, t:14, b:34};
+  const w = cssW - pad.l - pad.r;
+  const h = cssH - pad.t - pad.b;
+
+  const points = (hist||[])
+    .filter(x=>x && x.date && isFinite(Number(x.weight)))
+    .sort((a,b)=> String(a.date).localeCompare(String(b.date)))
+    .map(x=>({ date:x.date, weight:Number(x.weight) }));
+
+  // background grid
+  ctx.strokeStyle = 'rgba(255,255,255,.08)';
+  ctx.lineWidth = 1;
+  for(let i=0;i<=4;i++){
+    const y = pad.t + (h*i/4);
+    ctx.beginPath();
+    ctx.moveTo(pad.l, y);
+    ctx.lineTo(pad.l+w, y);
+    ctx.stroke();
+  }
+
+  if(points.length < 2){
+    ctx.fillStyle = 'rgba(255,255,255,.5)';
+    ctx.font = '12px system-ui';
+    ctx.fillText(points.length ? 'Add one more weigh-in to see a chart.' : 'No weigh-ins yet.', pad.l, pad.t + 18);
+    return;
+  }
+
+  const minW = Math.min(...points.map(p=>p.weight));
+  const maxW = Math.max(...points.map(p=>p.weight));
+  const range = Math.max(1, maxW - minW);
+
+  const xFor = (i)=> pad.l + (w * (i/(points.length-1)));
+  const yFor = (val)=> pad.t + h - (h * ((val - minW)/range));
+
+  // line
+  ctx.strokeStyle = '#22c55e';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  points.forEach((p,i)=>{
+    const x = xFor(i);
+    const y = yFor(p.weight);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // points
+  ctx.fillStyle = '#22c55e';
+  points.forEach((p,i)=>{
+    const x = xFor(i);
+    const y = yFor(p.weight);
+    ctx.beginPath();
+    ctx.arc(x,y,3,0,Math.PI*2);
+    ctx.fill();
+  });
+
+  // y-axis labels (min/max)
+  ctx.fillStyle = 'rgba(255,255,255,.65)';
+  ctx.font = '12px system-ui';
+  ctx.fillText(`${minW.toFixed(1)}`, 8, yFor(minW)+4);
+  ctx.fillText(`${maxW.toFixed(1)}`, 8, yFor(maxW)+4);
+
+  // x-axis labels (first/last)
+  const firstD = new Date(points[0].date+'T00:00:00');
+  const lastD = new Date(points[points.length-1].date+'T00:00:00');
+  ctx.fillText(firstD.toLocaleDateString(undefined,{month:'short', day:'numeric'}), pad.l, pad.t+h+24);
+  const lastLabel = lastD.toLocaleDateString(undefined,{month:'short', day:'numeric'});
+  const lw = ctx.measureText(lastLabel).width;
+  ctx.fillText(lastLabel, pad.l+w-lw, pad.t+h+24);
+}
+
+/* Wire up weight button + modal */
+(function(){
+  const btn = document.getElementById('currentWeightBtn');
+  if(btn){
+    const w = latestWeight();
+    btn.textContent = (w!=null) ? `${w.toFixed(1)} lb` : '—';
+    btn.addEventListener('click', openWeightModal);
+  }
+
+  const modal = document.getElementById('weightModal');
+  if(modal){
+    modal.addEventListener('click', (e)=>{
+      const t = e.target;
+      if(t && t.getAttribute && t.getAttribute('data-close')) closeWeightModal();
+    });
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && modal.classList.contains('open')) closeWeightModal();
+    });
+  }
+
+  const addBtn = document.getElementById('addWeightBtn');
+  if(addBtn){
+    addBtn.addEventListener('click', ()=>{
+      const raw = prompt("Enter today's weight (lb):");
+      if(!raw) return;
+      const val = Number(raw);
+      if(!isFinite(val) || val<=0) return alert('Please enter a valid weight.');
+      upsertWeightEntry(todayISO, val);
+      // update pill text
+      const btn2 = document.getElementById('currentWeightBtn');
+      if(btn2) btn2.textContent = `${val.toFixed(1)} lb`;
+      renderWeightModal();
+    });
+  }
+})();
+
 </script>
+
+<!-- Weight History Modal -->
+<div class="modal" id="weightModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close="1"></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-label="Weight history">
+    <div class="modal-head">
+      <div class="modal-title">Weight History</div>
+      <button class="modal-close" type="button" data-close="1">✕</button>
+    </div>
+    <canvas id="weightChart" width="760" height="220"></canvas>
+    <div class="modal-actions">
+      <button class="cta small" id="addWeightBtn" type="button">Add weigh-in</button>
+    </div>
+    <div class="weight-list" id="weightList"></div>
+  </div>
+</div>
+
 </body>
 </html>
