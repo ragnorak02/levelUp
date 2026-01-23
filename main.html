@@ -8,23 +8,24 @@
     :root{
       --bg0:#bfefff;
       --bg1:#aee6ff;
-      --card:#ffffffcc;
-      --card2:#ffffffee;
+
       --ink:#0b1b2a;
       --muted:#335b78;
-      --ring:rgba(0,0,0,.18);
 
-      --accent:#2563eb;
+      --card: rgba(255,255,255,.78);
+      --card2: rgba(255,255,255,.88);
+      --ring: rgba(0,0,0,.18);
+
+      --shadow: 0 14px 40px rgba(0,0,0,.16);
+      --radius: 16px;
+
       --good:#22c55e;
       --warn:#f59e0b;
       --bad:#ef4444;
 
       --ex:#ef4444;     /* exercise */
       --study:#3b82f6;  /* study */
-      --fin:#f59e0b;    /* finance */
-
-      --shadow: 0 14px 40px rgba(0,0,0,.16);
-      --radius: 16px;
+      --fin:#22c55e;    /* finances (green in your mockup) */
     }
 
     *{box-sizing:border-box}
@@ -37,45 +38,40 @@
       overflow-x:hidden;
     }
 
-    /* --- Top Header --- */
+    /* Header row (mockup) */
     .topbar{
       position:sticky;
       top:0;
       z-index:20;
       backdrop-filter: blur(8px) saturate(1.2);
-      background: rgba(191,239,255,.65);
+      background: rgba(191,239,255,.70);
       border-bottom: 1px solid rgba(0,0,0,.12);
     }
     .topbar-inner{
-      width:min(1200px, 100%);
+      width:min(980px, 100%);
       margin:0 auto;
-      padding:12px 14px;
+      padding:10px 10px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
+      gap:10px;
     }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-    .brand-title{
+
+    .title{
+      flex:1;
+      font-weight:950;
       font-size:22px;
-      font-weight:900;
-      letter-spacing:.5px;
-      padding:10px 16px;
-      border-radius:14px;
-      background: linear-gradient(90deg, #4f8cff, #2b6cff);
-      color:white;
-      box-shadow: 0 10px 24px rgba(37,99,235,.28);
+      padding:10px 12px;
+      border-radius:12px;
+      color:#fff;
+      background:#000;
+      box-shadow: 0 10px 22px rgba(0,0,0,.22);
     }
-    .meta{
+
+    .top-right{
       display:flex;
       align-items:center;
       gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
     }
     .pill{
       display:flex;
@@ -84,36 +80,43 @@
       padding:8px 10px;
       border-radius:999px;
       border:1px solid rgba(0,0,0,.15);
-      background: rgba(255,255,255,.65);
+      background: rgba(255,255,255,.75);
       box-shadow: 0 8px 18px rgba(0,0,0,.10);
-      font-weight:800;
+      font-weight:900;
+      white-space:nowrap;
     }
-    .pill small{font-weight:700; color:var(--muted)}
-    .ghost-btn{
+    .pill small{font-weight:800; color:var(--muted)}
+    .btn{
       all:unset;
       cursor:pointer;
-      padding:9px 12px;
+      padding:8px 10px;
       border-radius:12px;
       border:1px solid rgba(0,0,0,.18);
-      background: rgba(255,255,255,.55);
-      font-weight:850;
+      background: rgba(255,255,255,.70);
+      font-weight:950;
       box-shadow: 0 8px 18px rgba(0,0,0,.10);
+      white-space:nowrap;
     }
-    .ghost-btn:hover{background: rgba(255,255,255,.75)}
-    .ghost-btn:active{transform: translateY(1px)}
+    .btn:hover{background: rgba(255,255,255,.85)}
+    .btn:active{transform: translateY(1px)}
 
-    /* --- Layout Grid --- */
+    /* Main wrapper */
     .wrap{
-      width:min(1200px, 100%);
+      width:min(980px, 100%);
       margin:0 auto;
-      padding:14px;
-      display:grid;
-      gap:14px;
-      grid-template-columns: 1.15fr .95fr 1.2fr; /* character | modules | history */
-      align-items:start;
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
     }
 
-    /* Cards */
+    /* Top dashboard row (mockup) */
+    .dash-top{
+      display:flex;
+      gap:10px;
+      align-items:stretch;
+    }
+
     .card{
       background: var(--card);
       border: 1px solid var(--ring);
@@ -121,68 +124,61 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
-    .card-inner{padding:14px}
-    .card h2{
-      margin:0 0 10px;
-      font-size:16px;
-      letter-spacing:.2px;
-      color:rgba(0,0,0,.68);
+    .card-inner{padding:10px}
+
+    /* Left side: Character + power + status + transform */
+    .character-card{
+      flex: 1.35;
+      min-width: 0;
+    }
+    .section-label{
+      font-weight:900;
+      font-size:13px;
+      color: rgba(0,0,0,.65);
+      margin-bottom:6px;
     }
 
-    /* --- Character Panel --- */
-    .character{
-      position:relative;
-      overflow:hidden;
-      min-height: 520px;
-      background:
-        radial-gradient(1200px 600px at 30% 20%, rgba(37,99,235,.25), transparent 55%),
-        radial-gradient(1000px 520px at 70% 30%, rgba(34,197,94,.20), transparent 55%),
-        linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.45));
-    }
-    .character .card-inner{padding:12px}
     .character-frame{
       position:relative;
-      border-radius: 18px;
-      border: 1px solid rgba(0,0,0,.18);
-      background: rgba(255,255,255,.6);
-      box-shadow: 0 14px 36px rgba(0,0,0,.16);
+      border-radius: 14px;
+      border:1px solid rgba(0,0,0,.18);
+      background: rgba(255,255,255,.70);
       overflow:hidden;
     }
     .character-gif{
       width:100%;
-      height: 430px;
+      height: 200px;
       display:block;
       object-fit: cover;
     }
     .avatar-badge{
       position:absolute;
-      top:10px; left:10px;
-      width:54px; height:54px;
-      border-radius:14px;
+      top:8px; left:8px;
+      width:34px; height:34px;
+      border-radius:10px;
       border:1px solid rgba(0,0,0,.22);
-      background: rgba(255,255,255,.72);
+      background: rgba(255,255,255,.80);
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:28px;
-      box-shadow: 0 10px 24px rgba(0,0,0,.14);
+      font-size:18px;
+      box-shadow: 0 10px 18px rgba(0,0,0,.14);
       user-select:none;
     }
+
     .aura{
       position:absolute;
-      inset:-40px;
-      opacity:.0;
+      inset:-30px;
+      opacity:0;
       pointer-events:none;
       background:
-        radial-gradient(closest-side, rgba(255,255,255,.8), transparent 60%),
-        radial-gradient(closest-side, rgba(37,99,235,.55), transparent 62%),
-        radial-gradient(closest-side, rgba(34,197,94,.35), transparent 62%);
+        radial-gradient(closest-side, rgba(255,255,255,.9), transparent 60%),
+        radial-gradient(closest-side, rgba(239,68,68,.55), transparent 62%),
+        radial-gradient(closest-side, rgba(59,130,246,.35), transparent 62%);
       filter: blur(10px);
       transform: scale(.98);
     }
-    .transforming .aura{
-      animation: auraPulse 900ms ease-out;
-    }
+    .transforming .aura{ animation: auraPulse 900ms ease-out; }
     @keyframes auraPulse{
       0%{opacity:0; transform:scale(.98)}
       25%{opacity:.55}
@@ -190,91 +186,80 @@
       100%{opacity:0; transform:scale(1.06)}
     }
 
-    .character-footer{
-      display:flex;
-      gap:10px;
-      margin-top:12px;
-      flex-wrap:wrap;
-    }
-    .stat{
-      flex:1 1 140px;
-      background: rgba(255,255,255,.70);
-      border:1px solid rgba(0,0,0,.15);
-      border-radius:14px;
-      padding:10px 12px;
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .stat .k{color:var(--muted); font-weight:800; font-size:12px}
-    .stat .v{font-weight:950; font-size:18px}
-    .sub{margin-top:10px; color:rgba(0,0,0,.55); font-weight:700; font-size:12px}
-
-    /* --- Module Power Panel --- */
-    .modules .card-inner{padding:14px}
-    .module{
-      background: rgba(255,255,255,.70);
-      border:1px solid rgba(0,0,0,.15);
-      border-radius:16px;
-      padding:12px;
+    .character-bottom{
+      margin-top:8px;
       display:grid;
-      gap:10px;
-      margin-bottom:12px;
+      gap:8px;
+      grid-template-columns: 1fr 1fr;
     }
-    .module:last-child{margin-bottom:0}
-
-    .module-top{
+    .mini-card{
+      background: rgba(255,255,255,.75);
+      border:1px solid rgba(0,0,0,.15);
+      border-radius:12px;
+      padding:8px 10px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
+      min-width:0;
     }
-    .module-title{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:950;
-      letter-spacing:.2px;
+    .mini-card .k{
+      font-size:11px;
+      color: rgba(0,0,0,.58);
+      font-weight:900;
+      white-space:nowrap;
     }
-    .icon{
-      width:44px; height:44px;
-      border-radius:14px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:22px;
-      border:1px solid rgba(0,0,0,.16);
-      box-shadow: 0 10px 24px rgba(0,0,0,.10);
-      user-select:none;
-    }
-    .icon.ex{background: rgba(239,68,68,.15)}
-    .icon.study{background: rgba(59,130,246,.15)}
-    .icon.fin{background: rgba(245,158,11,.18)}
-
-    .module-meta{
-      display:flex;
-      align-items:baseline;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-      text-align:right;
-    }
-    .module-meta .num{
+    .mini-card .v{
       font-weight:950;
       font-size:14px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
-    .module-meta .cap{
-      color:rgba(0,0,0,.55);
-      font-weight:800;
+
+    .power-block{
+      margin-top:8px;
+      background: rgba(0,0,0,.08);
+      border:1px solid rgba(0,0,0,.14);
+      border-radius:12px;
+      padding:8px 10px;
+    }
+    .power-top{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .power-top .left{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:950;
+    }
+    .dot{
+      width:9px; height:9px; border-radius:999px;
+      background: var(--warn);
+      box-shadow: 0 0 0 3px rgba(245,158,11,.20);
+      flex:0 0 auto;
+    }
+    .dot.ready{
+      background: var(--good);
+      box-shadow: 0 0 0 3px rgba(34,197,94,.22);
+    }
+    .power-top .num{
+      font-weight:950;
       font-size:12px;
+      color: rgba(0,0,0,.70);
+      white-space:nowrap;
     }
 
     .bar{
+      margin-top:6px;
       height:12px;
       border-radius:999px;
-      border:1px solid rgba(0,0,0,.16);
-      background: rgba(0,0,0,.06);
+      background: rgba(0,0,0,.10);
+      border:1px solid rgba(0,0,0,.12);
       overflow:hidden;
     }
     .fill{
@@ -283,105 +268,121 @@
       border-radius:999px;
       transition: width .35s ease;
     }
-    .fill.ex{background: linear-gradient(90deg, rgba(239,68,68,.85), rgba(239,68,68,.55))}
-    .fill.study{background: linear-gradient(90deg, rgba(59,130,246,.9), rgba(59,130,246,.55))}
-    .fill.fin{background: linear-gradient(90deg, rgba(245,158,11,.92), rgba(245,158,11,.60))}
+    .fill.ex{ background: linear-gradient(90deg, rgba(239,68,68,.92), rgba(239,68,68,.55)); }
 
-    .module-actions{
+    .transform-row{
+      margin-top:8px;
       display:flex;
-      gap:10px;
-      flex-wrap:wrap;
       align-items:center;
       justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
     }
-    .link-btn{
-      all:unset;
-      cursor:pointer;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(0,0,0,.18);
-      background: rgba(255,255,255,.55);
-      font-weight:950;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-    .link-btn:hover{background: rgba(255,255,255,.78)}
-    .link-btn:active{transform: translateY(1px)}
     .transform-btn{
       all:unset;
-      cursor:not-allowed;
-      opacity:.55;
-      padding:10px 12px;
+      padding:8px 10px;
       border-radius:12px;
       border:1px solid rgba(0,0,0,.18);
-      background: rgba(255,255,255,.50);
       font-weight:950;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+      cursor:not-allowed;
+      opacity:.55;
+      background: rgba(255,255,255,.55);
+      white-space:nowrap;
     }
     .transform-btn.ready{
       cursor:pointer;
       opacity:1;
       background: linear-gradient(90deg, rgba(34,197,94,.95), rgba(34,197,94,.72));
-      border-color: rgba(0,0,0,.16);
-      color: rgba(0,0,0,.85);
-      box-shadow: 0 10px 26px rgba(34,197,94,.25);
+      box-shadow: 0 10px 22px rgba(34,197,94,.24);
+      color: rgba(0,0,0,.82);
     }
     .transform-btn.ready:hover{filter: brightness(1.03)}
     .transform-btn.ready:active{transform: translateY(1px)}
 
     .hint{
-      color:rgba(0,0,0,.55);
-      font-weight:800;
-      font-size:12px;
-      line-height:1.35;
-      margin-top:8px;
+      font-size:11px;
+      color: rgba(0,0,0,.55);
+      font-weight:850;
+      line-height:1.3;
     }
 
-    /* --- Portals (Below Character / or separate) --- */
-    .portals{
-      margin-top:12px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
+    /* Right side: stacked modules */
+    .modules-card{
+      flex: 1;
+      min-width: 0;
+    }
+    .modules-stack{
+      display:flex;
+      flex-direction:column;
       gap:10px;
     }
-    .portal{
-      background: rgba(255,255,255,.72);
-      border:1px solid rgba(0,0,0,.16);
-      border-radius:16px;
-      padding:12px;
-      text-decoration:none;
-      color:inherit;
-      box-shadow: 0 12px 28px rgba(0,0,0,.12);
+    .module{
+      background: rgba(255,255,255,.80);
+      border:1px solid rgba(0,0,0,.15);
+      border-radius:14px;
+      padding:10px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      cursor:pointer;
+      user-select:none;
+      box-shadow: 0 10px 18px rgba(0,0,0,.10);
+    }
+    .module:active{transform: translateY(1px)}
+    .module:hover{filter: brightness(1.02)}
+    .micon{
+      width:42px; height:42px;
+      border-radius:12px;
       display:flex;
       align-items:center;
+      justify-content:center;
+      font-size:20px;
+      border:1px solid rgba(0,0,0,.16);
+      flex:0 0 auto;
+      background: rgba(255,255,255,.80);
+    }
+    .micon.ex{ background: rgba(239,68,68,.16); }
+    .micon.study{ background: rgba(59,130,246,.16); }
+    .micon.fin{ background: rgba(34,197,94,.16); }
+
+    .mtext{
+      flex:1;
+      min-width:0;
+    }
+    .mname{
+      font-weight:950;
+      line-height:1.1;
+    }
+    .mpower{
+      margin-top:3px;
+      display:flex;
       justify-content:space-between;
       gap:10px;
-      transition: transform .15s ease, filter .15s ease;
+      color: rgba(0,0,0,.62);
+      font-weight:900;
+      font-size:12px;
     }
-    .portal:hover{transform: translateY(-2px); filter: brightness(1.02)}
-    .portal:active{transform: translateY(0px)}
-    .portal .left{
-      display:flex; align-items:center; gap:10px;
+    .mbar{
+      margin-top:6px;
+      height:10px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.12);
+      background: rgba(0,0,0,.08);
+      overflow:hidden;
     }
-    .portal .picon{
-      width:44px; height:44px;
-      border-radius:14px;
-      display:flex; align-items:center; justify-content:center;
-      font-size:22px;
-      border:1px solid rgba(0,0,0,.16);
+    .mfill{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      transition: width .35s ease;
     }
-    .picon.ex{background: rgba(239,68,68,.15)}
-    .picon.study{background: rgba(59,130,246,.15)}
-    .picon.fin{background: rgba(245,158,11,.18)}
-    .portal .name{font-weight:950}
-    .portal .subtxt{font-weight:800; font-size:12px; color:rgba(0,0,0,.55)}
+    .mfill.ex{ background: linear-gradient(90deg, rgba(239,68,68,.92), rgba(239,68,68,.55)); }
+    .mfill.study{ background: linear-gradient(90deg, rgba(59,130,246,.92), rgba(59,130,246,.55)); }
+    .mfill.fin{ background: linear-gradient(90deg, rgba(34,197,94,.92), rgba(34,197,94,.55)); }
 
-    /* --- Exercise History Panel --- */
+    /* Exercise History Section (unchanged behavior) */
     .history{
-      background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.58));
+      background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.62));
     }
     .history-head{
       display:flex;
@@ -394,7 +395,7 @@
     .history-title{
       display:flex; flex-direction:column; gap:2px;
     }
-    .history-title b{font-size:18px}
+    .history-title b{font-size:16px}
     .history-title span{color:rgba(0,0,0,.55); font-weight:800; font-size:12px}
     .history-cta{
       display:flex;
@@ -405,32 +406,34 @@
     .mini{
       all:unset;
       cursor:pointer;
-      padding:9px 10px;
+      padding:8px 10px;
       border-radius:12px;
       border:1px solid rgba(0,0,0,.18);
-      background: rgba(255,255,255,.55);
+      background: rgba(255,255,255,.65);
       font-weight:950;
+      white-space:nowrap;
     }
-    .mini:hover{background: rgba(255,255,255,.78)}
+    .mini:hover{background: rgba(255,255,255,.82)}
     .mini:active{transform: translateY(1px)}
 
     .summary{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      margin:12px 0;
+      margin:10px 0;
     }
     .chip{
-      background: rgba(255,255,255,.75);
+      background: rgba(255,255,255,.78);
       border:1px solid rgba(0,0,0,.15);
       border-radius:999px;
-      padding:8px 10px;
+      padding:7px 10px;
       font-weight:950;
       display:flex;
       gap:6px;
       align-items:baseline;
+      font-size:12px;
     }
-    .chip small{color:rgba(0,0,0,.55); font-weight:800}
+    .chip small{color:rgba(0,0,0,.55); font-weight:850}
 
     .exercise-list{
       display:grid;
@@ -438,7 +441,7 @@
       margin-top:6px;
     }
     .ex-row{
-      background: rgba(255,255,255,.70);
+      background: rgba(255,255,255,.75);
       border:1px solid rgba(0,0,0,.15);
       border-radius:14px;
       padding:10px 12px;
@@ -468,202 +471,139 @@
       font-weight:850;
       margin-top:2px;
     }
-
     .empty{
       padding:12px;
       border-radius:14px;
       border:1px dashed rgba(0,0,0,.22);
-      background: rgba(255,255,255,.5);
+      background: rgba(255,255,255,.55);
       color:rgba(0,0,0,.6);
       font-weight:850;
       line-height:1.4;
     }
 
-    /* Responsive */
-    @media (max-width: 1050px){
-      .wrap{
-        grid-template-columns: 1fr;
-      }
-      .character{min-height: unset}
-      .character-gif{height: 380px}
-      .portals{grid-template-columns: 1fr}
+    /* Mobile: keep the top area compact; stack only if extremely narrow */
+    @media (max-width: 360px){
+      .dash-top{flex-direction:column;}
+      .character-gif{height: 190px}
     }
   </style>
 </head>
 
 <body>
-  <!-- Header -->
+  <!-- Header (mockup style) -->
   <div class="topbar">
     <div class="topbar-inner">
-      <div class="brand">
-        <div class="brand-title">LEVEL UP!</div>
-      </div>
+      <div class="title">Journal</div>
 
-      <div class="meta">
+      <div class="top-right">
         <div class="pill" title="Overall character level (increases on transform)">
           <small>Overall</small>
           <span id="overallLevel">Lv 1</span>
         </div>
-        <div class="pill" title="Transforms completed (all modules)">
-          <small>Transforms</small>
-          <span id="transformCount">0</span>
-        </div>
-        <button class="ghost-btn" id="goHome" title="Reload dashboard">↻ Refresh</button>
+        <button class="btn" id="refreshBtn" title="Refresh dashboard">↻ Refresh</button>
       </div>
     </div>
   </div>
 
-  <!-- Main Grid -->
-  <div class="wrap">
-    <!-- Character Panel -->
-    <section class="card character" id="characterCard">
-      <div class="card-inner">
-        <h2>Character</h2>
+  <main class="wrap">
+    <!-- TOP DASHBOARD ROW (single row like mockup) -->
+    <section class="dash-top">
+      <!-- LEFT: Character + power + status + transform -->
+      <div class="card character-card">
+        <div class="card-inner">
+          <div class="section-label">Character</div>
 
-        <div class="character-frame" id="characterFrame">
-          <div class="avatar-badge" title="Character icon (replace later)">⚡</div>
-          <div class="aura" aria-hidden="true"></div>
-          <!-- Keep your current GIF as placeholder -->
-          <img
-            class="character-gif"
-            src="https://giffiles.alphacoders.com/220/220162.gif"
-            alt="Character GIF"
-          />
-        </div>
-
-        <div class="character-footer">
-          <div class="stat">
-            <div class="k">Status</div>
-            <div class="v" id="statusText">Charging</div>
+          <div class="character-frame" id="characterFrame">
+            <div class="avatar-badge" title="Character icon (replace later)">⚡</div>
+            <div class="aura" aria-hidden="true"></div>
+            <img
+              class="character-gif"
+              src="https://giffiles.alphacoders.com/220/220162.gif"
+              alt="Character GIF"
+            />
           </div>
-          <div class="stat">
-            <div class="k">Next Transform</div>
-            <div class="v" id="nextTransformHint">Exercise</div>
+
+          <div class="character-bottom">
+            <div class="mini-card">
+              <div class="k">Status</div>
+              <div class="v" id="statusText">Charging</div>
+            </div>
+            <div class="mini-card">
+              <div class="k">Next Transform</div>
+              <div class="v" id="nextTransformHint">Exercise</div>
+            </div>
+          </div>
+
+          <div class="power-block">
+            <div class="power-top">
+              <div class="left">
+                <div class="dot" id="statusDot"></div>
+                <div>Power</div>
+              </div>
+              <div class="num">
+                <span id="exPowerNow">0</span> / <span id="exPowerMax">50000</span>
+              </div>
+            </div>
+            <div class="bar"><div class="fill ex" id="exFill"></div></div>
+
+            <div class="transform-row">
+              <div class="hint" id="transformHint">
+                Train to fill the bar. When it hits max, Transform unlocks.
+              </div>
+              <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform</button>
+            </div>
           </div>
         </div>
+      </div>
 
-        <!-- Module portals (icon-based, cohesive) -->
-        <div class="portals" aria-label="Module portals">
-          <a class="portal" href="./powerUp/index.html" title="Open Exercise module">
-            <div class="left">
-              <div class="picon ex">💪</div>
-              <div>
-                <div class="name">Exercise</div>
-                <div class="subtxt">Power Up</div>
+      <!-- RIGHT: stacked module panels (navigation) -->
+      <div class="card modules-card">
+        <div class="card-inner">
+          <div class="modules-stack" aria-label="Modules">
+            <!-- Exercise -->
+            <div class="module" id="modExercise" role="button" tabindex="0" title="Open Exercise module">
+              <div class="micon ex">💪</div>
+              <div class="mtext">
+                <div class="mname">Exercise</div>
+                <div class="mpower">
+                  <span>Power</span>
+                  <span><span id="modExNow">0</span> / <span id="modExMax">50000</span></span>
+                </div>
+                <div class="mbar"><div class="mfill ex" id="modExFill"></div></div>
               </div>
             </div>
-            <div>→</div>
-          </a>
 
-          <a class="portal" href="./study/studyHome.html" title="Open Study module">
-            <div class="left">
-              <div class="picon study">📘</div>
-              <div>
-                <div class="name">Study</div>
-                <div class="subtxt">Flash Cards</div>
+            <!-- Study -->
+            <div class="module" id="modStudy" role="button" tabindex="0" title="Open Study module">
+              <div class="micon study">📘</div>
+              <div class="mtext">
+                <div class="mname">Study</div>
+                <div class="mpower">
+                  <span>Power</span>
+                  <span><span id="modStudyNow">0</span> / <span id="modStudyMax">1000</span></span>
+                </div>
+                <div class="mbar"><div class="mfill study" id="modStudyFill"></div></div>
               </div>
             </div>
-            <div>→</div>
-          </a>
 
-          <a class="portal" href="./finances/index.html" title="Open Finances module">
-            <div class="left">
-              <div class="picon fin">💰</div>
-              <div>
-                <div class="name">Finances</div>
-                <div class="subtxt">Budgeting</div>
+            <!-- Finances -->
+            <div class="module" id="modFin" role="button" tabindex="0" title="Open Finances module">
+              <div class="micon fin">💰</div>
+              <div class="mtext">
+                <div class="mname">Finances</div>
+                <div class="mpower">
+                  <span>Power</span>
+                  <span><span id="modFinNow">0</span> / <span id="modFinMax">1000</span></span>
+                </div>
+                <div class="mbar"><div class="mfill fin" id="modFinFill"></div></div>
               </div>
             </div>
-            <div>→</div>
-          </a>
-        </div>
-
-        <div class="sub">
-          Tip: The “Transform” button unlocks when a module hits its max threshold.
-          Exercise power is driven by your real workout logs.
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Module Power Bars -->
-    <section class="card modules">
-      <div class="card-inner">
-        <h2>Power Levels</h2>
-
-        <!-- Exercise -->
-        <div class="module" data-module="exercise">
-          <div class="module-top">
-            <div class="module-title">
-              <div class="icon ex">💪</div>
-              <div>
-                <div>Exercise</div>
-                <div class="hint" style="margin:2px 0 0">Real data (workout volume)</div>
-              </div>
-            </div>
-            <div class="module-meta">
-              <div class="num"><span id="exPowerNow">0</span> / <span id="exPowerMax">50000</span></div>
-              <div class="cap">Power</div>
-            </div>
-          </div>
-          <div class="bar"><div class="fill ex" id="exFill"></div></div>
-          <div class="module-actions">
-            <button class="link-btn" onclick="location.href='./powerUp/index.html'">Open 💥</button>
-            <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform ⚡</button>
-          </div>
-        </div>
-
-        <!-- Study -->
-        <div class="module" data-module="study">
-          <div class="module-top">
-            <div class="module-title">
-              <div class="icon study">📘</div>
-              <div>
-                <div>Study</div>
-                <div class="hint" style="margin:2px 0 0">Hook up later (flash cards)</div>
-              </div>
-            </div>
-            <div class="module-meta">
-              <div class="num"><span id="studyPowerNow">0</span> / <span id="studyPowerMax">1000</span></div>
-              <div class="cap">Power</div>
-            </div>
-          </div>
-          <div class="bar"><div class="fill study" id="studyFill"></div></div>
-          <div class="module-actions">
-            <button class="link-btn" onclick="location.href='./study/studyHome.html'">Open 📚</button>
-            <button class="transform-btn" id="studyTransform" title="Not connected yet">Transform ⚡</button>
-          </div>
-        </div>
-
-        <!-- Finances -->
-        <div class="module" data-module="finances">
-          <div class="module-top">
-            <div class="module-title">
-              <div class="icon fin">💰</div>
-              <div>
-                <div>Finances</div>
-                <div class="hint" style="margin:2px 0 0">Hook up later (budgeting)</div>
-              </div>
-            </div>
-            <div class="module-meta">
-              <div class="num"><span id="finPowerNow">0</span> / <span id="finPowerMax">1000</span></div>
-              <div class="cap">Power</div>
-            </div>
-          </div>
-          <div class="bar"><div class="fill fin" id="finFill"></div></div>
-          <div class="module-actions">
-            <button class="link-btn" onclick="location.href='./finances/index.html'">Open 📈</button>
-            <button class="transform-btn" id="finTransform" title="Not connected yet">Transform ⚡</button>
-          </div>
-        </div>
-
-        <div class="hint">
-          Exercise Transform resets only the dashboard “since last transform” meter.
-          Your workout history stays unchanged.
-        </div>
-      </div>
-    </section>
-
-    <!-- Exercise History -->
+    <!-- Exercise History Section (below; behavior preserved) -->
     <section class="card history">
       <div class="card-inner">
         <div class="history-head">
@@ -684,12 +624,10 @@
           <div class="chip"><small>Volume</small> <span id="hVol">—</span></div>
         </div>
 
-        <div id="historyBody">
-          <!-- Filled by JS -->
-        </div>
+        <div id="historyBody"></div>
       </div>
     </section>
-  </div>
+  </main>
 
   <script>
     /* -------------------------------
@@ -697,7 +635,7 @@
     --------------------------------*/
     const KEY_LEVEL = 'levelUp:characterLevel';
     const KEY_TRANSFORMS = 'levelUp:transformCount';
-    const KEY_EX_RESET_AT = 'levelUp:exerciseResetAt'; // ISO date; used only for dashboard meter
+    const KEY_EX_RESET_AT = 'levelUp:exerciseResetAt'; // ISO date; dashboard-only meter reset
 
     const todayISO = new Date().toISOString().slice(0,10);
 
@@ -720,7 +658,6 @@
     }
 
     function normalizeDay(raw){
-      // Expect: { date:'YYYY-MM-DD', exercises:[{name, bodyPart, sets:[{weight,reps,done}]}] }
       if(!raw || !raw.date) return null;
       const exercises = Array.isArray(raw.exercises) ? raw.exercises : [];
       return {
@@ -745,7 +682,6 @@
       (day.exercises || []).forEach(ex => {
         if(ex.sets && ex.sets.length) moves++;
         (ex.sets || []).forEach(s => {
-          // We count a set if it has any meaningful value
           if((s.weight > 0) || (s.reps > 0)) sets++;
           if(s.weight > 0 && s.reps > 0) volume += (s.weight * s.reps);
         });
@@ -760,7 +696,7 @@
         const raw = safeParse(k);
         const day = normalizeDay(raw);
         if(!day) return;
-        // Consider "logged" if at least one exercise exists OR any set has values
+
         const totals = dayTotals(day);
         const logged = (day.exercises && day.exercises.length) || totals.sets > 0 || totals.volume > 0;
         if(logged) days.push(day);
@@ -782,7 +718,6 @@
     --------------------------------*/
     function getExerciseResetAt(){
       const v = localStorage.getItem(KEY_EX_RESET_AT);
-      // If never set, default far in past so you start accumulating immediately
       return (v && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? v : '1900-01-01';
     }
 
@@ -816,9 +751,9 @@
     }
 
     /* -------------------------------
-       UI Render
+       UI Helpers
     --------------------------------*/
-    const EX_MAX = 50000; // you can tune this later
+    const EX_MAX = 50000; // tune later
     const STUDY_MAX = 1000;
     const FIN_MAX = 1000;
 
@@ -826,72 +761,91 @@
       if(max <= 0) return 0;
       return Math.max(0, Math.min(100, (now / max) * 100));
     }
-
-    function setFill(id, percent){
+    function setText(id, text){
+      const el = document.getElementById(id);
+      if(el) el.textContent = text;
+    }
+    function setWidth(id, percent){
       const el = document.getElementById(id);
       if(el) el.style.width = percent.toFixed(1) + '%';
     }
 
-    function setText(id, text){
-      const el = document.getElementById(id);
-      if(el) el.textContent = text;
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
     }
 
     function flashTransform(){
       const frame = document.getElementById('characterFrame');
       if(!frame) return;
       frame.classList.remove('transforming');
-      // force reflow
       void frame.offsetWidth;
       frame.classList.add('transforming');
       setTimeout(()=>frame.classList.remove('transforming'), 950);
     }
 
+    /* -------------------------------
+       Render: Top / Modules / History
+    --------------------------------*/
     function renderTop(){
       setText('overallLevel', 'Lv ' + getLevel());
-      setText('transformCount', String(getTransformCount()));
     }
 
-    function renderModules(){
-      // Exercise (real)
+    function renderModulesAndCharacter(){
       const resetAt = getExerciseResetAt();
       const exPower = volumeSince(resetAt);
 
+      // Character power display
       setText('exPowerNow', exPower.toLocaleString());
       setText('exPowerMax', EX_MAX.toLocaleString());
-      setFill('exFill', pct(exPower, EX_MAX));
+      setWidth('exFill', pct(exPower, EX_MAX));
 
-      const exBtn = document.getElementById('exTransform');
-      if(exBtn){
-        const ready = exPower >= EX_MAX && EX_MAX > 0;
-        exBtn.classList.toggle('ready', ready);
-        exBtn.disabled = !ready;
-        exBtn.style.cursor = ready ? 'pointer' : 'not-allowed';
-        exBtn.title = ready
-          ? 'Transform now! Resets Exercise power meter and increases overall level.'
-          : 'Keep training to charge the bar.';
+      // Right-side exercise module mirrors same values
+      setText('modExNow', exPower.toLocaleString());
+      setText('modExMax', EX_MAX.toLocaleString());
+      setWidth('modExFill', pct(exPower, EX_MAX));
+
+      // Study / Fin placeholders (wired later)
+      setText('modStudyNow', '0');
+      setText('modStudyMax', STUDY_MAX.toLocaleString());
+      setWidth('modStudyFill', 0);
+
+      setText('modFinNow', '0');
+      setText('modFinMax', FIN_MAX.toLocaleString());
+      setWidth('modFinFill', 0);
+
+      // Status + transform readiness
+      const ready = exPower >= EX_MAX && EX_MAX > 0;
+      const statusText = document.getElementById('statusText');
+      const nextTransformHint = document.getElementById('nextTransformHint');
+      const dot = document.getElementById('statusDot');
+      const hint = document.getElementById('transformHint');
+      const btn = document.getElementById('exTransform');
+
+      if(statusText) statusText.textContent = ready ? 'READY' : 'Charging';
+      if(nextTransformHint) nextTransformHint.textContent = 'Exercise';
+
+      if(dot){
+        dot.classList.toggle('ready', ready);
       }
 
-      // Study + Finances (placeholders; not connected yet)
-      setText('studyPowerNow', '0');
-      setText('studyPowerMax', STUDY_MAX.toLocaleString());
-      setFill('studyFill', 0);
+      if(hint){
+        hint.textContent = ready
+          ? 'Transformation ready. Tap Transform!'
+          : 'Train to fill the bar. When it hits max, Transform unlocks.';
+      }
 
-      setText('finPowerNow', '0');
-      setText('finPowerMax', FIN_MAX.toLocaleString());
-      setFill('finFill', 0);
-
-      // Character status hints
-      const status = document.getElementById('statusText');
-      const nextHint = document.getElementById('nextTransformHint');
-      if(status && nextHint){
-        if(exPower >= EX_MAX){
-          status.textContent = 'READY';
-          nextHint.textContent = 'Exercise';
-        } else {
-          status.textContent = 'Charging';
-          nextHint.textContent = 'Exercise';
-        }
+      if(btn){
+        btn.classList.toggle('ready', ready);
+        btn.disabled = !ready;
+        btn.style.cursor = ready ? 'pointer' : 'not-allowed';
+        btn.title = ready
+          ? 'Transform now! Resets Exercise power meter and increases overall level.'
+          : 'Keep training to charge the bar.';
       }
     }
 
@@ -919,7 +873,6 @@
       setText('hSets', String(totals.sets));
       setText('hVol', totals.volume.toLocaleString() + ' lb');
 
-      // Per-exercise summary rows
       const rows = [];
       latest.exercises.forEach(ex => {
         const sets = (ex.sets || []).filter(s => (s.weight > 0 || s.reps > 0)).length;
@@ -947,70 +900,81 @@
       `;
     }
 
-    function escapeHtml(str){
-      return String(str)
-        .replaceAll('&','&amp;')
-        .replaceAll('<','&lt;')
-        .replaceAll('>','&gt;')
-        .replaceAll('"','&quot;')
-        .replaceAll("'","&#039;");
-    }
-
     /* -------------------------------
        Transform Handling (Exercise)
     --------------------------------*/
     function doExerciseTransform(){
-      // Re-check ready state
       const exPower = volumeSince(getExerciseResetAt());
       if(exPower < EX_MAX) return;
 
-      // Increment overall level + transform count
       setLevel(getLevel() + 1);
       setTransformCount(getTransformCount() + 1);
 
-      // Reset the DASHBOARD meter only
+      // Reset DASHBOARD meter only (does not touch workout schema)
       localStorage.setItem(KEY_EX_RESET_AT, todayISO);
 
-      // Animation
       flashTransform();
-
-      // Re-render
       renderAll();
     }
 
     /* -------------------------------
-       Wiring
+       Navigation (modules = nav)
     --------------------------------*/
-    document.getElementById('goHome').addEventListener('click', ()=>location.reload());
+    function bindNav(){
+      const go = (url)=>{ location.href = url; };
 
-    document.getElementById('openExercise').addEventListener('click', ()=>{
-      // Open latest workout date if present, otherwise today
-      const latest = getLatestWorkout();
-      if(latest) location.href = `./powerUp/workout.html?date=${latest.date}`;
-      else location.href = './powerUp/index.html';
-    });
+      const modExercise = document.getElementById('modExercise');
+      const modStudy = document.getElementById('modStudy');
+      const modFin = document.getElementById('modFin');
 
-    document.getElementById('openAnalytics').addEventListener('click', ()=>{
-      location.href = './powerUp/analytics.html';
-    });
+      if(modExercise){
+        modExercise.addEventListener('click', ()=> go('./powerUp/index.html'));
+        modExercise.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./powerUp/index.html'); });
+      }
+      if(modStudy){
+        modStudy.addEventListener('click', ()=> go('./study/studyHome.html'));
+        modStudy.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./study/studyHome.html'); });
+      }
+      if(modFin){
+        modFin.addEventListener('click', ()=> go('./finances/index.html'));
+        modFin.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./finances/index.html'); });
+      }
+    }
 
-    document.getElementById('exTransform').addEventListener('click', doExerciseTransform);
+    /* -------------------------------
+       Buttons
+    --------------------------------*/
+    function bindButtons(){
+      const refreshBtn = document.getElementById('refreshBtn');
+      if(refreshBtn) refreshBtn.addEventListener('click', ()=>location.reload());
 
-    // Study/Finance transforms are intentionally disabled until those modules are connected.
-    ['studyTransform','finTransform'].forEach(id=>{
-      const btn = document.getElementById(id);
-      if(btn){
-        btn.addEventListener('click', ()=>{
-          alert('This module is not connected to real activity yet.\nWhen Study/Finances data is wired, this will transform the same way as Exercise.');
+      const exTransform = document.getElementById('exTransform');
+      if(exTransform) exTransform.addEventListener('click', doExerciseTransform);
+
+      const openExercise = document.getElementById('openExercise');
+      if(openExercise){
+        openExercise.addEventListener('click', ()=>{
+          const latest = getLatestWorkout();
+          if(latest) location.href = `./powerUp/workout.html?date=${latest.date}`;
+          else location.href = './powerUp/index.html';
         });
       }
-    });
+
+      const openAnalytics = document.getElementById('openAnalytics');
+      if(openAnalytics){
+        openAnalytics.addEventListener('click', ()=> location.href = './powerUp/analytics.html');
+      }
+    }
 
     function renderAll(){
       renderTop();
-      renderModules();
+      renderModulesAndCharacter();
       renderHistory();
     }
+
+    // Init
+    bindNav();
+    bindButtons();
     renderAll();
   </script>
 </body>
