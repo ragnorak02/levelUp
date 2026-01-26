@@ -217,6 +217,36 @@
       border-color: transparent;
     }
 
+    /* Store selector panel (Stores mode) */
+    .store-panel{
+      margin-top:10px;
+      padding:10px;
+      border-radius:14px;
+      border:1px solid rgba(42,53,67,.55);
+      background: rgba(11,15,20,.30);
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .store-chip{
+      all:unset;
+      cursor:pointer;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      color:var(--muted);
+      font-weight:900;
+      font-size:13px;
+      user-select:none;
+    }
+    .store-chip.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
+    }
+
     canvas{max-width:100%; width:100%}
 
     .legend{margin-top:12px; display:flex; flex-direction:column; gap:8px;}
@@ -282,7 +312,7 @@
 <body>
   <div class="topbar">
     <div class="topbar-inner">
-      <div class="brand">🏠 <span>Finances</span></div>
+      <a class="brand" href="https://ragnorak02.github.io/levelUp/main.html" title="Go to LevelUp Home">🏠 <span>Finances</span></a>
       <div class="nav">
         <a class="pill active" href="index.html">Home</a>
         <a class="pill" href="food.html">Food</a>
@@ -324,6 +354,7 @@
           <div>
 	            <button class="btn" id="mortgageToggleBtn" type="button" title="Hide or show mortgage payments in charts">Hide Mortgage</button>
             <button class="btn" id="donutResetBtn" type="button">Reset</button>
+            <button class="btn" id="storesBtn" type="button" title="View spending by store">Stores</button>
           </div>
         </div>
 
@@ -333,6 +364,13 @@
               <div class="tab active" id="tabAll">All</div>
               <div class="tab" id="tabGroceries">Groceries</div>
             </div>
+          </div>
+
+          <div id="storePanel" class="store-panel" style="display:none" aria-label="Store selector">
+            <button class="store-chip" type="button" data-store="Walmart">Walmart</button>
+            <button class="store-chip" type="button" data-store="Trader Joe's">Trader Joe's</button>
+            <button class="store-chip" type="button" data-store="Starbucks">Starbucks</button>
+            <button class="store-chip" type="button" data-store="Price Chopper">Price Chopper</button>
           </div>
 
           <div style="margin-top:12px;">
@@ -773,6 +811,8 @@
       // ---- month selection state ----
       let monthOffset = 0; // 0=current month, -1 previous, etc.
       let tab = 'all';     // 'all' | 'groceries'
+      let donutMode = 'category'; // 'category' | 'store' | 'storeCategory'
+      let selectedStore = null;   // store label from panel
       let selectedIndex = null;
       let activeCategories = [];
 
@@ -835,6 +875,9 @@
       const weekLabelEl = document.getElementById('weekLabel');
 
       const mortgageToggleBtn = document.getElementById('mortgageToggleBtn');
+      const storesBtn = document.getElementById('storesBtn');
+      const storePanel = document.getElementById('storePanel');
+      const storeChips = storePanel ? Array.from(storePanel.querySelectorAll('.store-chip')) : [];
 
       const statMonthEl = document.getElementById('statMonth');
       const statWeekEl = document.getElementById('statWeek');
@@ -900,11 +943,91 @@
 
       async function computeCategories(){
         const monthReceipts = getReceiptsForSelectedMonth();
+
+        // ---- Stores mode: donut shows (1) monthly spend by store, then (2) category breakdown within a store ----
+        if (donutMode === 'store'){
+          activeCategories = aggregateByStore(monthReceipts);
+          return;
+        }
+
+        if (donutMode === 'storeCategory' && selectedStore){
+          const group = String(selectedStore);
+          const storeOnly = monthReceipts.filter(r => normalizeStoreGroup(r.store) === group);
+          activeCategories = aggregateStoreCategoryBuckets(storeOnly);
+          return;
+        }
+
+        // ---- Default mode: existing behavior ----
         if (tab === 'groceries'){
           activeCategories = await aggregateGroceriesBreakdown(monthReceipts);
         } else {
           activeCategories = aggregateByReceiptCategory(monthReceipts);
         }
+      }
+
+      // Map raw receipt store names into the 4 main store buckets (else "Other")
+      function normalizeStoreGroup(storeName){
+        const s = String(storeName || '').toLowerCase();
+        if (!s) return 'Other';
+        if (s.includes('walmart')) return 'Walmart';
+        if (s.includes('trader joe')) return "Trader Joe's";
+        if (s.includes('starbucks')) return 'Starbucks';
+        if (s.includes('price chopper') || s.includes('pricechopper')) return 'Price Chopper';
+        return 'Other';
+      }
+
+      function aggregateByStore(receipts){
+        const buckets = {
+          'Walmart': 0,
+          "Trader Joe's": 0,
+          'Starbucks': 0,
+          'Price Chopper': 0,
+          'Other': 0
+        };
+        receipts.forEach(r=>{
+          const g = normalizeStoreGroup(r.store);
+          buckets[g] = (buckets[g] || 0) + (Number(r.total) || 0);
+        });
+        return Object.keys(buckets)
+          .map(k => ({ name: k, total: buckets[k] }))
+          .filter(x => x.total > 0 || x.name === 'Other');
+      }
+
+      // Category breakdown within a store (simple 4-bucket view)
+      function aggregateStoreCategoryBuckets(receipts){
+        const out = { 'Groceries': 0, 'Household': 0, 'Personal': 0, 'Other': 0 };
+
+        const HOUSEHOLD_KEYS = ['household','home','clean','cleaning','laundry','paper','kitchen','bath','toile','trash','supplies'];
+        const PERSONAL_KEYS = ['health','medical','pharmacy','beauty','personal','hygiene','groom','skincare'];
+
+        receipts.forEach(r=>{
+          const items = Array.isArray(r.items) ? r.items : [];
+          if (!items.length){
+            const rc = String(r.category || '').toLowerCase();
+            if (rc.includes('groc')) out['Groceries'] += (Number(r.total)||0);
+            else if (HOUSEHOLD_KEYS.some(k=>rc.includes(k))) out['Household'] += (Number(r.total)||0);
+            else if (PERSONAL_KEYS.some(k=>rc.includes(k))) out['Personal'] += (Number(r.total)||0);
+            else out['Other'] += (Number(r.total)||0);
+            return;
+          }
+
+          items.forEach(it=>{
+            const price = Number(it.price) || 0;
+            const cat = String(it.category || '').toLowerCase();
+            const sub = String(it.subcategory || '').toLowerCase();
+            const name = String(it.name || '').toLowerCase();
+            const hay = `${cat} ${sub} ${name}`;
+
+            if (cat.includes('groc')) out['Groceries'] += price;
+            else if (HOUSEHOLD_KEYS.some(k=>hay.includes(k))) out['Household'] += price;
+            else if (PERSONAL_KEYS.some(k=>hay.includes(k))) out['Personal'] += price;
+            else out['Other'] += price;
+          });
+        });
+
+        return Object.keys(out)
+          .map(k => ({ name: k, total: out[k] }))
+          .filter(x => x.total > 0);
       }
 
       function redraw(){
@@ -915,7 +1038,24 @@
         });
       }
 
+      function syncStoresUI(){
+        const storesActive = (donutMode === 'store' || donutMode === 'storeCategory');
+        if (storesBtn) storesBtn.classList.toggle('toggle-on', storesActive);
+        if (storePanel) storePanel.style.display = storesActive ? 'flex' : 'none';
+
+        // Hide the category tabs when stores mode is active (avoids confusing state)
+        const tabsWrap = document.querySelector('.tabs');
+        if (tabsWrap) tabsWrap.style.display = storesActive ? 'none' : 'flex';
+
+        if (storeChips && storeChips.length){
+          storeChips.forEach(btn=>{
+            btn.classList.toggle('active', storesActive && selectedStore && btn.dataset.store === selectedStore);
+          });
+        }
+      }
+
       async function refreshAll(){
+        syncStoresUI();
         updateTopStats();
         selectedIndex = null;
         await computeCategories();
@@ -923,6 +1063,8 @@
       }
 
       async function setTab(newTab){
+        // Tabs only apply in the default category mode.
+        if (donutMode !== 'category') return;
         tab = newTab;
         selectedIndex = null;
         tabAllEl.classList.toggle('active', tab === 'all');
@@ -944,8 +1086,13 @@
         redraw();
       });
 
-      document.getElementById('donutResetBtn').addEventListener('click', ()=>{
+      document.getElementById('donutResetBtn').addEventListener('click', async ()=>{
+        // Reset returns the donut to the original default state
+        donutMode = 'category';
+        selectedStore = null;
         selectedIndex = null;
+        syncStoresUI();
+        await computeCategories();
         redraw();
       });
 
@@ -977,6 +1124,38 @@
           mortgageToggleBtn.classList.toggle('toggle-on', hideMortgage);
           mortgageToggleBtn.textContent = hideMortgage ? 'Show Mortgage' : 'Hide Mortgage';
           await refreshAll();
+        });
+      }
+
+      // Stores toggle + drill-down
+      if (storesBtn){
+        storesBtn.addEventListener('click', async ()=>{
+          // Toggle between default category mode and Stores mode
+          if (donutMode === 'category'){
+            donutMode = 'store';
+            selectedStore = null;
+            selectedIndex = null;
+          } else {
+            donutMode = 'category';
+            selectedStore = null;
+            selectedIndex = null;
+          }
+          syncStoresUI();
+          await computeCategories();
+          redraw();
+        });
+      }
+
+      if (storeChips && storeChips.length){
+        storeChips.forEach(btn=>{
+          btn.addEventListener('click', async ()=>{
+            selectedStore = btn.dataset.store || null;
+            donutMode = selectedStore ? 'storeCategory' : 'store';
+            selectedIndex = null;
+            syncStoresUI();
+            await computeCategories();
+            redraw();
+          });
         });
       }
 

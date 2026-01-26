@@ -2112,6 +2112,116 @@
   "tax": 0.0,
   "total": 11.25,
   "notes": "Trader Joe's receipt - 01/21/26 16:21 - AMEX"
+},
+{
+  "id": "receipt_starbucks_20260125_0618_blonde_latte",
+  "date": "2026-01-25",
+  "store": "Starbucks",
+  "storeLocation": "Starbucks Mobile Order",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Blonde Vanilla Latte (Venti)",
+      "price": 6.25,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "calories": 320
+    }
+  ],
+  "subtotal": 6.25,
+  "tax": 0.50,
+  "total": 6.75,
+  "notes": "Mobile order • date manually set to Jan 25, 2026"
+}
+,
+{
+  "id": "receipt_starbucks_20260124_0630_blonde_latte",
+  "date": "2026-01-24",
+  "store": "Starbucks",
+  "storeLocation": "Starbucks Mobile Order",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Blonde Vanilla Latte (Venti)",
+      "price": 6.25,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "calories": 320
+    }
+  ],
+  "subtotal": 6.25,
+  "tax": 0.50,
+  "total": 6.75
+}
+,
+{
+  "id": "receipt_starbucks_20260120_0639_caramel_macchiato",
+  "date": "2026-01-20",
+  "store": "Starbucks",
+  "storeLocation": "Starbucks Mobile Order",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Caramel Macchiato (Venti)",
+      "price": 5.95,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "calories": 310
+    }
+  ],
+  "subtotal": 5.95,
+  "tax": 0.48,
+  "total": 6.43
+}
+,
+{
+  "id": "receipt_starbucks_20260124_0826_caramel_ribbon_crunch",
+  "date": "2026-01-24",
+  "store": "Starbucks",
+  "storeLocation": "Starbucks Mobile Order",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Caramel Ribbon Crunch Frappuccino (Venti)",
+      "price": 6.45,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Frappuccino",
+      "calories": 570
+    }
+  ],
+  "subtotal": 6.45,
+  "tax": 0.52,
+  "total": 6.97
+}
+,
+{
+  "id": "receipt_walmart_20260126_1057",
+  "date": "2026-01-26",
+  "store": "Walmart",
+  "storeLocation": "Walmart Supercenter • 311 Route 9W, Glenmont, NY 12077",
+  "category": "Groceries",
+  "items": [
+    { "name": "Organic Whole Milk", "price": 6.67, "quantity": 1, "subcategory": "Dairy" },
+    { "name": "Beets", "price": 2.57, "quantity": 1, "subcategory": "Produce" },
+    { "name": "Avocados (5 for $3.40)", "price": 3.40, "quantity": 1, "subcategory": "Produce" },
+    { "name": "Sweet Onion", "price": 4.34, "quantity": 1, "subcategory": "Produce" },
+    { "name": "Green Cabbage (1.79 lb)", "price": 1.54, "quantity": 1, "subcategory": "Produce" },
+    { "name": "Cosmic Crisp Apples (2.3 lb)", "price": 4.00, "quantity": 1, "subcategory": "Produce" },
+    { "name": "Tomato (0.81 lb)", "price": 0.75, "quantity": 1, "subcategory": "Produce" },
+    { "name": "Mandarin Oranges (3 lb bag)", "price": 3.97, "quantity": 1, "subcategory": "Produce" },
+    { "name": "Mangoes (2 for $1.94)", "price": 1.94, "quantity": 1, "subcategory": "Produce" },
+    { "name": "Peanut Butter (4 pack)", "price": 4.78, "quantity": 1, "subcategory": "Pantry" },
+    { "name": "Bread", "price": 3.98, "quantity": 1, "subcategory": "Bakery" },
+    { "name": "Brown Eggs", "price": 5.74, "quantity": 1, "subcategory": "Dairy" }
+  ],
+  "subtotal": 43.68,
+  "tax": 0.0,
+  "total": 43.68,
+  "notes": "Walmart Supercenter • Glenmont • AMEX"
 }
 
   ],
