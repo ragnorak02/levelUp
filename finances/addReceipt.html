@@ -53,6 +53,62 @@
     .form-row {
       display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
     }
+
+    /* Rental toggle (minimal UI, no house icon) */
+    .toggle-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--ring);
+      border-radius: 12px;
+      margin-top: 8px;
+    }
+    .toggle-label{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .toggle-label .t-title{ font-weight: 700; color: var(--ink); font-size: .95rem; }
+    .toggle-label .t-sub{ font-size: .8rem; color: var(--muted); }
+    .switch{
+      position: relative;
+      width: 48px;
+      height: 28px;
+      flex: 0 0 auto;
+    }
+    .switch input{ opacity:0; width:0; height:0; }
+    .slider{
+      position:absolute; inset:0;
+      background: #101923;
+      border: 1px solid var(--ring);
+      border-radius: 999px;
+      transition: .18s ease;
+    }
+    .slider:before{
+      content:"";
+      position:absolute;
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #c7d5e6;
+      border-radius: 999px;
+      transition: .18s ease;
+      box-shadow: 0 6px 14px rgba(0,0,0,.35);
+    }
+    .switch input:checked + .slider{
+      background: rgba(76,175,80,0.18);
+      border-color: rgba(76,175,80,0.55);
+    }
+    .switch input:checked + .slider:before{
+      transform: translate(20px, -50%);
+      background: #76f28a;
+    }
+
     .btn {
       all: unset; cursor: pointer; padding: .8rem 1.2rem; border-radius: 10px;
       font-weight: 600; font-size: 1rem; text-align: center; transition: all 0.2s;
@@ -125,6 +181,19 @@
           <div class="form-group">
             <label class="form-label">Total</label>
             <input type="number" step="0.01" class="form-input" id="total" placeholder="0.00" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="toggle-row">
+            <div class="toggle-label">
+              <div class="t-title">Rental</div>
+              <div class="t-sub">Tag this entire receipt as rental-property expenses.</div>
+            </div>
+            <label class="switch" aria-label="Rental">
+              <input type="checkbox" id="rentalToggle">
+              <span class="slider"></span>
+            </label>
           </div>
         </div>
 
@@ -325,6 +394,9 @@ STRAWBERRIE   085487700700 F      5.74</div>
       const store = document.getElementById('storeName').value;
       const date = document.getElementById('purchaseDate').value;
       const total = parseFloat(document.getElementById('total').value);
+      // Optional rental flag: when checked we add { property: "rental" } to the receipt.
+      // When unchecked, the field is omitted (primary/personal is the default).
+      const isRental = !!document.getElementById('rentalToggle')?.checked;
 
       if (!store || !date || !total) {
         showAlert('Please fill in store, date, and total', 'error');
@@ -349,6 +421,10 @@ STRAWBERRIE   085487700700 F      5.74</div>
         })),
         createdAt: new Date().toISOString()
       };
+
+      // IMPORTANT: Backward compatible.
+      // Only add property when explicitly marked as rental.
+      if (isRental) receipt.property = 'rental';
 
       // Save to localStorage
       try {

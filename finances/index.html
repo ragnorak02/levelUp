@@ -217,31 +217,32 @@
       border-color: transparent;
     }
 
-    /* Store selector panel (Stores mode) */
+    /* Extra controls on the donut row */
+    .donut-actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .tab.filter{padding:8px 14px}
+
+    /* Store selector panel (only visible in Stores mode) */
     .store-panel{
-      margin-top:10px;
-      padding:10px;
-      border-radius:14px;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 16px;
       border:1px solid rgba(42,53,67,.55);
-      background: rgba(11,15,20,.30);
+      background: rgba(11,15,20,.35);
       display:flex;
-      gap:8px;
       flex-wrap:wrap;
-      align-items:center;
+      gap:10px;
     }
-    .store-chip{
-      all:unset;
-      cursor:pointer;
-      padding:8px 12px;
-      border-radius:999px;
+    .store-btn{
+      padding: 9px 12px;
+      border-radius: 999px;
       border:1px solid rgba(42,53,67,.75);
-      background: rgba(19,26,34,.55);
+      background: rgba(11,15,20,.35);
       color:var(--muted);
-      font-weight:900;
-      font-size:13px;
+      font-weight: 900;
+      cursor:pointer;
       user-select:none;
     }
-    .store-chip.active{
+    .store-btn.active{
       color:#0b0f14;
       background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
       border-color: transparent;
@@ -312,7 +313,7 @@
 <body>
   <div class="topbar">
     <div class="topbar-inner">
-      <a class="brand" href="https://ragnorak02.github.io/levelUp/main.html" title="Go to LevelUp Home">🏠 <span>Finances</span></a>
+      <a class="brand" href="https://ragnorak02.github.io/levelUp/main.html" title="Back to LevelUp">🏠 <span>Finances</span></a>
       <div class="nav">
         <a class="pill active" href="index.html">Home</a>
         <a class="pill" href="food.html">Food</a>
@@ -354,7 +355,7 @@
           <div>
 	            <button class="btn" id="mortgageToggleBtn" type="button" title="Hide or show mortgage payments in charts">Hide Mortgage</button>
             <button class="btn" id="donutResetBtn" type="button">Reset</button>
-            <button class="btn" id="storesBtn" type="button" title="View spending by store">Stores</button>
+            <button class="btn" id="storesBtn" type="button">Stores</button>
           </div>
         </div>
 
@@ -364,14 +365,12 @@
               <div class="tab active" id="tabAll">All</div>
               <div class="tab" id="tabGroceries">Groceries</div>
             </div>
+            <div class="donut-actions">
+              <button class="tab filter" id="rentalFilterBtn" type="button" title="Show only receipts tagged as rental">Rental</button>
+            </div>
           </div>
 
-          <div id="storePanel" class="store-panel" style="display:none" aria-label="Store selector">
-            <button class="store-chip" type="button" data-store="Walmart">Walmart</button>
-            <button class="store-chip" type="button" data-store="Trader Joe's">Trader Joe's</button>
-            <button class="store-chip" type="button" data-store="Starbucks">Starbucks</button>
-            <button class="store-chip" type="button" data-store="Price Chopper">Price Chopper</button>
-          </div>
+          <div id="storePanel" class="store-panel" style="display:none;"></div>
 
           <div style="margin-top:12px;">
             <canvas id="donutCanvas" width="620" height="360"></canvas>
@@ -460,6 +459,16 @@
       "Drinks":"#14b8a6",
       "Grains":"#f97316",
       "Unknown":"#94a3b8"
+    };
+
+    // ---- fixed store colors (used in Stores mode) ----
+    const STORE_ORDER = ["Walmart","Trader Joe's","Starbucks","Price Chopper","Other"];
+    const STORE_COLORS = {
+      "Walmart": "#60a5fa",        // blue
+      "Trader Joe's": "#22c55e",    // green
+      "Starbucks": "#2dd4bf",      // teal
+      "Price Chopper": "#f97316",  // orange
+      "Other": "#94a3b8"           // gray
     };
 
     function hashColor(str){
@@ -811,14 +820,19 @@
       // ---- month selection state ----
       let monthOffset = 0; // 0=current month, -1 previous, etc.
       let tab = 'all';     // 'all' | 'groceries'
-      let donutMode = 'category'; // 'category' | 'store' | 'storeCategory'
-      let selectedStore = null;   // store label from panel
       let selectedIndex = null;
       let activeCategories = [];
 
       // ---- filters & week selection state ----
       let hideMortgage = false;
+      let rentalOnly = false;
       let weekIndex = 0; // 0=first week window inside the selected month
+
+      // ---- chart modes ----
+      // category: existing behavior
+      // stores: donut shows monthly spending by store; selecting a store drills down
+      let donutMode = 'category'; // 'category' | 'stores'
+      let selectedStore = null;   // store name (one of STORE_ORDER), or null
 
       function isMortgageReceipt(r){
         const cat = String(r.category||'').trim().toLowerCase();
@@ -831,6 +845,39 @@
 
       function applyMortgageFilter(list){
         return hideMortgage ? list.filter(r => !isMortgageReceipt(r)) : list;
+      }
+
+      function applyRentalFilter(list){
+        return rentalOnly ? list.filter(r => String(r.property||'').toLowerCase() === 'rental') : list;
+      }
+
+      function normalizeStoreName(store){
+        const s = String(store||'').trim().toLowerCase();
+        if (!s) return 'Other';
+        if (s.includes('walmart')) return 'Walmart';
+        if (s.includes("trader") && s.includes('joe')) return "Trader Joe's";
+        if (s.includes('starbuck')) return 'Starbucks';
+        if (s.includes('price chopper') || s.includes('pricechopper')) return 'Price Chopper';
+        return 'Other';
+      }
+
+      function aggregateByStore(receipts){
+        const map = new Map();
+        receipts.forEach(r => {
+          const name = normalizeStoreName(r.store);
+          const prev = map.get(name) || { name, total:0, itemsCount:0 };
+          prev.total += Number(r.total)||0;
+          prev.itemsCount += sumReceiptItemsCount(r);
+          map.set(name, prev);
+        });
+
+        // Ensure fixed order & include missing stores as 0s for consistent legend
+        return STORE_ORDER
+          .map(name => {
+            const v = map.get(name) || { name, total:0, itemsCount:0 };
+            return { ...v, color: STORE_COLORS[name] || getColor(name) };
+          })
+          .filter(v => v.total > 0 || v.name === 'Other');
       }
 
       function buildMonthWeeks(mStart, mEnd){
@@ -876,8 +923,8 @@
 
       const mortgageToggleBtn = document.getElementById('mortgageToggleBtn');
       const storesBtn = document.getElementById('storesBtn');
+      const rentalFilterBtn = document.getElementById('rentalFilterBtn');
       const storePanel = document.getElementById('storePanel');
-      const storeChips = storePanel ? Array.from(storePanel.querySelectorAll('.store-chip')) : [];
 
       const statMonthEl = document.getElementById('statMonth');
       const statWeekEl = document.getElementById('statWeek');
@@ -900,15 +947,16 @@
 
       function getReceiptsForSelectedMonth(){
         const { start, end } = getMonthRangeFromBase(now, monthOffset);
-        return applyMortgageFilter(allReceipts.filter(r => inRange(toDate(r.date), start, end)));
+        const inMonth = allReceipts.filter(r => inRange(toDate(r.date), start, end));
+        return applyRentalFilter(applyMortgageFilter(inMonth));
       }
 
       function updateTopStats(){
         const { start: mStart, end: mEnd, labelDate } = getMonthRangeFromBase(now, monthOffset);
         monthLabelEl.textContent = formatMonthLabel(labelDate, now);
 
-        // month total (respects mortgage toggle)
-        const monthReceipts = applyMortgageFilter(allReceipts.filter(r => inRange(toDate(r.date), mStart, mEnd)));
+        // month total (respects mortgage & rental toggles)
+        const monthReceipts = applyRentalFilter(applyMortgageFilter(allReceipts.filter(r => inRange(toDate(r.date), mStart, mEnd))));
         const monthSpent = monthReceipts.reduce((a,r)=>a+(Number(r.total)||0),0);
 
         // "This week" becomes a selectable week window within the selected month.
@@ -930,7 +978,7 @@
         if (weekIndex > maxIdx) weekIndex = maxIdx;
 
         const wk = weeks[weekIndex];
-        const weekSpent = applyMortgageFilter(allReceipts.filter(r => inRange(toDate(r.date), wk.start, wk.end)))
+        const weekSpent = applyRentalFilter(applyMortgageFilter(allReceipts.filter(r => inRange(toDate(r.date), wk.start, wk.end))))
           .reduce((a,r)=>a+(Number(r.total)||0),0);
 
         weekLabelEl.textContent = `${fmtMD(wk.start)}–${fmtMD(wk.end)}`;
@@ -943,91 +991,23 @@
 
       async function computeCategories(){
         const monthReceipts = getReceiptsForSelectedMonth();
-
-        // ---- Stores mode: donut shows (1) monthly spend by store, then (2) category breakdown within a store ----
-        if (donutMode === 'store'){
-          activeCategories = aggregateByStore(monthReceipts);
-          return;
-        }
-
-        if (donutMode === 'storeCategory' && selectedStore){
-          const group = String(selectedStore);
-          const storeOnly = monthReceipts.filter(r => normalizeStoreGroup(r.store) === group);
-          activeCategories = aggregateStoreCategoryBuckets(storeOnly);
-          return;
-        }
-
-        // ---- Default mode: existing behavior ----
-        if (tab === 'groceries'){
-          activeCategories = await aggregateGroceriesBreakdown(monthReceipts);
-        } else {
-          activeCategories = aggregateByReceiptCategory(monthReceipts);
-        }
-      }
-
-      // Map raw receipt store names into the 4 main store buckets (else "Other")
-      function normalizeStoreGroup(storeName){
-        const s = String(storeName || '').toLowerCase();
-        if (!s) return 'Other';
-        if (s.includes('walmart')) return 'Walmart';
-        if (s.includes('trader joe')) return "Trader Joe's";
-        if (s.includes('starbucks')) return 'Starbucks';
-        if (s.includes('price chopper') || s.includes('pricechopper')) return 'Price Chopper';
-        return 'Other';
-      }
-
-      function aggregateByStore(receipts){
-        const buckets = {
-          'Walmart': 0,
-          "Trader Joe's": 0,
-          'Starbucks': 0,
-          'Price Chopper': 0,
-          'Other': 0
-        };
-        receipts.forEach(r=>{
-          const g = normalizeStoreGroup(r.store);
-          buckets[g] = (buckets[g] || 0) + (Number(r.total) || 0);
-        });
-        return Object.keys(buckets)
-          .map(k => ({ name: k, total: buckets[k] }))
-          .filter(x => x.total > 0 || x.name === 'Other');
-      }
-
-      // Category breakdown within a store (simple 4-bucket view)
-      function aggregateStoreCategoryBuckets(receipts){
-        const out = { 'Groceries': 0, 'Household': 0, 'Personal': 0, 'Other': 0 };
-
-        const HOUSEHOLD_KEYS = ['household','home','clean','cleaning','laundry','paper','kitchen','bath','toile','trash','supplies'];
-        const PERSONAL_KEYS = ['health','medical','pharmacy','beauty','personal','hygiene','groom','skincare'];
-
-        receipts.forEach(r=>{
-          const items = Array.isArray(r.items) ? r.items : [];
-          if (!items.length){
-            const rc = String(r.category || '').toLowerCase();
-            if (rc.includes('groc')) out['Groceries'] += (Number(r.total)||0);
-            else if (HOUSEHOLD_KEYS.some(k=>rc.includes(k))) out['Household'] += (Number(r.total)||0);
-            else if (PERSONAL_KEYS.some(k=>rc.includes(k))) out['Personal'] += (Number(r.total)||0);
-            else out['Other'] += (Number(r.total)||0);
-            return;
+        // Stores mode:
+        // - no selectedStore => monthly totals by store
+        // - selectedStore    => category breakdown filtered to that store (tabs still work)
+        if (donutMode === 'stores'){
+          if (!selectedStore){
+            activeCategories = aggregateByStore(monthReceipts);
+          } else {
+            const filtered = monthReceipts.filter(r => normalizeStoreName(r.store) === selectedStore);
+            if (tab === 'groceries') activeCategories = await aggregateGroceriesBreakdown(filtered);
+            else activeCategories = aggregateByReceiptCategory(filtered);
           }
+          return;
+        }
 
-          items.forEach(it=>{
-            const price = Number(it.price) || 0;
-            const cat = String(it.category || '').toLowerCase();
-            const sub = String(it.subcategory || '').toLowerCase();
-            const name = String(it.name || '').toLowerCase();
-            const hay = `${cat} ${sub} ${name}`;
-
-            if (cat.includes('groc')) out['Groceries'] += price;
-            else if (HOUSEHOLD_KEYS.some(k=>hay.includes(k))) out['Household'] += price;
-            else if (PERSONAL_KEYS.some(k=>hay.includes(k))) out['Personal'] += price;
-            else out['Other'] += price;
-          });
-        });
-
-        return Object.keys(out)
-          .map(k => ({ name: k, total: out[k] }))
-          .filter(x => x.total > 0);
+        // Default category mode (existing behavior)
+        if (tab === 'groceries') activeCategories = await aggregateGroceriesBreakdown(monthReceipts);
+        else activeCategories = aggregateByReceiptCategory(monthReceipts);
       }
 
       function redraw(){
@@ -1038,33 +1018,45 @@
         });
       }
 
-      function syncStoresUI(){
-        const storesActive = (donutMode === 'store' || donutMode === 'storeCategory');
-        if (storesBtn) storesBtn.classList.toggle('toggle-on', storesActive);
-        if (storePanel) storePanel.style.display = storesActive ? 'flex' : 'none';
+      function renderStorePanel(){
+        if (!storePanel) return;
+        storePanel.innerHTML = '';
 
-        // Hide the category tabs when stores mode is active (avoids confusing state)
-        const tabsWrap = document.querySelector('.tabs');
-        if (tabsWrap) tabsWrap.style.display = storesActive ? 'none' : 'flex';
-
-        if (storeChips && storeChips.length){
-          storeChips.forEach(btn=>{
-            btn.classList.toggle('active', storesActive && selectedStore && btn.dataset.store === selectedStore);
+        const buttons = STORE_ORDER.filter(n => n !== 'Other');
+        buttons.forEach(name => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'store-btn' + (selectedStore === name ? ' active' : '');
+          b.textContent = name;
+          b.addEventListener('click', async ()=>{
+            // Clicking the active store toggles back to store totals
+            selectedStore = (selectedStore === name) ? null : name;
+            selectedIndex = null;
+            renderStorePanel();
+            await refreshAll();
           });
+          storePanel.appendChild(b);
+        });
+      }
+
+      function updateModeUI(){
+        if (storesBtn) storesBtn.classList.toggle('toggle-on', donutMode === 'stores');
+        if (rentalFilterBtn) rentalFilterBtn.classList.toggle('active', rentalOnly);
+        if (storePanel){
+          storePanel.style.display = (donutMode === 'stores') ? 'flex' : 'none';
+          if (donutMode === 'stores') renderStorePanel();
         }
       }
 
       async function refreshAll(){
-        syncStoresUI();
         updateTopStats();
+        updateModeUI();
         selectedIndex = null;
         await computeCategories();
         redraw();
       }
 
       async function setTab(newTab){
-        // Tabs only apply in the default category mode.
-        if (donutMode !== 'category') return;
         tab = newTab;
         selectedIndex = null;
         tabAllEl.classList.toggle('active', tab === 'all');
@@ -1086,14 +1078,18 @@
         redraw();
       });
 
-      document.getElementById('donutResetBtn').addEventListener('click', async ()=>{
-        // Reset returns the donut to the original default state
+      document.getElementById('donutResetBtn').addEventListener('click', ()=>{
+        // Full reset: back to default chart state
         donutMode = 'category';
         selectedStore = null;
+        rentalOnly = false;
+        tab = 'all';
         selectedIndex = null;
-        syncStoresUI();
-        await computeCategories();
-        redraw();
+
+        tabAllEl.classList.toggle('active', true);
+        tabGroEl.classList.toggle('active', false);
+        updateModeUI();
+        refreshAll();
       });
 
       monthPrevEl.addEventListener('click', async ()=>{
@@ -1118,44 +1114,33 @@
         updateTopStats();
       });
 
+      // Stores toggle (monthly store totals + drill-down)
+      if (storesBtn){
+        storesBtn.addEventListener('click', async ()=>{
+          donutMode = (donutMode === 'stores') ? 'category' : 'stores';
+          selectedStore = null;
+          selectedIndex = null;
+          updateModeUI();
+          await refreshAll();
+        });
+      }
+
+      // Rental filter toggle (only include receipts tagged with { property: "rental" })
+      if (rentalFilterBtn){
+        rentalFilterBtn.addEventListener('click', async ()=>{
+          rentalOnly = !rentalOnly;
+          selectedIndex = null;
+          updateModeUI();
+          await refreshAll();
+        });
+      }
+
       if (mortgageToggleBtn){
         mortgageToggleBtn.addEventListener('click', async ()=>{
           hideMortgage = !hideMortgage;
           mortgageToggleBtn.classList.toggle('toggle-on', hideMortgage);
           mortgageToggleBtn.textContent = hideMortgage ? 'Show Mortgage' : 'Hide Mortgage';
           await refreshAll();
-        });
-      }
-
-      // Stores toggle + drill-down
-      if (storesBtn){
-        storesBtn.addEventListener('click', async ()=>{
-          // Toggle between default category mode and Stores mode
-          if (donutMode === 'category'){
-            donutMode = 'store';
-            selectedStore = null;
-            selectedIndex = null;
-          } else {
-            donutMode = 'category';
-            selectedStore = null;
-            selectedIndex = null;
-          }
-          syncStoresUI();
-          await computeCategories();
-          redraw();
-        });
-      }
-
-      if (storeChips && storeChips.length){
-        storeChips.forEach(btn=>{
-          btn.addEventListener('click', async ()=>{
-            selectedStore = btn.dataset.store || null;
-            donutMode = selectedStore ? 'storeCategory' : 'store';
-            selectedIndex = null;
-            syncStoresUI();
-            await computeCategories();
-            redraw();
-          });
         });
       }
 

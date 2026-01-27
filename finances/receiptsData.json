@@ -2222,7 +2222,155 @@
   "tax": 0.0,
   "total": 43.68,
   "notes": "Walmart Supercenter • Glenmont • AMEX"
-}
+},
+[
+  {
+    "store": "Walmart",
+    "date": "2026-01-26",
+    "total": 143.78,
+    "property": "rental",
+    "items": [
+      {
+        "name": "MD Quartz Heater",
+        "category": "Home / Maintenance",
+        "price": 52.62
+      },
+      {
+        "name": "MD Quartz Heater",
+        "category": "Home / Maintenance",
+        "price": 52.62
+      },
+      {
+        "name": "25ft Garden Hose",
+        "category": "Home / Maintenance",
+        "price": 9.97
+      },
+      {
+        "name": "Bath Towel",
+        "category": "Household",
+        "price": 8.96
+      },
+      {
+        "name": "Bath Towel",
+        "category": "Household",
+        "price": 8.96
+      }
+    ]
+  },
+  {
+    "store": "Sunoco",
+    "date": "2026-01-23",
+    "total": 34.91,
+    "items": [
+      {
+        "name": "Unleaded Gas",
+        "category": "Gas",
+        "price": 34.91
+      }
+    ]
+  },
+  {
+    "store": "Lowe's",
+    "date": "2026-01-26",
+    "total": 4.70,
+    "property": "rental",
+    "items": [
+      {
+        "name": "5-Gallon Bucket",
+        "category": "Home / Maintenance",
+        "price": 4.35
+      },
+      {
+        "name": "Sales Tax",
+        "category": "Home / Maintenance",
+        "price": 0.35
+      }
+    ]
+  },
+  {
+    "store": "Restaurant",
+    "restaurant": "Chez Mike",
+    "date": "2026-01-23",
+    "total": 106.92,
+    "items": [
+      {
+        "name": "Whipped Ricotta",
+        "category": "Restaurant",
+        "price": 14.00
+      },
+      {
+        "name": "Oysters",
+        "category": "Restaurant",
+        "price": 18.00
+      },
+      {
+        "name": "Burger",
+        "category": "Restaurant",
+        "price": 16.00
+      },
+      {
+        "name": "Chowder",
+        "category": "Restaurant",
+        "price": 34.00
+      },
+      {
+        "name": "Vanilla Creme Brulee",
+        "category": "Restaurant",
+        "price": 8.00
+      },
+      {
+        "name": "Flourless Dessert",
+        "category": "Restaurant",
+        "price": 9.00
+      }
+    ]
+  },
+  {
+    "store": "The Fresh Market",
+    "date": "2026-01-23",
+    "total": 13.48,
+    "items": [
+      {
+        "name": "Cranberry Orange Muffin",
+        "category": "Groceries",
+        "price": 6.99
+      },
+      {
+        "name": "Cinnamon Roll (4ct)",
+        "category": "Groceries",
+        "price": 6.99
+      },
+      {
+        "name": "Bakery Discount",
+        "category": "Groceries",
+        "price": -0.50
+      }
+    ]
+  },
+  {
+    "store": "Trader Joe's",
+    "date": "2026-01-27",
+    "total": 9.06,
+    "items": [
+      {
+        "name": "Soyaki",
+        "category": "Groceries",
+        "price": 3.99
+      },
+      {
+        "name": "Shiitake Mushrooms",
+        "category": "Groceries",
+        "price": 3.49
+      },
+      {
+        "name": "Gold Potatoes",
+        "category": "Groceries",
+        "price": 1.58
+      }
+    ]
+  }
+]
+
 
   ],
   "metadata": {
