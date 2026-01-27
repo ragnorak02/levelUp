@@ -2223,156 +2223,106 @@
   "total": 43.68,
   "notes": "Walmart Supercenter • Glenmont • AMEX"
 },
-[
-  {
-    "store": "Walmart",
-    "date": "2026-01-26",
-    "total": 143.78,
-    "property": "rental",
-    "items": [
-      {
-        "name": "MD Quartz Heater",
-        "category": "Home / Maintenance",
-        "price": 52.62
-      },
-      {
-        "name": "MD Quartz Heater",
-        "category": "Home / Maintenance",
-        "price": 52.62
-      },
-      {
-        "name": "25ft Garden Hose",
-        "category": "Home / Maintenance",
-        "price": 9.97
-      },
-      {
-        "name": "Bath Towel",
-        "category": "Household",
-        "price": 8.96
-      },
-      {
-        "name": "Bath Towel",
-        "category": "Household",
-        "price": 8.96
-      }
-    ]
-  },
-  {
-    "store": "Sunoco",
-    "date": "2026-01-23",
-    "total": 34.91,
-    "items": [
-      {
-        "name": "Unleaded Gas",
-        "category": "Gas",
-        "price": 34.91
-      }
-    ]
-  },
-  {
-    "store": "Lowe's",
-    "date": "2026-01-26",
-    "total": 4.70,
-    "property": "rental",
-    "items": [
-      {
-        "name": "5-Gallon Bucket",
-        "category": "Home / Maintenance",
-        "price": 4.35
-      },
-      {
-        "name": "Sales Tax",
-        "category": "Home / Maintenance",
-        "price": 0.35
-      }
-    ]
-  },
-  {
-    "store": "Restaurant",
-    "restaurant": "Chez Mike",
-    "date": "2026-01-23",
-    "total": 106.92,
-    "items": [
-      {
-        "name": "Whipped Ricotta",
-        "category": "Restaurant",
-        "price": 14.00
-      },
-      {
-        "name": "Oysters",
-        "category": "Restaurant",
-        "price": 18.00
-      },
-      {
-        "name": "Burger",
-        "category": "Restaurant",
-        "price": 16.00
-      },
-      {
-        "name": "Chowder",
-        "category": "Restaurant",
-        "price": 34.00
-      },
-      {
-        "name": "Vanilla Creme Brulee",
-        "category": "Restaurant",
-        "price": 8.00
-      },
-      {
-        "name": "Flourless Dessert",
-        "category": "Restaurant",
-        "price": 9.00
-      }
-    ]
-  },
-  {
-    "store": "The Fresh Market",
-    "date": "2026-01-23",
-    "total": 13.48,
-    "items": [
-      {
-        "name": "Cranberry Orange Muffin",
-        "category": "Groceries",
-        "price": 6.99
-      },
-      {
-        "name": "Cinnamon Roll (4ct)",
-        "category": "Groceries",
-        "price": 6.99
-      },
-      {
-        "name": "Bakery Discount",
-        "category": "Groceries",
-        "price": -0.50
-      }
-    ]
-  },
-  {
-    "store": "Trader Joe's",
-    "date": "2026-01-27",
-    "total": 9.06,
-    "items": [
-      {
-        "name": "Soyaki",
-        "category": "Groceries",
-        "price": 3.99
-      },
-      {
-        "name": "Shiitake Mushrooms",
-        "category": "Groceries",
-        "price": 3.49
-      },
-      {
-        "name": "Gold Potatoes",
-        "category": "Groceries",
-        "price": 1.58
-      }
-    ]
-  }
-]
-
-
+{
+  "id": "receipt_walmart_20260126_1508_rental_heaters_hose_towels",
+  "date": "2026-01-26",
+  "store": "Walmart",
+  "storeLocation": "Walmart Supercenter • 800 Loudon Rd, Latham, NY 12110 (ST# 01997)",
+  "category": "Home",
+  "property": "rental",
+  "items": [
+    { "name": "MD Quartz Heater", "price": 52.62, "quantity": 1, "category": "Home", "subcategory": "Maintenance" },
+    { "name": "MD Quartz Heater", "price": 52.62, "quantity": 1, "category": "Home", "subcategory": "Maintenance" },
+    { "name": "25ft LD Hose (Garden Hose)", "price": 9.97, "quantity": 1, "category": "Home", "subcategory": "Maintenance" },
+    { "name": "Bath Towel", "price": 8.96, "quantity": 1, "category": "Home", "subcategory": "Household" },
+    { "name": "Bath Towel", "price": 8.96, "quantity": 1, "category": "Home", "subcategory": "Household" }
   ],
+  "subtotal": 133.13,
+  "tax": 10.65,
+  "total": 143.78,
+  "notes": "Rental property purchase. Heaters + hose + towels."
+},
+{
+  "id": "receipt_sunoco_20260123_1311_unleaded",
+  "date": "2026-01-23",
+  "store": "Sunoco",
+  "storeLocation": "Glenmont Sunoco • 415 RT 9W, Glenmont, NY 12077",
+  "category": "Gas",
+  "items": [
+    { "name": "Unleaded Gas (11.228 gal @ $3.109/gal)", "price": 34.91, "quantity": 1, "category": "Gas", "subcategory": "Fuel" }
+  ],
+  "subtotal": 34.91,
+  "tax": 0.00,
+  "total": 34.91,
+  "notes": "Pump 07 • Unleaded • Contactless"
+},
+{
+  "id": "receipt_lowes_20260126_bucket",
+  "date": "2026-01-26",
+  "store": "Lowe's",
+  "storeLocation": "Lowe's Home Centers, LLC • 790 Loudon Rd, Latham, NY 12110",
+  "category": "Home",
+  "property": "rental",
+  "items": [
+    { "name": "5-Gallon Lowe's Bucket", "price": 4.35, "quantity": 1, "category": "Home", "subcategory": "Maintenance" }
+  ],
+  "subtotal": 4.35,
+  "tax": 0.35,
+  "total": 4.70,
+  "notes": "Rental property supply purchase."
+},
+{
+  "id": "receipt_chez_mike_20260123_dinner",
+  "date": "2026-01-23",
+  "store": "Restaurant",
+  "restaurant": "Chez Mike",
+  "storeLocation": "596 Columbia Turnpike, East Greenbush, NY 12061",
+  "category": "Restaurants",
+  "items": [
+    { "name": "Whipped Ricotta", "price": 14.00, "quantity": 1, "category": "Restaurants", "subcategory": "Food" },
+    { "name": "Oysters", "price": 18.00, "quantity": 1, "category": "Restaurants", "subcategory": "Food" },
+    { "name": "Burger (Medium Well)", "price": 16.00, "quantity": 1, "category": "Restaurants", "subcategory": "Food" },
+    { "name": "Chowder", "price": 34.00, "quantity": 1, "category": "Restaurants", "subcategory": "Food" },
+    { "name": "Vanilla Creme Brulee", "price": 8.00, "quantity": 1, "category": "Restaurants", "subcategory": "Dessert" },
+    { "name": "Flourless Dessert", "price": 9.00, "quantity": 1, "category": "Restaurants", "subcategory": "Dessert" }
+  ],
+  "subtotal": 99.00,
+  "tax": 7.92,
+  "total": 106.92,
+  "notes": "Order 9895 • Table 22"
+},
+{
+  "id": "receipt_fresh_market_20260123_bakery",
+  "date": "2026-01-23",
+  "store": "The Fresh Market",
+  "storeLocation": "The Fresh Market",
+  "category": "Groceries",
+  "items": [
+    { "name": "Cranberry Orange Muffin", "price": 6.99, "quantity": 1, "category": "Groceries", "subcategory": "Bakery" },
+    { "name": "Cinnamon Roll (4ct)", "price": 6.99, "quantity": 1, "category": "Groceries", "subcategory": "Bakery" },
+    { "name": "Bakery Promo Discount", "price": -0.50, "quantity": 1, "category": "Groceries", "subcategory": "Discount" }
+  ],
+  "subtotal": 13.48,
+  "tax": 0.00,
+  "total": 13.48,
+  "notes": "Bakery purchase."
+},
+{
+  "id": "receipt_traderjoes_20260127_soyaki_mushrooms_potatoes",
+  "date": "2026-01-27",
+  "store": "Trader Joe's",
+  "storeLocation": "388 Feura Bush Rd, Glenmont, NY 12077 (Store #0579)",
+  "category": "Groceries",
+  "items": [
+    { "name": "Soyaki", "price": 3.99, "quantity": 1, "category": "Groceries", "subcategory": "Pantry" },
+    { "name": "Shiitake Mushrooms", "price": 3.49, "quantity": 1, "category": "Groceries", "subcategory": "Produce" },
+    { "name": "A-Potato Gold", "price": 1.58, "quantity": 1, "category": "Groceries", "subcategory": "Produce" }
+  ],
+  "subtotal": 9.06,
+  "tax": 0.00,
+  "total": 9.06,
+  "notes": "Items in transaction: 4"
+}
   "metadata": {
     "version": "1.0",
     "lastUpdated": "2026-01-17",
