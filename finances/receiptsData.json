@@ -2223,7 +2223,6 @@
   "total": 43.68,
   "notes": "Walmart Supercenter • Glenmont • AMEX"
 },
-[
   {
     "store": "Walmart",
     "date": "2026-01-26",
@@ -2370,9 +2369,7 @@
     ]
   }
 ]
-
-
-  ],
+,
   "metadata": {
     "version": "1.0",
     "lastUpdated": "2026-01-17",
