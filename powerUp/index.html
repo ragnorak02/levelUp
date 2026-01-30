@@ -327,7 +327,6 @@
   <div class="tile tile-date" id="lastDate">—</div>
   <div class="tile"><div class="t-label">Total</div><b id="lastVolume">—</b></div>
   <div class="tile"><div class="t-label">Exercises</div><b id="lastMoves">—</b></div>
-  <div class="tile"><div class="t-label">Sets</div><b id="lastSets">—</b></div>
   <div class="tile" id="setsLeftTile" style="display:none;"><div class="t-label">Left</div><b id="setsLeft">—</b></div>
 </div>
 <div class="ex-list" id="exList"></div>
@@ -411,9 +410,10 @@ const workouts = (readLocalDays().length ? readLocalDays() : demoWorkouts);
 
 const byDateAsc = (a,b)=> fmt(a.date) - fmt(b.date);
 const shortDate = (d)=> {
-  const date = new Date(d + 'T12:00:00'); // Use noon to avoid timezone issues
-  return date.toLocaleDateString(undefined, {month:'short', day:'numeric', weekday:'short'});
+  const date = new Date(d + 'T12:00:00');
+  return `${date.getMonth() + 1}/${date.getDate()}`;
 };
+
 const totalVolume = (wo)=> wo.exercises.reduce((sum, ex)=> sum + ex.sets.reduce((s, st)=> s + (st.weight||0)*(st.reps||0), 0), 0);
 const totalSets = (wo)=> wo.exercises.reduce((s,ex)=> s + ex.sets.length, 0);
 const completedSets = (wo)=> wo.exercises.reduce((s,ex)=> s + ex.sets.filter(st=>st.completed).length, 0);

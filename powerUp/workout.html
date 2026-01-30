@@ -137,6 +137,25 @@
   .strength-bar.same{background:linear-gradient(90deg, #d97706, #f59e0b); width:50% !important;}
   .strength-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:600; color:var(--ink); text-shadow:0 1px 2px rgba(0,0,0,0.5);}
 
+  /* ===== Condensed comparison summary (mobile-first) ===== */
+  .cmp-mini{display:grid; gap:10px; padding:2px 0}
+  .cmp-bars{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .cmp-bar{background:#0f141b; border:1px solid var(--ring); border-radius:12px; padding:10px}
+  .cmp-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
+  .cmp-head span{font-size:.78rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.4px}
+  .cmp-head b{font-size:1rem; font-weight:900; color:var(--ink)}
+  .cmp-sub{margin-top:2px; font-size:.75rem; color:var(--muted)}
+  .cmp-track{margin-top:8px; height:10px; background:#101a24; border:1px solid rgba(42,53,67,.9); border-radius:999px; overflow:hidden}
+  .cmp-fill{height:100%; border-radius:999px}
+  .cmp-fill.today{background:linear-gradient(90deg, var(--accent), #16a34a)}
+  .cmp-fill.best{background:linear-gradient(90deg, #f59e0b, #fb923c)}
+  .cmp-metrics{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .cmp-metric{background:#0f141b; border:1px solid var(--ring); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:3px}
+  .cmp-metric span{font-size:.78rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.4px}
+  .cmp-metric b{font-size:1rem; font-weight:900; color:var(--ink)}
+  .cmp-metric i{font-style:normal; font-size:.75rem; color:var(--muted)}
+
+
   .group-header{display:flex; align-items:center; justify-content:space-between; cursor:pointer; padding:4px 0; border-bottom:1px solid var(--ring); margin-bottom:8px;}
   .group-title{display:flex; align-items:center; gap:8px;}
   .collapse-icon{font-size:1.2rem; color:var(--muted); transition:transform 0.2s ease;}
@@ -552,6 +571,127 @@ function exStats(ex){
   const avg = reps ? vol / reps : 0;
   return { vol, reps, avg };
 }
+
+/* =========================
+   Condensed Performance Summary (mobile-first)
+   - Replaces per-set comparison rows with exercise-level aggregates
+   ========================= */
+
+function mdFromISO(iso){
+  if(!iso) return '—';
+  const d = new Date(String(iso).slice(0,10) + 'T00:00:00');
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
+
+function getAllTimeExercisePRVolume(exerciseName, bodyPart){
+  let bestVol = 0;
+  let bestDate = null;
+
+  for(let i=0; i<localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(!/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+
+    try{
+      const day = JSON.parse(localStorage.getItem(k));
+      const ex = (day?.exercises || []).find(e =>
+        String(e.name||'').toLowerCase().trim() === String(exerciseName||'').toLowerCase().trim() &&
+        String(e.bodyPart||'') === String(bodyPart||'')
+      );
+      if(!ex) continue;
+
+      const vol = (ex.sets||[]).reduce((s,st)=> s + (Number(st.weight)||0)*(Number(st.reps)||0), 0);
+      if(vol > bestVol){
+        bestVol = vol;
+        bestDate = day?.date || k.slice('powerUp:'.length);
+      }
+    }catch{}
+  }
+
+  return { vol: bestVol, date: bestDate };
+}
+
+function getAllTimeHeaviestSet(exerciseName, bodyPart){
+  let best = { weight: 0, reps: 0, date: null };
+
+  for(let i=0; i<localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(!/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+
+    try{
+      const day = JSON.parse(localStorage.getItem(k));
+      const ex = (day?.exercises || []).find(e =>
+        String(e.name||'').toLowerCase().trim() === String(exerciseName||'').toLowerCase().trim() &&
+        String(e.bodyPart||'') === String(bodyPart||'')
+      );
+      if(!ex) continue;
+
+      (ex.sets||[]).forEach(st=>{
+        const w = Number(st.weight)||0;
+        const r = Number(st.reps)||0;
+        if(w > best.weight || (w === best.weight && r > best.reps)){
+          best = { weight: w, reps: r, date: day?.date || k.slice('powerUp:'.length) };
+        }
+      });
+    }catch{}
+  }
+
+  return best;
+}
+
+function renderExerciseComparisonSummary(ex){
+  const { vol, reps } = exStats(ex);
+
+  // PR volume = best total exercise volume on any single day
+  const pr = getAllTimeExercisePRVolume(ex.name, ex.bodyPart);
+
+  // Heaviest set (all time)
+  const heavy = getAllTimeHeaviestSet(ex.name, ex.bodyPart);
+
+  // Bar scaling
+  const maxVol = Math.max(vol||0, pr.vol||0, 1);
+  const todayPct = Math.max(2, Math.round((vol / maxVol) * 100));
+  const prPct = Math.max(2, Math.round((pr.vol / maxVol) * 100));
+
+  const wrap = document.createElement('div');
+  wrap.className = 'cmp-mini';
+
+  wrap.innerHTML = `
+    <div class="cmp-bars">
+      <div class="cmp-bar">
+        <div class="cmp-head">
+          <span>Today</span>
+          <b>${Math.round(vol).toLocaleString()} lb</b>
+        </div>
+        <div class="cmp-track"><div class="cmp-fill today" style="width:${todayPct}%"></div></div>
+      </div>
+
+      <div class="cmp-bar">
+        <div class="cmp-head">
+          <span>PR (best day)</span>
+          <b>${Math.round(pr.vol||0).toLocaleString()} lb</b>
+        </div>
+        <div class="cmp-sub">${pr.date ? mdFromISO(pr.date) : '—'}</div>
+        <div class="cmp-track"><div class="cmp-fill best" style="width:${prPct}%"></div></div>
+      </div>
+    </div>
+
+    <div class="cmp-metrics">
+      <div class="cmp-metric">
+        <span>Heaviest</span>
+        <b>${heavy.weight ? `${heavy.weight} lb × ${heavy.reps || 0}` : '—'}</b>
+        <i>${heavy.date ? mdFromISO(heavy.date) : ''}</i>
+      </div>
+
+      <div class="cmp-metric">
+        <span>Total reps</span>
+        <b>${Math.round(reps||0)}</b>
+        <i></i>
+      </div>
+    </div>
+  `;
+
+  return wrap;
+}
 function countedSets(ex){ return ex.finished ? ex.sets : ex.sets.filter(s=> !!s.done); }
 function totalsFiltered(day){
   let sets=0, vol=0, exCount=day.exercises.length;
@@ -724,75 +864,109 @@ function renderExercise(ex){
         </div>
       </div>
     `;
-    const setsWrap = node.querySelector('.comparison-section');
-    const maxSets = Math.max(ex.sets.length, previousSets ? previousSets.length : 0);
-    for (let i = 0; i < maxSets; i++) {
-      const cs = ex.sets[i], ps = previousSets ? previousSets[i] : null;
-      const row = document.createElement('div'); row.className = 'comparison-row';
-      if (cs) {
-        const cw = cs.weight||'0', cr = cs.reps||'0', pw = ps ? (ps.weight||'0') : '0', pr = ps ? (ps.reps||'0') : '0';
-        const cmp = compareWeight(cw,pw);
-        const sym = cmp==='better'?'↑':cmp==='same'?'=':cmp==='worse'?'↓':'';
-        const diffStr = calculateDifference(cw,cr,pw,pr);
-        const diffCls = cmp==='better'?'better':(cmp==='worse'?'worse':'');
-        const sc = calculateStrengthChange(cw,cr,pw,pr);
-        row.innerHTML = `
-          <div class="set-label">Set ${i+1}</div>
-          <div class="set-data">
-            <div class="current-data">${cw} lbs × ${cr}</div>
-            <div class="vs-separator">vs</div>
-            <div class="previous-data">${ps ? pw : '—'} × ${ps ? pr : '—'}</div>
-          </div>
-          <div class="comparison-indicator ${cmp}">${sym}</div>
-          <div class="comparison-difference ${diffCls}">${diffStr}</div>
-          <div class="strength-indicator">
-            <div class="strength-bar ${sc.type}" style="width:${sc.type==='same'?'50':sc.percentage}%"></div>
-            <div class="strength-label">${sc.label}</div>
-          </div>
-        `;
-      } else {
-        row.innerHTML = `
-          <div class="set-label">Set ${i+1}</div>
-          <div class="set-data">
-            <div class="current-data">—</div>
-            <div class="vs-separator">vs</div>
-            <div class="previous-data">${ps?.weight||'0'} × ${ps?.reps||'0'}</div>
-          </div>
-          <div class="comparison-indicator"></div>
-          <div class="comparison-difference">Missing</div>
-          <div class="strength-indicator">
-            <div class="strength-bar worse" style="width:100%"></div>
-            <div class="strength-label">-100%</div>
-          </div>
-        `;
-      }
-      setsWrap.appendChild(row);
-    }
-  } else {
-    node.innerHTML = `
-      <div class="ex-header" data-act="toggleExercise">
-        <div>
-          <div class="ex-name">${ex.name}${copiedText}</div>
-          <div class="tag">${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep</div>
+
+    if (ex.finished) {
+
+  node.innerHTML = `
+    <div class="ex-header" data-act="toggleExercise">
+      <div>
+        <div class="ex-name">${ex.name}${copiedText}</div>
+        <div class="tag">
+          ${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep
         </div>
       </div>
-      <div class="sets"></div>
-      <div class="ex-actions-bottom">
-        <div>
-          <button class="btn-ghost btn-small" data-act="addSet">+ Set</button>
-          <button class="btn" style="padding:.6rem 1.2rem; background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a" data-act="markComplete">${ex.completed?'Completed ✓':'Complete'}</button>
-          <button class="btn-ghost btn-small" data-act="viewHistory">📊 History</button>
-        </div>
-        <div style="display:flex; gap:8px">
-          <button class="btn-ghost btn-small" data-act="removeSet" ${ex.sets.length <= 1 ? 'style="display:none"' : ''}>- Set</button>
-          <button class="btn-danger btn-small" data-act="removeExercise">Remove Exercise</button>
+    </div>
+
+    <div class="sets">
+      <div class="comparison-section">
+        <div class="comparison-label">Performance Comparison</div>
+      </div>
+    </div>
+
+    <div class="ex-actions-bottom">
+      <div style="display:flex; gap:8px; flex-wrap:wrap">
+        <button
+          class="btn"
+          style="padding:.6rem 1.2rem;
+                 background:linear-gradient(90deg,#4CAF50,#22c55e);
+                 color:#04130a"
+          data-act="markComplete"
+        >
+          ${ex.completed ? 'Completed ✓' : 'Complete'}
+        </button>
+
+        <button class="btn-ghost btn-small" data-act="viewHistory">
+          📊 History
+        </button>
+      </div>
+    </div>
+  `;
+
+  const setsWrap = node.querySelector('.comparison-section');
+
+  // ✅ condensed exercise-level comparison
+  setsWrap.appendChild(
+    renderExerciseComparisonSummary(ex)
+  );
+
+} else {
+
+  node.innerHTML = `
+    <div class="ex-header" data-act="toggleExercise">
+      <div>
+        <div class="ex-name">${ex.name}${copiedText}</div>
+        <div class="tag">
+          ${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep
         </div>
       </div>
-    `;
-    const setsWrap = node.querySelector('.sets');
-    ex.sets.forEach((s, i)=> setsWrap.appendChild(renderSet(ex.id, s, i, false)));
-  }
-  return node;
+    </div>
+
+    <div class="sets"></div>
+
+    <div class="ex-actions-bottom">
+      <div>
+        <button class="btn-ghost btn-small" data-act="addSet">+ Set</button>
+
+        <button
+          class="btn"
+          style="padding:.6rem 1.2rem;
+                 background:linear-gradient(90deg,#4CAF50,#22c55e);
+                 color:#04130a"
+          data-act="markComplete"
+        >
+          ${ex.completed ? 'Completed ✓' : 'Complete'}
+        </button>
+
+        <button class="btn-ghost btn-small" data-act="viewHistory">
+          📊 History
+        </button>
+      </div>
+
+      <div style="display:flex; gap:8px">
+        <button
+          class="btn-ghost btn-small"
+          data-act="removeSet"
+          ${ex.sets.length <= 1 ? 'style="display:none"' : ''}
+        >
+          − Set
+        </button>
+
+        <button
+          class="btn-danger btn-small"
+          data-act="removeExercise"
+        >
+          Remove Exercise
+        </button>
+      </div>
+    </div>
+  `;
+
+  const setsWrap = node.querySelector('.sets');
+  ex.sets.forEach((s, i) =>
+    setsWrap.appendChild(renderSet(ex.id, s, i, false))
+  );
+}
+}
 }
 
 function renderSet(exId, s, idx, locked=false){

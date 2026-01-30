@@ -951,6 +951,41 @@
         return applyRentalFilter(applyMortgageFilter(inMonth));
       }
 
+      function getReceiptsForCurrentView() {
+        // Start with whatever your “month receipts” function is
+        // (should already respect month + mortgage hide)
+        let list = getReceiptsForSelectedMonth();
+
+        // --- Rental filter ---
+        // If your rental toggle uses a boolean like rentalOnly:
+        if (typeof rentalOnly !== "undefined" && rentalOnly) {
+          list = list.filter(r => r && r.property === "rental");
+        }
+
+        // --- Stores mode ---
+        // If you have storesMode boolean and selectedStore string:
+        if (typeof storesMode !== "undefined" && storesMode) {
+          const keyForStore = (r) => (r.store || r.restaurant || "Other");
+
+          if (typeof selectedStore !== "undefined" && selectedStore) {
+            // Drill-down: only receipts for the selected store
+            list = list.filter(r => keyForStore(r) === selectedStore);
+          } else {
+            // Stores mode (no store selected): keep all receipts
+            // (donut shows store totals; recent purchases should show filtered receipts list)
+          }
+        }
+
+        // --- Tab logic ---
+        // If your Groceries tab means “only show grocery receipts”:
+        if (typeof tab !== "undefined" && tab === "groceries") {
+          list = list.filter(r => String(r.category || "").toLowerCase() === "groceries");
+        }
+
+        return list;
+      }
+
+
       function updateTopStats(){
         const { start: mStart, end: mEnd, labelDate } = getMonthRangeFromBase(now, monthOffset);
         monthLabelEl.textContent = formatMonthLabel(labelDate, now);
@@ -958,6 +993,7 @@
         // month total (respects mortgage & rental toggles)
         const monthReceipts = applyRentalFilter(applyMortgageFilter(allReceipts.filter(r => inRange(toDate(r.date), mStart, mEnd))));
         const monthSpent = monthReceipts.reduce((a,r)=>a+(Number(r.total)||0),0);
+
 
         // "This week" becomes a selectable week window within the selected month.
         const weeks = buildMonthWeeks(mStart, mEnd);
@@ -1063,6 +1099,8 @@
         tabGroEl.classList.toggle('active', tab === 'groceries');
         await computeCategories();
         redraw();
+        renderRecent();
+
       }
 
       tabAllEl.addEventListener('click', ()=>setTab('all'));
@@ -1151,7 +1189,8 @@
       let recentExpanded = false;
 
       function renderRecent(){
-        const sorted = [...allReceipts]
+        const sorted = [...getReceiptsForCurrentView()]
+
           .sort((a,b)=> toDate(b.date) - toDate(a.date));
 
         const maxCollapsed = 3;
