@@ -136,7 +136,7 @@
   .flags{display:flex; align-items:center; gap:12px; color:var(--muted); font-size:.9rem}
 
   /* ===== Condensed comparison summary (mobile-first) ===== */
-  .cmp-mini{display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:2px 0}
+  .cmp-mini{display:flex; gap:14px; align-items:flex-end; justify-content:space-between; padding:4px 0}
   @media (max-width: 360px){ .cmp-mini{grid-template-columns:1fr} }
   .cmp-bars{display:grid; grid-template-columns:1fr; gap:10px}
   .cmp-bar{background:#0f141b; border:1px solid var(--ring); border-radius:12px; padding:10px}
@@ -288,6 +288,60 @@
   }
   .bar-top-label.muted{color:rgba(255,255,255,.85)}
   .dualwrap{position:relative}
+
+
+  /* Layout cleanup: compact perf row */
+  .cmp-mini > *{min-width:0}
+  .cmp-block{
+    border:1px solid var(--ring);
+    background:#0b1118;
+    border-radius:14px;
+    padding:10px 10px;
+  }
+  .cmp-block.tight{padding:8px 10px}
+  .cmp-block.none{border:none; background:transparent; padding:0}
+
+  .cmp-target{
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    gap:8px;
+    min-width:140px;
+  }
+  .cmp-target .trow{line-height:1.05}
+  .cmp-target .trow span{color:var(--muted); font-weight:800; display:block}
+  .cmp-target .trow b{color:var(--ink); font-size:1.25rem}
+
+  .cmp-maxpair{
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    gap:10px;
+    min-width:120px;
+  }
+  .max-top{
+    display:flex;
+    gap:14px;
+    align-items:baseline;
+    justify-content:flex-start;
+    font-weight:900;
+  }
+  .max-top .mw{font-size:1.35rem}
+  .max-top .mr{font-size:1.15rem; color:rgba(255,255,255,.9)}
+  .bars-wrap{
+    display:flex;
+    gap:10px;
+    align-items:flex-end;
+    justify-content:flex-start;
+  }
+
+  @media (max-width: 420px){
+    .cmp-mini{gap:10px}
+    .cmp-target{min-width:120px}
+    .cmp-maxpair{min-width:110px}
+    .max-top .mw{font-size:1.25rem}
+    .max-top .mr{font-size:1.05rem}
+  }
 
 </style>
 </head>
@@ -709,25 +763,26 @@ function getBestRepsAtWeight(exName, bodyPart, weight){
 
 
 function renderExerciseComparisonSummary(ex){
-  // Iterations 3-5: aligned bars + labels in chart area only
-  const { vol } = exStats(ex); // total pounds lifted today for this exercise (Iteration 5)
+  // Layout-only cleanup: compact row, remove redundant labels/dates, no metric changes
+  const { vol } = exStats(ex); // total pounds lifted today for this exercise
 
-  // Best total-volume day (PR volume baseline)
   const prVol = getAllTimeExercisePRVolume(ex.name, ex.bodyPart);
   const targetVol = Number(prVol?.vol)||0;
+
   const pctVolRaw = (targetVol > 0) ? Math.round((vol / targetVol) * 100) : (vol > 0 ? 100 : 0);
   const pctVol = Math.max(0, Math.min(100, pctVolRaw));
   const goldVol = (pctVolRaw >= 100 && vol > 0 && targetVol > 0);
 
-  // MAX tile data (weight + reps)
   const heavy = getAllTimeHeaviestSet(ex.name, ex.bodyPart);
-  const currentMax = Math.max(...(ex.sets||[]).map(s=>Number(s.weight)||0), 0);
-
-  const repsTodayAtMax = Math.max(...(ex.sets||[]).filter(s=>(Number(s.weight)||0)===currentMax).map(s=>Number(s.reps)||0), 0);
-  const repsBestAtMax = getBestRepsAtWeight(ex.name, ex.bodyPart, currentMax) || repsTodayAtMax || 0;
-
-  // Progress fills (weight bar compares today max vs lifetime max weight; reps compares weight-matched reps)
   const targetMax = Number(heavy.weight)||0;
+
+  // Best reps at the max-weight baseline (weight-matched)
+  const repsBestAtMax = getBestRepsAtWeight(ex.name, ex.bodyPart, targetMax) || (Number(heavy.reps)||0) || 0;
+
+  // Bars in MAX area still reflect current workout progress (unchanged behavior)
+  const currentMax = Math.max(...(ex.sets||[]).map(s=>Number(s.weight)||0), 0);
+  const repsTodayAtMax = Math.max(...(ex.sets||[]).filter(s=>(Number(s.weight)||0)===currentMax).map(s=>Number(s.reps)||0), 0);
+
   const pctMaxRaw = (targetMax > 0) ? Math.round((currentMax / targetMax) * 100) : (currentMax > 0 ? 100 : 0);
   const pctMax = Math.max(0, Math.min(100, pctMaxRaw));
   const goldMax = (pctMaxRaw >= 100 && currentMax > 0 && targetMax > 0);
@@ -740,51 +795,35 @@ function renderExerciseComparisonSummary(ex){
   wrap.className = 'cmp-mini';
 
   wrap.innerHTML = `
-    <div class="cmp-tile">
-      <div class="cmp-head">
-        <span>Today</span>
-        <b>${Math.round(vol).toLocaleString()} lb</b>
-      </div>
-
-      <div class="cmp-body">
-        <div class="vtrack wide ${goldVol ? 'gold' : ''}">
-          <div class="vfill" style="height:${pctVol}%"></div>
-          <div class="vpct">${isFinite(pctVolRaw) ? pctVolRaw : 0}</div>
-        </div>
-
-        <div class="vlabels">
-          <div>Target<br><b>${targetVol ? `${Math.round(targetVol).toLocaleString()} lb` : '—'}</b></div>
-          <div>Current<br><b>${vol ? `${Math.round(vol).toLocaleString()} lb` : '—'}</b></div>
-        </div>
+    <!-- Today volume bar (no TODAY header) -->
+    <div class="cmp-block tight">
+      <div class="vtrack wide ${goldVol ? 'gold' : ''}">
+        <div class="vfill" style="height:${pctVol}%"></div>
+        <div class="vpct">${isFinite(pctVolRaw) ? pctVolRaw : 0}</div>
       </div>
     </div>
 
-    <div class="cmp-tile">
-      <div class="cmp-head">
-        <span>MAX</span>
-        <b>${heavy.weight ? `${heavy.weight} lb × ${heavy.reps || 0}` : '—'}</b>
+    <!-- Target volume block moved upward (box #1) -->
+    <div class="cmp-block cmp-target">
+      <div class="trow"><span>Target</span><b>${targetVol ? `${Math.round(targetVol).toLocaleString()} lb` : '—'}</b></div>
+      <div class="trow"><span>Current</span><b>${vol ? `${Math.round(vol).toLocaleString()} lb` : '—'}</b></div>
+    </div>
+
+    <!-- MAX area: pair max weight + best reps at that weight (boxes #2 and #3). No MAX label, no 50 lb × 6 header, no dates -->
+    <div class="cmp-block cmp-maxpair">
+      <div class="max-top">
+        <span class="mw">${targetMax ? `${targetMax} lb` : '—'}</span>
+        <span class="mr">${repsBestAtMax ? `${repsBestAtMax} reps` : ''}</span>
       </div>
 
-      <div class="cmp-body">
-        <div class="dualwrap">
-          <div class="vtrack wide ${goldMax ? 'gold' : ''}">
-            <div class="vfill" style="height:${pctMax}%"></div>
-            <div class="bar-top-label muted">${currentMax ? `${currentMax} lb` : '—'}</div>
-          </div>
-
-          <div class="vtrack thin ${goldReps ? 'gold' : ''}">
-            <div class="vfill" style="height:${repsPct}%"></div>
-            <div class="bar-top-label muted">${repsTodayAtMax ? `${repsTodayAtMax} reps` : '—'}</div>
-          </div>
+      <div class="bars-wrap">
+        <div class="vtrack wide ${goldMax ? 'gold' : ''}">
+          <div class="vfill" style="height:${pctMax}%"></div>
         </div>
-
-        <div class="vlabels">
-          <div>LB PR<br><b>${targetMax ? `${targetMax} lb` : '—'}</b></div>
-          <div>Best reps<br><b>${repsBestAtMax ? `${repsBestAtMax} reps` : '—'}</b></div>
+        <div class="vtrack thin ${goldReps ? 'gold' : ''}">
+          <div class="vfill" style="height:${repsPct}%"></div>
         </div>
       </div>
-
-      <div class="cmp-sub"><i>${heavy.date ? mdFromISO(heavy.date) : ''}</i></div>
     </div>
   `;
 
