@@ -168,7 +168,7 @@
 
   .cmp-body{display:flex; gap:12px; align-items:flex-end; justify-content:space-between; margin-top:10px}
   .dualwrap{display:flex; gap:10px; align-items:flex-end}
-  .vfill{width:100%; border-radius:0; background:linear-gradient(180deg, var(--accent), #16a34a)}
+  .vfill{width:100%; border-radius:0;}
   .vtrack.gold .vfill{background:linear-gradient(180deg, #f59e0b, #fbbf24)}
   .vpct{
     position:absolute;
@@ -384,6 +384,14 @@
     box-shadow:0 0 0 2px rgba(34,197,94,.15) inset;
     background:rgba(20,30,40,.65);
   }
+
+
+  /* Iterations 6-7: bar fill color ramp + percent readability */
+  .vfill.neutral{background:#263447;}
+  .vfill.warm{background:linear-gradient(180deg,#fbbf24,#f59e0b);}
+  .vfill.green{background:linear-gradient(180deg,#34d399,#16a34a);}
+  .vfill.gold{background:linear-gradient(180deg,#fde047,#f59e0b);}
+  .vpct{font-size:.72rem; line-height:1; padding:0 2px;}
 
 </style>
 </head>
@@ -805,6 +813,15 @@ function getBestRepsAtWeight(exName, bodyPart, weight){
 }
 
 
+function barFillClass(pctRaw){
+  const p = Number(pctRaw);
+  if(!isFinite(p) || p <= 0) return 'neutral';
+  if(p >= 100) return 'gold';
+  if(p >= 80) return 'green';
+  if(p >= 50) return 'warm';
+  return 'neutral';
+}
+
 function renderExerciseComparisonSummary(ex){
   // Layout-only cleanup: compact row, remove redundant labels/dates, no metric changes
   const { vol } = exStats(ex); // total pounds lifted today for this exercise
@@ -841,7 +858,7 @@ function renderExerciseComparisonSummary(ex){
     <!-- Today volume bar (no TODAY header) -->
     <div class="cmp-block tight">
       <div class="vtrack wide ${goldVol ? 'gold' : ''}">
-        <div class="vfill" style="height:${pctVol}%"></div>
+        <div class="vfill ${barFillClass(pctVolRaw)}" style="height:${pctVol}%"></div>
         <div class="vpct">${isFinite(pctVolRaw) ? pctVolRaw : 0}</div>
       </div>
     </div>
@@ -856,10 +873,10 @@ function renderExerciseComparisonSummary(ex){
     <div class="cmp-block cmp-maxpair">
       <div class="bars-wrap">
         <div class="vtrack wide ${goldMax ? 'gold' : ''}">
-          <div class="vfill" style="height:${pctMax}%"></div>
+          <div class="vfill ${barFillClass(pctMaxRaw)}" style="height:${pctMax}%"></div>
         </div>
         <div class="vtrack thin ${goldReps ? 'gold' : ''}">
-          <div class="vfill" style="height:${repsPct}%"></div>
+          <div class="vfill ${barFillClass(repsPctRaw)}" style="height:${repsPct}%"></div>
         </div>
       </div>
 
