@@ -8,7 +8,7 @@
   :root{
     --bg:#080c11; --panel:#0d131a; --ink:#e8eef6; --muted:#9fb0c7; --ring:#1c2a37;
     --accent:#4CAF50; --danger:#ef4444; --warn:#f59e0b;
-    --finished-bg:#0f1f15; --finished-ring:#1f4030;
+    --finished-bg:#0e141b; --finished-ring:#1c2a37;
     --orange:#ff9500; --orange-bg:#2a1f0a;
 
     --power-glow:#1e3a8a;
@@ -88,6 +88,27 @@
   .supergroup h2{margin:.2rem 0 .4rem; font-size:1rem; color:#c7d2fe}
   .supergroup.hidden{display:none}
 
+  /* ===== Body-part tabs (completed view) ===== */
+  .bp-tabs{display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 10px}
+  .bp-tab{
+    all:unset; cursor:pointer;
+    padding:.45rem .7rem;
+    border-radius:999px;
+    border:1px solid var(--ring);
+    background:#0b1118;
+    color:var(--muted);
+    font-weight:800;
+    font-size:.9rem;
+  }
+  .bp-tab[aria-selected="true"]{
+    background:linear-gradient(90deg,#1a2332,#0b1118);
+    border-color:#2dd4bf66;
+    color:var(--ink);
+    box-shadow:0 0 0 2px rgba(45,212,191,.14) inset;
+  }
+  .bp-tab:active{transform:translateY(1px)}
+
+
   .group{background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:10px; margin-top:10px; position:relative}
   .group h3{margin:.1rem 0 .4rem; font-size:1rem; color:var(--muted)}
   .group.hidden{display:none}
@@ -114,29 +135,6 @@
   .lbs-label{font-size:.85rem; color:var(--muted); white-space:nowrap}
   .flags{display:flex; align-items:center; gap:12px; color:var(--muted); font-size:.9rem}
 
-  .comparison-section{margin:8px 0; border-top:1px solid var(--ring); padding-top:8px;}
-  .comparison-label{text-align:center; font-size:.8rem; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;}
-  .comparison-row{display:grid; grid-template-columns: auto 1fr auto auto auto auto; gap:12px; align-items:center; padding:8px 0; border-bottom:1px solid rgba(28,42,55,0.5);}
-  .comparison-row:last-child{border-bottom:none}
-  .set-label{font-size:.85rem; color:var(--muted); min-width:40px; font-weight:600;}
-  .set-data{display:flex; justify-content:space-between; align-items:center;}
-  .current-data{font-weight:700; color:var(--ink); font-size:1rem;}
-  .previous-data{font-weight:700; color:#9fb0c7; font-size:1rem;}
-  .vs-separator{color:var(--muted); font-size:.9rem;}
-  .comparison-indicator{font-size:.9rem; font-weight:700; text-align:center; min-width:20px;}
-  .comparison-indicator.better{color:var(--accent)}
-  .comparison-indicator.same{color:#f59e0b}
-  .comparison-indicator.worse{color:#ef4444}
-  .comparison-difference{font-size:.8rem; font-weight:600; color:var(--muted); text-align:right; min-width:60px;}
-  .comparison-difference.better{color:var(--accent)}
-  .comparison-difference.worse{color:#ef4444}
-  .strength-indicator{width:60px; height:20px; position:relative; background:#1a2332; border-radius:3px; overflow:hidden; border:1px solid var(--ring);}
-  .strength-bar{height:100%; transition:width 0.3s ease; border-radius:2px;}
-  .strength-bar.better{background:linear-gradient(90deg, var(--accent), #16a34a);}
-  .strength-bar.worse{background:linear-gradient(90deg, #dc2626, #ef4444);}
-  .strength-bar.same{background:linear-gradient(90deg, #d97706, #f59e0b); width:50% !important;}
-  .strength-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:600; color:var(--ink); text-shadow:0 1px 2px rgba(0,0,0,0.5);}
-
   /* ===== Condensed comparison summary (mobile-first) ===== */
   .cmp-mini{display:grid; gap:10px; padding:2px 0}
   .cmp-bars{display:grid; grid-template-columns:1fr 1fr; gap:10px}
@@ -148,6 +146,8 @@
   .cmp-track{margin-top:8px; height:10px; background:#101a24; border:1px solid rgba(42,53,67,.9); border-radius:999px; overflow:hidden}
   .cmp-fill{height:100%; border-radius:999px}
   .cmp-fill.today{background:linear-gradient(90deg, var(--accent), #16a34a)}
+  .cmp-fill.gold{background:linear-gradient(90deg, #fbbf24, #f59e0b)}
+  .cmp-fill.neutral{background:linear-gradient(90deg, #475569, #334155)}
   .cmp-fill.best{background:linear-gradient(90deg, #f59e0b, #fb923c)}
   .cmp-metrics{display:grid; grid-template-columns:1fr 1fr; gap:10px}
   .cmp-metric{background:#0f141b; border:1px solid var(--ring); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:3px}
@@ -162,9 +162,6 @@
   .group.collapsed .collapse-icon{transform:rotate(-90deg);}
   .group.collapsed .group-content{display:none;}
   .ex-header{cursor:pointer; position:relative;}
-  .ex-header::after{content:'▼'; position:absolute; right:8px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:.8rem; transition:transform 0.2s ease;}
-  .ex.collapsed .ex-header::after{transform:translateY(-50%) rotate(-90deg);}
-  .ex.collapsed .sets, .ex.collapsed .ex-actions-bottom{display:none;}
 
   .spacer{height:70px}
 
@@ -250,6 +247,7 @@
 
   <section id="sg-completed" class="supergroup">
     <h2>Completed</h2>
+    <div class="bp-tabs" id="completedTabs" role="tablist" aria-label="Muscle groups"></div>
     <div id="log-completed"></div>
   </section>
 
@@ -351,6 +349,7 @@ function getAllExercises(bp){
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 let current = new Date();
+let selectedCompletedBP = null;
 const keyFor = (d)=>`powerUp:${d.toISOString().slice(0,10)}`;
 
 function blankDay(date){ return { date: date.toISOString().slice(0,10), exercises:[] }; }
@@ -478,51 +477,6 @@ function drawExerciseHistoryChart(canvasId, history) {
   });
 }
 
-function compareWeight(c,p){ c=Number(c)||0; p=Number(p)||0; if(c>p) return 'better'; if(c===p && c>0) return 'same'; if(c<p) return 'worse'; return ''; }
-function calculateStrengthChange(cw,cr,pw,pr){
-  const cW = Number(cw) || 0, cR = Number(cr) || 0;
-  const pW = Number(pw) || 0, pR = Number(pr) || 0;
-
-  // Primary metric: weight. Reps are secondary and should not "penalize" a heavier set.
-  if (pW === 0 && pR === 0) return {type:'new', percentage:0, label:'NEW'};
-
-  if (cW > pW){
-    const diff = cW - pW;
-    const pct = (pW > 0) ? Math.min((diff / pW) * 100, 100) : 100;
-    return {type:'better', percentage:pct, label:`+${diff} lb`};
-  }
-  if (cW < pW){
-    const diff = pW - cW;
-    const pct = (pW > 0) ? Math.min((diff / pW) * 100, 100) : 100;
-    return {type:'worse', percentage:pct, label:`-${diff} lb`};
-  }
-
-  // Same weight → compare reps
-  if (cR > pR){
-    const diff = cR - pR;
-    const pct = (pR > 0) ? Math.min((diff / pR) * 100, 100) : 100;
-    return {type:'better', percentage:pct, label:`+${diff} rep`};
-  }
-  if (cR < pR){
-    const diff = pR - cR;
-    const pct = (pR > 0) ? Math.min((diff / pR) * 100, 100) : 100;
-    return {type:'worse', percentage:pct, label:`-${diff} rep`};
-  }
-  return {type:'same', percentage:0, label:'='};
-}
-function calculateDifference(cw,cr,pw,pr){
-  const cW = Number(cw) || 0, cR = Number(cr) || 0;
-  const pW = Number(pw) || 0, pR = Number(pr) || 0;
-
-  const w = cW - pW;
-  const r = cR - pR;
-
-  const wStr = (pW === 0 && cW === 0) ? '—' : (w > 0 ? `+${w} lb` : w < 0 ? `${w} lb` : '0 lb');
-  const rStr = (pR === 0 && cR === 0) ? '—' : (r > 0 ? `+${r} rep` : r < 0 ? `${r} rep` : '0 rep');
-
-  // Keep it readable; weight first.
-  return `${wStr}, ${rStr}`;
-}
 function getPreviousWorkouts(limit=5){
   const workouts=[]; const today=new Date(); const cur=current.toISOString().slice(0,10);
   for(let i=1;i<=90 && workouts.length<limit;i++){
@@ -766,7 +720,7 @@ function render(){
   const done   = day.exercises.filter(ex=> !!ex.completed);
 
   renderSuperGroup('#log-inprogress', '#sg-inprogress', inProg);
-  renderSuperGroup('#log-completed', '#sg-completed', done);
+  renderCompletedTabs(done);
 
   const {sets, vol, exCount} = totalsFiltered(day);
   $('#tSets').textContent = sets;
@@ -778,6 +732,51 @@ function render(){
 
   armDragAndDrop();
 }
+
+function renderCompletedTabs(list){
+  const container = document.getElementById('log-completed');
+  const tabs = document.getElementById('completedTabs');
+
+  const groups = list.reduce((m,o)=>((m[o.bodyPart]??=[]).push(o),m),{});
+  const bps = Object.keys(groups).sort();
+
+  const superNode = document.getElementById('sg-completed');
+  superNode.classList.toggle('hidden', bps.length === 0);
+
+  if(bps.length === 0){
+    if(tabs) tabs.innerHTML = '';
+    if(container) container.innerHTML = '';
+    return;
+  }
+
+  if(!selectedCompletedBP || !groups[selectedCompletedBP]){
+    selectedCompletedBP = bps[0];
+  }
+
+  // Tabs
+  tabs.innerHTML = '';
+  bps.forEach(bp=>{
+    const btn = document.createElement('button');
+    btn.className = 'bp-tab';
+    btn.type = 'button';
+    btn.textContent = bp;
+    btn.setAttribute('role','tab');
+    const selected = bp === selectedCompletedBP;
+    btn.setAttribute('aria-selected', selected ? 'true' : 'false');
+    btn.addEventListener('click', ()=>{
+      selectedCompletedBP = bp;
+      renderCompletedTabs(list);
+    });
+    tabs.appendChild(btn);
+  });
+
+  // Only one body part visible at a time
+  container.innerHTML = '';
+  (groups[selectedCompletedBP] || []).forEach(ex=>{
+    container.appendChild(renderExercise(ex));
+  });
+}
+
 
 function renderSuperGroup(containerSel, superSel, list){
   const container = $(containerSel);
@@ -843,81 +842,65 @@ function renderExercise(ex){
   const {vol, avg} = exStats(ex);
   const copiedText = ex.copied ? ' (copied)' : '';
 
-  if (ex.finished) {
-    const previousSets = getPreviousExerciseData(ex.name, ex.bodyPart);
+  // ---------- Completed exercise ----------
+  if(ex.finished){
     node.innerHTML = `
-      <div class="ex-header" data-act="toggleExercise">
+      <div class="ex-header">
         <div>
           <div class="ex-name">${ex.name}${copiedText}</div>
           <div class="tag">${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep</div>
         </div>
       </div>
-      <div class="sets" id="comparison-${ex.id}">
-        <div class="comparison-section">
-          <div class="comparison-label">Performance Comparison</div>
-        </div>
-      </div>
+
+      <div class="sets"></div>
+
       <div class="ex-actions-bottom">
         <div style="display:flex; gap:8px; flex-wrap:wrap">
-          <button class="btn" style="padding:.6rem 1.2rem; background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a" data-act="markComplete">${ex.completed?'Completed ✓':'Complete'}</button>
+          <button class="btn" style="padding:.6rem 1.2rem; background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a" data-act="markComplete">
+            ${ex.completed ? 'Completed ✓' : 'Complete'}
+          </button>
           <button class="btn-ghost btn-small" data-act="viewHistory">📊 History</button>
         </div>
       </div>
     `;
 
-    if (ex.finished) {
+    const setsWrap = node.querySelector('.sets');
 
+    // Aggregated, exercise-level performance summary (no red, no per-set deltas)
+    const summary = renderExerciseComparisonSummary(ex);
+
+    // Color psychology: gold = PR, green = close, neutral = otherwise
+    try{
+      const heavy = getAllTimeHeaviestSet(ex.name, ex.bodyPart);
+      const currentMax = Math.max(...(ex.sets||[]).map(s=>Number(s.weight)||0), 0);
+      const fill = summary.querySelector('.cmp-fill.today');
+      if(fill){
+        if(currentMax >= (heavy.weight||0) && currentMax > 0){
+          fill.classList.remove('today');
+          fill.classList.add('gold');
+        }else if(heavy.weight && currentMax >= heavy.weight * 0.9){
+          // keep green
+        }else{
+          fill.classList.remove('today');
+          fill.classList.add('neutral');
+        }
+      }
+    }catch{}
+
+    setsWrap.appendChild(summary);
+
+    // Sets list stays visible (locked)
+    (ex.sets||[]).forEach((s,i)=> setsWrap.appendChild(renderSet(ex.id, s, i, true)));
+
+    return node;
+  }
+
+  // ---------- In-progress exercise ----------
   node.innerHTML = `
     <div class="ex-header" data-act="toggleExercise">
       <div>
         <div class="ex-name">${ex.name}${copiedText}</div>
-        <div class="tag">
-          ${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep
-        </div>
-      </div>
-    </div>
-
-    <div class="sets">
-      <div class="comparison-section">
-        <div class="comparison-label">Performance Comparison</div>
-      </div>
-    </div>
-
-    <div class="ex-actions-bottom">
-      <div style="display:flex; gap:8px; flex-wrap:wrap">
-        <button
-          class="btn"
-          style="padding:.6rem 1.2rem;
-                 background:linear-gradient(90deg,#4CAF50,#22c55e);
-                 color:#04130a"
-          data-act="markComplete"
-        >
-          ${ex.completed ? 'Completed ✓' : 'Complete'}
-        </button>
-
-        <button class="btn-ghost btn-small" data-act="viewHistory">
-          📊 History
-        </button>
-      </div>
-    </div>
-  `;
-
-  const setsWrap = node.querySelector('.comparison-section');
-
-  // ✅ condensed exercise-level comparison
-  setsWrap.appendChild(
-    renderExerciseComparisonSummary(ex)
-  );
-
-} else {
-
-  node.innerHTML = `
-    <div class="ex-header" data-act="toggleExercise">
-      <div>
-        <div class="ex-name">${ex.name}${copiedText}</div>
-        <div class="tag">
-          ${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep
-        </div>
+        <div class="tag">${ex.sets.length} set(s) • ${Math.round(vol)} lb • avg ${Math.round(avg)} lb/rep</div>
       </div>
     </div>
 
@@ -927,49 +910,27 @@ function renderExercise(ex){
       <div>
         <button class="btn-ghost btn-small" data-act="addSet">+ Set</button>
 
-        <button
-          class="btn"
-          style="padding:.6rem 1.2rem;
-                 background:linear-gradient(90deg,#4CAF50,#22c55e);
-                 color:#04130a"
-          data-act="markComplete"
-        >
+        <button class="btn" style="padding:.6rem 1.2rem; background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a" data-act="markComplete">
           ${ex.completed ? 'Completed ✓' : 'Complete'}
         </button>
 
-        <button class="btn-ghost btn-small" data-act="viewHistory">
-          📊 History
-        </button>
+        <button class="btn-ghost btn-small" data-act="viewHistory">📊 History</button>
       </div>
 
       <div style="display:flex; gap:8px">
-        <button
-          class="btn-ghost btn-small"
-          data-act="removeSet"
-          ${ex.sets.length <= 1 ? 'style="display:none"' : ''}
-        >
-          − Set
-        </button>
-
-        <button
-          class="btn-danger btn-small"
-          data-act="removeExercise"
-        >
-          Remove Exercise
-        </button>
+        <button class="btn-ghost btn-small" data-act="removeSet" ${ex.sets.length <= 1 ? 'style="display:none"' : ''}>− Set</button>
+        <button class="btn-danger btn-small" data-act="removeExercise">Remove Exercise</button>
       </div>
     </div>
   `;
 
   const setsWrap = node.querySelector('.sets');
-  ex.sets.forEach((s, i) =>
-    setsWrap.appendChild(renderSet(ex.id, s, i, false))
-  );
-}
-}
+  ex.sets.forEach((s, i) => setsWrap.appendChild(renderSet(ex.id, s, i, false)));
+
+  return node;
 }
 
-function renderSet(exId, s, idx, locked=false){
+function renderSet(exId, s, idx, locked = false) {
   const row = document.createElement('div');
   row.className = 'set-row'; row.dataset.exId = exId; row.dataset.idx = idx;
   if (locked) {

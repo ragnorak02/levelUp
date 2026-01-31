@@ -44,10 +44,7 @@
   #lastWorkoutCard{grid-column: span 9; display:grid; grid-template-columns: 1.15fr 1fr; gap:12px}
   .val{display:flex; align-items:baseline; gap:8px; font-size:1.6rem; font-weight:700}
   .trend{font-size:.8rem; color:var(--muted)}
-  .spark{width:100%; height:45px; display:block}
-  .meta{display:flex; gap:10px; flex-wrap:wrap}
-.badge{background:#0f1720; border:1px solid var(--ring); color:var(--muted); padding:.3rem .55rem; border-radius:999px; font-size:.82rem}
-
+    
 /* Today's Workout tiles (compact, square-ish) */
 .meta-tiles{display:flex; gap:8px; flex-wrap:wrap; align-items:stretch; margin-top:6px}
 .tile{
@@ -66,10 +63,7 @@
 }
 .tile b{color:var(--ink); font-size:1rem}
 .tile .t-label{font-size:.72rem; letter-spacing:.02em}
-.tile.tile-date{min-width:120px; text-align:left; justify-content:center}
   .ex-list{display:grid; gap:6px}
-  .ex{display:flex; justify-content:space-between; background:#0f141b; border:1px dashed #213043; border-radius:10px; padding:6px 8px; font-size:.95rem}
-  .ex b{font-weight:700}
   .cta-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
   .cta{
     all:unset; cursor:pointer; background:linear-gradient(90deg, var(--accent), #22c55e);
@@ -211,9 +205,6 @@
     .wrap{gap:8px; padding:8px 8px 12px}
     .card{padding:10px; border-radius:12px}
     .val{font-size:1.4rem}
-    .spark{height:40px}
-    .badge{font-size:.78rem; padding:.25rem .5rem}
-    .ex{padding:6px 7px; font-size:.92rem}
     .legend{font-size:.8rem}
     .calendar .card{padding:8px}
     .day{border-radius:8px}
@@ -324,10 +315,8 @@
             <button class="nav-btn" id="nextWorkout">→</button>
           </div>
           <div class="meta-tiles">
-  <div class="tile tile-date" id="lastDate">—</div>
   <div class="tile"><div class="t-label">Total</div><b id="lastVolume">—</b></div>
   <div class="tile"><div class="t-label">Exercises</div><b id="lastMoves">—</b></div>
-  <div class="tile" id="setsLeftTile" style="display:none;"><div class="t-label">Left</div><b id="setsLeft">—</b></div>
 </div>
 <div class="ex-list" id="exList"></div>
         </div>
@@ -459,36 +448,6 @@ function calculatePowerLevel() {
   };
 }
 
-/* Sparkline */
-function drawSpark(id, points){
-  const c = document.getElementById(id);
-  const w = c.clientWidth, h=c.clientHeight;
-  c.width = Math.max(260,w); c.height = Math.max(52,h);
-  const ctx = c.getContext('2d');
-  ctx.clearRect(0,0,c.width,c.height);
-  if(!points || points.length<2) return;
-
-  const xs = points.map(p=>p.x.getTime());
-  const ys = points.map(p=>p.y);
-  const minX = Math.min(...xs), maxX = Math.max(...xs);
-  const minY = Math.min(...ys), maxY = Math.max(...ys);
-  const pad = 8;
-  const xScale = (t)=> pad + ((t-minX)/(maxX-minX||1))*(c.width-2*pad);
-  const yScale = (v)=> c.height - pad - ((v-minY)/(maxY-minY||1))*(c.height-2*pad);
-
-  ctx.strokeStyle = '#233446'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
-  ctx.beginPath(); ctx.moveTo(pad, yScale(minY)); ctx.lineTo(c.width-pad, yScale(minY)); ctx.stroke();
-  ctx.setLineDash([]);
-
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-2') || '#2dd4bf';
-  ctx.lineWidth = 2; ctx.beginPath();
-  points.forEach((p,i)=>{ const x=xScale(p.x.getTime()), y=yScale(p.y); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
-  ctx.stroke();
-
-  const lp = points[points.length-1]; const lx=xScale(lp.x.getTime()), ly=yScale(lp.y);
-  ctx.fillStyle = '#e8eef6'; ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2); ctx.fill();
-}
-
 /* Power Level card */
 function renderPowerLevel(){
   const power = calculatePowerLevel();
@@ -535,21 +494,8 @@ function renderWorkoutPanel(){
 
   const title = document.getElementById('workoutPanelTitle');
   title.textContent = isToday ? 'Today\'s Workout' : shortDate(selectedWorkoutDate);
-
-  document.getElementById('lastDate').textContent = shortDate(selectedWorkoutDate);
   document.getElementById('lastVolume').textContent = totalVolume(workout).toLocaleString()+' lb';
   document.getElementById('lastMoves').textContent = workout.exercises.length;
-  document.getElementById('lastSets').textContent = totalSets(workout);
-
-  const setsLeftWrap = document.getElementById('setsLeftTile');
-  if(isToday && workout.exercises.length > 0){
-    const left = totalSets(workout) - completedSets(workout);
-    setsLeftWrap.style.display = 'inline-flex';
-    document.getElementById('setsLeft').textContent = left;
-  } else {
-    setsLeftWrap.style.display = 'none';
-  }
-
   // Grouped list
   const exList = document.getElementById('exList');
   exList.innerHTML = '';
