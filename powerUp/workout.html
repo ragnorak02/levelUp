@@ -386,12 +386,54 @@
   }
 
 
-  /* Iterations 6-7: bar fill color ramp + percent readability */
-  .vfill.neutral{background:#263447;}
-  .vfill.warm{background:linear-gradient(180deg,#fbbf24,#f59e0b);}
-  .vfill.green{background:linear-gradient(180deg,#34d399,#16a34a);}
-  .vfill.gold{background:linear-gradient(180deg,#fde047,#f59e0b);}
+    /* Iterations 6-7: cold -> heat -> gold ramp + glow + percent readability */
+  .vfill.neutral{
+    background:linear-gradient(180deg,#22324a,#2f4b72);
+    box-shadow:0 0 10px rgba(79,141,255,.25);
+  }
+  .vfill.warm{
+    background:linear-gradient(180deg,#ff7a18,#ffb020);
+    box-shadow:0 0 12px rgba(255,138,24,.32);
+  }
+  .vfill.hot{
+    background:linear-gradient(180deg,#ffc531,#fff27a);
+    box-shadow:0 0 14px rgba(255,197,49,.42);
+  }
+  .vfill.gold{
+    background:linear-gradient(180deg,#fff7a8,#ffd54a);
+    box-shadow:0 0 18px rgba(255,214,74,.55), 0 0 34px rgba(255,214,74,.25);
+    animation:goldPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes goldPulse{
+    0%,100%{ filter:brightness(1); }
+    50%{ filter:brightness(1.12); }
+  }
+
+  /* Subtle glow on the track so even low fills feel “powered up” */
+  .vtrack{box-shadow:0 0 0 1px rgba(255,255,255,.02), 0 8px 24px rgba(0,0,0,.35) inset}
   .vpct{font-size:.72rem; line-height:1; padding:0 2px;}
+
+
+  /* Align MAX bars with Today by using a right-side data column (no bottom label pushing baseline) */
+  .cmp-maxpair{
+    display:flex;
+    flex-direction:row;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    min-width:160px;
+  }
+  .max-data{
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    gap:10px;
+    min-width:92px;
+  }
+  .max-data .trow{line-height:1.05}
+  .max-data .trow span{color:var(--muted); font-weight:800; display:block}
+  .max-data .trow b{color:var(--ink); font-size:1.05rem}
+  .bars-wrap{display:flex; gap:10px; align-items:flex-end; justify-content:flex-start}
 
 </style>
 </head>
@@ -817,10 +859,11 @@ function barFillClass(pctRaw){
   const p = Number(pctRaw);
   if(!isFinite(p) || p <= 0) return 'neutral';
   if(p >= 100) return 'gold';
-  if(p >= 80) return 'green';
+  if(p >= 80) return 'hot';
   if(p >= 50) return 'warm';
   return 'neutral';
 }
+
 
 function renderExerciseComparisonSummary(ex){
   // Layout-only cleanup: compact row, remove redundant labels/dates, no metric changes
@@ -869,7 +912,7 @@ function renderExerciseComparisonSummary(ex){
       <div class="trow"><span>Current</span><b>${vol ? `${Math.round(vol).toLocaleString()} lb` : '—'}</b></div>
     </div>
 
-    <!-- MAX area: pair max weight + best reps at that weight. No MAX label, no dates -->
+    <!-- MAX area: bars + right-side data (keeps bar baselines aligned). No dates/extra headers -->
     <div class="cmp-block cmp-maxpair">
       <div class="bars-wrap">
         <div class="vtrack wide ${goldMax ? 'gold' : ''}">
@@ -880,13 +923,12 @@ function renderExerciseComparisonSummary(ex){
         </div>
       </div>
 
-      <div class="max-bottom">
-        <span class="mw">${targetMax ? `${targetMax} lb` : '—'}</span>
-        <span class="mr">${repsBestAtMax ? `${repsBestAtMax} reps` : ''}</span>
+      <div class="max-data">
+        <div class="trow"><span>Max</span><b>${targetMax ? `${targetMax} lb` : '—'}</b></div>
+        <div class="trow"><span>Best reps</span><b>${repsBestAtMax ? `${repsBestAtMax} reps` : '—'}</b></div>
       </div>
     </div>
   `;
-
   return wrap;
 }
 function countedSets(ex){ return ex.finished ? ex.sets : ex.sets.filter(s=> !!s.done); }
