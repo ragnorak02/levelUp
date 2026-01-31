@@ -177,6 +177,34 @@
   }
   .vlabels{display:flex; flex-direction:column; justify-content:space-between; color:var(--muted); font-size:.85rem}
   .vlabels b{color:var(--ink); font-size:1rem}
+
+  .vtrack.thin{width:14px}
+  .vtrack.wide{width:28px}
+
+  /* Iteration 4: dual bars inside Heaviest tile */
+  .dualrow{display:flex; gap:10px; align-items:flex-end; margin-top:10px}
+  .dualmeta{display:flex; flex-direction:column; gap:8px; margin-left:2px}
+  .dualmeta-row{display:flex; align-items:baseline; gap:8px; color:var(--muted); font-size:.9rem}
+  .dualmeta-row b{color:var(--ink); font-size:1rem}
+  .dual-lab{min-width:38px; text-transform:lowercase}
+
+  /* Iteration 5: completed set list = 2 per row on mobile */
+  .set-grid{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; margin-top:10px}
+  @media (max-width: 360px){ .set-grid{grid-template-columns:1fr} }
+  .set-row.locked{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    padding:10px;
+    border:1px solid var(--ring);
+    border-radius:12px;
+    background:#0b1118;
+  }
+  .set-row.locked .lbs-label{opacity:.85}
+  .set-row.locked .flags, .set-row.locked .tools{display:none !important}
+  .set-row.locked.rest-pause{
+    background:linear-gradient(180deg,#2a2100,#3a2a00);
+    border-color:#fbbf24;
+  }
   .cmp-fill.today{background:linear-gradient(90deg, var(--accent), #16a34a)}
   .cmp-fill.gold{background:linear-gradient(90deg, #fbbf24, #f59e0b)}
   .cmp-fill.neutral{background:linear-gradient(90deg, #475569, #334155)}
@@ -624,8 +652,28 @@ function getAllTimeHeaviestSet(exerciseName, bodyPart){
   return best;
 }
 
+function getBestRepsAtWeight(exName, bodyPart, weight){
+  const wTarget = Number(weight)||0;
+  if(!wTarget) return 0;
+
+  let best = 0;
+  allDays().forEach(day=>{
+    (day.exercises||[]).forEach(ex=>{
+      if(ex.name !== exName) return;
+      if(bodyPart && ex.bodyPart !== bodyPart) return;
+      (ex.sets||[]).forEach(s=>{
+        const w = Number(s.weight)||0;
+        const r = Number(s.reps)||0;
+        if(w === wTarget && r > best) best = r;
+      });
+    });
+  });
+
+  return best;
+}
+
 function renderExerciseComparisonSummary(ex){
-  // Iterations 2-3: compact, mobile-first summary (no per-set comparison, no red)
+  // Iterations 2-4: compact, mobile-first summary (no per-set comparison, no red)
   const heavy = getAllTimeHeaviestSet(ex.name, ex.bodyPart);
 
   const currentMax = Math.max(...(ex.sets||[]).map(s=>Number(s.weight)||0), 0);
@@ -633,11 +681,17 @@ function renderExerciseComparisonSummary(ex){
 
   const pctRaw = (target > 0) ? Math.round((currentMax / target) * 100) : (currentMax > 0 ? 100 : 0);
   const pct = Math.max(0, Math.min(100, pctRaw));
+  const goldToday = (pctRaw >= 100 && currentMax > 0 && target > 0);
+
+  // Iteration 4: reps bar baseline is weight-matched (best reps ever at today's heaviest weight)
+  const repsTodayAtMax = Math.max(...(ex.sets||[]).filter(s=>(Number(s.weight)||0)===currentMax).map(s=>Number(s.reps)||0), 0);
+  const repsBestAtMax = getBestRepsAtWeight(ex.name, ex.bodyPart, currentMax) || repsTodayAtMax || 0;
+
+  const repsPctRaw = repsBestAtMax ? Math.round((repsTodayAtMax / repsBestAtMax) * 100) : (repsTodayAtMax ? 100 : 0);
+  const repsPct = Math.max(0, Math.min(100, repsPctRaw));
 
   const wrap = document.createElement('div');
   wrap.className = 'cmp-mini';
-
-  const gold = (pctRaw >= 100 && currentMax > 0 && target > 0);
 
   wrap.innerHTML = `
     <div class="cmp-bar">
@@ -647,7 +701,7 @@ function renderExerciseComparisonSummary(ex){
       </div>
 
       <div class="vrow">
-        <div class="vtrack ${gold ? 'gold' : ''}">
+        <div class="vtrack wide ${goldToday ? 'gold' : ''}">
           <div class="vfill" style="height:${pct}%"></div>
           <div class="vpct">${isFinite(pctRaw) ? pctRaw : 0}%</div>
         </div>
@@ -662,6 +716,28 @@ function renderExerciseComparisonSummary(ex){
     <div class="cmp-metric">
       <span>Heaviest</span>
       <b>${heavy.weight ? `${heavy.weight} lb × ${heavy.reps || 0}` : '—'}</b>
+
+      <div class="dualrow">
+        <div class="vtrack wide ${(pctRaw >= 100 && currentMax>0 && target>0) ? 'gold' : ''}">
+          <div class="vfill" style="height:${Math.max(0, Math.min(100, (target>0?Math.round((currentMax/target)*100):0)))}%"></div>
+        </div>
+
+        <div class="vtrack thin ${(repsPctRaw >= 100 && repsTodayAtMax>0) ? 'gold' : ''}">
+          <div class="vfill" style="height:${repsPct}%"></div>
+        </div>
+
+        <div class="dualmeta">
+          <div class="dualmeta-row">
+            <span class="dual-lab">lb</span>
+            <b>${currentMax ? `${currentMax}/${target||'—'}` : '—'}</b>
+          </div>
+          <div class="dualmeta-row">
+            <span class="dual-lab">reps</span>
+            <b>${repsTodayAtMax ? `${repsTodayAtMax}/${repsBestAtMax||'—'}` : '—'}</b>
+          </div>
+        </div>
+      </div>
+
       <i>${heavy.date ? mdFromISO(heavy.date) : ''}</i>
     </div>
   `;
@@ -911,8 +987,11 @@ function renderExercise(ex){
 
     setsWrap.appendChild(summary);
 
-    // Sets list stays visible (locked)
-    (ex.sets||[]).forEach((s,i)=> setsWrap.appendChild(renderSet(ex.id, s, i, true)));
+    // Iteration 5: sets render as 2-per-row grid (locked)
+    const setGrid = document.createElement('div');
+    setGrid.className = 'set-grid';
+    setsWrap.appendChild(setGrid);
+    (ex.sets||[]).forEach((s,i)=> setGrid.appendChild(renderSet(ex.id, s, i, true)));
 
     return node;
   }
@@ -954,7 +1033,7 @@ function renderExercise(ex){
 
 function renderSet(exId, s, idx, locked = false) {
   const row = document.createElement('div');
-  row.className = 'set-row'; row.dataset.exId = exId; row.dataset.idx = idx;
+  row.className = 'set-row' + (locked ? ' locked' : '') + (s.restPause ? ' rest-pause' : ''); row.dataset.exId = exId; row.dataset.idx = idx;
   if (locked) {
     row.innerHTML = `
       <div class="weight-input-group">
@@ -962,9 +1041,6 @@ function renderSet(exId, s, idx, locked = false) {
         <span class="lbs-label">lbs</span>
       </div>
       <input class="num-input" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" disabled/>
-      <div></div>
-      <div class="flags" style="visibility:hidden;"></div>
-      <div class="tools" style="visibility:hidden;"></div>
     `;
   } else {
     const copiedClass = s.copied ? ' copied' : '';
