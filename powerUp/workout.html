@@ -657,20 +657,30 @@ function getBestRepsAtWeight(exName, bodyPart, weight){
   if(!wTarget) return 0;
 
   let best = 0;
-  allDays().forEach(day=>{
-    (day.exercises||[]).forEach(ex=>{
-      if(ex.name !== exName) return;
-      if(bodyPart && ex.bodyPart !== bodyPart) return;
+
+  for(let i=0; i<localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(!/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+
+    try{
+      const day = JSON.parse(localStorage.getItem(k));
+      const ex = (day?.exercises || []).find(e =>
+        String(e.name||'').toLowerCase().trim() === String(exName||'').toLowerCase().trim() &&
+        (!bodyPart || String(e.bodyPart||'') === String(bodyPart||''))
+      );
+      if(!ex) continue;
+
       (ex.sets||[]).forEach(s=>{
         const w = Number(s.weight)||0;
         const r = Number(s.reps)||0;
         if(w === wTarget && r > best) best = r;
       });
-    });
-  });
+    }catch{}
+  }
 
   return best;
 }
+
 
 function renderExerciseComparisonSummary(ex){
   // Iterations 2-4: compact, mobile-first summary (no per-set comparison, no red)
