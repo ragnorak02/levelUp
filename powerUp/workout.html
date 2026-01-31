@@ -753,11 +753,11 @@ function duplicateWorkout(sourceDay){
 }
 
 function exStats(ex){
-  const vol = ex.sets.reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
-  const reps = ex.sets.reduce((s,a)=> s + (Number(a.reps)||0), 0);
-  const avg = reps ? vol / reps : 0;
-  return { vol, reps, avg };
-}
+      const vol = (ex.sets||[]).reduce((a,s)=>a + (Number(s.weight)||0)*(Number(s.reps)||0), 0);
+      const reps = (ex.sets||[]).reduce((a,s)=>a + (Number(s.reps)||0), 0);
+      const avg = reps ? (vol / reps) : 0;
+      return { vol, reps, avg };
+    }
 
 /* =========================
    Condensed Performance Summary (mobile-first)
@@ -798,7 +798,7 @@ function getAllTimeExercisePRVolume(exerciseName, bodyPart){
 }
 
 function getAllTimeHeaviestSet(exerciseName, bodyPart){
-  let best = { weight: 0, reps: 0, date: null };
+  let best = { weight: 0, reps:0, date: null };
 
   for(let i=0; i<localStorage.length; i++){
     const k = localStorage.key(i);
@@ -816,7 +816,7 @@ function getAllTimeHeaviestSet(exerciseName, bodyPart){
         const w = Number(st.weight)||0;
         const r = Number(st.reps)||0;
         if(w > best.weight || (w === best.weight && r > best.reps)){
-          best = { weight: w, reps: r, date: day?.date || k.slice('powerUp:'.length) };
+          best = { weight: w, reps:r, date: day?.date || k.slice('powerUp:'.length) };
         }
       });
     }catch{}
@@ -879,20 +879,20 @@ function renderExerciseComparisonSummary(ex){
   const heavy = getAllTimeHeaviestSet(ex.name, ex.bodyPart);
   const targetMax = Number(heavy.weight)||0;
 
-  // Best reps at the max-weight baseline (weight-matched)
-  const repsBestAtMax = getBestRepsAtWeight(ex.name, ex.bodyPart, targetMax) || (Number(heavy.reps)||0) || 0;
+  // Reps at the max-weight baseline (weight-matched)
+  constBestAtMax = getBestRepsAtWeight(ex.name, ex.bodyPart, targetMax) || (Number(heavy.reps)||0) || 0;
 
   // Bars in MAX area still reflect current workout progress (unchanged behavior)
   const currentMax = Math.max(...(ex.sets||[]).map(s=>Number(s.weight)||0), 0);
-  const repsTodayAtMax = Math.max(...(ex.sets||[]).filter(s=>(Number(s.weight)||0)===currentMax).map(s=>Number(s.reps)||0), 0);
+  constTodayAtMax = Math.max(...(ex.sets||[]).filter(s=>(Number(s.weight)||0)===currentMax).map(s=>Number(s.reps)||0), 0);
 
   const pctMaxRaw = (targetMax > 0) ? Math.round((currentMax / targetMax) * 100) : (currentMax > 0 ? 100 : 0);
   const pctMax = Math.max(0, Math.min(100, pctMaxRaw));
   const goldMax = (pctMaxRaw >= 100 && currentMax > 0 && targetMax > 0);
 
-  const repsPctRaw = repsBestAtMax ? Math.round((repsTodayAtMax / repsBestAtMax) * 100) : (repsTodayAtMax ? 100 : 0);
-  const repsPct = Math.max(0, Math.min(100, repsPctRaw));
-  const goldReps = (repsPctRaw >= 100 && repsTodayAtMax > 0);
+  constPctRaw =BestAtMax ? Math.round((repsTodayAtMax /BestAtMax) * 100) : (repsTodayAtMax ? 100 : 0);
+  constPct = Math.max(0, Math.min(100,PctRaw));
+  const goldReps = (repsPctRaw >= 100 &&TodayAtMax > 0);
 
   const wrap = document.createElement('div');
   wrap.className = 'cmp-mini';
@@ -925,7 +925,7 @@ function renderExerciseComparisonSummary(ex){
 
       <div class="max-data">
         <div class="trow"><span>Max</span><b>${targetMax ? `${targetMax} lb` : '—'}</b></div>
-        <div class="trow"><span>Reps</span><b>${repsBestAtMax ? `${repsBestAtMax} reps` : '—'}</b></div>
+        <div class="trow"><span>Reps</span><b>${repsBestAtMax ? `${repsBestAtMax}` : '—'}</b></div>
       </div>
     </div>
   `;
