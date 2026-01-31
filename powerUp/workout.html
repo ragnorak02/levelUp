@@ -125,6 +125,21 @@
   .ex-name{font-weight:700}
   .tag{font-size:.9rem; color:var(--muted)}
   .sets{display:grid; gap:6px}
+
+  /* Iteration 5: completed set list = 2 per row on mobile */
+  .sets.locked-grid{grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px}
+  @media (max-width: 360px){ .sets.locked-grid{grid-template-columns:1fr} }
+
+  .set-row.locked{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    padding:10px;
+    border:1px solid var(--ring);
+    border-radius:12px;
+    background:#0b1118;
+  }
+  .set-row.locked .flags,
+  .set-row.locked .tools{display:none !important}
   .ex-actions-bottom{display:flex; gap:8px; margin-top:4px; justify-content:space-between; align-items:center}
 
   .set-row{display:grid; grid-template-columns: auto auto auto 1fr auto; gap:8px; align-items:center}
@@ -137,6 +152,69 @@
 
   /* ===== Condensed comparison summary (mobile-first) ===== */
   .cmp-mini{display:grid; gap:10px; padding:2px 0}
+
+  /* ===== Performance Summary (Iterations 2-4) ===== */
+  .cmp-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px}
+  @media (max-width: 360px){ .cmp-grid{grid-template-columns:1fr} }
+
+  .cmp-tile{
+    border:1px solid var(--ring);
+    background:#0b1118;
+    border-radius:14px;
+    padding:10px;
+  }
+  .cmp-top{display:flex; justify-content:space-between; align-items:baseline; gap:10px}
+  .cmp-top span{color:var(--muted); font-weight:800; letter-spacing:.02em}
+  .cmp-top b{font-size:1.2rem}
+
+  .vrow{display:flex; gap:12px; align-items:stretch; margin-top:10px}
+  .vlabels{display:flex; flex-direction:column; justify-content:space-between; color:var(--muted); font-size:.85rem}
+  .vlabels b{color:var(--ink); font-size:1rem}
+  .vtarget, .vcurrent{line-height:1.05}
+
+  .vbar{
+    position:relative;
+    width:28px;
+    height:120px;
+    border-radius:999px;
+    border:1px solid var(--ring);
+    background:#0a0f14;
+    overflow:hidden;
+    display:flex;
+    align-items:flex-end;
+    flex:0 0 auto;
+  }
+  .vbar.thin{width:14px}
+  .vbar.wide{width:28px}
+
+  .vfill{
+    width:100%;
+    background:linear-gradient(180deg, #16a34a, #4CAF50);
+    border-radius:999px;
+  }
+  .vbar.gold .vfill{background:linear-gradient(180deg, #f59e0b, #fbbf24)}
+  .vbar.neutral .vfill{background:linear-gradient(180deg, #334155, #475569)}
+
+  .vpercent{
+    position:absolute;
+    top:6px;
+    left:50%;
+    transform:translateX(-50%);
+    font-weight:900;
+    font-size:.85rem;
+    color:var(--ink);
+    text-shadow:0 2px 10px rgba(0,0,0,.6);
+    pointer-events:none;
+    white-space:nowrap;
+  }
+
+  .dualrow{display:flex; gap:10px; align-items:flex-end; margin-top:10px}
+  .dualmeta{display:flex; flex-direction:column; gap:8px; margin-left:2px}
+  .dualmeta-row{display:flex; align-items:baseline; gap:8px; color:var(--muted); font-size:.9rem}
+  .dualmeta-row b{color:var(--ink); font-size:1rem}
+  .dual-lab{min-width:38px; text-transform:lowercase}
+
+  .cmp-sub{margin-top:8px; color:var(--muted); font-size:.85rem}
   .cmp-bars{display:grid; grid-template-columns:1fr 1fr; gap:10px}
   .cmp-bar{background:#0f141b; border:1px solid var(--ring); border-radius:12px; padding:10px}
   .cmp-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
@@ -592,54 +670,104 @@ function getAllTimeHeaviestSet(exerciseName, bodyPart){
   return best;
 }
 
+function getBestRepsAtWeight(exName, bodyPart, weight){
+  // Best reps ever recorded at the given weight for this exercise (weight-matched baseline)
+  const wTarget = Number(weight)||0;
+  if(!wTarget) return 0;
+
+  let best = 0;
+  allDays().forEach(day=>{
+    (day.exercises||[]).forEach(ex=>{
+      if(ex.name !== exName) return;
+      if(bodyPart && ex.bodyPart !== bodyPart) return;
+      (ex.sets||[]).forEach(s=>{
+        const w = Number(s.weight)||0;
+        const r = Number(s.reps)||0;
+        if(w === wTarget && r > best) best = r;
+      });
+    });
+  });
+  return best;
+}
+
 function renderExerciseComparisonSummary(ex){
-  const { vol, reps } = exStats(ex);
-
-  // PR volume = best total exercise volume on any single day
-  const pr = getAllTimeExercisePRVolume(ex.name, ex.bodyPart);
-
-  // Heaviest set (all time)
+  // Aggregated, mobile-first performance summary (no per-set comparison, no red)
   const heavy = getAllTimeHeaviestSet(ex.name, ex.bodyPart);
 
-  // Bar scaling
-  const maxVol = Math.max(vol||0, pr.vol||0, 1);
-  const todayPct = Math.max(2, Math.round((vol / maxVol) * 100));
-  const prPct = Math.max(2, Math.round((pr.vol / maxVol) * 100));
+  const currentMax = Math.max(...(ex.sets||[]).map(s=>Number(s.weight)||0), 0);
+  const todayRepsAtMax = Math.max(...(ex.sets||[]).filter(s=>(Number(s.weight)||0)===currentMax).map(s=>Number(s.reps)||0), 0);
+
+  const lifetimeMax = Number(heavy.weight)||0;
+  const lifetimeRepsAtMax = Number(heavy.reps)||0;
+
+  // Today progress toward lifetime heaviest (target)
+  const pct = lifetimeMax ? Math.round((currentMax / lifetimeMax) * 100) : (currentMax ? 100 : 0);
+  const clampedPct = Math.max(0, Math.min(100, pct));
+
+  // Heaviest dual bars
+  const lbPct = lifetimeMax ? Math.round((currentMax / lifetimeMax) * 100) : (currentMax ? 100 : 0);
+  const lbClamped = Math.max(0, Math.min(100, lbPct));
+
+  const bestRepsAtWeight = getBestRepsAtWeight(ex.name, ex.bodyPart, currentMax) || todayRepsAtMax || 0;
+  const repsPct = bestRepsAtWeight ? Math.round((todayRepsAtMax / bestRepsAtWeight) * 100) : (todayRepsAtMax ? 100 : 0);
+  const repsClamped = Math.max(0, Math.min(100, repsPct));
 
   const wrap = document.createElement('div');
   wrap.className = 'cmp-mini';
 
+  const todayFillClass = (pct >= 100 && currentMax>0 && lifetimeMax>0) ? 'gold' : (pct >= 90 ? 'today' : 'neutral');
+
   wrap.innerHTML = `
-    <div class="cmp-bars">
-      <div class="cmp-bar">
-        <div class="cmp-head">
+    <div class="cmp-grid">
+      <!-- Iter 2 + 3: Today tile with vertical bar -->
+      <div class="cmp-tile">
+        <div class="cmp-top">
           <span>Today</span>
-          <b>${Math.round(vol).toLocaleString()} lb</b>
+          <b>${currentMax ? `${currentMax} lb` : '—'}</b>
         </div>
-        <div class="cmp-track"><div class="cmp-fill today" style="width:${todayPct}%"></div></div>
-      </div>
 
-      <div class="cmp-bar">
-        <div class="cmp-head">
-          <span>PR (best day)</span>
-          <b>${Math.round(pr.vol||0).toLocaleString()} lb</b>
+        <div class="vrow">
+          <div class="vbar ${todayFillClass}">
+            <div class="vfill" style="height:${clampedPct}%"></div>
+            <div class="vpercent">${isFinite(pct) ? pct : 0}%</div>
+          </div>
+
+          <div class="vlabels">
+            <div class="vtarget">Target<br><b>${lifetimeMax ? `${lifetimeMax} lb` : '—'}</b></div>
+            <div class="vcurrent">Current<br><b>${currentMax ? `${currentMax} lb` : '—'}</b></div>
+          </div>
         </div>
-        <div class="cmp-sub">${pr.date ? mdFromISO(pr.date) : '—'}</div>
-        <div class="cmp-track"><div class="cmp-fill best" style="width:${prPct}%"></div></div>
-      </div>
-    </div>
-
-    <div class="cmp-metrics">
-      <div class="cmp-metric">
-        <span>Heaviest</span>
-        <b>${heavy.weight ? `${heavy.weight} lb × ${heavy.reps || 0}` : '—'}</b>
-        <i>${heavy.date ? mdFromISO(heavy.date) : ''}</i>
       </div>
 
-      <div class="cmp-metric">
-        <span>Total reps</span>
-        <b>${Math.round(reps||0)}</b>
-        <i></i>
+      <!-- Iter 2 + 4: Heaviest tile with dual vertical bars (lb wide + reps thin) -->
+      <div class="cmp-tile">
+        <div class="cmp-top">
+          <span>Heaviest</span>
+          <b>${lifetimeMax ? `${lifetimeMax} lb × ${lifetimeRepsAtMax || 0}` : '—'}</b>
+        </div>
+
+        <div class="dualrow">
+          <div class="vbar wide ${(lbPct>=100 && currentMax>0 && lifetimeMax>0) ? 'gold' : (lbPct>=90 ? 'today' : 'neutral')}">
+            <div class="vfill" style="height:${lbClamped}%"></div>
+          </div>
+
+          <div class="vbar thin ${(repsPct>=100 && todayRepsAtMax>0) ? 'gold' : (repsPct>=90 ? 'today' : 'neutral')}">
+            <div class="vfill" style="height:${repsClamped}%"></div>
+          </div>
+
+          <div class="dualmeta">
+            <div class="dualmeta-row">
+              <span class="dual-lab">lb</span>
+              <b>${currentMax ? `${currentMax}/${lifetimeMax||'—'}` : '—'}</b>
+            </div>
+            <div class="dualmeta-row">
+              <span class="dual-lab">reps</span>
+              <b>${todayRepsAtMax ? `${todayRepsAtMax}/${bestRepsAtWeight||'—'}` : '—'}</b>
+            </div>
+          </div>
+        </div>
+
+        <div class="cmp-sub"><i>${heavy.date ? mdFromISO(heavy.date) : ''}</i></div>
       </div>
     </div>
   `;
@@ -865,6 +993,7 @@ function renderExercise(ex){
     `;
 
     const setsWrap = node.querySelector('.sets');
+    setsWrap.classList.add('locked-grid');
 
     // Aggregated, exercise-level performance summary (no red, no per-set deltas)
     const summary = renderExerciseComparisonSummary(ex);
@@ -925,6 +1054,7 @@ function renderExercise(ex){
   `;
 
   const setsWrap = node.querySelector('.sets');
+    setsWrap.classList.add('locked-grid');
   ex.sets.forEach((s, i) => setsWrap.appendChild(renderSet(ex.id, s, i, false)));
 
   return node;
@@ -940,9 +1070,6 @@ function renderSet(exId, s, idx, locked = false) {
         <span class="lbs-label">lbs</span>
       </div>
       <input class="num-input" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" disabled/>
-      <div></div>
-      <div class="flags" style="visibility:hidden;"></div>
-      <div class="tools" style="visibility:hidden;"></div>
     `;
   } else {
     const copiedClass = s.copied ? ' copied' : '';
