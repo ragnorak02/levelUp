@@ -136,7 +136,8 @@
   .flags{display:flex; align-items:center; gap:12px; color:var(--muted); font-size:.9rem}
 
   /* ===== Condensed comparison summary (mobile-first) ===== */
-  .cmp-mini{display:grid; gap:10px; padding:2px 0}
+  .cmp-mini{display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:2px 0}
+  @media (max-width: 360px){ .cmp-mini{grid-template-columns:1fr} }
   .cmp-bars{display:grid; grid-template-columns:1fr; gap:10px}
   .cmp-bar{background:#0f141b; border:1px solid var(--ring); border-radius:12px; padding:10px}
   .cmp-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
@@ -145,6 +146,37 @@
   .cmp-sub{margin-top:2px; font-size:.75rem; color:var(--muted)}
   .cmp-track{margin-top:8px; height:10px; background:#101a24; border:1px solid rgba(42,53,67,.9); border-radius:999px; overflow:hidden}
   .cmp-fill{height:100%; border-radius:999px}
+
+  /* Iterations 2-3: vertical progress bar for Today */
+  .vrow{display:flex; gap:12px; align-items:stretch; margin-top:10px}
+  .vtrack{
+    position:relative;
+    width:28px;
+    height:120px;
+    border-radius:999px;
+    border:1px solid rgba(42,53,67,.9);
+    background:#101a24;
+    overflow:hidden;
+    display:flex;
+    align-items:flex-end;
+    flex:0 0 auto;
+  }
+  .vfill{width:100%; border-radius:999px; background:linear-gradient(180deg, var(--accent), #16a34a)}
+  .vtrack.gold .vfill{background:linear-gradient(180deg, #f59e0b, #fbbf24)}
+  .vpct{
+    position:absolute;
+    top:6px;
+    left:50%;
+    transform:translateX(-50%);
+    font-weight:900;
+    font-size:.85rem;
+    color:var(--ink);
+    text-shadow:0 2px 10px rgba(0,0,0,.6);
+    pointer-events:none;
+    white-space:nowrap;
+  }
+  .vlabels{display:flex; flex-direction:column; justify-content:space-between; color:var(--muted); font-size:.85rem}
+  .vlabels b{color:var(--ink); font-size:1rem}
   .cmp-fill.today{background:linear-gradient(90deg, var(--accent), #16a34a)}
   .cmp-fill.gold{background:linear-gradient(90deg, #fbbf24, #f59e0b)}
   .cmp-fill.neutral{background:linear-gradient(90deg, #475569, #334155)}
@@ -593,37 +625,44 @@ function getAllTimeHeaviestSet(exerciseName, bodyPart){
 }
 
 function renderExerciseComparisonSummary(ex){
-  const { vol } = exStats(ex);
-
-  // Heaviest set (all time)
+  // Iterations 2-3: compact, mobile-first summary (no per-set comparison, no red)
   const heavy = getAllTimeHeaviestSet(ex.name, ex.bodyPart);
 
-  // Scale Today bar against the best known volume for this exercise (all-time PR volume),
-  // but do not render the PR tile in Iteration 1.
-  const pr = getAllTimeExercisePRVolume(ex.name, ex.bodyPart);
-  const maxVol = Math.max(vol||0, pr.vol||0, 1);
-  const todayPct = Math.max(2, Math.round((vol / maxVol) * 100));
+  const currentMax = Math.max(...(ex.sets||[]).map(s=>Number(s.weight)||0), 0);
+  const target = Number(heavy.weight)||0;
+
+  const pctRaw = (target > 0) ? Math.round((currentMax / target) * 100) : (currentMax > 0 ? 100 : 0);
+  const pct = Math.max(0, Math.min(100, pctRaw));
 
   const wrap = document.createElement('div');
   wrap.className = 'cmp-mini';
 
+  const gold = (pctRaw >= 100 && currentMax > 0 && target > 0);
+
   wrap.innerHTML = `
-    <div class="cmp-bars">
-      <div class="cmp-bar">
-        <div class="cmp-head">
-          <span>Today</span>
-          <b>${Math.round(vol).toLocaleString()} lb</b>
+    <div class="cmp-bar">
+      <div class="cmp-head">
+        <span>Today</span>
+        <b>${currentMax ? `${currentMax} lb` : '—'}</b>
+      </div>
+
+      <div class="vrow">
+        <div class="vtrack ${gold ? 'gold' : ''}">
+          <div class="vfill" style="height:${pct}%"></div>
+          <div class="vpct">${isFinite(pctRaw) ? pctRaw : 0}%</div>
         </div>
-        <div class="cmp-track"><div class="cmp-fill today" style="width:${todayPct}%"></div></div>
+
+        <div class="vlabels">
+          <div>Target<br><b>${target ? `${target} lb` : '—'}</b></div>
+          <div>Current<br><b>${currentMax ? `${currentMax} lb` : '—'}</b></div>
+        </div>
       </div>
     </div>
 
-    <div class="cmp-metrics">
-      <div class="cmp-metric">
-        <span>Heaviest</span>
-        <b>${heavy.weight ? `${heavy.weight} lb × ${heavy.reps || 0}` : '—'}</b>
-        <i>${heavy.date ? mdFromISO(heavy.date) : ''}</i>
-      </div>
+    <div class="cmp-metric">
+      <span>Heaviest</span>
+      <b>${heavy.weight ? `${heavy.weight} lb × ${heavy.reps || 0}` : '—'}</b>
+      <i>${heavy.date ? mdFromISO(heavy.date) : ''}</i>
     </div>
   `;
 
