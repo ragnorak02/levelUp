@@ -153,7 +153,7 @@
     position:relative;
     width:28px;
     height:140px;
-    border-radius:8px;
+    border-radius:0px;
     border:1px solid rgba(42,53,67,.9);
     background:#101a24;
     overflow:hidden;
@@ -343,6 +343,48 @@
     .max-top .mr{font-size:1.05rem}
   }
 
+
+  .cmp-maxpair{display:flex; flex-direction:column; justify-content:flex-end; gap:10px; min-width:120px}
+  .max-bottom{
+    display:flex;
+    gap:14px;
+    align-items:baseline;
+    justify-content:space-between;
+    font-weight:900;
+  }
+  .max-bottom .mw{font-size:1.25rem}
+  .max-bottom .mr{font-size:1.05rem; color:rgba(255,255,255,.9)}
+
+
+  /* Exercise tabs (within Completed, below muscle tabs) */
+  .ex-tabs{
+    display:flex;
+    gap:10px;
+    margin:10px 0 14px;
+    overflow:auto;
+    padding-bottom:4px;
+  }
+  .ex-tab{
+    flex:0 0 auto;
+    padding:10px 14px;
+    border-radius:999px;
+    border:1px solid rgba(42,53,67,.85);
+    background:rgba(10,16,22,.35);
+    color:var(--muted);
+    font-weight:900;
+    letter-spacing:.01em;
+    white-space:nowrap;
+    max-width:75vw;
+    text-overflow:ellipsis;
+    overflow:hidden;
+  }
+  .ex-tab[aria-selected="true"]{
+    color:var(--ink);
+    border-color:rgba(34,197,94,.6);
+    box-shadow:0 0 0 2px rgba(34,197,94,.15) inset;
+    background:rgba(20,30,40,.65);
+  }
+
 </style>
 </head>
 <body>
@@ -490,6 +532,7 @@ const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 let current = new Date();
 let selectedCompletedBP = null;
+let selectedCompletedExByBP = {};
 const keyFor = (d)=>`powerUp:${d.toISOString().slice(0,10)}`;
 
 function blankDay(date){ return { date: date.toISOString().slice(0,10), exercises:[] }; }
@@ -809,13 +852,8 @@ function renderExerciseComparisonSummary(ex){
       <div class="trow"><span>Current</span><b>${vol ? `${Math.round(vol).toLocaleString()} lb` : '—'}</b></div>
     </div>
 
-    <!-- MAX area: pair max weight + best reps at that weight (boxes #2 and #3). No MAX label, no 50 lb × 6 header, no dates -->
+    <!-- MAX area: pair max weight + best reps at that weight. No MAX label, no dates -->
     <div class="cmp-block cmp-maxpair">
-      <div class="max-top">
-        <span class="mw">${targetMax ? `${targetMax} lb` : '—'}</span>
-        <span class="mr">${repsBestAtMax ? `${repsBestAtMax} reps` : ''}</span>
-      </div>
-
       <div class="bars-wrap">
         <div class="vtrack wide ${goldMax ? 'gold' : ''}">
           <div class="vfill" style="height:${pctMax}%"></div>
@@ -823,6 +861,11 @@ function renderExerciseComparisonSummary(ex){
         <div class="vtrack thin ${goldReps ? 'gold' : ''}">
           <div class="vfill" style="height:${repsPct}%"></div>
         </div>
+      </div>
+
+      <div class="max-bottom">
+        <span class="mw">${targetMax ? `${targetMax} lb` : '—'}</span>
+        <span class="mr">${repsBestAtMax ? `${repsBestAtMax} reps` : ''}</span>
       </div>
     </div>
   `;
@@ -958,10 +1001,42 @@ function renderCompletedTabs(list){
   });
 
   // Only one body part visible at a time
+  const exList = (groups[selectedCompletedBP] || []);
   container.innerHTML = '';
-  (groups[selectedCompletedBP] || []).forEach(ex=>{
-    container.appendChild(renderExercise(ex));
+
+  // Exercise tabs row (below muscle group tabs)
+  const exTabs = document.createElement('div');
+  exTabs.className = 'ex-tabs';
+  exTabs.setAttribute('role','tablist');
+  exTabs.setAttribute('aria-label','Exercises');
+  container.appendChild(exTabs);
+
+  if(exList.length === 0) return;
+
+  // Track selected exercise per body part
+  const savedId = selectedCompletedExByBP[selectedCompletedBP];
+  const firstId = exList[0].id;
+  const selectedExId = exList.some(e=>e.id===savedId) ? savedId : firstId;
+  selectedCompletedExByBP[selectedCompletedBP] = selectedExId;
+
+  exTabs.innerHTML = '';
+  exList.forEach(ex=>{
+    const b = document.createElement('button');
+    b.className = 'ex-tab';
+    b.type = 'button';
+    b.textContent = ex.name;
+    const selected = ex.id === selectedExId;
+    b.setAttribute('aria-selected', selected ? 'true' : 'false');
+    b.addEventListener('click', ()=>{
+      selectedCompletedExByBP[selectedCompletedBP] = ex.id;
+      renderCompletedTabs(list);
+    });
+    exTabs.appendChild(b);
   });
+
+  // Render only the selected exercise card
+  const selectedEx = exList.find(e=>e.id===selectedExId) || exList[0];
+  container.appendChild(renderExercise(selectedEx));
 }
 
 
