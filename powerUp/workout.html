@@ -28,9 +28,9 @@
   .bar{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
   .home{all:unset; cursor:pointer; border:1px solid var(--ring); padding:.35rem .6rem; border-radius:.6rem}
   h1{margin:0; font-size:1rem}
-  .date-nav{display:flex; align-items:center; gap:10px}
+  .date-nav{display:flex; align-items:center; justify-content:center; gap:10px; width:100%}
   .date-nav button{all:unset; cursor:pointer; padding:.3rem .5rem; border:1px solid var(--ring); border-radius:.5rem}
-  .date-str{min-width:9.5ch; text-align:center}
+  .date-str{flex:1; text-align:center; font-weight:900; letter-spacing:.02em}
 
   .wrap{width:min(900px,100%); margin-inline:auto; padding:10px; display:flex; flex-direction:column; gap:10px; flex:1}
 
@@ -188,24 +188,7 @@
   .dualmeta-row b{color:var(--ink); font-size:1rem}
   .dual-lab{min-width:38px; text-transform:lowercase}
 
-  /* Iteration 5: completed set list = 2 per row on mobile */
-  .set-grid{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; margin-top:10px}
-  @media (max-width: 360px){ .set-grid{grid-template-columns:1fr} }
-  .set-row.locked{
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    padding:10px;
-    border:1px solid var(--ring);
-    border-radius:12px;
-    background:#0b1118;
-  }
-  .set-row.locked .lbs-label{opacity:.85}
-  .set-row.locked .flags, .set-row.locked .tools{display:none !important}
-  .set-row.locked.rest-pause{
-    background:linear-gradient(180deg,#2a2100,#3a2a00);
-    border-color:#fbbf24;
-  }
-  .cmp-fill.today{background:linear-gradient(90deg, var(--accent), #16a34a)}
+    .cmp-fill.today{background:linear-gradient(90deg, var(--accent), #16a34a)}
   .cmp-fill.gold{background:linear-gradient(90deg, #fbbf24, #f59e0b)}
   .cmp-fill.neutral{background:linear-gradient(90deg, #475569, #334155)}
   .cmp-fill.best{background:linear-gradient(90deg, #f59e0b, #fb923c)}
@@ -254,6 +237,34 @@
   
   /* FIX #3: Exercise history chart styles */
   .history-chart{width:100%; height:200px; margin:10px 0; border:1px solid var(--ring); border-radius:8px; background:#0a1016}
+
+  /* ===== Sets list (2-col simple list) ===== */
+  .set-grid{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin-top:10px}
+  @media (max-width: 360px){ .set-grid{grid-template-columns:1fr} }
+
+  .set-item{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:10px 8px;
+    border-radius:12px;
+    background:rgba(10,16,22,.55);
+    border:1px solid rgba(42,53,67,.75);
+    font-weight:900;
+    letter-spacing:.02em;
+  }
+  .set-item .si-unit, .set-item .si-x{color:var(--muted); font-weight:800}
+  .set-item.set-special{
+    background:linear-gradient(180deg,#2a2100,#3a2a00);
+    border-color:#fbbf24;
+  }
+
+
+  .actions{display:flex; gap:10px; align-items:center; justify-content:flex-start; flex-wrap:wrap}
+  .btn-workout-template{padding:.55rem .75rem; min-width:120px}
+  .btn-stack{display:flex; flex-direction:column; line-height:1.05; text-align:center}
+  .btn-stack .btn-sub{font-size:.8rem; opacity:.9; font-weight:900}
 </style>
 </head>
 <body>
@@ -270,11 +281,8 @@
       <button id="nextDay">→</button>
     </div>
     <div class="actions">
-      <button class="btn-purple" id="addWorkout">Add Workout</button>
+      <button class="btn-purple btn-workout-template" id="addWorkout"><span class="btn-stack"><span>Workout</span><span class="btn-sub">Template</span></span></button>
       <button class="btn" id="addExercise">Add Exercise</button>
-      <button class="btn-ghost" id="saveBtn">Save</button>
-      <button class="btn-today" id="todayBtn">Today</button>
-      <button class="btn-ghost" id="clearBtn">Clear Day</button>
     </div>
   </div>
 </header>
@@ -292,13 +300,7 @@
   <section class="totals" id="totalsBar">
     <span class="chip">Sets: <b id="tSets">0</b></span>
     <span class="chip">Volume: <b id="tVol">0 lb</b></span>
-    <span class="chip">Exercises: <b id="tEx">0</b></span>
-    <span class="chip">Status: <b id="tStatus">Not started</b></span>
-    <div style="margin-left:auto; display:flex; gap:6px;">
-      <button class="home" id="collapseAll" title="Collapse all">▾</button>
-      <button class="home" id="expandAll" title="Expand all">▣</button>
-    </div>
-  </section>
+    <span class="chip">Exercises: <b id="tEx">0</b></span>  </section>
 
   <section id="sg-inprogress" class="supergroup">
     <h2>In Progress</h2>
@@ -683,7 +685,7 @@ function getBestRepsAtWeight(exName, bodyPart, weight){
 
 
 function renderExerciseComparisonSummary(ex){
-  // Iterations 2-4: compact, mobile-first summary (no per-set comparison, no red)
+  // UI-only summary (no per-set comparison, no negative/red indicators)
   const heavy = getAllTimeHeaviestSet(ex.name, ex.bodyPart);
 
   const currentMax = Math.max(...(ex.sets||[]).map(s=>Number(s.weight)||0), 0);
@@ -693,62 +695,58 @@ function renderExerciseComparisonSummary(ex){
   const pct = Math.max(0, Math.min(100, pctRaw));
   const goldToday = (pctRaw >= 100 && currentMax > 0 && target > 0);
 
-  // Iteration 4: reps bar baseline is weight-matched (best reps ever at today's heaviest weight)
+  // Reps baseline is weight-matched: best reps ever at today's heaviest weight
   const repsTodayAtMax = Math.max(...(ex.sets||[]).filter(s=>(Number(s.weight)||0)===currentMax).map(s=>Number(s.reps)||0), 0);
   const repsBestAtMax = getBestRepsAtWeight(ex.name, ex.bodyPart, currentMax) || repsTodayAtMax || 0;
 
   const repsPctRaw = repsBestAtMax ? Math.round((repsTodayAtMax / repsBestAtMax) * 100) : (repsTodayAtMax ? 100 : 0);
   const repsPct = Math.max(0, Math.min(100, repsPctRaw));
+  const goldReps = (repsPctRaw >= 100 && repsTodayAtMax > 0);
 
   const wrap = document.createElement('div');
   wrap.className = 'cmp-mini';
 
   wrap.innerHTML = `
-    <div class="cmp-bar">
+    <div class="cmp-tile">
       <div class="cmp-head">
         <span>Today</span>
-        <b>${currentMax ? `${currentMax} lb` : '—'}</b>
       </div>
 
-      <div class="vrow">
+      <div class="cmp-body">
         <div class="vtrack wide ${goldToday ? 'gold' : ''}">
           <div class="vfill" style="height:${pct}%"></div>
           <div class="vpct">${isFinite(pctRaw) ? pctRaw : 0}%</div>
         </div>
 
-        <div class="vlabels">
-          <div>Target<br><b>${target ? `${target} lb` : '—'}</b></div>
-          <div>Current<br><b>${currentMax ? `${currentMax} lb` : '—'}</b></div>
+        <div class="num-box">
+          <div class="nb-row"><span>Target</span><b>${target ? `${target} lb` : '—'}</b></div>
+          <div class="nb-row"><span>Current</span><b>${currentMax ? `${currentMax} lb` : '—'}</b></div>
         </div>
       </div>
     </div>
 
-    <div class="cmp-metric">
-      <span>Heaviest</span>
-      <b>${heavy.weight ? `${heavy.weight} lb × ${heavy.reps || 0}` : '—'}</b>
-
-      <div class="dualrow">
-        <div class="vtrack wide ${(pctRaw >= 100 && currentMax>0 && target>0) ? 'gold' : ''}">
-          <div class="vfill" style="height:${Math.max(0, Math.min(100, (target>0?Math.round((currentMax/target)*100):0)))}%"></div>
-        </div>
-
-        <div class="vtrack thin ${(repsPctRaw >= 100 && repsTodayAtMax>0) ? 'gold' : ''}">
-          <div class="vfill" style="height:${repsPct}%"></div>
-        </div>
-
-        <div class="dualmeta">
-          <div class="dualmeta-row">
-            <span class="dual-lab">lb</span>
-            <b>${currentMax ? `${currentMax}/${target||'—'}` : '—'}</b>
-          </div>
-          <div class="dualmeta-row">
-            <span class="dual-lab">reps</span>
-            <b>${repsTodayAtMax ? `${repsTodayAtMax}/${repsBestAtMax||'—'}` : '—'}</b>
-          </div>
-        </div>
+    <div class="cmp-tile">
+      <div class="cmp-head">
+        <span>Heaviest</span>
+        <b>${heavy.weight ? `${heavy.weight} lb × ${heavy.reps || 0}` : '—'}</b>
       </div>
 
-      <i>${heavy.date ? mdFromISO(heavy.date) : ''}</i>
+      <div class="cmp-body">
+        <div class="dualwrap">
+          <div class="vtrack wide ${goldToday ? 'gold' : ''}">
+            <div class="vfill" style="height:${Math.max(0, Math.min(100, (target>0?Math.round((currentMax/target)*100):0)))}%"></div>
+          </div>
+          <div class="vtrack thin ${goldReps ? 'gold' : ''}">
+            <div class="vfill" style="height:${repsPct}%"></div>
+          </div>
+        </div>
+
+        <div class="num-box">
+          <div class="nb-row"><span>LB</span><b>${currentMax ? `${currentMax}/${target||'—'}` : '—'}</b></div>
+          <div class="nb-row"><span>REPS</span><b>${repsTodayAtMax ? `${repsTodayAtMax}/${repsBestAtMax||'—'}` : '—'}</b></div>
+          <div class="nb-sub">${heavy.date ? mdFromISO(heavy.date) : ''}</div>
+        </div>
+      </div>
     </div>
   `;
 
@@ -820,7 +818,12 @@ function applyPowerTheme(vol){
 }
 
 function render(){
-  $('#dateStr').textContent = new Intl.DateTimeFormat(undefined,{weekday:'short',month:'short',day:'numeric'}).format(current);
+  (function(){
+  const isToday = (new Date().toISOString().slice(0,10) === current.toISOString().slice(0,10));
+  const weekday = new Intl.DateTimeFormat(undefined,{weekday:'long'}).format(current);
+  const md = new Intl.DateTimeFormat(undefined,{month:'short',day:'numeric'}).format(current);
+  $('#dateStr').textContent = isToday ? `Today · ${weekday}, ${md}` : `${weekday}, ${md}`;
+})();
   const day = loadDay(current);
   renderPowerCard(day);
 
@@ -834,8 +837,7 @@ function render(){
   $('#tSets').textContent = sets;
   $('#tVol').textContent = Math.round(vol) + ' lb';
   $('#tEx').textContent = exCount;
-  $('#tStatus').textContent = (sets === 0) ? 'Not started' : (areAllSetsDone(day) ? 'Completed' : 'In progress');
-
+  
   if ($('#calPopup').style.display === 'flex') buildCalendar(current);
 
   armDragAndDrop();
@@ -1045,13 +1047,12 @@ function renderSet(exId, s, idx, locked = false) {
   const row = document.createElement('div');
   row.className = 'set-row' + (locked ? ' locked' : '') + (s.restPause ? ' rest-pause' : ''); row.dataset.exId = exId; row.dataset.idx = idx;
   if (locked) {
-    row.innerHTML = `
-      <div class="weight-input-group">
-        <input class="num-input" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" disabled/>
-        <span class="lbs-label">lbs</span>
-      </div>
-      <input class="num-input" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" disabled/>
-    `;
+    row.className = 'set-item' + (s.restPause || s.superset || s.special || s.extra ? ' set-special' : '');
+    row.dataset.exId = exId; row.dataset.idx = idx;
+    const w = (s.weight ?? '—');
+    const r = (s.reps ?? '—');
+    row.innerHTML = `<span class="si-w">${w}</span><span class="si-unit">lb</span><span class="si-x">×</span><span class="si-r">${r}</span>`;
+    return row;
   } else {
     const copiedClass = s.copied ? ' copied' : '';
     row.innerHTML = `
@@ -1263,8 +1264,7 @@ document.addEventListener('change', (e)=>{
       saveDay(day); render(); return;
     }
     saveDay(day);
-    $('#tStatus').textContent = areAllSetsDone(day) ? 'Completed' : 'In progress';
-    const {sets, vol, exCount} = totalsFiltered(day);
+        const {sets, vol, exCount} = totalsFiltered(day);
     $('#tSets').textContent = sets; $('#tVol').textContent = Math.round(vol)+' lb'; $('#tEx').textContent = exCount;
     renderPowerCard(day);
   }
@@ -1332,12 +1332,7 @@ function armDragAndDrop(){
   }, {capture:true});
 }
 
-$('#collapseAll').addEventListener('click', ()=>{ $$('.group').forEach(g=> g.classList.add('collapsed')); });
-$('#expandAll').addEventListener('click', ()=>{ $$('.group').forEach(g=> g.classList.remove('collapsed')); });
 
-$('#saveBtn').addEventListener('click', ()=>{ const day = loadDay(current); saveDay(day); $('#saveBtn').textContent = 'Saved ✔'; setTimeout(()=> $('#saveBtn').textContent='Save', 1100); });
-$('#clearBtn').addEventListener('click', ()=>{ if(!confirm('Clear all exercises for this day?')) return; saveDay(blankDay(current)); render(); });
-$('#todayBtn').addEventListener('click', ()=>{ current = new Date(); render(); });
 
 $('#prevDay').addEventListener('click', ()=>{ current.setDate(current.getDate()-1); lastLevelIdx=-1; render(); });
 $('#nextDay').addEventListener('click', ()=>{ current.setDate(current.getDate()+1); lastLevelIdx=-1; render(); });
