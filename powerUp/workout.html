@@ -161,6 +161,13 @@
     align-items:flex-end;
     flex:0 0 auto;
   }
+
+  /* Perf refine Iter 2: keep dual bars side-by-side (shared baseline) */
+  .vtrack.wide{width:28px}
+  .vtrack.thin{width:14px}
+
+  .cmp-body{display:flex; gap:12px; align-items:flex-end; justify-content:space-between; margin-top:10px}
+  .dualwrap{display:flex; gap:10px; align-items:flex-end}
   .vfill{width:100%; border-radius:999px; background:linear-gradient(180deg, var(--accent), #16a34a)}
   .vtrack.gold .vfill{background:linear-gradient(180deg, #f59e0b, #fbbf24)}
   .vpct{
@@ -727,7 +734,7 @@ function renderExerciseComparisonSummary(ex){
 
     <div class="cmp-tile">
       <div class="cmp-head">
-        <span>Heaviest</span>
+        <span>MAX</span>
         <b>${heavy.weight ? `${heavy.weight} lb × ${heavy.reps || 0}` : '—'}</b>
       </div>
 
