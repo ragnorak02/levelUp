@@ -152,8 +152,8 @@
   .vtrack{
     position:relative;
     width:28px;
-    height:120px;
-    border-radius:999px;
+    height:140px;
+    border-radius:8px;
     border:1px solid rgba(42,53,67,.9);
     background:#101a24;
     overflow:hidden;
@@ -168,7 +168,7 @@
 
   .cmp-body{display:flex; gap:12px; align-items:flex-end; justify-content:space-between; margin-top:10px}
   .dualwrap{display:flex; gap:10px; align-items:flex-end}
-  .vfill{width:100%; border-radius:999px; background:linear-gradient(180deg, var(--accent), #16a34a)}
+  .vfill{width:100%; border-radius:0; background:linear-gradient(180deg, var(--accent), #16a34a)}
   .vtrack.gold .vfill{background:linear-gradient(180deg, #f59e0b, #fbbf24)}
   .vpct{
     position:absolute;
@@ -176,7 +176,7 @@
     left:50%;
     transform:translateX(-50%);
     font-weight:900;
-    font-size:.85rem;
+    font-size:.78rem;
     color:var(--ink);
     text-shadow:0 2px 10px rgba(0,0,0,.6);
     pointer-events:none;
@@ -272,6 +272,23 @@
   .btn-workout-template{padding:.55rem .75rem; min-width:120px}
   .btn-stack{display:flex; flex-direction:column; line-height:1.05; text-align:center}
   .btn-stack .btn-sub{font-size:.8rem; opacity:.9; font-weight:900}
+
+  /* Iterations 4-5: labels at top of bars */
+  .bar-top-label{
+    position:absolute;
+    top:6px;
+    left:50%;
+    transform:translateX(-50%);
+    font-weight:900;
+    font-size:.82rem;
+    color:var(--ink);
+    text-shadow:0 2px 10px rgba(0,0,0,.65);
+    pointer-events:none;
+    white-space:nowrap;
+  }
+  .bar-top-label.muted{color:rgba(255,255,255,.85)}
+  .dualwrap{position:relative}
+
 </style>
 </head>
 <body>
@@ -692,19 +709,28 @@ function getBestRepsAtWeight(exName, bodyPart, weight){
 
 
 function renderExerciseComparisonSummary(ex){
-  // UI-only summary (no per-set comparison, no negative/red indicators)
+  // Iterations 3-5: aligned bars + labels in chart area only
+  const { vol } = exStats(ex); // total pounds lifted today for this exercise (Iteration 5)
+
+  // Best total-volume day (PR volume baseline)
+  const prVol = getAllTimeExercisePRVolume(ex.name, ex.bodyPart);
+  const targetVol = Number(prVol?.vol)||0;
+  const pctVolRaw = (targetVol > 0) ? Math.round((vol / targetVol) * 100) : (vol > 0 ? 100 : 0);
+  const pctVol = Math.max(0, Math.min(100, pctVolRaw));
+  const goldVol = (pctVolRaw >= 100 && vol > 0 && targetVol > 0);
+
+  // MAX tile data (weight + reps)
   const heavy = getAllTimeHeaviestSet(ex.name, ex.bodyPart);
-
   const currentMax = Math.max(...(ex.sets||[]).map(s=>Number(s.weight)||0), 0);
-  const target = Number(heavy.weight)||0;
 
-  const pctRaw = (target > 0) ? Math.round((currentMax / target) * 100) : (currentMax > 0 ? 100 : 0);
-  const pct = Math.max(0, Math.min(100, pctRaw));
-  const goldToday = (pctRaw >= 100 && currentMax > 0 && target > 0);
-
-  // Reps baseline is weight-matched: best reps ever at today's heaviest weight
   const repsTodayAtMax = Math.max(...(ex.sets||[]).filter(s=>(Number(s.weight)||0)===currentMax).map(s=>Number(s.reps)||0), 0);
   const repsBestAtMax = getBestRepsAtWeight(ex.name, ex.bodyPart, currentMax) || repsTodayAtMax || 0;
+
+  // Progress fills (weight bar compares today max vs lifetime max weight; reps compares weight-matched reps)
+  const targetMax = Number(heavy.weight)||0;
+  const pctMaxRaw = (targetMax > 0) ? Math.round((currentMax / targetMax) * 100) : (currentMax > 0 ? 100 : 0);
+  const pctMax = Math.max(0, Math.min(100, pctMaxRaw));
+  const goldMax = (pctMaxRaw >= 100 && currentMax > 0 && targetMax > 0);
 
   const repsPctRaw = repsBestAtMax ? Math.round((repsTodayAtMax / repsBestAtMax) * 100) : (repsTodayAtMax ? 100 : 0);
   const repsPct = Math.max(0, Math.min(100, repsPctRaw));
@@ -717,17 +743,18 @@ function renderExerciseComparisonSummary(ex){
     <div class="cmp-tile">
       <div class="cmp-head">
         <span>Today</span>
+        <b>${Math.round(vol).toLocaleString()} lb</b>
       </div>
 
       <div class="cmp-body">
-        <div class="vtrack wide ${goldToday ? 'gold' : ''}">
-          <div class="vfill" style="height:${pct}%"></div>
-          <div class="vpct">${isFinite(pctRaw) ? pctRaw : 0}%</div>
+        <div class="vtrack wide ${goldVol ? 'gold' : ''}">
+          <div class="vfill" style="height:${pctVol}%"></div>
+          <div class="vpct">${isFinite(pctVolRaw) ? pctVolRaw : 0}</div>
         </div>
 
-        <div class="num-box">
-          <div class="nb-row"><span>Target</span><b>${target ? `${target} lb` : '—'}</b></div>
-          <div class="nb-row"><span>Current</span><b>${currentMax ? `${currentMax} lb` : '—'}</b></div>
+        <div class="vlabels">
+          <div>Target<br><b>${targetVol ? `${Math.round(targetVol).toLocaleString()} lb` : '—'}</b></div>
+          <div>Current<br><b>${vol ? `${Math.round(vol).toLocaleString()} lb` : '—'}</b></div>
         </div>
       </div>
     </div>
@@ -740,20 +767,24 @@ function renderExerciseComparisonSummary(ex){
 
       <div class="cmp-body">
         <div class="dualwrap">
-          <div class="vtrack wide ${goldToday ? 'gold' : ''}">
-            <div class="vfill" style="height:${Math.max(0, Math.min(100, (target>0?Math.round((currentMax/target)*100):0)))}%"></div>
+          <div class="vtrack wide ${goldMax ? 'gold' : ''}">
+            <div class="vfill" style="height:${pctMax}%"></div>
+            <div class="bar-top-label muted">${currentMax ? `${currentMax} lb` : '—'}</div>
           </div>
+
           <div class="vtrack thin ${goldReps ? 'gold' : ''}">
             <div class="vfill" style="height:${repsPct}%"></div>
+            <div class="bar-top-label muted">${repsTodayAtMax ? `${repsTodayAtMax} reps` : '—'}</div>
           </div>
         </div>
 
-        <div class="num-box">
-          <div class="nb-row"><span>LB</span><b>${currentMax ? `${currentMax}/${target||'—'}` : '—'}</b></div>
-          <div class="nb-row"><span>REPS</span><b>${repsTodayAtMax ? `${repsTodayAtMax}/${repsBestAtMax||'—'}` : '—'}</b></div>
-          <div class="nb-sub">${heavy.date ? mdFromISO(heavy.date) : ''}</div>
+        <div class="vlabels">
+          <div>LB PR<br><b>${targetMax ? `${targetMax} lb` : '—'}</b></div>
+          <div>Best reps<br><b>${repsBestAtMax ? `${repsBestAtMax} reps` : '—'}</b></div>
         </div>
       </div>
+
+      <div class="cmp-sub"><i>${heavy.date ? mdFromISO(heavy.date) : ''}</i></div>
     </div>
   `;
 
