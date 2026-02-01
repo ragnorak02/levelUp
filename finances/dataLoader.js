@@ -16,7 +16,7 @@
   };
   
   // Bump this whenever receiptsData.json changes so all devices refresh localStorage
-  const CURRENT_VERSION = '1.2';
+  const CURRENT_VERSION = '1.3';
 
   // Expose a stable loader object so pages can reliably await seeding/merging.
   // Pages should: await window.FinancesDataLoader.ready
@@ -119,23 +119,32 @@
    * Initialize data loading on page load.
    * IMPORTANT: we MERGE by default so we never wipe user-entered receipts.
    */
-  async function initialize() {
-    // Only run in browser environment
-    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-      return false;
+    async function initialize() {
+      // Only run in browser environment
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return false;
+      }
+
+      // Merge at most once per session (per version) to avoid repeated fetch on every refresh.
+      const SESSION_KEY = 'finances:lastMergeVersion';
+      const lastMerged = sessionStorage.getItem(SESSION_KEY);
+
+      // If we've already merged this version in this browser session, we can safely exit early.
+      if (lastMerged === CURRENT_VERSION && isDataLoaded()) {
+        console.log('✅ Hardcoded receipt data already loaded (session merge already done)');
+        return true;
+      }
+
+      // Always attempt merge once per session so edits to receiptsData.json get picked up
+      // even if someone forgets to bump CURRENT_VERSION.
+      const ok = await mergeHardcodedData();
+
+      // Record that we merged this version during this session
+      try { sessionStorage.setItem(SESSION_KEY, CURRENT_VERSION); } catch (e) {}
+
+      return ok;
     }
 
-    // If already loaded at this version, we're done.
-    if (isDataLoaded()) {
-      console.log('✅ Hardcoded receipt data already loaded');
-      return true;
-    }
-
-    // If receipts already exist, merge new hardcoded receipts in (do NOT overwrite).
-    // If there are no receipts yet, merge will effectively seed from scratch.
-    const ok = await mergeHardcodedData();
-    return ok;
-  }
   
   /**
    * Force reload hardcoded data (clears existing and reloads)

@@ -824,7 +824,7 @@
       let activeCategories = [];
 
       // ---- filters & week selection state ----
-      let hideMortgage = false;
+      let hideMortgage = true;
       let rentalOnly = false;
       let weekIndex = 0; // 0=first week window inside the selected month
 
@@ -922,6 +922,11 @@
       const weekLabelEl = document.getElementById('weekLabel');
 
       const mortgageToggleBtn = document.getElementById('mortgageToggleBtn');
+      if (mortgageToggleBtn){
+        mortgageToggleBtn.classList.toggle('toggle-on', hideMortgage);
+        mortgageToggleBtn.textContent = hideMortgage ? 'Show Mortgage' : 'Hide Mortgage';
+      }
+
       const storesBtn = document.getElementById('storesBtn');
       const rentalFilterBtn = document.getElementById('rentalFilterBtn');
       const storePanel = document.getElementById('storePanel');
@@ -1090,6 +1095,7 @@
         selectedIndex = null;
         await computeCategories();
         redraw();
+        renderRecent(); // keep recent list in sync with the viewed month
       }
 
       async function setTab(newTab){
@@ -1189,9 +1195,17 @@
       let recentExpanded = false;
 
       function renderRecent(){
-        const sorted = [...getReceiptsForCurrentView()]
+        const { start: mStart, end: mEnd } = getMonthRangeFromBase(now, monthOffset);
 
-          .sort((a,b)=> toDate(b.date) - toDate(a.date));
+        const monthReceipts = allReceipts.filter(r => {
+          const d = toDate(r.date);
+          if (!(d >= mStart && d < mEnd)) return false;
+          if (hideMortgage && isMortgageReceipt(r)) return false;
+          return true;
+        });
+
+        const sorted = [...monthReceipts].sort((a,b)=> toDate(b.date) - toDate(a.date));
+
 
         const maxCollapsed = 3;
         const maxExpanded = 12;
