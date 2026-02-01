@@ -2367,7 +2367,113 @@
         "price": 1.58
       }
     ]
+  },
+  [
+  {
+    "id": "receipt_lowes_2026-01-26_bucket",
+    "date": "2026-01-26",
+    "store": "Lowe's",
+    "storeLocation": "Latham, NY",
+    "category": "Rental",
+    "subtotal": 4.35,
+    "tax": 0.35,
+    "total": 4.70,
+    "items": [
+      {
+        "name": "5-Gallon Lowe's Bucket",
+        "price": 4.35,
+        "quantity": 1,
+        "category": "Rental",
+        "subcategory": "Supplies"
+      }
+    ],
+    "notes": "Rental house"
+  },
+  {
+    "id": "receipt_jang_tuh_2026-01-28_grocery_1",
+    "date": "2026-01-28",
+    "store": "Jang Tuh Asian Grocery",
+    "storeLocation": "Latham, NY",
+    "category": "Groceries",
+    "subtotal": 19.96,
+    "tax": 0.00,
+    "total": 19.96,
+    "items": [
+      { "name": "Kimchi", "price": 13.99, "quantity": 1, "category": "Groceries" },
+      { "name": "Perilla Oil", "price": 5.99, "quantity": 1, "category": "Groceries" }
+    ]
+  },
+  {
+    "id": "receipt_jang_tuh_2026-01-28_grocery_2",
+    "date": "2026-01-28",
+    "store": "Jang Tuh Asian Grocery",
+    "storeLocation": "Latham, NY",
+    "category": "Groceries",
+    "subtotal": 18.99,
+    "tax": 0.00,
+    "total": 18.99,
+    "items": [
+      { "name": "CJ Brown Sweet Rice", "price": 18.99, "quantity": 1, "category": "Groceries" }
+    ]
+  },
+  {
+    "id": "receipt_walmart_2026-01-27_groceries",
+    "date": "2026-01-27",
+    "store": "Walmart",
+    "storeLocation": "Glenmont, NY",
+    "category": "Groceries",
+    "subtotal": 60.17,
+    "tax": 0.00,
+    "total": 60.17,
+    "items": [
+      { "name": "Whole Milk", "price": 6.26, "quantity": 1 },
+      { "name": "Yogurt", "price": 4.74, "quantity": 2 },
+      { "name": "Scallions", "price": 1.92, "quantity": 1 },
+      { "name": "Avocados", "price": 2.97, "quantity": 1 },
+      { "name": "Corn", "price": 3.97, "quantity": 1 },
+      { "name": "Romaine Hearts", "price": 3.42, "quantity": 1 },
+      { "name": "Green Cabbage", "price": 1.66, "quantity": 1 },
+      { "name": "Apples", "price": 5.46, "quantity": 1 },
+      { "name": "Grape Tomatoes", "price": 2.27, "quantity": 1 },
+      { "name": "Blueberries", "price": 5.12, "quantity": 1 },
+      { "name": "Mushrooms", "price": 2.04, "quantity": 1 },
+      { "name": "Chocolate Bar", "price": 3.76, "quantity": 1 },
+      { "name": "Bread", "price": 3.98, "quantity": 1 },
+      { "name": "Strawberries", "price": 5.74, "quantity": 1 }
+    ]
+  },
+  {
+    "id": "receipt_trader_joes_2026-01-21",
+    "date": "2026-01-21",
+    "store": "Trader Joe's",
+    "storeLocation": "Glenmont, NY",
+    "category": "Groceries",
+    "subtotal": 11.25,
+    "tax": 0.00,
+    "total": 11.25,
+    "items": [
+      { "name": "Romaine Hearts", "price": 2.99, "quantity": 1 },
+      { "name": "King Oyster Mushrooms", "price": 3.49, "quantity": 1 },
+      { "name": "Greek Yogurt Plain", "price": 0.99, "quantity": 1 },
+      { "name": "Garlic (Peeled)", "price": 2.49, "quantity": 1 },
+      { "name": "Green Onions", "price": 1.29, "quantity": 1 }
+    ]
+  },
+  {
+    "id": "receipt_fresh_market_2026-01-26",
+    "date": "2026-01-26",
+    "store": "The Fresh Market",
+    "storeLocation": "Glenmont, NY",
+    "category": "Groceries",
+    "subtotal": 13.48,
+    "tax": 0.00,
+    "total": 13.48,
+    "items": [
+      { "name": "Cranberry Orange Muffin", "price": 6.99, "quantity": 1 },
+      { "name": "Cinnamon Rolls (4ct)", "price": 6.99, "quantity": 1 }
+    ]
   }
+]
 ]
 ,
   "metadata": {
