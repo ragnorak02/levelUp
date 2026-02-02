@@ -76,7 +76,7 @@
       border-color: transparent;
     }
 
-    .wrap{max-width:1120px; margin:0 auto; padding:12px}
+    .wrap{max-width:1120px; margin:0 auto; padding:10px}
 
     .card{
       background: rgba(19,26,34,.72);
@@ -89,7 +89,7 @@
     /* Month nav above the 2 stats */
     .monthbar{
       display:flex; align-items:center; justify-content:center; gap:10px;
-      padding:12px 12px 0 12px;
+      padding:8px 12px 0 12px;
     }
     .monthbtn{
       width:40px; height:38px;
@@ -353,8 +353,8 @@
         <div class="card-h">
           <h3>📊 Spending by Category</h3>
           <div>
-	            <button class="btn" id="mortgageToggleBtn" type="button" title="Hide or show mortgage payments in charts">Hide Mortgage</button>
-            <button class="btn" id="donutResetBtn" type="button">Reset</button>
+	            <button class="btn" id="mortgageToggleBtn" type="button" title="Hide or show mortgage payments in charts">Show Mortgage</button>
+            <button class="btn" id="rentalFilterBtn" type="button" title="Show only receipts tagged as rental">Rental</button>
             <button class="btn" id="storesBtn" type="button">Stores</button>
           </div>
         </div>
@@ -364,10 +364,11 @@
             <div class="tabs">
               <div class="tab active" id="tabAll">All</div>
               <div class="tab" id="tabGroceries">Groceries</div>
+              <div class="tab" id="tabRestaurants">Restaurants</div>
+              <div class="tab" id="tabCafe">Cafe</div>
+              <div class="tab" id="tabGas">Gas</div>
             </div>
-            <div class="donut-actions">
-              <button class="tab filter" id="rentalFilterBtn" type="button" title="Show only receipts tagged as rental">Rental</button>
-            </div>
+            <div class="donut-actions"></div>
           </div>
 
           <div id="storePanel" class="store-panel" style="display:none;"></div>
@@ -379,18 +380,7 @@
           <div class="legend" id="donutLegend"></div>
         </div>
       </div>
-
-      <div class="card">
-        <div class="card-h">
-          <h3>🧠 Budget Status</h3>
-        </div>
-        <div class="card-b">
-          <div class="empty">🎯 Set up budgets to track your spending goals.</div>
-          <div style="display:flex; justify-content:center;">
-            <a class="btn" href="budget.html">Set Budgets</a>
-          </div>
-        </div>
-      </div>
+</div>
     </div>
 
     <div class="card" style="margin-top:14px;">
@@ -819,7 +809,7 @@
 
       // ---- month selection state ----
       let monthOffset = 0; // 0=current month, -1 previous, etc.
-      let tab = 'all';     // 'all' | 'groceries'
+      let tab = 'all';     // 'all' | 'groceries' | 'restaurants' | 'cafe' | 'gas'
       let selectedIndex = null;
       let activeCategories = [];
 
@@ -936,6 +926,9 @@
 
       const tabAllEl = document.getElementById('tabAll');
       const tabGroEl = document.getElementById('tabGroceries');
+      const tabRestEl = document.getElementById('tabRestaurants');
+      const tabCafeEl = document.getElementById('tabCafe');
+      const tabGasEl = document.getElementById('tabGas');
 
       const canvas = document.getElementById('donutCanvas');
       const legend = document.getElementById('donutLegend');
@@ -1031,7 +1024,23 @@
       }
 
       async function computeCategories(){
-        const monthReceipts = getReceiptsForSelectedMonth();
+        let monthReceipts = getReceiptsForSelectedMonth();
+
+        // Apply category tabs (except "all")
+        const tabKey = String(tab || 'all').toLowerCase();
+        if (tabKey !== 'all' && tabKey !== 'groceries'){
+          const want =
+            tabKey === 'restaurants' ? 'restaurant' :
+            tabKey === 'cafe' ? 'cafe' :
+            tabKey === 'gas' ? 'gas' :
+            tabKey;
+          monthReceipts = monthReceipts.filter(r => String(r.category || '').trim().toLowerCase() === want);
+        } else if (tabKey === 'groceries'){
+          // For groceries tab, keep grocery receipts + direct grocery subcategories
+          const groceryCats = new Set(['groceries','meat/fish','dairy','produce','snacks','pantry','bakery','drinks','grains']);
+          monthReceipts = monthReceipts.filter(r => groceryCats.has(String(r.category || '').trim().toLowerCase()));
+        }
+
         // Stores mode:
         // - no selectedStore => monthly totals by store
         // - selectedStore    => category breakdown filtered to that store (tabs still work)
@@ -1040,14 +1049,14 @@
             activeCategories = aggregateByStore(monthReceipts);
           } else {
             const filtered = monthReceipts.filter(r => normalizeStoreName(r.store) === selectedStore);
-            if (tab === 'groceries') activeCategories = await aggregateGroceriesBreakdown(filtered);
+            if (tabKey === 'groceries') activeCategories = await aggregateGroceriesBreakdown(filtered);
             else activeCategories = aggregateByReceiptCategory(filtered);
           }
           return;
         }
 
         // Default category mode (existing behavior)
-        if (tab === 'groceries') activeCategories = await aggregateGroceriesBreakdown(monthReceipts);
+        if (tabKey === 'groceries') activeCategories = await aggregateGroceriesBreakdown(monthReceipts);
         else activeCategories = aggregateByReceiptCategory(monthReceipts);
       }
 
@@ -1082,7 +1091,7 @@
 
       function updateModeUI(){
         if (storesBtn) storesBtn.classList.toggle('toggle-on', donutMode === 'stores');
-        if (rentalFilterBtn) rentalFilterBtn.classList.toggle('active', rentalOnly);
+        if (rentalFilterBtn) rentalFilterBtn.classList.toggle('toggle-on', rentalOnly);
         if (storePanel){
           storePanel.style.display = (donutMode === 'stores') ? 'flex' : 'none';
           if (donutMode === 'stores') renderStorePanel();
@@ -1101,16 +1110,23 @@
       async function setTab(newTab){
         tab = newTab;
         selectedIndex = null;
+
         tabAllEl.classList.toggle('active', tab === 'all');
         tabGroEl.classList.toggle('active', tab === 'groceries');
+        if (tabRestEl) tabRestEl.classList.toggle('active', tab === 'restaurants');
+        if (tabCafeEl) tabCafeEl.classList.toggle('active', tab === 'cafe');
+        if (tabGasEl) tabGasEl.classList.toggle('active', tab === 'gas');
+
         await computeCategories();
         redraw();
         renderRecent();
-
       }
 
       tabAllEl.addEventListener('click', ()=>setTab('all'));
       tabGroEl.addEventListener('click', ()=>setTab('groceries'));
+      if (tabRestEl) tabRestEl.addEventListener('click', ()=>setTab('restaurants'));
+      if (tabCafeEl) tabCafeEl.addEventListener('click', ()=>setTab('cafe'));
+      if (tabGasEl) tabGasEl.addEventListener('click', ()=>setTab('gas'));
 
       canvas.addEventListener('click', (ev) => {
         const rect = canvas.getBoundingClientRect();
@@ -1120,20 +1136,6 @@
         if (idx == null) selectedIndex = null;
         else selectedIndex = (selectedIndex === idx) ? null : idx;
         redraw();
-      });
-
-      document.getElementById('donutResetBtn').addEventListener('click', ()=>{
-        // Full reset: back to default chart state
-        donutMode = 'category';
-        selectedStore = null;
-        rentalOnly = false;
-        tab = 'all';
-        selectedIndex = null;
-
-        tabAllEl.classList.toggle('active', true);
-        tabGroEl.classList.toggle('active', false);
-        updateModeUI();
-        refreshAll();
       });
 
       monthPrevEl.addEventListener('click', async ()=>{
@@ -1195,17 +1197,27 @@
       let recentExpanded = false;
 
       function renderRecent(){
-        const { start: mStart, end: mEnd } = getMonthRangeFromBase(now, monthOffset);
+        let list = getReceiptsForSelectedMonth();
 
-        const monthReceipts = allReceipts.filter(r => {
-          const d = toDate(r.date);
-          if (!(d >= mStart && d < mEnd)) return false;
-          if (hideMortgage && isMortgageReceipt(r)) return false;
-          return true;
-        });
+        const tabKey = String(tab || 'all').toLowerCase();
+        if (tabKey !== 'all' && tabKey !== 'groceries'){
+          const want =
+            tabKey === 'restaurants' ? 'restaurant' :
+            tabKey === 'cafe' ? 'cafe' :
+            tabKey === 'gas' ? 'gas' :
+            tabKey;
+          list = list.filter(r => String(r.category || '').trim().toLowerCase() === want);
+        } else if (tabKey === 'groceries'){
+          const groceryCats = new Set(['groceries','meat/fish','dairy','produce','snacks','pantry','bakery','drinks','grains']);
+          list = list.filter(r => groceryCats.has(String(r.category || '').trim().toLowerCase()));
+        }
 
-        const sorted = [...monthReceipts].sort((a,b)=> toDate(b.date) - toDate(a.date));
+        // Stores drill-down should affect Recent Purchases
+        if (donutMode === 'stores' && selectedStore){
+          list = list.filter(r => normalizeStoreName(r.store) === selectedStore);
+        }
 
+        const sorted = [...list].sort((a,b)=> toDate(b.date) - toDate(a.date));
 
         const maxCollapsed = 3;
         const maxExpanded = 12;
@@ -1259,7 +1271,6 @@
           recentWrap.appendChild(row);
         });
 
-        // show toggle only if there are more than 3 receipts total
         if (sorted.length > maxCollapsed){
           recentToggleWrap.style.display = 'flex';
           recentToggleBtn.textContent = recentExpanded ? 'Show less ▲' : 'Show more ▼';
