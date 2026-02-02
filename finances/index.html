@@ -33,7 +33,7 @@
     }
     .topbar-inner{
       max-width:1120px; margin:0 auto;
-      padding:10px 12px;
+      padding:8px 12px;
       display:flex; align-items:center; gap:10px;
     }
     .brand{
@@ -76,7 +76,7 @@
       border-color: transparent;
     }
 
-    .wrap{max-width:1120px; margin:0 auto; padding:10px}
+    .wrap{max-width:1120px; margin:0 auto; padding:6px}
 
     .card{
       background: rgba(19,26,34,.72);
@@ -89,7 +89,7 @@
     /* Month nav above the 2 stats */
     .monthbar{
       display:flex; align-items:center; justify-content:center; gap:10px;
-      padding:8px 12px 0 12px;
+      padding:4px 10px 0 10px;
     }
     .monthbtn{
       width:40px; height:38px;
@@ -110,7 +110,7 @@
 
     .stats{
       display:grid; gap:12px; grid-template-columns: repeat(2, 1fr);
-      padding:12px;
+      padding:10px;
     }
     .stat{
       padding:12px 14px;
@@ -173,7 +173,7 @@
 
     .card-h{
       display:flex; align-items:center; justify-content:space-between;
-      padding:14px 16px;
+      padding:10px 14px;
       border-bottom:1px solid rgba(42,53,67,.55);
       gap:12px;
       flex-wrap:wrap;
@@ -183,7 +183,7 @@
       display:flex; align-items:center; gap:8px;
       letter-spacing:.2px;
     }
-    .card-b{padding:14px 16px}
+    .card-b{padding:12px 14px}
 
     .btn{
       padding:10px 14px;
@@ -313,19 +313,19 @@
 <body>
   <div class="topbar">
     <div class="topbar-inner">
-      <a class="brand" href="https://ragnorak02.github.io/levelUp/main.html" title="Back to LevelUp">🏠 <span>Finances</span></a>
+      <a class="brand" href="index.html" title="Finances dashboard">💰 <span>Finances</span></a>
       <div class="nav">
-        <a class="pill active" href="index.html">Home</a>
+        <a class="pill" href="https://ragnorak02.github.io/levelUp/main.html">Home</a>
+        <a class="pill active" href="index.html">Finances</a>
         <a class="pill" href="food.html">Food</a>
         <a class="pill" href="search.html">Search</a>
         <a class="pill" href="receipts.html">Receipts</a>
-        <a class="pill" href="analytics.html">Analytics</a>
       </div>
     </div>
   </div>
 
   <div class="wrap">
-    <div class="card" style="margin-top:12px;">
+    <div class="card" style="margin-top:8px;">
       <div class="monthbar">
         <button class="monthbtn" id="monthPrev" type="button">◀</button>
         <div class="monthlabel" id="monthLabel">Month</div>
