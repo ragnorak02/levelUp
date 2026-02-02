@@ -838,7 +838,10 @@
       }
 
       function applyRentalFilter(list){
-        return rentalOnly ? list.filter(r => String(r.property||'').toLowerCase() === 'rental') : list;
+        const prop = (r)=> String(r.property||'').trim().toLowerCase();
+        // Default: exclude rental-property receipts from primary view
+        // (Rental toggle switches the whole app into rental-only mode)
+        return rentalOnly ? list.filter(r => prop(r) === 'rental') : list.filter(r => prop(r) !== 'rental');
       }
 
       function normalizeStoreName(store){
@@ -913,7 +916,7 @@
 
       const mortgageToggleBtn = document.getElementById('mortgageToggleBtn');
       if (mortgageToggleBtn){
-        mortgageToggleBtn.classList.toggle('toggle-on', hideMortgage);
+        mortgageToggleBtn.classList.toggle('toggle-on', !hideMortgage);
         mortgageToggleBtn.textContent = hideMortgage ? 'Show Mortgage' : 'Hide Mortgage';
       }
 
@@ -1055,8 +1058,12 @@
           return;
         }
 
-        // Default category mode (existing behavior)
+        // Default category mode
+        // - groceries => grocery breakdown
+        // - restaurants/cafe => break down by store (so you can see which restaurants/cafes)
+        // - otherwise => category breakdown
         if (tabKey === 'groceries') activeCategories = await aggregateGroceriesBreakdown(monthReceipts);
+        else if (tabKey === 'restaurants' || tabKey === 'cafe') activeCategories = aggregateByStore(monthReceipts);
         else activeCategories = aggregateByReceiptCategory(monthReceipts);
       }
 
@@ -1184,7 +1191,7 @@
       if (mortgageToggleBtn){
         mortgageToggleBtn.addEventListener('click', async ()=>{
           hideMortgage = !hideMortgage;
-          mortgageToggleBtn.classList.toggle('toggle-on', hideMortgage);
+          mortgageToggleBtn.classList.toggle('toggle-on', !hideMortgage);
           mortgageToggleBtn.textContent = hideMortgage ? 'Show Mortgage' : 'Hide Mortgage';
           await refreshAll();
         });
