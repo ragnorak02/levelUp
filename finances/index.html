@@ -33,9 +33,11 @@
     }
     .topbar-inner{
       max-width:1120px; margin:0 auto;
-      padding:8px 12px;
+      padding:6px 10px;
       display:flex; align-items:center; gap:10px;
-    }
+      flex-wrap:nowrap;
+    
+}
     .brand{
       display:flex; align-items:center; gap:8px;
       font-weight:900;
@@ -76,7 +78,10 @@
       border-color: transparent;
     }
 
-    .wrap{max-width:1120px; margin:0 auto; padding:6px}
+    .wrap{
+      max-width:1120px; margin:0 auto; padding:8px;
+    
+}
 
     .card{
       background: rgba(19,26,34,.72);
@@ -89,8 +94,9 @@
     /* Month nav above the 2 stats */
     .monthbar{
       display:flex; align-items:center; justify-content:center; gap:10px;
-      padding:4px 10px 0 10px;
-    }
+      padding:6px 10px 0 10px;
+    
+}
     .monthbtn{
       width:40px; height:38px;
       border-radius:12px;
@@ -109,9 +115,10 @@
     }
 
     .stats{
-      display:grid; gap:12px; grid-template-columns: repeat(2, 1fr);
+      display:grid; gap:10px; grid-template-columns: repeat(2, 1fr);
       padding:10px;
-    }
+    
+}
     .stat{
       padding:12px 14px;
       background: rgba(11,15,20,.35);
@@ -173,17 +180,18 @@
 
     .card-h{
       display:flex; align-items:center; justify-content:space-between;
-      padding:10px 14px;
-      border-bottom:1px solid rgba(42,53,67,.55);
-      gap:12px;
-      flex-wrap:wrap;
-    }
+      padding:10px 12px;
+    
+}
     .card-h h3{
       margin:0; font-size:14px; color:var(--muted);
       display:flex; align-items:center; gap:8px;
       letter-spacing:.2px;
     }
-    .card-b{padding:12px 14px}
+    .card-b{
+      padding:10px 12px;
+    
+}
 
     .btn{
       padding:10px 14px;
@@ -307,13 +315,38 @@
       justify-content:center;
       gap:8px;
     }
-  </style>
+  
+
+    .brand-group{
+      display:flex; align-items:center; gap:8px;
+      flex:0 0 auto;
+    
+    }
+
+
+    .brand-group .brand{
+      padding:8px 10px;
+      border-radius:999px;
+    
+    }
+
+
+    .brand-group .brand.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
+    
+    }
+</style>
 </head>
 
 <body>
   <div class="topbar">
     <div class="topbar-inner">
-      <a class="brand" href="index.html" title="Finances dashboard">💰 <span>Finances</span></a>
+      <div class="brand-group" role="navigation" aria-label="Home and Finances">
+  <a class="brand brand-home" href="https://ragnorak02.github.io/levelUp/main.html" title="Back to LevelUp Home">🏠 <span>Home</span></a>
+  <a class="brand brand-fin active" href="index.html" title="Finances dashboard">💰 <span>Finances</span></a>
+</div>
       <div class="nav">
         <a class="pill" href="https://ragnorak02.github.io/levelUp/main.html">Home</a>
         <a class="pill active" href="index.html">Finances</a>
@@ -373,7 +406,7 @@
 
           <div id="storePanel" class="store-panel" style="display:none;"></div>
 
-          <div style="margin-top:12px;">
+          <div style="margin-top:8px;">
             <canvas id="donutCanvas" width="620" height="360"></canvas>
           </div>
 
@@ -383,7 +416,7 @@
 </div>
     </div>
 
-    <div class="card" style="margin-top:14px;">
+    <div class="card" style="margin-top:10px;">
       <div class="card-h">
         <h3>🛒 Recent Purchases</h3>
       </div>
