@@ -5,222 +5,252 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Receipts</title>
   <style>
-    :root {
-      --bg: #080c11; --panel: #0d131a; --ink: #e8eef6; --muted: #9fb0c7;
-      --ring: #1c2a37; --accent: #4CAF50; --accent-2: #2dd4bf; --danger: #ef4444;
-      --card-bg: #0e141b; --hover-bg: #1a1f26;
+    :root{
+      --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7;
+      --accent:#4CAF50; --accent2:#2dd4bf;
+      --ring:#2a3543; --good:#22c55e; --danger:#ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
-      background: linear-gradient(180deg, #070b10 0%, #0a1016 100%); color: var(--ink);
-      min-height: 100vh; padding-bottom: 80px;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 800px at 50% -200px, rgba(76,175,80,.20), transparent 55%),
+        radial-gradient(900px 700px at 10% 0%, rgba(45,212,191,.12), transparent 60%),
+        var(--bg);
+      color:var(--ink);
+      min-height:100vh;
+      padding-bottom: 80px;
     }
-    
-    /* Header */
-    header {
-      background: #0b1118; border-bottom: 1px solid var(--ring); padding: 16px;
-      position: sticky; top: 0; z-index: 100;
+    a{color:inherit; text-decoration:none}
+
+    /* --- TOPBAR (copied from index.html) --- */
+    .topbar{
+      position:sticky; top:0; z-index:20;
+      background: linear-gradient(180deg, rgba(11,15,20,.92), rgba(11,15,20,.72));
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(42,53,67,.55);
     }
-    .header-row {
-      display: flex; align-items: center; gap: 16px; margin-bottom: 12px;
+    .topbar-inner{
+      max-width:1120px; margin:0 auto;
+      padding:6px 10px;
+      display:flex; align-items:center; gap:10px;
+      flex-wrap:nowrap;
     }
-    .home-btn {
-      all: unset; cursor: pointer; border: 1px solid var(--ring); padding: 12px 16px;
-      border-radius: 10px; font-size: 1rem; color: var(--muted); min-height: 48px;
-      display: flex; align-items: center; justify-content: center;
+    .brand-group{display:flex; align-items:center; gap:8px; flex:0 0 auto;}
+    .brand{
+      display:flex; align-items:center; gap:8px;
+      font-weight:900;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      box-shadow: var(--shadow);
+      flex:0 0 auto;
+      white-space:nowrap;
     }
-    h1 { margin: 0; font-size: 1.3rem; font-weight: 600; flex: 1; }
-    
-    /* Nav pills: no horizontal scrolling; wrap instead */
-    .nav-pills {
-      display: flex; gap: 8px;
-      padding: 4px; background: var(--panel); border-radius: 10px; border: 1px solid var(--ring);
-      flex-wrap: wrap;
+    .brand-group .brand.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
     }
-    .nav-pill {
-      all: unset; cursor: pointer; padding: 8px 12px; border-radius: 8px;
-      font-size: 0.92rem; color: var(--muted); white-space: nowrap; min-height: 40px;
-      display: flex; align-items: center;
+    .nav{
+      margin-left:auto;
+      display:flex; gap:8px;
+      align-items:center;
+      flex:1 1 auto;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling: touch;
+      white-space:nowrap;
+      padding-bottom:2px;
     }
-    .nav-pill.active {
-      background: linear-gradient(90deg, var(--accent), #22c55e);
-      color: #04130a; font-weight: 600;
+    .nav::-webkit-scrollbar{height:6px}
+    .nav::-webkit-scrollbar-thumb{background:rgba(42,53,67,.6); border-radius:999px}
+    .pill{
+      flex:0 0 auto;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
+    }
+    .pill.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
     }
 
-    .wrap { padding: 20px 16px; }
-    
+    .wrap{ max-width:1120px; margin:0 auto; padding: 16px; }
+
     /* Filter Bar */
-    .filter-bar {
-      background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
-      padding: 16px; margin-bottom: 20px;
+    .filter-bar{
+      background: rgba(19,26,34,.72);
+      border:1px solid rgba(42,53,67,.70);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
     }
-    .filter-row {
-      display: flex; gap: 12px; margin-bottom: 12px; overflow-x: auto;
-      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    .filter-row{
+      display:flex; gap:10px; margin-bottom: 10px;
+      overflow-x:auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width:none;
     }
-    .filter-row::-webkit-scrollbar { display: none; }
-    .filter-btn {
-      all: unset; cursor: pointer; padding: 8px 12px; border-radius: 10px;
-      font-size: 0.92rem; font-weight: 600; border: 1px solid var(--ring);
-      background: var(--card-bg); color: var(--muted); white-space: nowrap;
-      min-height: 40px; display: flex; align-items: center; gap: 8px;
-    }
-    .filter-btn.active {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #04130a; border-color: var(--accent);
-    }
-
-    /* Compact Receipt Rows (tap to expand) */
-    .receipt-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      background: var(--panel);
-      border: 1px solid var(--ring);
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 12px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
-    }
-    .receipt-main {
-      all: unset;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 10px;
-      border-radius: 12px;
-      background: rgba(14, 20, 27, 0.35);
-      border: 1px solid rgba(28, 42, 55, 0.7);
-      min-height: 56px;
-    }
-    .receipt-main:active { transform: translateY(1px); }
-    .receipt-left { flex: 1; min-width: 0; }
-    .receipt-store {
-      font-weight: 800;
-      font-size: 1.05rem;
-      color: var(--ink);
-      line-height: 1.1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .receipt-sub {
-      margin-top: 6px;
-      font-size: 0.9rem;
-      color: var(--muted);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .receipt-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-    .receipt-amount {
-      font-weight: 900;
-      font-size: 1.05rem;
-      color: var(--accent);
-    }
-    .receipt-chevron {
-      width: 28px;
-      height: 28px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+    .filter-row::-webkit-scrollbar{display:none}
+    .filter-btn{
+      all:unset; cursor:pointer;
+      padding:8px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(28, 42, 55, 0.9);
+      font-size: 13px; font-weight: 900;
+      border:1px solid rgba(42,53,67,.70);
+      background: rgba(11,15,20,.35);
       color: var(--muted);
-      background: rgba(14, 20, 27, 0.45);
-      font-weight: 900;
+      white-space:nowrap;
+      min-height: 38px;
+      display:flex; align-items:center; gap:8px;
     }
-    .receipt-delete {
-      all: unset;
-      cursor: pointer;
-      width: 46px;
-      height: 46px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 12px;
-      border: 1px solid rgba(239, 68, 68, 0.35);
-      background: rgba(239, 68, 68, 0.08);
-      color: var(--danger);
-      font-size: 1.05rem;
-    }
-    .receipt-delete:active { transform: translateY(1px); }
-    .receipt-details {
-      grid-column: 1 / -1;
-      display: none;
-      padding: 6px 10px 10px;
-      border-top: 1px solid rgba(28, 42, 55, 0.7);
-      margin-top: 2px;
-    }
-    .receipt-details.show { display: block; }
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(28, 42, 55, 0.5);
-      font-size: 0.98rem;
-    }
-    .item-row:last-child { border-bottom: none; }
-    .item-name { flex: 1; color: var(--ink); }
-    .item-price { font-weight: 800; color: var(--accent-2); margin-left: 12px; }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center; padding: 60px 20px; color: var(--muted);
-    }
-    .empty-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
-    .empty-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 12px; color: var(--ink); }
-    .add-btn {
-      all: unset; cursor: pointer; display: inline-flex; align-items: center;
-      gap: 8px; padding: 16px 32px; background: linear-gradient(90deg, var(--accent), #22c55e);
-      color: #04130a; border-radius: 12px; font-weight: 700; font-size: 1.1rem;
-      margin-top: 20px; min-height: 56px;
+    .filter-btn.active{
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      color:#0b0f14;
+      border-color: transparent;
     }
 
     /* Stats Bar */
-    .stats-bar {
-      background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
-      padding: 16px; margin-bottom: 20px; display: flex; justify-content: space-around;
-      text-align: center;
+    .stats-bar{
+      background: rgba(19,26,34,.72);
+      border:1px solid rgba(42,53,67,.70);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      display:flex; justify-content:space-around; text-align:center;
     }
-    .stat { flex: 1; }
-    .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
-    .stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+    .stat{ flex:1; }
+    .stat-value{ font-size: 22px; font-weight: 950; color: var(--good); }
+    .stat-label{ font-size: 12px; color: var(--muted); font-weight: 800; margin-top: 2px; }
 
-    /* Small screens: tighten paddings a bit */
-    @media (max-width: 420px) {
-      .home-btn { padding: 10px 12px; min-height: 44px; }
-      .nav-pill { padding: 8px 10px; min-height: 40px; font-size: 0.9rem; }
-      .filter-bar { padding: 14px; }
-      .receipt-row { padding: 10px; }
+    /* Compact rows */
+    .receipt-row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      background: rgba(19,26,34,.72);
+      border:1px solid rgba(42,53,67,.70);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+    .receipt-main{
+      all:unset; cursor:pointer;
+      display:flex; align-items:center; gap:12px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      background: rgba(11,15,20,.35);
+      border:1px solid rgba(42,53,67,.55);
+      min-height: 56px;
+    }
+    .receipt-left{ flex:1; min-width:0; }
+    .receipt-store{
+      font-weight: 950;
+      font-size: 16px;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .receipt-sub{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .receipt-right{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .receipt-amount{ font-weight: 950; font-size: 16px; color: var(--good); }
+    .receipt-chevron{
+      width: 28px; height: 28px;
+      display:inline-flex; align-items:center; justify-content:center;
+      border-radius: 999px;
+      border:1px solid rgba(42,53,67,.70);
+      color: var(--muted);
+      background: rgba(11,15,20,.35);
+      font-weight: 950;
+    }
+    .receipt-delete{
+      all:unset; cursor:pointer;
+      width: 46px; height: 46px;
+      display:inline-flex; align-items:center; justify-content:center;
+      border-radius: 14px;
+      border:1px solid rgba(239,68,68,.35);
+      background: rgba(239,68,68,.08);
+      color: var(--danger);
+      font-size: 16px;
+      font-weight: 950;
+    }
+    .receipt-details{
+      grid-column: 1 / -1;
+      display:none;
+      padding: 6px 10px 10px;
+      border-top: 1px solid rgba(42,53,67,.45);
+      margin-top: 2px;
+    }
+    .receipt-details.show{ display:block; }
+    .item-row{
+      display:flex; justify-content:space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(42,53,67,.35);
+      font-size: 14px;
+    }
+    .item-row:last-child{ border-bottom:none; }
+    .item-name{ flex:1; color: var(--ink); }
+    .item-price{ font-weight: 900; color: rgba(45,212,191,.95); margin-left: 12px; }
+
+    .empty-state{
+      text-align:center; padding: 50px 16px; color: var(--muted);
+      background: rgba(19,26,34,.40);
+      border:1px dashed rgba(42,53,67,.70);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    .empty-icon{ font-size: 44px; margin-bottom: 10px; opacity:.7; }
+    .empty-title{ font-size: 18px; font-weight: 950; color: var(--ink); margin-bottom: 8px; }
+
+    .add-btn{
+      all:unset; cursor:pointer;
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      color:#0b0f14;
+      border-radius: 14px;
+      font-weight: 950;
+      margin-top: 14px;
     }
   </style>
   <script src="dataLoader.js"></script>
 </head>
 <body>
-  <header>
-    <div class="header-row">
-      <button class="home-btn" onclick="location.href='index.html'">⟵</button>
-      <h1>Receipts</h1>
+  <!-- TOPBAR (standardized) -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-group" role="navigation" aria-label="Home and Finances">
+        <a class="brand brand-home" href="https://ragnorak02.github.io/levelUp/main.html" title="Back to LevelUp Home">🏠 <span>Home</span></a>
+        <a class="brand brand-fin active" href="index.html" title="Finances dashboard">💰</a>
+      </div>
+      <div class="nav">
+        <a class="pill" href="index.html">Finances</a>
+        <a class="pill" href="food.html">Food</a>
+        <a class="pill" href="search.html">Search</a>
+        <a class="pill active" href="receipts.html">Receipts</a>
+      </div>
     </div>
-    <nav class="nav-pills">
-      <button class="nav-pill" onclick="location.href='index.html'">Dashboard</button>
-      <button class="nav-pill" onclick="location.href='food.html'">Food</button>
-      <button class="nav-pill" onclick="location.href='search.html'">Search</button>
-      <button class="nav-pill active">Receipts</button>
-      <button class="nav-pill" onclick="location.href='analytics.html'">Analytics</button>
-    </nav>
-  </header>
+  </div>
 
   <main class="wrap">
-    <!-- Filter Bar -->
     <div class="filter-bar">
       <div class="filter-row" id="storeFilters">
         <button class="filter-btn active" data-store="all">All Stores</button>
@@ -232,7 +262,6 @@
       </div>
     </div>
 
-    <!-- Stats Bar -->
     <div class="stats-bar" id="statsBar">
       <div class="stat">
         <div class="stat-value" id="totalReceipts">0</div>
@@ -248,34 +277,24 @@
       </div>
     </div>
 
-    <!-- Receipts List -->
     <div id="receiptsList"></div>
   </main>
 
   <script>
     const STORAGE_KEY = 'finances:receipts';
 
-    // Load receipts
     function loadReceipts() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      } catch (e) {
-        console.error('Error loading receipts:', e);
-        return [];
-      }
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+      catch (e) { console.error('Error loading receipts:', e); return []; }
     }
 
-    // Initialize (after seeding hardcoded data on first load)
     let allReceipts = [];
     let filteredReceipts = [];
-
     let activeStore = 'all';
     let activePeriod = 'all';
 
     (async function initReceiptsPage() {
-      // IMPORTANT: wait for dataLoader.js to finish seeding/merging
       await (window.FinancesDataLoader?.ready || Promise.resolve());
-
       allReceipts = loadReceipts();
       applyFilters();
       render();
@@ -285,9 +304,7 @@
       const now = new Date();
       let out = [...allReceipts];
 
-      if (activeStore !== 'all') {
-        out = out.filter(r => r.store === activeStore);
-      }
+      if (activeStore !== 'all') out = out.filter(r => r.store === activeStore);
 
       if (activePeriod === 'month') {
         out = out.filter(r => {
@@ -302,44 +319,36 @@
       filteredReceipts = out;
     }
 
-    // Render everything
     function render() {
       if (allReceipts.length === 0) {
         showEmptyState();
         return;
       }
-
       renderStoreFilters();
       renderReceipts();
       updateStats();
     }
 
-    // Empty state
     function showEmptyState() {
       document.getElementById('receiptsList').innerHTML = `
         <div class="empty-state">
           <div class="empty-icon">🧾</div>
           <div class="empty-title">No Receipts Yet</div>
           <p>Start tracking your spending by adding your first receipt</p>
-          <button class="add-btn" onclick="location.href='addReceipt.html'">
-            📝 Add Receipt
-          </button>
+          <button class="add-btn" onclick="location.href='addReceipt.html'">📝 Add Receipt</button>
         </div>
       `;
       document.getElementById('statsBar').style.display = 'none';
       document.querySelector('.filter-bar').style.display = 'none';
     }
 
-    // Render store filters
     function renderStoreFilters() {
       const stores = [...new Set(allReceipts.map(r => r.store))];
       const container = document.getElementById('storeFilters');
-      
+
       container.innerHTML = `<button class="filter-btn ${activeStore==='all' ? 'active' : ''}" data-store="all">All Stores</button>`;
-      container.querySelector('[data-store="all"]').addEventListener('click', (e) => {
-        onStoreSelected('all', e);
-      });
-      
+      container.querySelector('[data-store="all"]').addEventListener('click', (e) => onStoreSelected('all', e));
+
       stores.forEach(store => {
         const btn = document.createElement('button');
         btn.className = 'filter-btn' + (store === activeStore ? ' active' : '');
@@ -350,46 +359,35 @@
       });
     }
 
-    // Store selection handler (fixes event.target bug)
     function onStoreSelected(store, e) {
       activeStore = store;
       document.querySelectorAll('[data-store]').forEach(btn => btn.classList.remove('active'));
       e.currentTarget.classList.add('active');
-
       applyFilters();
       renderReceipts();
       updateStats();
     }
 
-    // Filter by date
     document.querySelectorAll('[data-period]').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        
+
         activePeriod = btn.dataset.period;
         applyFilters();
-        
         renderReceipts();
         updateStats();
       });
     });
 
-    // Render receipts
     function renderReceipts() {
       const container = document.getElementById('receiptsList');
       container.innerHTML = '';
-      
-      // Sort by date (newest first)
+
       const sorted = [...filteredReceipts].sort((a, b) => new Date(b.date) - new Date(a.date));
-      
-      sorted.forEach((receipt) => {
-        const row = createReceiptRow(receipt);
-        container.appendChild(row);
-      });
+      sorted.forEach(receipt => container.appendChild(createReceiptRow(receipt)));
     }
 
-    // Create compact row (tap row to expand; delete on the right)
     function createReceiptRow(receipt) {
       const row = document.createElement('div');
       row.className = 'receipt-row';
@@ -397,15 +395,13 @@
       const id = String(receipt.id || `${receipt.store}_${receipt.date}_${receipt.total}`)
         .replace(/[^a-zA-Z0-9_-]/g, '_');
 
-      const dateStr = new Date(receipt.date).toLocaleDateString('en-US', {
-        month: 'short', day: 'numeric', year: 'numeric'
-      });
+      const dateStr = new Date(receipt.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
       row.innerHTML = `
         <button class="receipt-main" type="button" onclick="toggleReceiptDetails('${id}')" aria-expanded="false" aria-controls="details_${id}">
           <div class="receipt-left">
             <div class="receipt-store">${receipt.store}</div>
-            <div class="receipt-sub">${dateStr} • ${receipt.items.length} items</div>
+            <div class="receipt-sub">${dateStr} • ${(receipt.items||[]).length} items</div>
           </div>
           <div class="receipt-right">
             <div class="receipt-amount">$${parseFloat(receipt.total || 0).toFixed(2)}</div>
@@ -414,7 +410,7 @@
         </button>
         <button class="receipt-delete" type="button" onclick="deleteReceiptById('${receipt.id || ''}')" aria-label="Delete receipt">🗑️</button>
         <div class="receipt-details" id="details_${id}">
-          ${receipt.items.map(item => `
+          ${(receipt.items||[]).map(item => `
             <div class="item-row">
               <span class="item-name">${item.name}</span>
               <span class="item-price">$${parseFloat(item.price || 0).toFixed(2)}</span>
@@ -426,7 +422,6 @@
       return row;
     }
 
-    // Toggle details by safe DOM id
     function toggleReceiptDetails(safeId) {
       const details = document.getElementById(`details_${safeId}`);
       const chev = document.getElementById(`chev_${safeId}`);
@@ -436,13 +431,9 @@
       chev.textContent = expanded ? '▴' : '▾';
     }
 
-    // Delete by receipt.id (fixes mismatch caused by sorting + filtering)
     function deleteReceiptById(receiptId) {
       if (!confirm('Delete this receipt?')) return;
-      if (!receiptId) {
-        alert('This receipt is missing an id and cannot be safely deleted.');
-        return;
-      }
+      if (!receiptId) { alert('This receipt is missing an id and cannot be safely deleted.'); return; }
 
       const idx = allReceipts.findIndex(r => r.id === receiptId);
       if (idx === -1) return;
@@ -454,17 +445,14 @@
       render();
     }
 
-    // Update stats
     function updateStats() {
       const total = filteredReceipts.reduce((sum, r) => sum + parseFloat(r.total || 0), 0);
       const avg = filteredReceipts.length > 0 ? total / filteredReceipts.length : 0;
-      
+
       document.getElementById('totalReceipts').textContent = filteredReceipts.length;
       document.getElementById('totalSpent').textContent = '$' + total.toFixed(2);
       document.getElementById('avgReceipt').textContent = '$' + avg.toFixed(2);
     }
-
-    // NOTE: do not call render() here — initReceiptsPage() runs after data loader is ready.
   </script>
 </body>
 </html>

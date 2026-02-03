@@ -5,145 +5,219 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Price Lookup</title>
   <style>
-    :root {
-      --bg: #080c11; --panel: #0d131a; --ink: #e8eef6; --muted: #9fb0c7;
-      --ring: #1c2a37; --accent: #4CAF50; --accent-2: #2dd4bf; --danger: #ef4444;
-      --warn: #f59e0b; --card-bg: #0e141b; --hover-bg: #1a1f26;
+    :root{
+      --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7;
+      --accent:#4CAF50; --accent2:#2dd4bf;
+      --ring:#2a3543; --good:#22c55e; --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
-      background: linear-gradient(180deg, #070b10 0%, #0a1016 100%); color: var(--ink);
-      min-height: 100vh;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 800px at 50% -200px, rgba(76,175,80,.20), transparent 55%),
+        radial-gradient(900px 700px at 10% 0%, rgba(45,212,191,.12), transparent 60%),
+        var(--bg);
+      color:var(--ink);
+      min-height:100vh;
     }
-    header {
-      background: #0b1118; border-bottom: 1px solid var(--ring); padding: 12px 16px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    a{color:inherit; text-decoration:none}
+
+    /* --- TOPBAR (copied from index.html) --- */
+    .topbar{
+      position:sticky; top:0; z-index:20;
+      background: linear-gradient(180deg, rgba(11,15,20,.92), rgba(11,15,20,.72));
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(42,53,67,.55);
     }
-    .home-btn {
-      all: unset; cursor: pointer; border: 1px solid var(--ring); padding: .4rem .7rem;
-      border-radius: .6rem; font-size: .9rem; color: var(--muted); transition: background 0.2s;
+    .topbar-inner{
+      max-width:1120px; margin:0 auto;
+      padding:6px 10px;
+      display:flex; align-items:center; gap:10px;
+      flex-wrap:nowrap;
     }
-    .home-btn:hover { background: var(--hover-bg); }
-    h1 { margin: 0; font-size: 1.1rem; font-weight: 600; }
-    .nav-pills {
-      display: flex; gap: 6px; background: var(--panel); padding: 4px;
-      border-radius: 10px; border: 1px solid var(--ring); flex-wrap: wrap;
+    .brand-group{display:flex; align-items:center; gap:8px; flex:0 0 auto;}
+    .brand{
+      display:flex; align-items:center; gap:8px;
+      font-weight:900;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      box-shadow: var(--shadow);
+      flex:0 0 auto;
+      white-space:nowrap;
     }
-    .nav-pill {
-      all: unset; cursor: pointer; padding: .4rem .8rem; border-radius: 8px;
-      font-size: .85rem; color: var(--muted); transition: all .2s; white-space: nowrap;
+    .brand-group .brand.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
     }
-    .nav-pill.active {
-      background: linear-gradient(90deg, var(--accent), #22c55e);
-      color: #04130a; font-weight: 600;
+    .nav{
+      margin-left:auto;
+      display:flex; gap:8px;
+      align-items:center;
+      flex:1 1 auto;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling: touch;
+      white-space:nowrap;
+      padding-bottom:2px;
     }
-    .wrap {
-      width: min(1200px, 100%); margin: 0 auto; padding: 16px;
-      display: flex; flex-direction: column; gap: 16px;
+    .nav::-webkit-scrollbar{height:6px}
+    .nav::-webkit-scrollbar-thumb{background:rgba(42,53,67,.6); border-radius:999px}
+    .pill{
+      flex:0 0 auto;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
     }
-    .search-box {
-      background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
-      padding: 20px; position: sticky; top: 16px; z-index: 10;
+    .pill.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
     }
-    .search-input {
-      width: 100%; padding: 14px 16px; background: var(--card-bg);
-      border: 2px solid var(--ring); border-radius: 12px; color: var(--ink);
-      font-size: 1.1rem; transition: border-color 0.2s;
+
+    .wrap{max-width:1120px; margin:0 auto; padding:16px; display:flex; flex-direction:column; gap:16px;}
+
+    .search-box{
+      background: rgba(19,26,34,.72);
+      border:1px solid rgba(42,53,67,.70);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+      position: sticky;
+      top: 56px; /* sits under topbar */
+      z-index: 10;
     }
-    .search-input:focus { outline: none; border-color: var(--accent); }
-    .quick-filters {
-      display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+
+    .search-input{
+      width:100%;
+      padding:14px 16px;
+      background: rgba(11,15,20,.35);
+      border: 2px solid rgba(42,53,67,.70);
+      border-radius: 14px;
+      color: var(--ink);
+      font-size: 16px;
     }
-    .filter-btn {
-      all: unset; cursor: pointer; padding: .5rem .9rem; border-radius: 20px;
-      background: var(--card-bg); border: 1px solid var(--ring);
-      font-size: .85rem; color: var(--muted); transition: all 0.2s;
+    .search-input:focus{ outline:none; border-color: rgba(76,175,80,.75); }
+
+    .quick-filters{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+    .filter-btn{
+      all:unset; cursor:pointer;
+      padding:8px 12px;
+      border-radius: 999px;
+      background: rgba(11,15,20,.35);
+      border: 1px solid rgba(42,53,67,.70);
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 900;
     }
-    .filter-btn:hover { background: var(--hover-bg); }
-    .filter-btn.active {
-      background: var(--accent); color: #04130a; border-color: var(--accent); font-weight: 600;
+    .filter-btn.active{
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      color:#0b0f14;
+      border-color: transparent;
     }
-    .results-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 0; border-bottom: 1px solid var(--ring);
+
+    .results-header{
+      display:flex; justify-content:space-between; align-items:center;
+      padding: 0 2px;
+      border-bottom: 1px solid rgba(42,53,67,.45);
+      padding-bottom: 10px;
     }
-    .results-count { color: var(--muted); font-size: .9rem; }
-    .sort-select {
-      padding: .5rem .8rem; background: var(--card-bg); border: 1px solid var(--ring);
-      border-radius: 8px; color: var(--ink); font-size: .9rem; cursor: pointer;
+    .results-count{ color: var(--muted); font-size: 13px; font-weight: 800; }
+    .sort-select{
+      padding:8px 10px;
+      background: rgba(11,15,20,.35);
+      border:1px solid rgba(42,53,67,.70);
+      border-radius: 12px;
+      color: var(--ink);
+      font-weight: 900;
     }
-    .item-card {
-      background: var(--panel); border: 1px solid var(--ring); border-radius: 12px;
-      padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;
+
+    .item-card{
+      background: rgba(19,26,34,.72);
+      border:1px solid rgba(42,53,67,.70);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
     }
-    .item-card:hover {
-      background: var(--hover-bg); border-color: var(--accent);
-      transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, .3);
+    .item-card:hover{
+      border-color: rgba(76,175,80,.65);
+      background: rgba(76,175,80,.04);
+      transform: translateY(-1px);
     }
-    .item-header {
-      display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;
+    .item-header{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
+    .item-name{ font-weight: 950; font-size: 16px; }
+    .item-category{ font-size: 12px; color: rgba(45,212,191,.95); font-weight: 800; }
+    .item-price{ font-size: 22px; font-weight: 950; color: var(--good); text-align:right; }
+    .price-unit{ font-size: 12px; color: var(--muted); font-weight: 800; }
+
+    .price-stats{ display:flex; gap:14px; margin-top: 6px; font-size: 12px; color: var(--muted); flex-wrap:wrap; font-weight: 800; }
+    .stat-value{ color: var(--ink); font-weight: 900; }
+
+    .store-comparison{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(42,53,67,.45);
     }
-    .item-name {
-      font-weight: 600; font-size: 1.1rem; color: var(--ink); margin-bottom: 4px;
+    .store-price{
+      background: rgba(11,15,20,.35);
+      border: 1px solid rgba(42,53,67,.70);
+      border-radius: 12px;
+      padding: 10px 12px;
+      flex: 1;
+      min-width: 140px;
     }
-    .item-category {
-      font-size: .85rem; color: var(--accent-2);
+    .store-name{ font-size: 12px; color: var(--muted); font-weight: 900; }
+    .store-amount{ font-size: 16px; font-weight: 950; }
+    .store-best{ outline: 2px solid rgba(76,175,80,.45); }
+
+    .empty-state{
+      text-align:center; padding: 50px 16px; color: var(--muted);
+      background: rgba(19,26,34,.40);
+      border:1px dashed rgba(42,53,67,.70);
+      border-radius: 16px;
     }
-    .item-price {
-      font-size: 1.5rem; font-weight: 700; color: var(--accent); text-align: right;
-    }
-    .price-unit { font-size: .85rem; color: var(--muted); }
-    .store-comparison {
-      display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px;
-      padding-top: 12px; border-top: 1px solid var(--ring);
-    }
-    .store-price {
-      background: var(--card-bg); border: 1px solid var(--ring); border-radius: 8px;
-      padding: 8px 12px; flex: 1; min-width: 120px;
-    }
-    .store-name {
-      font-size: .8rem; color: var(--muted); margin-bottom: 4px;
-    }
-    .store-amount {
-      font-size: 1.1rem; font-weight: 700; color: var(--ink);
-    }
-    .store-best {
-      background: rgba(76, 175, 80, 0.1); border-color: var(--accent);
-    }
-    .store-best .store-amount { color: var(--accent); }
-    .price-stats {
-      display: flex; gap: 16px; margin-top: 8px; font-size: .85rem; color: var(--muted);
-    }
-    .stat-item { display: flex; align-items: center; gap: 4px; }
-    .stat-label { color: var(--muted); }
-    .stat-value { color: var(--ink); font-weight: 600; }
-    .empty-state {
-      text-align: center; padding: 60px 20px; color: var(--muted);
-    }
-    .empty-icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.5; }
-    @media (max-width: 768px) {
-      .item-header { flex-direction: column; gap: 8px; }
-      .item-price { text-align: left; }
-      .store-comparison { flex-direction: column; }
+    .empty-icon{ font-size: 44px; margin-bottom: 10px; opacity: .7; }
+
+    @media (max-width: 768px){
+      .item-header{ flex-direction:column; gap:8px; }
+      .item-price{ text-align:left; }
+      .store-comparison{ flex-direction:column; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <button class="home-btn" onclick="location.href='index.html'">⟵ Dashboard</button>
-    <h1>Price Lookup</h1>
-    <nav class="nav-pills">
-      <button class="nav-pill" onclick="location.href='index.html'">Dashboard</button>
-      <button class="nav-pill" onclick="location.href='food.html'">Food</button>
-      <button class="nav-pill active">Search</button>
-      <button class="nav-pill" onclick="location.href='receipts.html'">Receipts</button>
-    </nav>
-  </header>
+  <!-- TOPBAR (standardized) -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-group" role="navigation" aria-label="Home and Finances">
+        <a class="brand brand-home" href="https://ragnorak02.github.io/levelUp/main.html" title="Back to LevelUp Home">🏠 <span>Home</span></a>
+        <a class="brand brand-fin active" href="index.html" title="Finances dashboard">💰</a>
+      </div>
+      <div class="nav">
+        <a class="pill" href="index.html">Finances</a>
+        <a class="pill" href="food.html">Food</a>
+        <a class="pill active" href="search.html">Search</a>
+        <a class="pill" href="receipts.html">Receipts</a>
+      </div>
+    </div>
+  </div>
 
   <main class="wrap">
     <div class="search-box">
-      <input type="text" class="search-input" id="searchInput" 
+      <input type="text" class="search-input" id="searchInput"
              placeholder="Search items... (e.g., 'milk', 'chicken', 'yogurt')" autofocus>
       <div class="quick-filters">
         <button class="filter-btn active" data-category="all">All Items</button>
@@ -182,12 +256,11 @@
       await (window.FinancesDataLoader?.ready || window.financesDataReady || Promise.resolve());
       loadAllItems();
       setupEventListeners();
-      
-      // Check for URL query
+
       const params = new URLSearchParams(window.location.search);
       const query = params.get('q');
       const category = params.get('category');
-      
+
       if (query) {
         document.getElementById('searchInput').value = query;
         performSearch(query);
@@ -198,15 +271,12 @@
 
     function setupEventListeners() {
       const searchInput = document.getElementById('searchInput');
-      searchInput.addEventListener('input', (e) => {
-        performSearch(e.target.value);
-      });
+      searchInput.addEventListener('input', (e) => performSearch(e.target.value));
 
       document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
-          
           currentFilter = btn.dataset.category;
           performSearch(searchInput.value);
         });
@@ -214,7 +284,7 @@
 
       document.getElementById('sortSelect').addEventListener('change', (e) => {
         currentSort = e.target.value;
-        performSearch(searchInput.value);
+        performSearch(document.getElementById('searchInput').value);
       });
     }
 
@@ -223,46 +293,32 @@
       const itemsMap = new Map();
 
       receipts.forEach(receipt => {
-        receipt.items.forEach(item => {
+        (receipt.items || []).forEach(item => {
           const key = (item.name || '').toLowerCase();
-          
           if (!itemsMap.has(key)) {
-            itemsMap.set(key, {
-              name: item.name,
-              category: item.category || 'Other',
-              prices: [],
-              stores: {}
-            });
+            itemsMap.set(key, { name: item.name, category: item.category || 'Other', prices: [], stores: {} });
           }
 
           const itemData = itemsMap.get(key);
           const price = parseFloat(item.price) || 0;
-          
+
           if (price > 0) {
-            itemData.prices.push({
-              price,
-              date: receipt.date,
-              store: receipt.store || 'Walmart'
-            });
+            itemData.prices.push({ price, date: receipt.date, store: receipt.store || 'Walmart' });
 
             const store = receipt.store || 'Walmart';
-            if (!itemData.stores[store]) {
-              itemData.stores[store] = [];
-            }
+            if (!itemData.stores[store]) itemData.stores[store] = [];
             itemData.stores[store].push(price);
           }
         });
       });
 
       allItems = Array.from(itemsMap.values()).map(item => {
-        // Calculate stats
         const allPrices = item.prices.map(p => p.price);
         const avgPrice = allPrices.reduce((a, b) => a + b, 0) / allPrices.length;
         const minPrice = Math.min(...allPrices);
         const maxPrice = Math.max(...allPrices);
-        const lastPrice = item.prices[item.prices.length - 1];
+        const lastPriceObj = item.prices[item.prices.length - 1];
 
-        // Store averages
         const storeAvgs = {};
         Object.entries(item.stores).forEach(([store, prices]) => {
           storeAvgs[store] = prices.reduce((a, b) => a + b, 0) / prices.length;
@@ -273,9 +329,9 @@
           avgPrice,
           minPrice,
           maxPrice,
-          lastPrice: lastPrice.price,
-          lastDate: lastPrice.date,
-          lastStore: lastPrice.store,
+          lastPrice: lastPriceObj.price,
+          lastDate: lastPriceObj.date,
+          lastStore: lastPriceObj.store,
           purchaseCount: item.prices.length,
           storeAvgs
         };
@@ -283,48 +339,28 @@
     }
 
     function getReceipts() {
-      try {
-        return JSON.parse(localStorage.getItem('finances:receipts') || '[]');
-      } catch (e) {
-        return [];
-      }
+      try { return JSON.parse(localStorage.getItem('finances:receipts') || '[]'); }
+      catch (e) { return []; }
     }
 
     function performSearch(query) {
       const searchTerm = query.toLowerCase();
-      
       let results = allItems;
 
-      // Filter by category
-      if (currentFilter !== 'all') {
-        results = results.filter(item => item.category === currentFilter);
-      }
+      if (currentFilter !== 'all') results = results.filter(item => item.category === currentFilter);
+      if (searchTerm.length > 0) results = results.filter(item => item.name.toLowerCase().includes(searchTerm));
 
-      // Filter by search term
-      if (searchTerm.length > 0) {
-        results = results.filter(item => 
-          item.name.toLowerCase().includes(searchTerm)
-        );
-      }
-
-      // Sort
       results = sortResults(results, currentSort);
-
       renderResults(results);
     }
 
     function sortResults(results, sortBy) {
       switch (sortBy) {
-        case 'name':
-          return results.sort((a, b) => a.name.localeCompare(b.name));
-        case 'price-low':
-          return results.sort((a, b) => a.lastPrice - b.lastPrice);
-        case 'price-high':
-          return results.sort((a, b) => b.lastPrice - a.lastPrice);
-        case 'recent':
-          return results.sort((a, b) => new Date(b.lastDate) - new Date(a.lastDate));
-        default:
-          return results;
+        case 'name': return results.sort((a, b) => a.name.localeCompare(b.name));
+        case 'price-low': return results.sort((a, b) => a.lastPrice - b.lastPrice);
+        case 'price-high': return results.sort((a, b) => b.lastPrice - a.lastPrice);
+        case 'recent': return results.sort((a, b) => new Date(b.lastDate) - new Date(a.lastDate));
+        default: return results;
       }
     }
 
@@ -345,11 +381,7 @@
       }
 
       container.innerHTML = '';
-
-      results.forEach(item => {
-        const card = createItemCard(item);
-        container.appendChild(card);
-      });
+      results.forEach(item => container.appendChild(createItemCard(item)));
     }
 
     function createItemCard(item) {
@@ -357,16 +389,13 @@
       card.className = 'item-card';
       card.onclick = () => viewItemDetail(item);
 
-      // Find best store
       const stores = Object.entries(item.storeAvgs);
-      const bestStore = stores.length > 0 
-        ? stores.reduce((a, b) => a[1] < b[1] ? a : b)
-        : null;
+      const bestStore = stores.length > 0 ? stores.reduce((a, b) => (a[1] < b[1] ? a : b)) : null;
 
       const storeComparisonHTML = stores.length > 1 ? `
         <div class="store-comparison">
           ${stores.sort((a, b) => a[1] - b[1]).map(([store, avg]) => `
-            <div class="store-price ${store === bestStore[0] ? 'store-best' : ''}">
+            <div class="store-price ${bestStore && store === bestStore[0] ? 'store-best' : ''}">
               <div class="store-name">${store}</div>
               <div class="store-amount">$${avg.toFixed(2)}</div>
             </div>
@@ -386,22 +415,10 @@
           </div>
         </div>
         <div class="price-stats">
-          <div class="stat-item">
-            <span class="stat-label">Avg:</span>
-            <span class="stat-value">$${item.avgPrice.toFixed(2)}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Lowest:</span>
-            <span class="stat-value">$${item.minPrice.toFixed(2)}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Highest:</span>
-            <span class="stat-value">$${item.maxPrice.toFixed(2)}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Purchased:</span>
-            <span class="stat-value">${item.purchaseCount}x</span>
-          </div>
+          <div>Avg: <span class="stat-value">$${item.avgPrice.toFixed(2)}</span></div>
+          <div>Lowest: <span class="stat-value">$${item.minPrice.toFixed(2)}</span></div>
+          <div>Highest: <span class="stat-value">$${item.maxPrice.toFixed(2)}</span></div>
+          <div>Purchased: <span class="stat-value">${item.purchaseCount}x</span></div>
         </div>
         ${storeComparisonHTML}
       `;
@@ -411,16 +428,13 @@
 
     function filterByCategory(category) {
       currentFilter = category;
-      
       document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.category === category);
       });
-      
       performSearch(document.getElementById('searchInput').value);
     }
 
     function viewItemDetail(item) {
-      // Could open a modal or navigate to detail page
       alert(`Item: ${item.name}\n\nLast Price: $${item.lastPrice.toFixed(2)}\nAverage: $${item.avgPrice.toFixed(2)}\nLowest Ever: $${item.minPrice.toFixed(2)}\n\nPurchased ${item.purchaseCount} times`);
     }
   </script>

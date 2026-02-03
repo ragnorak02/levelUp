@@ -2483,7 +2483,219 @@
     { "name": "Strawberries", "price": 5.74, "quantity": 1, "category": "Groceries", "subcategory": "Produce", "store": "Walmart", "storePrice": 5.74, "pricePerUnit": 5.74, "code": "854877007000" }
   ],
   "notes": "Subtotal/Total visible: 60.17. (If the exact date on the receipt is different, change this date to match.)"
+},
+{
+  "id": "receipt_ge_supreme_silicone_20260203",
+  "date": "2026-02-03",
+  "store": "Home Depot",
+  "storeLocation": "Online Order",
+  "category": "Rental Property",
+  "items": [
+    {
+      "name": "GE Supreme Silicone Caulk 10.1 oz Kitchen & Bath Sealant (White)",
+      "code": "",
+      "price": 13.48,
+      "quantity": 1,
+      "category": "Rental Property",
+      "subcategory": "Maintenance",
+      "store": "Home Depot",
+      "storePrice": 13.48,
+      "pricePerUnit": 13.48,
+      "notes": "Online order for rental house bathroom sealing"
+    }
+  ],
+  "subtotal": 13.48,
+  "tax": 1.08,
+  "total": 14.56,
+  "notes": "Home Depot online order WK15297469 – GE Supreme Silicone Caulk for rental property maintenance"
+},
+{
+  "id": "receipt_starbucks_20260203_1148",
+  "date": "2026-02-03",
+  "store": "Starbucks",
+  "storeLocation": "Mobile Order",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Pistachio Cream Cold Brew (Grande)",
+      "code": "",
+      "price": 5.45,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 5.45,
+      "pricePerUnit": 5.45
+    },
+    {
+      "name": "Starbucks Blonde Vanilla Latte (Venti)",
+      "code": "",
+      "price": 6.25,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 6.25,
+      "pricePerUnit": 6.25
+    },
+    {
+      "name": "Chocolate Cake Pop",
+      "code": "",
+      "price": 3.25,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Snack",
+      "store": "Starbucks",
+      "storePrice": 3.25,
+      "pricePerUnit": 3.25
+    },
+    {
+      "name": "Reward 100 Stars (Discount)",
+      "code": "",
+      "price": -3.25,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Rewards",
+      "store": "Starbucks",
+      "storePrice": -3.25,
+      "pricePerUnit": -3.25,
+      "notes": "Star reward redemption"
+    }
+  ],
+  "subtotal": 11.7,
+  "tax": 0.94,
+  "total": 12.64,
+  "notes": "Starbucks mobile order — 23.4★ earned — 2026-02-03 11:48 AM"
+},
+{
+  "id": "receipt_starbucks_20260201_0613",
+  "date": "2026-02-01",
+  "store": "Starbucks",
+  "storeLocation": "Mobile Order",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Salted Caramel Cream Cold Brew (Venti) - Light Ice, 2 pumps Vanilla, Extra Salted Caramel Cold Foam",
+      "code": "",
+      "price": 5.65,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 5.65,
+      "pricePerUnit": 5.65
+    }
+  ],
+  "subtotal": 5.65,
+  "tax": 0.45,
+  "total": 6.1,
+  "notes": "Starbucks mobile order — 11.3★ earned — 2026-02-01 06:13 AM"
+},
+{
+  "id": "receipt_uncommon_grounds_20260203_1140",
+  "date": "2026-02-03",
+  "store": "Uncommon Grounds",
+  "storeLocation": "1475 Western Ave, Suite 9-11, Albany, NY 12203",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Single Bagel - Cinnamon Raisin (No Toast)",
+      "code": "",
+      "price": 1.4,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Food",
+      "store": "Uncommon Grounds",
+      "storePrice": 1.4,
+      "pricePerUnit": 1.4
+    },
+    {
+      "name": "Single Bagel - Jalapeno Cheddar",
+      "code": "",
+      "price": 1.4,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Food",
+      "store": "Uncommon Grounds",
+      "storePrice": 1.4,
+      "pricePerUnit": 1.4
+    },
+    {
+      "name": "Toast + Honey Walnut Cream Cheese",
+      "code": "",
+      "price": 4.15,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Food",
+      "store": "Uncommon Grounds",
+      "storePrice": 4.15,
+      "pricePerUnit": 4.15
+    }
+  ],
+  "subtotal": 6.95,
+  "tax": 0.22,
+  "total": 7.17,
+  "notes": "Uncommon Grounds takeout — Check #438 — Server: Devon D — 2026-02-03 11:40 AM"
+},
+{
+  "id": "receipt_walmart_20260202_1801",
+  "date": "2026-02-02",
+  "store": "Walmart",
+  "storeLocation": "Walmart Glenmont, NY (ST# 3583)",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "GV OHP Granola",
+      "code": "194346267450",
+      "price": 2.94,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Walmart",
+      "storePrice": 2.94,
+      "pricePerUnit": 2.94
+    },
+    {
+      "name": "BG XCRMY Oat (likely oatmilk)",
+      "code": "194346193830",
+      "price": 3.83,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Drinks",
+      "store": "Walmart",
+      "storePrice": 3.83,
+      "pricePerUnit": 3.83
+    },
+    {
+      "name": "Reese 12pk",
+      "code": "034000405510",
+      "price": 3.16,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Walmart",
+      "storePrice": 3.16,
+      "pricePerUnit": 3.16
+    },
+    {
+      "name": "Bell Pepper",
+      "code": "711069440650",
+      "price": 0.86,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 0.86,
+      "pricePerUnit": 0.86
+    }
+  ],
+  "subtotal": 10.79,
+  "tax": 0.25,
+  "total": 11.04,
+  "notes": "Walmart receipt — paid with gift card — 2026-02-02 18:01"
 }
+
+
 
 ]
 ,

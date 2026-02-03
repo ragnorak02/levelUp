@@ -5,88 +5,153 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Food Tracking</title>
   <style>
-    :root {
-      --bg: #080c11; --panel: #0d131a; --ink: #e8eef6; --muted: #9fb0c7;
-      --ring: #1c2a37; --accent: #4CAF50; --accent-2: #2dd4bf; --danger: #ef4444;
-      --warn: #f59e0b; --card-bg: #0e141b; --hover-bg: #1a1f26;
+    :root{
+      --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7;
+      --accent:#4CAF50; --accent2:#2dd4bf;
+      --ring:#2a3543; --good:#22c55e; --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
-      background: linear-gradient(180deg, #070b10 0%, #0a1016 100%); color: var(--ink);
-      min-height: 100vh;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 800px at 50% -200px, rgba(76,175,80,.20), transparent 55%),
+        radial-gradient(900px 700px at 10% 0%, rgba(45,212,191,.12), transparent 60%),
+        var(--bg);
+      color:var(--ink);
+      min-height:100vh;
     }
-    header {
-      background: #0b1118; border-bottom: 1px solid var(--ring); padding: 12px 16px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    a{color:inherit; text-decoration:none}
+
+    /* --- TOPBAR (copied from index.html) --- */
+    .topbar{
+      position:sticky; top:0; z-index:20;
+      background: linear-gradient(180deg, rgba(11,15,20,.92), rgba(11,15,20,.72));
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(42,53,67,.55);
     }
-    .home-btn {
-      all: unset; cursor: pointer; border: 1px solid var(--ring); padding: .4rem .7rem;
-      border-radius: .6rem; font-size: .9rem; color: var(--muted); transition: background 0.2s;
+    .topbar-inner{
+      max-width:1120px; margin:0 auto;
+      padding:6px 10px;
+      display:flex; align-items:center; gap:10px;
+      flex-wrap:nowrap;
     }
-    .home-btn:hover { background: var(--hover-bg); }
-    h1 { margin: 0; font-size: 1.1rem; font-weight: 600; }
-    .nav-pills {
-      display: flex; gap: 6px; background: var(--panel); padding: 4px;
-      border-radius: 10px; border: 1px solid var(--ring); flex-wrap: wrap;
+    .brand-group{
+      display:flex; align-items:center; gap:8px;
+      flex:0 0 auto;
     }
-    .nav-pill {
-      all: unset; cursor: pointer; padding: .4rem .8rem; border-radius: 8px;
-      font-size: .85rem; color: var(--muted); transition: all .2s; white-space: nowrap;
+    .brand{
+      display:flex; align-items:center; gap:8px;
+      font-weight:900;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      box-shadow: var(--shadow);
+      flex:0 0 auto;
+      white-space:nowrap;
     }
-    .nav-pill.active {
-      background: linear-gradient(90deg, var(--accent), #22c55e);
-      color: #04130a; font-weight: 600;
+    .brand-group .brand.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
     }
-    .wrap {
-      width: min(1200px, 100%); margin: 0 auto; padding: 16px;
-      display: flex; flex-direction: column; gap: 16px;
+    .nav{
+      margin-left:auto;
+      display:flex; gap:8px;
+      align-items:center;
+      flex:1 1 auto;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling: touch;
+      white-space:nowrap;
+      padding-bottom:2px;
     }
-    .card {
-      background: var(--panel); border: 1px solid var(--ring); border-radius: 14px;
-      padding: 16px; box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
+    .nav::-webkit-scrollbar{height:6px}
+    .nav::-webkit-scrollbar-thumb{background:rgba(42,53,67,.6); border-radius:999px}
+    .pill{
+      flex:0 0 auto;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
     }
-    .card h3 { margin: 0 0 12px; font-size: 1rem; color: var(--muted); font-weight: 600; }
+    .pill.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
+    }
+
+    /* --- page layout --- */
+    .wrap{
+      max-width:1120px; margin:0 auto; padding:16px;
+      display:flex; flex-direction:column; gap:16px;
+    }
+    .card{
+      background: rgba(19,26,34,.72);
+      border:1px solid rgba(42,53,67,.70);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .card h3{ margin:0 0 12px; font-size:14px; color:var(--muted); font-weight:900; letter-spacing:.2px; }
+
     .stats-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;
+      display:grid; gap:10px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
-    .stat-card {
-      background: var(--card-bg); border: 1px solid var(--ring); border-radius: 12px;
-      padding: 16px; text-align: center;
+    .stat-card{
+      padding:12px 14px;
+      background: rgba(11,15,20,.35);
+      border:1px solid rgba(42,53,67,.55);
+      border-radius: 14px;
+      text-align:center;
     }
-    .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
-    .stat-label { font-size: .85rem; color: var(--muted); }
-    .food-categories {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;
+    .stat-value{font-size:24px; font-weight:900; color:var(--good); line-height:1.1}
+    .stat-label{font-size:12px; color:var(--muted); margin-top:4px; font-weight:800}
+
+    .food-categories{
+      display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;
     }
-    .food-cat {
-      background: var(--card-bg); border: 1px solid var(--ring); border-radius: 12px;
-      padding: 16px; cursor: pointer; transition: all 0.2s;
+    .food-cat{
+      background: rgba(11,15,20,.35);
+      border:1px solid rgba(42,53,67,.55);
+      border-radius: 14px;
+      padding:14px;
+      cursor:pointer;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
     }
-    .food-cat:hover { background: var(--hover-bg); border-color: var(--accent); transform: translateY(-2px); }
-    .food-cat-icon { font-size: 2rem; margin-bottom: 8px; }
-    .food-cat-name { font-weight: 600; color: var(--ink); margin-bottom: 4px; }
-    .food-cat-amount { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
-    .food-cat-items { font-size: .85rem; color: var(--muted); }
-    .chart-container { position: relative; height: 250px; margin: 20px 0; }
-    canvas { max-width: 100%; max-height: 100%; }
-    @media (max-width: 768px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .food-categories { grid-template-columns: 1fr; }
-    }
+    .food-cat:hover{ border-color: rgba(76,175,80,.65); background: rgba(76,175,80,.06); transform: translateY(-1px); }
+    .food-cat-icon{ font-size: 26px; margin-bottom: 8px; }
+    .food-cat-name{ font-weight: 900; }
+    .food-cat-amount{ font-size: 18px; font-weight: 950; color: var(--good); margin-top: 2px; }
+    .food-cat-items{ font-size: 12px; color: var(--muted); font-weight: 800; margin-top: 2px; }
+
+    .chart-container{ position:relative; height:250px; margin: 10px 0 0; }
+    canvas{ max-width:100%; max-height:100%; width:100%; }
   </style>
 </head>
 <body>
-  <header>
-    <button class="home-btn" onclick="location.href='index.html'">⟵ Dashboard</button>
-    <h1>Food Tracking</h1>
-    <nav class="nav-pills">
-      <button class="nav-pill" onclick="location.href='index.html'">Dashboard</button>
-      <button class="nav-pill active">Food</button>
-      <button class="nav-pill" onclick="location.href='search.html'">Search</button>
-      <button class="nav-pill" onclick="location.href='receipts.html'">Receipts</button>
-    </nav>
-  </header>
+  <!-- TOPBAR (standardized) -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-group" role="navigation" aria-label="Home and Finances">
+        <a class="brand brand-home" href="https://ragnorak02.github.io/levelUp/main.html" title="Back to LevelUp Home">🏠 <span>Home</span></a>
+        <a class="brand brand-fin active" href="index.html" title="Finances dashboard">💰</a>
+      </div>
+      <div class="nav">
+        <a class="pill" href="index.html">Finances</a>
+        <a class="pill active" href="food.html">Food</a>
+        <a class="pill" href="search.html">Search</a>
+        <a class="pill" href="receipts.html">Receipts</a>
+      </div>
+    </div>
+  </div>
 
   <main class="wrap">
     <div class="stats-grid">
@@ -110,9 +175,7 @@
 
     <div class="card">
       <h3>🍎 Food Categories</h3>
-      <div class="food-categories" id="foodCategories">
-        <!-- Dynamic content -->
-      </div>
+      <div class="food-categories" id="foodCategories"></div>
     </div>
 
     <div class="card">
@@ -127,7 +190,6 @@
     const FOOD_CATEGORIES = {
       'Produce': '🥬',
       'Dairy': '🥛',
-      // Support both legacy and new naming
       'Meat': '🥩',
       'Meat/Fish': '🥩',
       'Grains': '🌾',
@@ -146,7 +208,7 @@
     function loadFoodData() {
       const receipts = getReceipts();
       const foodData = analyzeFoodSpending(receipts);
-      
+
       updateFoodStats(foodData);
       renderFoodCategories(foodData.categories);
       drawFoodChart(foodData.categories);
@@ -176,26 +238,19 @@
         const date = new Date(receipt.date);
         let hasFoodItems = false;
 
-        receipt.items.forEach(item => {
+        (receipt.items || []).forEach(item => {
           if (Object.keys(FOOD_CATEGORIES).includes(item.category)) {
             const price = parseFloat(item.price) || 0;
             hasFoodItems = true;
 
-            if (!categories[item.category]) {
-              categories[item.category] = { total: 0, count: 0 };
-            }
+            if (!categories[item.category]) categories[item.category] = { total: 0, count: 0 };
 
             categories[item.category].total += price;
             categories[item.category].count++;
             totalFood += price;
 
-            if (date.getMonth() === thisMonth && date.getFullYear() === thisYear) {
-              monthFood += price;
-            }
-
-            if (date >= weekAgo) {
-              weekFood += price;
-            }
+            if (date.getMonth() === thisMonth && date.getFullYear() === thisYear) monthFood += price;
+            if (date >= weekAgo) weekFood += price;
           }
         });
 
@@ -258,16 +313,12 @@
       const total = Object.values(categories).reduce((sum, cat) => sum + cat.total, 0);
       if (total === 0) return;
 
-      const colors = ['#4CAF50', '#8b5cf6', '#f59e0b', '#ef4444', '#8b5cf6', '#3b82f6', '#ec4899', '#14b8a6'];
-
+      const colors = ['#4CAF50', '#8b5cf6', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899', '#14b8a6', '#94a3b8'];
       const CATEGORY_COLORS = {'Groceries': '#4CAF50', 'Cafe': '#f59e0b', 'Restaurant': '#ef4444' };
-
 
       let currentAngle = -Math.PI / 2;
 
       Object.entries(categories).forEach(([name, cat], i) => {
-
-
         const sliceAngle = (cat.total / total) * 2 * Math.PI;
 
         ctx.beginPath();
@@ -276,21 +327,20 @@
         ctx.closePath();
 
         ctx.fillStyle = CATEGORY_COLORS[name] || colors[i % colors.length];
-
         ctx.fill();
 
         currentAngle += sliceAngle;
       });
 
       ctx.fillStyle = '#e8eef6';
-      ctx.font = 'bold 20px system-ui';
+      ctx.font = '900 22px system-ui';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('$' + total.toFixed(0), centerX, centerY);
 
-      ctx.font = '12px system-ui';
+      ctx.font = '800 12px system-ui';
       ctx.fillStyle = '#9fb0c7';
-      ctx.fillText('Food Total', centerX, centerY + 20);
+      ctx.fillText('Food Total', centerX, centerY + 22);
     }
 
     function viewCategory(category) {
