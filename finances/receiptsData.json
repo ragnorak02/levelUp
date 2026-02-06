@@ -2490,6 +2490,7 @@
   "store": "Home Depot",
   "storeLocation": "Online Order",
   "category": "Rental Property",
+  "property": "rental",
   "items": [
     {
       "name": "GE Supreme Silicone Caulk 10.1 oz Kitchen & Bath Sealant (White)",
@@ -2693,9 +2694,204 @@
   "tax": 0.25,
   "total": 11.04,
   "notes": "Walmart receipt — paid with gift card — 2026-02-02 18:01"
+},
+{
+  "id": "receipt_walmart_20260204_kinderjoy",
+  "date": "2026-02-04",
+  "store": "Walmart",
+  "storeLocation": "Walmart Glenmont, NY (ST# 3583)",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Kinder Joy Egg",
+      "code": "009800000520",
+      "price": 1.97,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Candy",
+      "store": "Walmart",
+      "storePrice": 1.97,
+      "pricePerUnit": 1.97
+    }
+  ],
+  "subtotal": 1.97,
+  "tax": 0.16,
+  "total": 2.13,
+  "notes": "Walmart receipt - gift card redemption, 02/04/26 16:55"
+},
+{
+  "id": "receipt_market32_20260206",
+  "date": "2026-02-06",
+  "store": "Market 32",
+  "storeLocation": "Market 32 Glenmont, NY (#196)",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Fresh Cherries",
+      "code": "CHERRIES_87391",
+      "price": 4.03,
+      "quantity": 1,
+      "weight": 1.01,
+      "unit": "lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Market 32",
+      "storePrice": 3.99,
+      "pricePerPound": 3.99
+    },
+    {
+      "name": "Chicken Tenders",
+      "code": "M32_CKN_TENX",
+      "price": 55.02,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Meat",
+      "store": "Market 32",
+      "notes": "Multiple packages of chicken tenders (bulk purchase)"
+    }
+  ],
+  "subtotal": 55.02,
+  "tax": 0.0,
+  "total": 55.02,
+  "notes": "Market 32 receipt - multiple chicken tender packs, 02/06/26 11:42 AM"
+},
+{
+  "id": "receipt_walmart_20260204_groceries",
+  "date": "2026-02-04",
+  "store": "Walmart",
+  "storeLocation": "Walmart Glenmont, NY (ST# 3583)",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Chobani Flip Greek Yogurt Peanut Butter Cup (4pk)",
+      "code": "081829001960",
+      "price": 4.78,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 4.78,
+      "pricePerUnit": 4.78
+    },
+    {
+      "name": "Barilla Penne Pasta (16 oz)",
+      "code": "007680828073",
+      "price": 1.84,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Pantry",
+      "store": "Walmart",
+      "storePrice": 1.84,
+      "pricePerUnit": 1.84
+    },
+    {
+      "name": "Shredded Cheddar Cheese",
+      "code": "013562000040",
+      "price": 1.44,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 1.44,
+      "pricePerUnit": 1.44
+    },
+    {
+      "name": "Tomato Sauce",
+      "code": "041129077900",
+      "price": 2.98,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Sauces",
+      "store": "Walmart",
+      "storePrice": 2.98,
+      "pricePerUnit": 2.98
+    },
+    {
+      "name": "Mandarin Oranges (3 lb bag)",
+      "code": "089973400206",
+      "price": 3.97,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 3.97,
+      "pricePerUnit": 3.97
+    },
+    {
+      "name": "Blueberry Bagels",
+      "code": "048121255040",
+      "price": 1.58,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Bakery",
+      "store": "Walmart",
+      "storePrice": 1.58,
+      "pricePerUnit": 1.58
+    },
+    {
+      "name": "Mushrooms",
+      "code": "681131354620",
+      "price": 2.27,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 2.27,
+      "pricePerUnit": 2.27
+    },
+    {
+      "name": "Grape Tomatoes",
+      "code": "751666881050",
+      "price": 1.36,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 1.36,
+      "pricePerUnit": 1.36
+    },
+    {
+      "name": "Bananas",
+      "code": "000000004011",
+      "price": 1.36,
+      "quantity": 1,
+      "weight": 2.72,
+      "unit": "lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "pricePerPound": 0.50
+    },
+    {
+      "name": "Red Apples",
+      "code": "879329005940",
+      "price": 2.29,
+      "quantity": 1,
+      "weight": 1.59,
+      "unit": "lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "pricePerPound": 1.44
+    },
+    {
+      "name": "Avocado",
+      "code": "000000004060",
+      "price": 2.72,
+      "quantity": 4,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 0.68,
+      "pricePerUnit": 0.68,
+      "notes": "4 for $2.72"
+    }
+  ],
+  "subtotal": 29.20,
+  "tax": 0.0,
+  "total": 29.20,
+  "notes": "Walmart receipt - gift card redemption, 02/04/26 16:49"
 }
-
-
 
 ]
 ,
