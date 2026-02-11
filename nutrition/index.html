@@ -299,6 +299,34 @@
   }
   .qs-btn:hover{background: rgba(255,255,255,.10)}
 
+  .day-nav{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .day-nav-btn{
+    all:unset;
+    cursor:pointer;
+    width:32px; height:32px;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    color:var(--ink);
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .day-nav-btn:hover{background: rgba(255,255,255,.10)}
+  .day-nav-label{
+    font-weight:950;
+    font-size:14px;
+    min-width:120px;
+    text-align:center;
+  }
+
   .empty-state{
     text-align:center;
     padding:20px 12px;
@@ -338,11 +366,18 @@
   </div>
 
   <div class="wrap">
+    <!-- Day navigation -->
+    <div class="day-nav">
+      <button class="day-nav-btn" id="dayPrev" title="Previous day">◀</button>
+      <div class="day-nav-label" id="dayLabel">Today</div>
+      <button class="day-nav-btn" id="dayNext" title="Next day">▶</button>
+    </div>
+
     <!-- Daily summary -->
     <div class="card">
       <div class="card-inner">
         <div class="section-header">
-          <div class="section-title">Today's Nutrition</div>
+          <div class="section-title" id="sectionTitle">Today's Nutrition</div>
           <div class="section-link" id="targetLink" onclick="location.href='targets.html'">Set Targets</div>
         </div>
         <div class="daily-summary" id="dailySummary">
@@ -456,7 +491,8 @@
     let builderIngredients = [];
     let selectedIngredient = null;
 
-    const todayISO = new Date().toISOString().slice(0, 10);
+    const actualToday = new Date().toISOString().slice(0, 10);
+    let viewDate = actualToday;
 
     // --- localStorage helpers ---
     function loadMeals(){
@@ -501,6 +537,29 @@
       return null;
     }
 
+    // --- Day navigation ---
+    function shiftDay(offset){
+      const d = new Date(viewDate + 'T12:00:00');
+      d.setDate(d.getDate() + offset);
+      viewDate = d.toISOString().slice(0, 10);
+      updateDayLabel();
+      renderAll();
+    }
+
+    function updateDayLabel(){
+      const label = document.getElementById('dayLabel');
+      const title = document.getElementById('sectionTitle');
+      if(viewDate === actualToday){
+        if(label) label.textContent = 'Today';
+        if(title) title.textContent = "Today's Nutrition";
+      } else {
+        const d = new Date(viewDate + 'T12:00:00');
+        const formatted = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+        if(label) label.textContent = formatted;
+        if(title) title.textContent = formatted + ' Nutrition';
+      }
+    }
+
     // --- Load ingredients DB ---
     async function loadIngredientsDb(){
       try {
@@ -530,7 +589,7 @@
     }
 
     function renderDailySummary(){
-      const dayMeals = todayMeals.filter(m => m.date === todayISO);
+      const dayMeals = todayMeals.filter(m => m.date === viewDate);
       let cal = 0, pro = 0, carb = 0, fat = 0;
       dayMeals.forEach(m => {
         cal += m.totals.calories || 0;
@@ -552,10 +611,10 @@
 
     function renderMealsList(){
       const container = document.getElementById('mealsList');
-      const dayMeals = todayMeals.filter(m => m.date === todayISO);
+      const dayMeals = todayMeals.filter(m => m.date === viewDate);
 
       if (!dayMeals.length) {
-        container.innerHTML = '<div class="empty-state">No meals logged today. Tap + Add Meal to start.</div>';
+        container.innerHTML = '<div class="empty-state">No meals logged. Tap + Add Meal to start.</div>';
         return;
       }
 
@@ -584,7 +643,7 @@
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const i = Number(btn.dataset.idx);
-          const dayMealsFiltered = todayMeals.filter(m => m.date === todayISO);
+          const dayMealsFiltered = todayMeals.filter(m => m.date === viewDate);
           const mealToDelete = dayMealsFiltered[i];
           if (!mealToDelete) return;
           const globalIdx = todayMeals.indexOf(mealToDelete);
@@ -618,9 +677,21 @@
     }
 
     function renderAll(){
+      updateDayLabel();
       renderDailySummary();
       renderMealsList();
       renderFavorites();
+      // Update save button text
+      const saveBtn = document.getElementById('saveMealBtn');
+      if(saveBtn){
+        if(viewDate === actualToday){
+          saveBtn.textContent = "Save Meal to Today's Log";
+        } else {
+          const d = new Date(viewDate + 'T12:00:00');
+          const lbl = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          saveBtn.textContent = 'Save Meal to ' + lbl;
+        }
+      }
     }
 
     // --- Builder ---
@@ -752,7 +823,7 @@
 
       const meal = {
         id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-        date: todayISO,
+        date: viewDate,
         time: now.toTimeString().slice(0, 5),
         name: name,
         ingredients: builderIngredients.map(i => ({ ...i })),
@@ -796,7 +867,7 @@
 
       const meal = {
         id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-        date: todayISO,
+        date: viewDate,
         time: now.toTimeString().slice(0, 5),
         name: fav.name,
         ingredients: fav.ingredients.map(i => ({ ...i })),
@@ -819,6 +890,8 @@
     }
 
     // --- Event bindings ---
+    document.getElementById('dayPrev').addEventListener('click', () => shiftDay(-1));
+    document.getElementById('dayNext').addEventListener('click', () => shiftDay(1));
     document.getElementById('addMealBtn').addEventListener('click', () => openBuilder());
     document.getElementById('modalClose').addEventListener('click', closeBuilder);
     document.getElementById('mealModal').addEventListener('click', (e) => {

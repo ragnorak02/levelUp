@@ -665,16 +665,17 @@ body{
   line-height:1.4;
 }
 
-@media (max-width: 860px){
-  .dash-top{flex-direction:column;}
-}
 @media (max-width: 480px){
   .wrap{padding:6px;}
   .card-inner{padding:8px;}
-  .vbar{min-height:140px;}
+  .modules-grid{gap:6px;}
+  .modv{padding:8px 4px; gap:6px;}
+  .micon{width:30px; height:30px; font-size:14px; border-radius:10px;}
+  .vbar{min-height:120px;}
+  .abbr{font-size:11px;}
   .nbar-val{width:70px;}
 }
 @media (max-width: 360px){
-  .modules-grid{gap:8px}
-  .vbar{min-height: 140px}
+  .modules-grid{gap:4px}
+  .vbar{min-height:100px}
 }

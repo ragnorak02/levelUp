@@ -19,7 +19,7 @@ const financeState = {
   chart: null,
   monthOffset: 0,      // 0 = current month, -1 = previous, etc.
   chartVisible: true,
-  category: 'groc',    // active filter: 'groc', 'rental', 'cafe'
+  category: 'all',     // active filter: 'all', 'groc', 'rental', 'cafe'
 };
 
 /* --------------------------------
@@ -305,24 +305,27 @@ function isCafeCat(cat){
 
 function filterByActiveCategory(entries){
   const cat = financeState.category;
+  if(cat === 'all') return entries;
   if(cat === 'groc') return filterGroceries(entries);
   if(cat === 'rental') return entries.filter(e => isRentalCat(e.category) || isRentalCat(e.subcategory));
   if(cat === 'cafe') return entries.filter(e => isCafeCat(e.category) || isCafeCat(e.subcategory));
-  return filterGroceries(entries);
+  return entries;
 }
 
 function getCategoryLabel(){
+  if(financeState.category === 'all') return 'All Spending';
   if(financeState.category === 'groc') return 'Groceries';
   if(financeState.category === 'rental') return 'Rental';
   if(financeState.category === 'cafe') return 'Cafe';
-  return 'Groceries';
+  return 'All Spending';
 }
 
 function sumBySubcategory(entries){
+  const isAll = financeState.category === 'all';
   const fallback = getCategoryLabel();
   const map = new Map();
   for(const e of entries){
-    const k = e.subcategory || fallback;
+    const k = isAll ? (e.category || 'Other') : (e.subcategory || fallback);
     map.set(k, (map.get(k) || 0) + (Number(e.amount) || 0));
   }
   return [...map.entries()]
@@ -476,8 +479,24 @@ function loadNutritionTargets(){
 }
 
 function renderNutritionCard(){
-  const meals = loadNutritionMeals().filter(m => m.date === todayISO);
+  const allMeals = loadNutritionMeals();
+  const todayMeals = allMeals.filter(m => m.date === todayISO);
   const targets = loadNutritionTargets();
+
+  // Fallback to most recent date if nothing logged today
+  let meals = todayMeals;
+  let isToday = true;
+  let displayDate = todayISO;
+
+  if(!todayMeals.length && allMeals.length){
+    const dates = [...new Set(allMeals.map(m => m.date))].sort();
+    const fallbackDate = dates[dates.length - 1];
+    if(fallbackDate){
+      meals = allMeals.filter(m => m.date === fallbackDate);
+      isToday = false;
+      displayDate = fallbackDate;
+    }
+  }
 
   let cal = 0, pro = 0, carb = 0, fat = 0;
   meals.forEach(m => {
@@ -540,7 +559,13 @@ function renderNutritionCard(){
   // Update sub text
   const sub = $('nutritionSub');
   if(sub){
-    sub.textContent = meals.length ? `${meals.length} meal${meals.length > 1 ? 's' : ''} logged today` : 'No meals logged today';
+    if(isToday){
+      sub.textContent = meals.length ? `${meals.length} meal${meals.length > 1 ? 's' : ''} logged today` : 'No meals logged today';
+    } else {
+      const d = new Date(displayDate + 'T12:00:00');
+      const label = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      sub.textContent = `${meals.length} meal${meals.length > 1 ? 's' : ''} on ${label}`;
+    }
   }
 
   // Cross-section: estimated food cost from today's meals
