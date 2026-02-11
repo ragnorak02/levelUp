@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nutrition — Recipes</title>
+<style>
+  :root{
+    --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7;
+    --accent:#4CAF50; --accent2:#2dd4bf;
+    --ring:#2a3543; --good:#22c55e; --warn:#f59e0b; --danger:#ef4444;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
+    background:
+      radial-gradient(1200px 800px at 50% -200px, rgba(76,175,80,.15), transparent 55%),
+      radial-gradient(900px 700px at 10% 0%, rgba(45,212,191,.08), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    padding-bottom:80px;
+  }
+  a{color:inherit; text-decoration:none}
+
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    background: linear-gradient(180deg, rgba(11,15,20,.95), rgba(11,15,20,.75));
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--ring);
+  }
+  .topbar-inner{
+    max-width:700px; margin:0 auto;
+    padding:8px 10px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand-group{display:flex; align-items:center; gap:8px; flex:0 0 auto;}
+  .brand{
+    display:flex; align-items:center; gap:6px;
+    font-weight:900;
+    padding:8px 10px;
+    border-radius:999px;
+    border:1px solid var(--ring);
+    background: rgba(19,26,34,.55);
+    box-shadow: var(--shadow);
+    white-space:nowrap;
+    font-size:13px;
+  }
+  .brand.active{
+    color:#0b0f14;
+    background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+    border-color: transparent;
+  }
+  .nav{
+    margin-left:auto;
+    display:flex; gap:8px;
+    align-items:center;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+  .nav .pill{
+    padding:8px 12px;
+    border-radius:999px;
+    border:1px solid var(--ring);
+    background: rgba(19,26,34,.55);
+    color:var(--muted);
+    font-weight:800;
+    font-size:13px;
+  }
+  .nav .pill.active{
+    color:#0b0f14;
+    background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+    border-color: transparent;
+  }
+
+  .wrap{max-width:700px; margin:0 auto; padding:10px; display:flex; flex-direction:column; gap:10px;}
+
+  .card{
+    background: var(--card);
+    border:1px solid var(--ring);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  .card-inner{padding:12px;}
+
+  .section-header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .section-title{font-weight:950; font-size:14px;}
+
+  /* Recipe cards grid */
+  .recipe-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap:10px;
+  }
+  .recipe-card{
+    padding:12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.04);
+    cursor:pointer;
+    transition: border-color .2s;
+  }
+  .recipe-card:hover{border-color: rgba(76,175,80,.35);}
+  .recipe-card.expanded{
+    border-color: rgba(76,175,80,.45);
+    background: rgba(76,175,80,.04);
+  }
+  .recipe-name{font-weight:950; font-size:14px; margin-bottom:4px;}
+  .recipe-meta{font-size:12px; color:var(--muted); font-weight:800;}
+  .recipe-stats{
+    display:flex; gap:10px; margin-top:6px;
+    font-size:12px; font-weight:900;
+  }
+  .recipe-stats .rs-cal{color:var(--good);}
+  .recipe-stats .rs-cost{color:var(--warn);}
+
+  /* Expanded recipe detail */
+  .recipe-detail{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid rgba(255,255,255,.08);
+    display:none;
+  }
+  .recipe-card.expanded .recipe-detail{display:block;}
+  .rd-ing{
+    font-size:12px;
+    color:var(--muted);
+    padding:3px 0;
+    display:flex;
+    justify-content:space-between;
+  }
+  .rd-totals{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:4px;
+    margin-top:8px;
+    padding:8px;
+    border-radius:10px;
+    background: rgba(255,255,255,.04);
+    text-align:center;
+    font-size:11px;
+  }
+  .rd-totals .t-val{font-weight:950; color:var(--good);}
+  .rd-totals .t-lbl{color:var(--muted); font-weight:800;}
+  .rd-actions{
+    display:flex; gap:6px; margin-top:10px;
+  }
+  .rd-btn{
+    all:unset; cursor:pointer;
+    flex:1;
+    padding:8px 10px;
+    border-radius:10px;
+    text-align:center;
+    font-weight:900;
+    font-size:12px;
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    color:var(--ink);
+  }
+  .rd-btn:hover{background: rgba(255,255,255,.10)}
+  .rd-btn.primary{
+    background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+    color:#0b0f14;
+    border-color:transparent;
+  }
+  .rd-btn.danger{
+    border-color: rgba(239,68,68,.30);
+    background: rgba(239,68,68,.08);
+    color:var(--danger);
+  }
+
+  .add-recipe-btn{
+    all:unset; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:12px;
+    border-radius:14px;
+    border:1px dashed rgba(76,175,80,.40);
+    background: rgba(76,175,80,.06);
+    color:var(--good);
+    font-weight:950;
+    font-size:14px;
+  }
+  .add-recipe-btn:active{transform: translateY(1px)}
+
+  .empty-state{
+    text-align:center;
+    padding:20px 12px;
+    color:var(--muted);
+    font-weight:800;
+  }
+
+  /* Modal overlay */
+  .modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:50;
+    background: rgba(0,0,0,.70);
+    backdrop-filter: blur(4px);
+    overflow-y:auto;
+    padding:20px 10px;
+  }
+  .modal-overlay.show{display:flex; justify-content:center; align-items:flex-start;}
+  .modal{
+    width:min(600px, 100%);
+    background: var(--card);
+    border:1px solid var(--ring);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding:16px;
+  }
+  .modal-header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .modal-title{font-weight:950; font-size:16px;}
+  .modal-close{
+    all:unset; cursor:pointer;
+    width:32px; height:32px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    font-weight:900;
+  }
+
+  .input-row{margin-bottom:10px;}
+  .input-row label{display:block; font-weight:900; font-size:12px; color:var(--muted); margin-bottom:4px;}
+  .input-row input{
+    width:100%;
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    color:var(--ink);
+    font-weight:900;
+    font-size:14px;
+    outline:none;
+  }
+  .input-row input:focus{border-color: rgba(76,175,80,.55);}
+
+  .inline-inputs{
+    display:flex; gap:10px;
+  }
+  .inline-inputs .input-row{flex:1;}
+
+  .search-results{
+    max-height:200px;
+    overflow-y:auto;
+    border:1px solid var(--ring);
+    border-radius:12px;
+    background: rgba(11,15,20,.60);
+  }
+  .search-results:empty{display:none;}
+  .search-result{
+    padding:8px 12px;
+    cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    font-size:13px;
+  }
+  .search-result:last-child{border-bottom:none;}
+  .search-result:hover{background: rgba(255,255,255,.06);}
+  .search-result .sr-name{font-weight:900;}
+  .search-result .sr-meta{color:var(--muted); font-size:11px;}
+
+  .builder-list{margin:10px 0; max-height:220px; overflow-y:auto;}
+  .builder-item{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:6px 10px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.03);
+    margin-bottom:6px;
+    font-size:13px;
+  }
+  .builder-item .bi-name{font-weight:900; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .builder-item .bi-info{color:var(--muted); font-size:11px; margin-left:8px; white-space:nowrap;}
+  .builder-item .bi-remove{
+    all:unset; cursor:pointer; margin-left:8px;
+    color:var(--danger); font-weight:900; font-size:14px;
+  }
+
+  .builder-totals{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:6px;
+    padding:8px 10px;
+    border-radius:12px;
+    border:1px solid rgba(76,175,80,.25);
+    background: rgba(76,175,80,.06);
+    text-align:center;
+    font-size:12px;
+    margin:10px 0;
+  }
+  .builder-totals .bt-val{font-weight:950; color:var(--good);}
+  .builder-totals .bt-lbl{color:var(--muted); font-size:10px; font-weight:800;}
+
+  .builder-cost{
+    text-align:center;
+    font-size:12px;
+    font-weight:900;
+    color:var(--warn);
+    margin-bottom:8px;
+  }
+
+  .quick-servings{display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;}
+  .qs-btn{
+    all:unset; cursor:pointer;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    color:var(--muted);
+    font-weight:800;
+    font-size:11px;
+  }
+  .qs-btn:hover{background: rgba(255,255,255,.10)}
+
+  .save-recipe-btn{
+    all:unset; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:12px;
+    border-radius:14px;
+    background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+    color:#0b0f14;
+    font-weight:950;
+  }
+  .save-recipe-btn:active{transform: translateY(1px)}
+  .save-recipe-btn:disabled{opacity:.5; cursor:not-allowed;}
+
+  /* Log-as-meal modal */
+  .log-modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:60;
+    background: rgba(0,0,0,.70);
+    backdrop-filter: blur(4px);
+    overflow-y:auto;
+    padding:20px 10px;
+  }
+  .log-modal-overlay.show{display:flex; justify-content:center; align-items:center;}
+  .log-modal{
+    width:min(400px, 100%);
+    background: var(--card);
+    border:1px solid var(--ring);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding:16px;
+    text-align:center;
+  }
+  .log-modal .lm-title{font-weight:950; font-size:16px; margin-bottom:12px;}
+  .log-modal .lm-info{font-size:13px; color:var(--muted); margin-bottom:12px;}
+  .log-modal .lm-row{display:flex; gap:8px; justify-content:center; align-items:center; margin-bottom:14px;}
+  .log-modal .lm-row label{font-weight:900; font-size:13px;}
+  .log-modal .lm-row input{
+    width:80px;
+    padding:8px 10px;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    color:var(--ink);
+    font-weight:900;
+    font-size:14px;
+    text-align:center;
+    outline:none;
+  }
+  .log-modal .lm-btns{display:flex; gap:8px;}
+  .log-modal .lm-btn{
+    all:unset; cursor:pointer;
+    flex:1;
+    padding:10px;
+    border-radius:12px;
+    text-align:center;
+    font-weight:950;
+    font-size:14px;
+  }
+  .log-modal .lm-cancel{
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    color:var(--ink);
+  }
+  .log-modal .lm-confirm{
+    background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+    color:#0b0f14;
+  }
+
+  @media(max-width:460px){
+    .recipe-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-group">
+        <a class="brand" href="../main.html">&#127968; Home</a>
+        <a class="brand active" href="index.html">&#127869; Nutrition</a>
+      </div>
+      <div class="nav">
+        <a class="pill" href="index.html">Log</a>
+        <a class="pill" href="targets.html">Targets</a>
+        <a class="pill active" href="recipes.html">Recipes</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="card-inner">
+        <div class="section-header">
+          <div class="section-title">Recipe Library</div>
+        </div>
+        <div id="recipeList"></div>
+        <button class="add-recipe-btn" id="addRecipeBtn">+ Create Recipe</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recipe Builder Modal -->
+  <div class="modal-overlay" id="recipeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="builderTitle">Create Recipe</div>
+        <button class="modal-close" id="modalClose">&#10005;</button>
+      </div>
+
+      <div class="inline-inputs">
+        <div class="input-row" style="flex:2;">
+          <label for="recipeName">Recipe Name</label>
+          <input type="text" id="recipeName" placeholder="e.g. Grilled Chicken Bowl" />
+        </div>
+        <div class="input-row" style="flex:0 0 90px;">
+          <label for="recipeServings">Servings</label>
+          <input type="number" id="recipeServings" placeholder="1" min="1" inputmode="numeric" />
+        </div>
+      </div>
+
+      <div class="input-row">
+        <label for="ingredientSearch">Search Ingredients</label>
+        <input type="text" id="ingredientSearch" placeholder="Type to search..." autocomplete="off" />
+      </div>
+      <div class="search-results" id="searchResults"></div>
+
+      <div id="weightInput" style="display:none;">
+        <div class="input-row">
+          <label id="weightLabel">Weight (g)</label>
+          <input type="number" id="ingredientWeight" placeholder="100" inputmode="decimal" />
+        </div>
+        <div class="quick-servings" id="quickServings"></div>
+        <button class="qs-btn" id="addIngredientBtn" style="margin-top:8px; width:100%; text-align:center; padding:10px; font-size:13px; font-weight:950; color:var(--good); border-color:rgba(76,175,80,.35);">+ Add to Recipe</button>
+      </div>
+
+      <div class="builder-list" id="builderList"></div>
+
+      <div class="builder-totals" id="builderTotals">
+        <div><div class="bt-val" id="btCal">0</div><div class="bt-lbl">Cal</div></div>
+        <div><div class="bt-val" id="btPro">0g</div><div class="bt-lbl">Protein</div></div>
+        <div><div class="bt-val" id="btCarb">0g</div><div class="bt-lbl">Carbs</div></div>
+        <div><div class="bt-val" id="btFat">0g</div><div class="bt-lbl">Fat</div></div>
+      </div>
+
+      <div class="builder-cost" id="builderCost"></div>
+
+      <button class="save-recipe-btn" id="saveRecipeBtn" disabled>Save Recipe</button>
+    </div>
+  </div>
+
+  <!-- Log-as-Meal Modal -->
+  <div class="log-modal-overlay" id="logModal">
+    <div class="log-modal">
+      <div class="lm-title">Log as Meal</div>
+      <div class="lm-info" id="logInfo"></div>
+      <div class="lm-row">
+        <label for="logServings">Servings:</label>
+        <input type="number" id="logServings" value="1" min="0.25" step="0.25" inputmode="decimal" />
+      </div>
+      <div class="lm-btns">
+        <button class="lm-btn lm-cancel" id="logCancel">Cancel</button>
+        <button class="lm-btn lm-confirm" id="logConfirm">Log Meal</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    const RECIPES_KEY = 'nutrition:recipes';
+    const MEALS_KEY = 'nutrition:meals';
+    const RECEIPTS_KEY = 'finances:receipts';
+
+    let ingredientsDb = [];
+    let recipes = [];
+
+    // Builder state
+    let builderIngredients = [];
+    let selectedIngredient = null;
+    let editingRecipeId = null;
+
+    // Log-as-meal state
+    let logRecipeTarget = null;
+
+    // --- localStorage helpers ---
+    function loadRecipes(){
+      try { return JSON.parse(localStorage.getItem(RECIPES_KEY) || '[]'); } catch { return []; }
+    }
+    function saveRecipes(arr){
+      localStorage.setItem(RECIPES_KEY, JSON.stringify(arr));
+    }
+    function loadMeals(){
+      try { return JSON.parse(localStorage.getItem(MEALS_KEY) || '[]'); } catch { return []; }
+    }
+    function saveMeals(meals){
+      localStorage.setItem(MEALS_KEY, JSON.stringify(meals));
+    }
+
+    // --- Cost estimation (same logic as index.html) ---
+    function estimateIngredientCost(ingredientName, weightG){
+      try {
+        const receipts = JSON.parse(localStorage.getItem(RECEIPTS_KEY) || '[]');
+        const norm = (s) => String(s || '').toLowerCase().trim();
+        const needle = norm(ingredientName);
+
+        for (const r of receipts) {
+          if (!Array.isArray(r.items)) continue;
+          for (const it of r.items) {
+            const itemName = norm(it.name);
+            if (itemName.includes(needle) || needle.includes(itemName)) {
+              const price = Number(it.price) || 0;
+              const qty = Number(it.quantity) || 1;
+              if (price > 0) {
+                const estPackageG = 500;
+                return (price / qty) * (weightG / estPackageG);
+              }
+            }
+          }
+        }
+      } catch(e) {}
+      return null;
+    }
+
+    // --- Load ingredients DB ---
+    async function loadIngredientsDb(){
+      try {
+        const r = await fetch('ingredients.json', { cache: 'no-store' });
+        if (!r.ok) return [];
+        const data = await r.json();
+        return data.ingredients || [];
+      } catch(e) {
+        console.warn('[recipes] Could not load ingredients.json:', e);
+        return [];
+      }
+    }
+
+    // --- Search ---
+    function searchIngredients(query){
+      if (!query || query.length < 2) return [];
+      const q = query.toLowerCase();
+      return ingredientsDb
+        .filter(ing => ing.name.toLowerCase().includes(q))
+        .slice(0, 15);
+    }
+
+    function escHtml(str){
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // --- Render recipe list ---
+    function renderRecipeList(){
+      const container = document.getElementById('recipeList');
+
+      if(!recipes.length){
+        container.innerHTML = '<div class="empty-state">No recipes yet. Create one to build reusable meals.</div>';
+        return;
+      }
+
+      container.innerHTML = '<div class="recipe-grid" id="recipeGrid"></div>';
+      const grid = document.getElementById('recipeGrid');
+
+      recipes.forEach((recipe, idx) => {
+        const servings = recipe.servings || 1;
+        const perCal = Math.round((recipe.totals.calories || 0) / servings);
+        const perCost = recipe.totals.cost != null ? (recipe.totals.cost / servings) : null;
+        const ingCount = (recipe.ingredients || []).length;
+
+        const card = document.createElement('div');
+        card.className = 'recipe-card';
+        card.dataset.idx = idx;
+
+        let statsHtml = `<span class="rs-cal">${perCal} cal/serving</span>`;
+        if(perCost != null){
+          statsHtml += `<span class="rs-cost">~$${perCost.toFixed(2)}</span>`;
+        }
+
+        // Detail section (hidden until expanded)
+        let ingHtml = (recipe.ingredients || []).map(i =>
+          `<div class="rd-ing"><span>${escHtml(i.name)}</span><span>${i.weight}g &middot; ${Math.round(i.calories || 0)} cal</span></div>`
+        ).join('');
+
+        const t = recipe.totals;
+        const detailHtml = `
+          <div class="recipe-detail">
+            <div style="font-weight:900; font-size:12px; color:var(--muted); margin-bottom:4px;">Ingredients</div>
+            ${ingHtml || '<div style="font-size:12px; color:var(--muted);">No ingredients</div>'}
+            <div class="rd-totals">
+              <div><div class="t-val">${Math.round(t.calories || 0)}</div><div class="t-lbl">Cal total</div></div>
+              <div><div class="t-val">${Math.round(t.protein || 0)}g</div><div class="t-lbl">Protein</div></div>
+              <div><div class="t-val">${Math.round(t.carbs || 0)}g</div><div class="t-lbl">Carbs</div></div>
+              <div><div class="t-val">${Math.round(t.fat || 0)}g</div><div class="t-lbl">Fat</div></div>
+            </div>
+            ${servings > 1 ? `<div style="text-align:center; font-size:11px; color:var(--muted); margin-top:4px;">${servings} servings &middot; ${perCal} cal per serving</div>` : ''}
+            <div class="rd-actions">
+              <button class="rd-btn primary" data-action="log" data-idx="${idx}">Log as Meal</button>
+              <button class="rd-btn" data-action="edit" data-idx="${idx}">Edit</button>
+              <button class="rd-btn danger" data-action="delete" data-idx="${idx}">Delete</button>
+            </div>
+          </div>
+        `;
+
+        card.innerHTML = `
+          <div class="recipe-name">${escHtml(recipe.name)}</div>
+          <div class="recipe-meta">${ingCount} ingredient${ingCount !== 1 ? 's' : ''}${servings > 1 ? ' &middot; ' + servings + ' servings' : ''}</div>
+          <div class="recipe-stats">${statsHtml}</div>
+          ${detailHtml}
+        `;
+
+        // Toggle expand
+        card.addEventListener('click', (e) => {
+          if(e.target.closest('.rd-btn')) return;
+          card.classList.toggle('expanded');
+        });
+
+        grid.appendChild(card);
+      });
+
+      // Action buttons
+      grid.querySelectorAll('.rd-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const idx = Number(btn.dataset.idx);
+          const action = btn.dataset.action;
+          if(action === 'log') openLogModal(recipes[idx]);
+          else if(action === 'edit') openRecipeBuilder(recipes[idx]);
+          else if(action === 'delete') deleteRecipe(recipes[idx].id);
+        });
+      });
+    }
+
+    // --- Recipe Builder ---
+    function openRecipeBuilder(recipe){
+      editingRecipeId = recipe ? recipe.id : null;
+      builderIngredients = recipe ? recipe.ingredients.map(i => ({ ...i })) : [];
+      selectedIngredient = null;
+
+      document.getElementById('builderTitle').textContent = recipe ? 'Edit Recipe' : 'Create Recipe';
+      document.getElementById('recipeName').value = recipe ? recipe.name : '';
+      document.getElementById('recipeServings').value = recipe ? (recipe.servings || 1) : 1;
+      document.getElementById('ingredientSearch').value = '';
+      document.getElementById('searchResults').innerHTML = '';
+      document.getElementById('weightInput').style.display = 'none';
+
+      renderBuilderList();
+      updateBuilderTotals();
+      document.getElementById('recipeModal').classList.add('show');
+    }
+
+    function closeBuilder(){
+      document.getElementById('recipeModal').classList.remove('show');
+    }
+
+    function renderBuilderList(){
+      const container = document.getElementById('builderList');
+      if(!builderIngredients.length){
+        container.innerHTML = '<div class="empty-state" style="padding:12px;">Search and add ingredients above.</div>';
+        document.getElementById('saveRecipeBtn').disabled = true;
+        return;
+      }
+      document.getElementById('saveRecipeBtn').disabled = false;
+
+      container.innerHTML = '';
+      builderIngredients.forEach((ing, idx) => {
+        const div = document.createElement('div');
+        div.className = 'builder-item';
+        const costStr = ing.estimatedCost != null ? ` &middot; ~$${ing.estimatedCost.toFixed(2)}` : '';
+        div.innerHTML = `
+          <div class="bi-name">${escHtml(ing.name)}</div>
+          <div class="bi-info">${ing.weight}g &middot; ${Math.round(ing.calories || 0)} cal${costStr}</div>
+          <button class="bi-remove" data-idx="${idx}">&#10005;</button>
+        `;
+        container.appendChild(div);
+      });
+
+      container.querySelectorAll('.bi-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          builderIngredients.splice(Number(btn.dataset.idx), 1);
+          renderBuilderList();
+          updateBuilderTotals();
+        });
+      });
+    }
+
+    function updateBuilderTotals(){
+      let cal = 0, pro = 0, carb = 0, fat = 0, cost = null;
+      builderIngredients.forEach(i => {
+        cal += i.calories || 0;
+        pro += i.protein || 0;
+        carb += i.carbs || 0;
+        fat += i.fat || 0;
+        if(i.estimatedCost != null) cost = (cost || 0) + i.estimatedCost;
+      });
+      document.getElementById('btCal').textContent = Math.round(cal);
+      document.getElementById('btPro').textContent = Math.round(pro) + 'g';
+      document.getElementById('btCarb').textContent = Math.round(carb) + 'g';
+      document.getElementById('btFat').textContent = Math.round(fat) + 'g';
+
+      const costEl = document.getElementById('builderCost');
+      if(cost != null){
+        costEl.textContent = 'Est. cost: $' + cost.toFixed(2);
+      } else {
+        costEl.textContent = '';
+      }
+    }
+
+    function selectIngredient(ing){
+      selectedIngredient = ing;
+      document.getElementById('weightInput').style.display = 'block';
+      document.getElementById('weightLabel').textContent = 'Weight for ' + ing.name + ' (' + (ing.defaultUnit || 'g') + ')';
+      document.getElementById('ingredientWeight').value = '';
+      document.getElementById('searchResults').innerHTML = '';
+      document.getElementById('ingredientSearch').value = ing.name;
+
+      const qs = document.getElementById('quickServings');
+      qs.innerHTML = '';
+      if(ing.commonServings){
+        ing.commonServings.forEach(s => {
+          const btn = document.createElement('button');
+          btn.className = 'qs-btn';
+          btn.textContent = s.label;
+          btn.addEventListener('click', () => {
+            document.getElementById('ingredientWeight').value = s.grams;
+          });
+          qs.appendChild(btn);
+        });
+      }
+    }
+
+    function addSelectedIngredient(){
+      if(!selectedIngredient) return;
+      const w = Number(document.getElementById('ingredientWeight').value) || 0;
+      if(w <= 0) return;
+
+      const p = selectedIngredient.per100g;
+      const factor = w / 100;
+      const cost = estimateIngredientCost(selectedIngredient.name, w);
+
+      builderIngredients.push({
+        name: selectedIngredient.name,
+        weight: w,
+        unit: selectedIngredient.defaultUnit || 'g',
+        caloriesPer100g: p.calories,
+        proteinPer100g: p.protein,
+        carbsPer100g: p.carbs,
+        fatPer100g: p.fat,
+        calories: p.calories * factor,
+        protein: p.protein * factor,
+        carbs: p.carbs * factor,
+        fat: p.fat * factor,
+        estimatedCost: cost,
+      });
+
+      selectedIngredient = null;
+      document.getElementById('weightInput').style.display = 'none';
+      document.getElementById('ingredientSearch').value = '';
+      document.getElementById('ingredientWeight').value = '';
+
+      renderBuilderList();
+      updateBuilderTotals();
+    }
+
+    function saveRecipe(){
+      if(!builderIngredients.length) return;
+      const name = document.getElementById('recipeName').value.trim() || 'Untitled Recipe';
+      const servings = Math.max(1, Number(document.getElementById('recipeServings').value) || 1);
+
+      let totalCost = null;
+      builderIngredients.forEach(i => {
+        if(i.estimatedCost != null) totalCost = (totalCost || 0) + i.estimatedCost;
+      });
+
+      const recipe = {
+        id: editingRecipeId || ('recipe_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6)),
+        name: name,
+        servings: servings,
+        ingredients: builderIngredients.map(i => ({ ...i })),
+        totals: {
+          calories: builderIngredients.reduce((s, i) => s + (i.calories || 0), 0),
+          protein: builderIngredients.reduce((s, i) => s + (i.protein || 0), 0),
+          carbs: builderIngredients.reduce((s, i) => s + (i.carbs || 0), 0),
+          fat: builderIngredients.reduce((s, i) => s + (i.fat || 0), 0),
+          cost: totalCost,
+        },
+        created: editingRecipeId
+          ? (recipes.find(r => r.id === editingRecipeId) || {}).created || new Date().toISOString()
+          : new Date().toISOString(),
+      };
+
+      if(editingRecipeId){
+        const idx = recipes.findIndex(r => r.id === editingRecipeId);
+        if(idx >= 0) recipes[idx] = recipe;
+        else recipes.push(recipe);
+      } else {
+        recipes.push(recipe);
+      }
+
+      saveRecipes(recipes);
+      closeBuilder();
+      renderRecipeList();
+    }
+
+    function deleteRecipe(id){
+      recipes = recipes.filter(r => r.id !== id);
+      saveRecipes(recipes);
+      renderRecipeList();
+    }
+
+    // --- Log as Meal ---
+    function openLogModal(recipe){
+      logRecipeTarget = recipe;
+      const servings = recipe.servings || 1;
+      const perCal = Math.round((recipe.totals.calories || 0) / servings);
+      document.getElementById('logInfo').textContent = recipe.name + ' \u2014 ' + perCal + ' cal per serving';
+      document.getElementById('logServings').value = 1;
+      document.getElementById('logModal').classList.add('show');
+    }
+
+    function closeLogModal(){
+      document.getElementById('logModal').classList.remove('show');
+      logRecipeTarget = null;
+    }
+
+    function logRecipeAsMeal(){
+      if(!logRecipeTarget) return;
+      const servingsInput = Number(document.getElementById('logServings').value) || 1;
+      const recipe = logRecipeTarget;
+      const recipeServings = recipe.servings || 1;
+      const scale = servingsInput / recipeServings;
+
+      const now = new Date();
+      const today = now.toISOString().slice(0, 10);
+
+      let totalCost = null;
+      if(recipe.totals.cost != null) totalCost = recipe.totals.cost * scale;
+
+      const meal = {
+        id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        date: today,
+        time: now.toTimeString().slice(0, 5),
+        name: recipe.name + (servingsInput !== 1 ? ' (' + servingsInput + ' serving' + (servingsInput !== 1 ? 's' : '') + ')' : ''),
+        ingredients: recipe.ingredients.map(i => ({
+          name: i.name,
+          weight: Math.round(i.weight * scale),
+          unit: i.unit || 'g',
+          calories: (i.calories || 0) * scale,
+          protein: (i.protein || 0) * scale,
+          carbs: (i.carbs || 0) * scale,
+          fat: (i.fat || 0) * scale,
+          estimatedCost: i.estimatedCost != null ? i.estimatedCost * scale : null,
+        })),
+        totals: {
+          calories: (recipe.totals.calories || 0) * scale,
+          protein: (recipe.totals.protein || 0) * scale,
+          carbs: (recipe.totals.carbs || 0) * scale,
+          fat: (recipe.totals.fat || 0) * scale,
+          cost: totalCost,
+        }
+      };
+
+      const meals = loadMeals();
+      meals.push(meal);
+      saveMeals(meals);
+
+      closeLogModal();
+
+      // Brief confirmation
+      const info = document.getElementById('logInfo');
+      if(info){
+        const origText = info.textContent;
+        info.textContent = 'Meal logged!';
+        info.style.color = 'var(--good)';
+        setTimeout(() => {
+          info.textContent = origText;
+          info.style.color = '';
+        }, 1500);
+      }
+    }
+
+    // --- Event bindings ---
+    document.getElementById('addRecipeBtn').addEventListener('click', () => openRecipeBuilder());
+    document.getElementById('modalClose').addEventListener('click', closeBuilder);
+    document.getElementById('recipeModal').addEventListener('click', (e) => {
+      if(e.target === document.getElementById('recipeModal')) closeBuilder();
+    });
+    document.getElementById('addIngredientBtn').addEventListener('click', addSelectedIngredient);
+    document.getElementById('saveRecipeBtn').addEventListener('click', saveRecipe);
+
+    document.getElementById('logCancel').addEventListener('click', closeLogModal);
+    document.getElementById('logConfirm').addEventListener('click', logRecipeAsMeal);
+    document.getElementById('logModal').addEventListener('click', (e) => {
+      if(e.target === document.getElementById('logModal')) closeLogModal();
+    });
+
+    // Search input
+    let searchTimeout;
+    document.getElementById('ingredientSearch').addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      const q = e.target.value;
+      searchTimeout = setTimeout(() => {
+        const results = searchIngredients(q);
+        const container = document.getElementById('searchResults');
+        if(!results.length){
+          container.innerHTML = '';
+          return;
+        }
+        container.innerHTML = '';
+        results.forEach(ing => {
+          const div = document.createElement('div');
+          div.className = 'search-result';
+          div.innerHTML = `
+            <div>
+              <div class="sr-name">${escHtml(ing.name)}</div>
+              <div class="sr-meta">${ing.category}</div>
+            </div>
+            <div class="sr-meta">${ing.per100g.calories} cal/100g</div>
+          `;
+          div.addEventListener('click', () => selectIngredient(ing));
+          container.appendChild(div);
+        });
+      }, 150);
+    });
+
+    // Weight input Enter key
+    document.getElementById('ingredientWeight').addEventListener('keydown', (e) => {
+      if(e.key === 'Enter') addSelectedIngredient();
+    });
+
+    // --- Init ---
+    (async function init(){
+      ingredientsDb = await loadIngredientsDb();
+      recipes = loadRecipes();
+      renderRecipeList();
+    })();
+  </script>
+</body>
+</html>

@@ -361,6 +361,7 @@
       <div class="nav">
         <a class="pill active" href="index.html">Log</a>
         <a class="pill" href="targets.html">Targets</a>
+        <a class="pill" href="recipes.html">Recipes</a>
       </div>
     </div>
   </div>
@@ -941,6 +942,15 @@
       todayMeals = loadMeals();
       favorites = loadFavorites();
       targets = loadTargets();
+
+      // Auto-navigate to most recent date with meals if today is empty
+      if(!todayMeals.filter(m => m.date === actualToday).length){
+        const dates = [...new Set(todayMeals.map(m => m.date))].sort();
+        if(dates.length){
+          viewDate = dates[dates.length - 1];
+        }
+      }
+
       renderAll();
     })();
   </script>

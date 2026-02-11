@@ -14,6 +14,9 @@ const EX_MAX = 50000;
 /* ===== Finance Threshold (for Fin vertical bar only) ===== */
 const FIN_MAX = 2000;
 
+/* ===== Nutrition shared state (set by renderNutritionCard, read by renderModulesAndCharacter) ===== */
+let lastNutritionCal = 0;
+
 /* ===== Finance State ===== */
 const financeState = {
   chart: null,
@@ -483,14 +486,16 @@ function renderNutritionCard(){
   const todayMeals = allMeals.filter(m => m.date === todayISO);
   const targets = loadNutritionTargets();
 
-  // Fallback to most recent date if nothing logged today
+  // Fallback to most recent date with EITHER meals or workouts
   let meals = todayMeals;
   let isToday = true;
   let displayDate = todayISO;
 
-  if(!todayMeals.length && allMeals.length){
-    const dates = [...new Set(allMeals.map(m => m.date))].sort();
-    const fallbackDate = dates[dates.length - 1];
+  if(!todayMeals.length){
+    const mealDates = [...new Set(allMeals.map(m => m.date))];
+    const workoutDates = getAllWorkouts().map(w => w.date);
+    const allDates = [...new Set([...mealDates, ...workoutDates])].sort();
+    const fallbackDate = allDates.length ? allDates[allDates.length - 1] : null;
     if(fallbackDate){
       meals = allMeals.filter(m => m.date === fallbackDate);
       isToday = false;
@@ -522,13 +527,16 @@ function renderNutritionCard(){
   setText('nvalCarb', `${Math.round(carb)}g / ${targets.dailyCarbs}g`);
   setText('nvalFat', `${Math.round(fat)}g / ${targets.dailyFat}g`);
 
-  // Intake vs exercise burn comparison — always show with placeholders
+  // Store computed cal for vertical bar in renderModulesAndCharacter()
+  lastNutritionCal = cal;
+
+  // Intake vs exercise burn comparison — uses displayDate (today or fallback)
   const vsEl = $('nutritionVs');
   if(vsEl){
-    const todayWorkouts = getAllWorkouts().filter(w => w.date === todayISO);
-    let todayVolume = 0;
-    todayWorkouts.forEach(w => { todayVolume += dayTotals(w).volume; });
-    const burnEstimate = Math.round(todayVolume * 0.05);
+    const dateWorkouts = getAllWorkouts().filter(w => w.date === displayDate);
+    let dateVolume = 0;
+    dateWorkouts.forEach(w => { dateVolume += dayTotals(w).volume; });
+    const burnEstimate = Math.round(dateVolume * 0.05);
 
     vsEl.classList.add('show');
 
@@ -548,9 +556,9 @@ function renderNutritionCard(){
         </div>
         <div style="margin-top:2px; font-size:11px; color:var(--muted)">${recoveryPct}% recovery target</div>`;
     } else if(cal > 0){
-      vsEl.innerHTML = `Ate <b>${Math.round(cal)}</b> cal — <span style="color:var(--muted)">No workout data today</span>`;
+      vsEl.innerHTML = `Ate <b>${Math.round(cal)}</b> cal — <span style="color:var(--muted)">No workout data${isToday ? ' today' : ''}</span>`;
     } else if(burnEstimate > 0){
-      vsEl.innerHTML = `Burned ~<b>${burnEstimate}</b> cal from workout — <span style="color:var(--muted)">No meal data today</span>`;
+      vsEl.innerHTML = `Burned ~<b>${burnEstimate}</b> cal from workout — <span style="color:var(--muted)">No meal data${isToday ? ' today' : ''}</span>`;
     } else {
       vsEl.innerHTML = `<span style="color:var(--muted)">Log a meal or workout to see intake vs burn</span>`;
     }
@@ -601,12 +609,9 @@ function renderModulesAndCharacter(){
   // Study fill: (placeholder until you wire study power)
   setHeight('modStudyFill', 0);
 
-  // Nutrition fill: today's calorie intake as % of target
-  const nutMeals = loadNutritionMeals().filter(m => m.date === todayISO);
+  // Nutrition fill: calorie intake as % of target (uses lastNutritionCal from renderNutritionCard)
   const nutTargets = loadNutritionTargets();
-  let nutCal = 0;
-  nutMeals.forEach(m => { if(m.totals) nutCal += m.totals.calories || 0; });
-  setHeight('modNutFill', pct(nutCal, nutTargets.dailyCalories));
+  setHeight('modNutFill', pct(lastNutritionCal, nutTargets.dailyCalories));
 
   const ready = exPower >= EX_MAX && EX_MAX > 0;
   const statusText = $('statusText');
@@ -791,10 +796,10 @@ function bindButtons(){
 ----------------------------------*/
 function renderAll(){
   renderTop();
+  renderNutritionCard();        // must run before renderModulesAndCharacter (sets lastNutritionCal)
   renderModulesAndCharacter();
   renderHistory();
   renderFinanceDonut();
-  renderNutritionCard();
 }
 
 /* --------------------------------

@@ -32,18 +32,47 @@
   }
   .topbar-inner{
     max-width:600px; margin:0 auto;
-    padding:10px;
+    padding:8px 10px;
     display:flex; align-items:center; gap:10px;
   }
-  .back{
-    all:unset; cursor:pointer;
+  .brand-group{display:flex; align-items:center; gap:8px; flex:0 0 auto;}
+  .brand{
+    display:flex; align-items:center; gap:6px;
+    font-weight:900;
     padding:8px 10px;
     border-radius:999px;
     border:1px solid var(--ring);
     background: rgba(19,26,34,.55);
-    font-weight:900;
+    box-shadow: var(--shadow);
+    white-space:nowrap;
+    font-size:13px;
   }
-  .topbar-title{font-weight:950; font-size:16px;}
+  .brand.active{
+    color:#0b0f14;
+    background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+    border-color: transparent;
+  }
+  .nav{
+    margin-left:auto;
+    display:flex; gap:8px;
+    align-items:center;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+  .nav .pill{
+    padding:8px 12px;
+    border-radius:999px;
+    border:1px solid var(--ring);
+    background: rgba(19,26,34,.55);
+    color:var(--muted);
+    font-weight:800;
+    font-size:13px;
+  }
+  .nav .pill.active{
+    color:#0b0f14;
+    background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+    border-color: transparent;
+  }
 
   .wrap{max-width:600px; margin:0 auto; padding:12px; display:flex; flex-direction:column; gap:12px;}
 
@@ -136,8 +165,15 @@
 <body>
   <div class="topbar">
     <div class="topbar-inner">
-      <a class="back" href="index.html">← Back</a>
-      <div class="topbar-title">Daily Targets</div>
+      <div class="brand-group">
+        <a class="brand" href="../main.html">🏠 Home</a>
+        <a class="brand active" href="index.html">🍽 Nutrition</a>
+      </div>
+      <div class="nav">
+        <a class="pill" href="index.html">Log</a>
+        <a class="pill active" href="targets.html">Targets</a>
+        <a class="pill" href="recipes.html">Recipes</a>
+      </div>
     </div>
   </div>
 
