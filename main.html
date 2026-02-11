@@ -50,30 +50,6 @@
               alt="Character GIF"
             />
           </div>
-
-          <div class="character-bottom">
-            <div class="mini-card">
-              <div class="k">Status</div>
-              <div class="v" id="statusText">Charging</div>
-            </div>
-          </div>
-
-          <div class="power-block">
-            <div class="power-top">
-              <div class="left">
-                <div class="dot" id="statusDot"></div>
-                <div>Power</div>
-              </div>
-              <div class="num">
-                <span id="exPowerNow">0</span> / <span id="exPowerMax">50000</span>
-              </div>
-            </div>
-            <div class="bar"><div class="fill ex" id="exFill"></div></div>
-
-            <div class="transform-row">
-              <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform</button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -98,8 +74,31 @@
               <div class="vbar"><div class="vfill fin" id="modFinFill"></div></div>
               <div class="abbr">Fin</div>
             </div>
+
+            <div class="modv" id="modNutrition" role="button" tabindex="0" title="Open Nutrition module">
+              <div class="modv-top"><div class="micon nut">🍎</div></div>
+              <div class="vbar"><div class="vfill nut" id="modNutFill"></div></div>
+              <div class="abbr">Nut</div>
+            </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- POWER STRIP: Status + Power Bar + Transform -->
+    <section class="card power-strip">
+      <div class="power-strip-inner">
+        <div class="power-strip-left">
+          <div class="dot" id="statusDot"></div>
+          <div class="power-strip-label" id="statusText">Charging</div>
+        </div>
+        <div class="power-strip-bar">
+          <div class="bar"><div class="fill ex" id="exFill"></div></div>
+        </div>
+        <div class="power-strip-num">
+          <span id="exPowerNow">0</span> / <span id="exPowerMax">50000</span>
+        </div>
+        <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform</button>
       </div>
     </section>
 
@@ -112,13 +111,16 @@
           <button class="finance-nav-btn" id="financeMonthNext" type="button" title="Next month">▶</button>
         </div>
         <div class="finance-header-right">
+          <button class="fin-filter active" data-cat="groc" title="Groceries">🛒</button>
+          <button class="fin-filter" data-cat="rental" title="Rental">🏠</button>
+          <button class="fin-filter" data-cat="cafe" title="Cafe & Restaurant">☕</button>
           <button class="chip-btn" id="financeToggleChart" title="Show/hide chart">👁</button>
         </div>
       </div>
 
       <div class="finance-body">
         <div class="donut-wrap" id="financeDonutWrap">
-          <canvas id="financeDonut" width="110" height="110" aria-label="Grocery spending donut"></canvas>
+          <canvas id="financeDonut" width="150" height="150" aria-label="Spending donut"></canvas>
           <div class="donut-center">
             <div class="donut-total" id="financeTotal">$0</div>
             <div class="donut-caption" id="financeTotalLabel">Groceries</div>

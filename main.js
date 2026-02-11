@@ -19,6 +19,7 @@ const financeState = {
   chart: null,
   monthOffset: 0,      // 0 = current month, -1 = previous, etc.
   chartVisible: true,
+  category: 'groc',    // active filter: 'groc', 'rental', 'cafe'
 };
 
 /* --------------------------------
@@ -292,10 +293,36 @@ function filterGroceries(entries){
   return entries.filter(e => isGroceriesCat(e.category) || isGroceriesCat(e.subcategory));
 }
 
-function sumByGroceriesSubcategory(entries){
+function isRentalCat(cat){
+  const c = String(cat || '').toLowerCase();
+  return c.includes('rent') || c.includes('mortgage') || c.includes('housing') || c.includes('utilit');
+}
+
+function isCafeCat(cat){
+  const c = String(cat || '').toLowerCase();
+  return c.includes('cafe') || c.includes('restaurant') || c.includes('dining') || c.includes('food service') || c.includes('takeout') || c.includes('fast food');
+}
+
+function filterByActiveCategory(entries){
+  const cat = financeState.category;
+  if(cat === 'groc') return filterGroceries(entries);
+  if(cat === 'rental') return entries.filter(e => isRentalCat(e.category) || isRentalCat(e.subcategory));
+  if(cat === 'cafe') return entries.filter(e => isCafeCat(e.category) || isCafeCat(e.subcategory));
+  return filterGroceries(entries);
+}
+
+function getCategoryLabel(){
+  if(financeState.category === 'groc') return 'Groceries';
+  if(financeState.category === 'rental') return 'Rental';
+  if(financeState.category === 'cafe') return 'Cafe';
+  return 'Groceries';
+}
+
+function sumBySubcategory(entries){
+  const fallback = getCategoryLabel();
   const map = new Map();
   for(const e of entries){
-    const k = e.subcategory || 'Groceries';
+    const k = e.subcategory || fallback;
     map.set(k, (map.get(k) || 0) + (Number(e.amount) || 0));
   }
   return [...map.entries()]
@@ -353,22 +380,23 @@ function renderFinanceDonut(){
     return;
   }
 
+  const catLabel = getCategoryLabel();
   const receipts = loadFinanceReceipts();
   const allEntries = receiptsToEntries(receipts);
   const monthEntries = filterByMonthOffset(allEntries, financeState.monthOffset);
-  const groceryEntries = filterGroceries(monthEntries);
+  const filteredEntries = filterByActiveCategory(monthEntries);
 
-  const rows = sumByGroceriesSubcategory(groceryEntries);
+  const rows = sumBySubcategory(filteredEntries);
   const total = rows.reduce((s,r)=>s+r.value, 0);
   setText('financeTotal', formatMoney(total));
-  setText('financeTotalLabel', 'Groceries');
+  setText('financeTotalLabel', catLabel);
 
   // Empty state
   if(!rows.length){
     destroyFinanceChart();
     if(emptyEl){
       emptyEl.classList.add('show');
-      emptyEl.innerHTML = `No grocery data for <b>${escapeHtml(getMonthLabel(financeState.monthOffset))}</b>.<br/>Add receipts and this will populate automatically.`;
+      emptyEl.innerHTML = `No ${escapeHtml(catLabel.toLowerCase())} data for <b>${escapeHtml(getMonthLabel(financeState.monthOffset))}</b>.<br/>Add receipts and this will populate automatically.`;
     }
     legendEl.innerHTML = '';
     return;
@@ -548,6 +576,13 @@ function renderModulesAndCharacter(){
   // Study fill: (placeholder until you wire study power)
   setHeight('modStudyFill', 0);
 
+  // Nutrition fill: today's calorie intake as % of target
+  const nutMeals = loadNutritionMeals().filter(m => m.date === todayISO);
+  const nutTargets = loadNutritionTargets();
+  let nutCal = 0;
+  nutMeals.forEach(m => { if(m.totals) nutCal += m.totals.calories || 0; });
+  setHeight('modNutFill', pct(nutCal, nutTargets.dailyCalories));
+
   const ready = exPower >= EX_MAX && EX_MAX > 0;
   const statusText = $('statusText');
   const dot = $('statusDot');
@@ -589,25 +624,38 @@ function renderHistory(){
   setText('hSets', String(totals.sets));
   setText('hVol', totals.volume.toLocaleString() + ' lb');
 
-  const rows = [];
-  latest.exercises.forEach(ex => {
+  // Top 3 heaviest exercises, one per body part
+  const scored = latest.exercises.map(ex => {
     const sets = (ex.sets || []).filter(s => (s.weight > 0 || s.reps > 0)).length;
     const vol = (ex.sets || []).reduce((sum, s) => sum + ((s.weight>0 && s.reps>0) ? (s.weight*s.reps) : 0), 0);
-    if(sets === 0 && vol === 0) return;
+    const maxWeight = (ex.sets || []).reduce((mx, s) => Math.max(mx, s.weight || 0), 0);
+    return { ex, sets, vol, maxWeight };
+  }).filter(s => s.sets > 0 || s.vol > 0);
 
-    rows.push(`
-      <div class="ex-row">
-        <div>
-          <div class="n">${escapeHtml(ex.name)}</div>
-          <div class="m">${escapeHtml(ex.bodyPart)} • ${sets} set(s)</div>
-        </div>
-        <div class="r">
-          ${Math.round(vol).toLocaleString()} lb
-          <small>volume</small>
-        </div>
-      </div>
-    `);
+  // Group by bodyPart, pick heaviest per group
+  const byPart = new Map();
+  scored.forEach(s => {
+    const part = s.ex.bodyPart;
+    if(!byPart.has(part) || s.maxWeight > byPart.get(part).maxWeight){
+      byPart.set(part, s);
+    }
   });
+
+  // Sort by maxWeight desc, take top 3
+  const top3 = [...byPart.values()].sort((a, b) => b.maxWeight - a.maxWeight).slice(0, 3);
+
+  const rows = top3.map(s => `
+    <div class="ex-row">
+      <div>
+        <div class="n">${escapeHtml(s.ex.name)}</div>
+        <div class="m">${escapeHtml(s.ex.bodyPart)} • ${s.sets} set(s)</div>
+      </div>
+      <div class="r">
+        ${Math.round(s.maxWeight).toLocaleString()} lb
+        <small>heaviest</small>
+      </div>
+    </div>
+  `);
 
   if(container){
     container.innerHTML = `
@@ -639,6 +687,12 @@ function bindNav(){
   if(modFin){
     modFin.addEventListener('click', ()=> go('./finances/index.html'));
     modFin.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./finances/index.html'); });
+  }
+
+  const modNutrition = $('modNutrition');
+  if(modNutrition){
+    modNutrition.addEventListener('click', ()=> go('./nutrition/index.html'));
+    modNutrition.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./nutrition/index.html'); });
   }
 }
 
@@ -695,6 +749,16 @@ function bindButtons(){
       renderFinanceDonut();
     });
   }
+
+  // Finance category filter buttons
+  document.querySelectorAll('.fin-filter').forEach(btn => {
+    btn.addEventListener('click', ()=>{
+      financeState.category = btn.dataset.cat;
+      document.querySelectorAll('.fin-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderFinanceDonut();
+    });
+  });
 }
 
 /* --------------------------------
