@@ -18,8 +18,8 @@
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;
       background:
-        radial-gradient(1200px 800px at 50% -200px, rgba(76,175,80,.20), transparent 55%),
-        radial-gradient(900px 700px at 10% 0%, rgba(45,212,191,.12), transparent 60%),
+        radial-gradient(1200px 800px at 50% -200px, rgba(245,158,11,.10), transparent 55%),
+        radial-gradient(900px 700px at 10% 0%, rgba(34,197,94,.06), transparent 60%),
         var(--bg);
       color:var(--ink);
       min-height:100vh;
@@ -143,7 +143,7 @@
       background: rgba(19,26,34,.72);
       border:1px solid rgba(42,53,67,.70);
       border-radius: 16px;
-      padding: 12px;
+      padding: 10px;
       box-shadow: var(--shadow);
       margin-bottom: 12px;
     }
@@ -182,7 +182,7 @@
     }
     .receipt-delete{
       all:unset; cursor:pointer;
-      width: 46px; height: 46px;
+      width: 40px; height: 40px;
       display:inline-flex; align-items:center; justify-content:center;
       border-radius: 14px;
       border:1px solid rgba(239,68,68,.35);
@@ -209,6 +209,18 @@
     .item-name{ flex:1; color: var(--ink); }
     .item-price{ font-weight: 900; color: rgba(45,212,191,.95); margin-left: 12px; }
 
+    .receipt-cat-badge{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+      background:rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.25);
+      color:var(--good);
+      margin-left:8px;
+      vertical-align:middle;
+    }
     .empty-state{
       text-align:center; padding: 50px 16px; color: var(--muted);
       background: rgba(19,26,34,.40);
@@ -293,9 +305,26 @@
     let activeStore = 'all';
     let activePeriod = 'all';
 
+    // Read ?month=YYYY-MM from query params (passed from dashboard/finance page)
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryMonth = urlParams.get('month'); // e.g. "2026-02"
+
+    // If month param is present, default to month filter
+    if (queryMonth && /^\d{4}-\d{2}$/.test(queryMonth)) {
+      activePeriod = 'month';
+    }
+
     (async function initReceiptsPage() {
       await (window.FinancesDataLoader?.ready || Promise.resolve());
       allReceipts = loadReceipts();
+
+      // Activate the month filter button if query param present
+      if (activePeriod === 'month') {
+        document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
+        const monthBtn = document.querySelector('[data-period="month"]');
+        if (monthBtn) monthBtn.classList.add('active');
+      }
+
       applyFilters();
       render();
     })();
@@ -304,12 +333,25 @@
       const now = new Date();
       let out = [...allReceipts];
 
-      if (activeStore !== 'all') out = out.filter(r => r.store === activeStore);
+      if (activeStore !== 'all') {
+        const norm = activeStore.trim().toLowerCase();
+        out = out.filter(r => (r.store || '').trim().toLowerCase() === norm);
+      }
 
       if (activePeriod === 'month') {
+        // Use query param month if available, otherwise current month
+        let filterYear, filterMonth;
+        if (queryMonth && /^\d{4}-\d{2}$/.test(queryMonth)) {
+          const [y, m] = queryMonth.split('-').map(Number);
+          filterYear = y;
+          filterMonth = m - 1; // 0-indexed
+        } else {
+          filterYear = now.getFullYear();
+          filterMonth = now.getMonth();
+        }
         out = out.filter(r => {
           const d = new Date(r.date);
-          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          return d.getMonth() === filterMonth && d.getFullYear() === filterYear;
         });
       } else if (activePeriod === 'week') {
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -343,15 +385,22 @@
     }
 
     function renderStoreFilters() {
-      const stores = [...new Set(allReceipts.map(r => r.store))];
+      // Deduplicate stores by normalized key, keep first casing
+      const seen = new Map();
+      allReceipts.forEach(r => {
+        const norm = (r.store || '').trim().toLowerCase();
+        if (!seen.has(norm)) seen.set(norm, (r.store || '').trim());
+      });
+      const stores = [...seen.values()];
       const container = document.getElementById('storeFilters');
 
       container.innerHTML = `<button class="filter-btn ${activeStore==='all' ? 'active' : ''}" data-store="all">All Stores</button>`;
       container.querySelector('[data-store="all"]').addEventListener('click', (e) => onStoreSelected('all', e));
 
       stores.forEach(store => {
+        const isActive = activeStore !== 'all' && store.trim().toLowerCase() === activeStore.trim().toLowerCase();
         const btn = document.createElement('button');
-        btn.className = 'filter-btn' + (store === activeStore ? ' active' : '');
+        btn.className = 'filter-btn' + (isActive ? ' active' : '');
         btn.dataset.store = store;
         btn.textContent = store;
         btn.addEventListener('click', (e) => onStoreSelected(store, e));
@@ -385,22 +434,33 @@
       container.innerHTML = '';
 
       const sorted = [...filteredReceipts].sort((a, b) => new Date(b.date) - new Date(a.date));
-      sorted.forEach(receipt => container.appendChild(createReceiptRow(receipt)));
+
+      if (sorted.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-title">No Receipts Found</div>
+            <p>No receipts match your current filters. Try changing the store or date range.</p>
+          </div>
+        `;
+        return;
+      }
+
+      sorted.forEach((receipt, index) => container.appendChild(createReceiptRow(receipt, index)));
     }
 
-    function createReceiptRow(receipt) {
+    function createReceiptRow(receipt, index) {
       const row = document.createElement('div');
       row.className = 'receipt-row';
 
-      const id = String(receipt.id || `${receipt.store}_${receipt.date}_${receipt.total}`)
-        .replace(/[^a-zA-Z0-9_-]/g, '_');
+      const id = `r${index}`;
 
       const dateStr = new Date(receipt.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
       row.innerHTML = `
         <button class="receipt-main" type="button" onclick="toggleReceiptDetails('${id}')" aria-expanded="false" aria-controls="details_${id}">
           <div class="receipt-left">
-            <div class="receipt-store">${receipt.store}</div>
+            <div class="receipt-store">${receipt.store}${receipt.category ? `<span class="receipt-cat-badge">${receipt.category}</span>` : ''}</div>
             <div class="receipt-sub">${dateStr} • ${(receipt.items||[]).length} items</div>
           </div>
           <div class="receipt-right">
@@ -446,6 +506,13 @@
     }
 
     function updateStats() {
+      const statsBar = document.getElementById('statsBar');
+      if (filteredReceipts.length === 0) {
+        if (statsBar) statsBar.style.display = 'none';
+        return;
+      }
+      if (statsBar) statsBar.style.display = '';
+
       const total = filteredReceipts.reduce((sum, r) => sum + parseFloat(r.total || 0), 0);
       const avg = filteredReceipts.length > 0 ? total / filteredReceipts.length : 0;
 

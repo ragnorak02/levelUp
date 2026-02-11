@@ -11,18 +11,14 @@ const todayISO = new Date().toISOString().slice(0,10);
 /* ===== Exercise Threshold ===== */
 const EX_MAX = 50000;
 
-/* ===== Finance Threshold (for Fin vertical bar only) =====
-   This does NOT affect your finance page — just maps monthly spend into a %.
-   You can tune later.
-*/
+/* ===== Finance Threshold (for Fin vertical bar only) ===== */
 const FIN_MAX = 2000;
 
 /* ===== Finance State ===== */
 const financeState = {
-  tab: 'all',                // 'all' | 'groceries'
-  hideMortgage: false,
-  hideUtilities: false,
   chart: null,
+  monthOffset: 0,      // 0 = current month, -1 = previous, etc.
+  chartVisible: true,
 };
 
 /* --------------------------------
@@ -199,17 +195,13 @@ function doExerciseTransform(){
 
 /* --------------------------------
    Finance: REAL adapter (finances:receipts)
-   - matches receipts.html storage + shape
 ----------------------------------*/
 const FIN_STORAGE_KEY = 'finances:receipts';
 
 async function ensureFinanceSeeded(){
-  // If your finance module has a loader that seeds localStorage on first load,
-  // this will wait for it (same pattern used in receipts.html).
   try{
     await (window.FinancesDataLoader?.ready || Promise.resolve());
   }catch(e){
-    // non-fatal
     console.warn('[finance] dataLoader ready wait failed:', e);
   }
 }
@@ -224,7 +216,6 @@ function loadFinanceReceipts(){
 }
 
 function parseYMD(dateStr){
-  // accepts "YYYY-MM-DD" or ISO-like; returns YYYY-MM-DD or null
   if(!dateStr) return null;
   if(typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
   const dt = new Date(dateStr);
@@ -232,33 +223,39 @@ function parseYMD(dateStr){
   return null;
 }
 
-function thisMonthRange(){
+function monthRangeFromOffset(offset){
   const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth()+1).padStart(2,'0');
+  const base = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  const y = base.getFullYear();
+  const m = String(base.getMonth()+1).padStart(2,'0');
   const start = `${y}-${m}-01`;
-  const endDt = new Date(y, now.getMonth()+1, 1); // exclusive
+  const endDt = new Date(y, base.getMonth()+1, 1);
   const end = endDt.toISOString().slice(0,10);
-  return { start, end };
+  const label = base.toLocaleString('en-US', { month: 'long', year: (y !== now.getFullYear() ? 'numeric' : undefined) });
+  return { start, end, label, year: y, month: base.getMonth() };
+}
+
+function getMonthLabel(offset){
+  const now = new Date();
+  const base = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  const sameYear = base.getFullYear() === now.getFullYear();
+  const m = base.toLocaleString('en-US', { month: 'long' });
+  return sameYear ? m : `${m} ${base.getFullYear()}`;
 }
 
 function receiptsToEntries(receipts){
-  // Normalize into "entries" that the donut can aggregate:
-  // entry: { date, amount, category, subcategory }
   const out = [];
 
   receipts.forEach(r => {
     const date = parseYMD(r.date || r.purchaseDate || r.createdAt);
     if(!date) return;
 
-    // If items exist, treat each item as an entry (category/subcategory)
     if(Array.isArray(r.items) && r.items.length){
       r.items.forEach(it => {
         const qty = Number(it.quantity ?? 1) || 1;
         const price = Number(it.price ?? it.amount ?? it.cost ?? 0) || 0;
         const amount = price * qty;
 
-        // fallbacks: item.category/subcategory, then receipt.category
         const category = String(it.category ?? r.category ?? 'Other').trim() || 'Other';
         const subcategory = String(it.subcategory ?? it.subCategory ?? it.type ?? '').trim();
 
@@ -269,7 +266,6 @@ function receiptsToEntries(receipts){
       return;
     }
 
-    // Otherwise treat receipt itself as one entry (use receipt.category)
     const amount = Number(r.total ?? r.amount ?? r.cost ?? 0) || 0;
     const category = String(r.category ?? 'Other').trim() || 'Other';
     const subcategory = String(r.subcategory ?? r.subCategory ?? r.type ?? r.store ?? '').trim();
@@ -282,51 +278,18 @@ function receiptsToEntries(receipts){
   return out;
 }
 
-function filterThisMonth(entries){
-  const { start, end } = thisMonthRange();
+function filterByMonthOffset(entries, offset){
+  const { start, end } = monthRangeFromOffset(offset);
   return entries.filter(e => e.date >= start && e.date < end);
 }
 
-function isMortgageCat(cat){
-  const c = String(cat || '').toLowerCase();
-  return c.includes('mortgage');
-}
-function isUtilitiesCat(cat){
-  const c = String(cat || '').toLowerCase();
-  return c.includes('utilit') || c.includes('electric') || c.includes('gas') || c.includes('water') || c.includes('internet');
-}
 function isGroceriesCat(cat){
   const c = String(cat || '').toLowerCase();
   return c.includes('groc');
 }
 
-function applyFinanceFilters(entries){
-  let out = [...entries];
-
-  // Tab: all vs groceries
-  if(financeState.tab === 'groceries'){
-    out = out.filter(e => isGroceriesCat(e.category) || isGroceriesCat(e.subcategory));
-  }
-
-  if(financeState.hideMortgage){
-    out = out.filter(e => !isMortgageCat(e.category));
-  }
-  if(financeState.hideUtilities){
-    out = out.filter(e => !isUtilitiesCat(e.category));
-  }
-
-  return out;
-}
-
-function sumByCategory(entries){
-  const map = new Map();
-  for(const e of entries){
-    const k = e.category || 'Other';
-    map.set(k, (map.get(k) || 0) + (Number(e.amount) || 0));
-  }
-  return [...map.entries()]
-    .map(([name, value]) => ({ name, value }))
-    .sort((a,b)=>b.value-a.value);
+function filterGroceries(entries){
+  return entries.filter(e => isGroceriesCat(e.category) || isGroceriesCat(e.subcategory));
 }
 
 function sumByGroceriesSubcategory(entries){
@@ -361,19 +324,29 @@ function destroyFinanceChart(){
   }
 }
 
+function renderFinanceMonthLabel(){
+  setText('financeMonthLabel', getMonthLabel(financeState.monthOffset));
+}
+
 function renderFinanceDonut(){
   const emptyEl = $('financeEmpty');
   const legendEl = $('financeLegend');
   const canvas = $('financeDonut');
+  const donutWrap = $('financeDonutWrap');
 
-  if(!legendEl || !canvas){
-    return;
+  if(!legendEl || !canvas) return;
+
+  // Handle chart visibility toggle
+  if(donutWrap){
+    donutWrap.style.display = financeState.chartVisible ? 'flex' : 'none';
   }
+
+  renderFinanceMonthLabel();
 
   // Chart.js availability
   if(typeof Chart === 'undefined'){
     if(emptyEl){
-      emptyEl.style.display = 'block';
+      emptyEl.classList.add('show');
       emptyEl.innerHTML = `Chart.js not loaded. Add the Chart.js script tag in <b>main.html</b>.`;
     }
     legendEl.innerHTML = '';
@@ -381,28 +354,26 @@ function renderFinanceDonut(){
   }
 
   const receipts = loadFinanceReceipts();
-  const entriesAll = filterThisMonth(receiptsToEntries(receipts));
-  const entries = applyFinanceFilters(entriesAll);
+  const allEntries = receiptsToEntries(receipts);
+  const monthEntries = filterByMonthOffset(allEntries, financeState.monthOffset);
+  const groceryEntries = filterGroceries(monthEntries);
 
-  const rows = (financeState.tab === 'groceries')
-    ? sumByGroceriesSubcategory(entries)
-    : sumByCategory(entries);
-
+  const rows = sumByGroceriesSubcategory(groceryEntries);
   const total = rows.reduce((s,r)=>s+r.value, 0);
   setText('financeTotal', formatMoney(total));
-  setText('financeTotalLabel', 'Total');
+  setText('financeTotalLabel', 'Groceries');
 
   // Empty state
   if(!rows.length){
     destroyFinanceChart();
     if(emptyEl){
-      emptyEl.style.display = 'block';
-      emptyEl.innerHTML = `No finance data found for <b>this month</b>.<br/>Add receipts and this donut will populate automatically.`;
+      emptyEl.classList.add('show');
+      emptyEl.innerHTML = `No grocery data for <b>${escapeHtml(getMonthLabel(financeState.monthOffset))}</b>.<br/>Add receipts and this will populate automatically.`;
     }
     legendEl.innerHTML = '';
     return;
   }
-  if(emptyEl) emptyEl.style.display = 'none';
+  if(emptyEl) emptyEl.classList.remove('show');
 
   const labels = rows.map(r => r.name);
   const values = rows.map(r => r.value);
@@ -420,6 +391,11 @@ function renderFinanceDonut(){
   `).join('');
 
   // Chart
+  if(!financeState.chartVisible){
+    destroyFinanceChart();
+    return;
+  }
+
   destroyFinanceChart();
   financeState.chart = new Chart(canvas, {
     type: 'doughnut',
@@ -450,8 +426,107 @@ function renderFinanceDonut(){
     }
   });
 
-  // Update FIN vertical bar power based on monthly total
-  setHeight('modFinFill', pct(total, FIN_MAX));
+  // Update FIN vertical bar power based on grocery total for this month
+  // Only update from current month
+  if(financeState.monthOffset === 0){
+    setHeight('modFinFill', pct(total, FIN_MAX));
+  }
+}
+
+/* --------------------------------
+   Nutrition: daily summary for dashboard
+----------------------------------*/
+function loadNutritionMeals(){
+  try { return JSON.parse(localStorage.getItem('nutrition:meals') || '[]'); }
+  catch { return []; }
+}
+
+function loadNutritionTargets(){
+  try {
+    return JSON.parse(localStorage.getItem('nutrition:targets')) || { dailyCalories: 2200, dailyProtein: 165, dailyCarbs: 250, dailyFat: 75 };
+  } catch { return { dailyCalories: 2200, dailyProtein: 165, dailyCarbs: 250, dailyFat: 75 }; }
+}
+
+function renderNutritionCard(){
+  const meals = loadNutritionMeals().filter(m => m.date === todayISO);
+  const targets = loadNutritionTargets();
+
+  let cal = 0, pro = 0, carb = 0, fat = 0;
+  meals.forEach(m => {
+    if(!m.totals) return;
+    cal += m.totals.calories || 0;
+    pro += m.totals.protein || 0;
+    carb += m.totals.carbs || 0;
+    fat += m.totals.fat || 0;
+  });
+
+  const nbarCal = $('nbarCal');
+  const nbarPro = $('nbarPro');
+  const nbarCarb = $('nbarCarb');
+  const nbarFat = $('nbarFat');
+
+  if(nbarCal) nbarCal.style.width = pct(cal, targets.dailyCalories).toFixed(1) + '%';
+  if(nbarPro) nbarPro.style.width = pct(pro, targets.dailyProtein).toFixed(1) + '%';
+  if(nbarCarb) nbarCarb.style.width = pct(carb, targets.dailyCarbs).toFixed(1) + '%';
+  if(nbarFat) nbarFat.style.width = pct(fat, targets.dailyFat).toFixed(1) + '%';
+
+  setText('nvalCal', `${Math.round(cal)} / ${targets.dailyCalories}`);
+  setText('nvalPro', `${Math.round(pro)}g / ${targets.dailyProtein}g`);
+  setText('nvalCarb', `${Math.round(carb)}g / ${targets.dailyCarbs}g`);
+  setText('nvalFat', `${Math.round(fat)}g / ${targets.dailyFat}g`);
+
+  // Intake vs exercise burn comparison — always show with placeholders
+  const vsEl = $('nutritionVs');
+  if(vsEl){
+    const todayWorkouts = getAllWorkouts().filter(w => w.date === todayISO);
+    let todayVolume = 0;
+    todayWorkouts.forEach(w => { todayVolume += dayTotals(w).volume; });
+    const burnEstimate = Math.round(todayVolume * 0.05);
+
+    vsEl.classList.add('show');
+
+    if(cal > 0 && burnEstimate > 0){
+      const diff = Math.round(cal - burnEstimate);
+      const status = diff >= 0 ? 'surplus' : 'deficit';
+      const target = targets.dailyCalories + burnEstimate;
+      const recoveryPct = Math.max(0, Math.min(100, Math.round((cal / target) * 100)));
+      let recoveryColor = 'var(--good)';
+      if(recoveryPct < 60) recoveryColor = 'var(--danger)';
+      else if(recoveryPct < 80) recoveryColor = 'var(--warn)';
+
+      const diffColor = diff >= 0 ? 'var(--good)' : 'var(--warn)';
+      vsEl.innerHTML = `Ate <b>${Math.round(cal)}</b> cal, burned ~<b>${burnEstimate}</b> cal → <span style="color:${diffColor}">${Math.abs(diff)} cal ${status}</span>
+        <div style="margin-top:6px; height:6px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden">
+          <div style="height:100%; width:${recoveryPct}%; border-radius:999px; background:${recoveryColor}; transition:width .35s ease"></div>
+        </div>
+        <div style="margin-top:2px; font-size:11px; color:var(--muted)">${recoveryPct}% recovery target</div>`;
+    } else if(cal > 0){
+      vsEl.innerHTML = `Ate <b>${Math.round(cal)}</b> cal — <span style="color:var(--muted)">No workout data today</span>`;
+    } else if(burnEstimate > 0){
+      vsEl.innerHTML = `Burned ~<b>${burnEstimate}</b> cal from workout — <span style="color:var(--muted)">No meal data today</span>`;
+    } else {
+      vsEl.innerHTML = `<span style="color:var(--muted)">Log a meal or workout to see intake vs burn</span>`;
+    }
+  }
+
+  // Update sub text
+  const sub = $('nutritionSub');
+  if(sub){
+    sub.textContent = meals.length ? `${meals.length} meal${meals.length > 1 ? 's' : ''} logged today` : 'No meals logged today';
+  }
+
+  // Cross-section: estimated food cost from today's meals
+  const foodCostEl = $('financeFoodCost');
+  if(foodCostEl){
+    let todayCost = 0;
+    meals.forEach(m => { todayCost += (m.totals && m.totals.cost) ? m.totals.cost : 0; });
+    if(todayCost > 0){
+      foodCostEl.classList.add('show');
+      foodCostEl.textContent = `Est. food cost today: ${formatMoney2(todayCost)}`;
+    } else {
+      foodCostEl.classList.remove('show');
+    }
+  }
 }
 
 /* --------------------------------
@@ -558,28 +633,13 @@ function bindNav(){
     modExercise.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./powerUp/index.html'); });
   }
   if(modStudy){
-    // update this path to your real study page if different
     modStudy.addEventListener('click', ()=> go('./study/studyHome.html'));
     modStudy.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./study/studyHome.html'); });
   }
   if(modFin){
-    // update this path to your real finance page if different
     modFin.addEventListener('click', ()=> go('./finances/index.html'));
     modFin.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./finances/index.html'); });
   }
-}
-
-function setFinanceBtnStates(){
-  const tabAll = $('financeTabAll');
-  const tabGro = $('financeTabGroceries');
-  const hm = $('financeHideMortgage');
-  const hu = $('financeHideUtilities');
-
-  if(tabAll) tabAll.classList.toggle('active', financeState.tab === 'all');
-  if(tabGro) tabGro.classList.toggle('active', financeState.tab === 'groceries');
-
-  if(hm) hm.classList.toggle('active', !!financeState.hideMortgage);
-  if(hu) hu.classList.toggle('active', !!financeState.hideUtilities);
 }
 
 function bindButtons(){
@@ -603,50 +663,35 @@ function bindButtons(){
     openAnalytics.addEventListener('click', ()=> location.href = './powerUp/analytics.html');
   }
 
-  // Finance buttons
-  const tabAll = $('financeTabAll');
-  const tabGro = $('financeTabGroceries');
-  const hm = $('financeHideMortgage');
-  const hu = $('financeHideUtilities');
-  const reset = $('financeReset');
+  // Nutrition
+  const openNutrition = $('openNutrition');
+  if(openNutrition){
+    openNutrition.addEventListener('click', ()=> location.href = './nutrition/index.html');
+  }
 
-  if(tabAll){
-    tabAll.addEventListener('click', ()=>{
-      financeState.tab = 'all';
-      setFinanceBtnStates();
+  // Finance month navigation
+  const monthPrev = $('financeMonthPrev');
+  const monthNext = $('financeMonthNext');
+
+  if(monthPrev){
+    monthPrev.addEventListener('click', ()=>{
+      financeState.monthOffset -= 1;
       renderFinanceDonut();
     });
   }
-  if(tabGro){
-    tabGro.addEventListener('click', ()=>{
-      financeState.tab = 'groceries';
-      setFinanceBtnStates();
-      renderFinanceDonut();
-    });
-  }
-
-  if(hm){
-    hm.addEventListener('click', ()=>{
-      financeState.hideMortgage = !financeState.hideMortgage;
-      setFinanceBtnStates();
+  if(monthNext){
+    monthNext.addEventListener('click', ()=>{
+      financeState.monthOffset += 1;
       renderFinanceDonut();
     });
   }
 
-  if(hu){
-    hu.addEventListener('click', ()=>{
-      financeState.hideUtilities = !financeState.hideUtilities;
-      setFinanceBtnStates();
-      renderFinanceDonut();
-    });
-  }
-
-  if(reset){
-    reset.addEventListener('click', ()=>{
-      financeState.tab = 'all';
-      financeState.hideMortgage = false;
-      financeState.hideUtilities = false;
-      setFinanceBtnStates();
+  // Finance chart toggle
+  const toggleChart = $('financeToggleChart');
+  if(toggleChart){
+    toggleChart.addEventListener('click', ()=>{
+      financeState.chartVisible = !financeState.chartVisible;
+      toggleChart.classList.toggle('active', !financeState.chartVisible);
       renderFinanceDonut();
     });
   }
@@ -659,8 +704,8 @@ function renderAll(){
   renderTop();
   renderModulesAndCharacter();
   renderHistory();
-  setFinanceBtnStates();
   renderFinanceDonut();
+  renderNutritionCard();
 }
 
 /* --------------------------------

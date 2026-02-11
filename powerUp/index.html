@@ -24,7 +24,10 @@
 
   header{
     display:flex; align-items:center; justify-content:space-between;
-    padding:.6rem .9rem; border-bottom:1px solid var(--ring); background:#0e141b;
+    padding:.6rem .9rem; border-bottom:1px solid var(--ring);
+    background: linear-gradient(180deg, rgba(11,15,20,.95), rgba(11,15,20,.75));
+    backdrop-filter: blur(10px);
+    position:sticky; top:0; z-index:20;
   }
   header h1{margin:0; font-size:1.05rem; letter-spacing:.2px}
   header .home{all:unset; cursor:pointer; padding:.35rem .6rem; border-radius:.6rem; border:1px solid var(--ring)}
@@ -34,8 +37,8 @@
 
   .grid{display:grid; gap:10px; grid-template-columns: repeat(12, 1fr)}
   .card{
-    background:var(--card); border:1px solid var(--ring); border-radius:14px;
-    padding:10px; box-shadow:0 8px 30px rgba(0,0,0,.25);
+    background:var(--card); border:1px solid rgba(42,53,67,.70); border-radius:16px;
+    padding:10px; box-shadow:0 4px 20px rgba(0,0,0,.20);
   }
   .card h3{margin:.1rem 0 .45rem; font-size:.95rem; color:var(--muted); font-weight:600}
 
@@ -155,6 +158,7 @@
   .day{
     aspect-ratio:1/1; border:1px solid var(--ring); border-radius:var(--cal-radius);
     position:relative; background:#0f141b; cursor:pointer;
+    min-height:44px;
   }
   .day:hover{background:#1a1f26}
   .day.muted{opacity:.45; cursor:default}

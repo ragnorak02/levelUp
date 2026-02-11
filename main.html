@@ -103,40 +103,69 @@
       </div>
     </section>
 
-    <!-- FINANCE (donut chart + filters — embedded as components, not iframe) -->
+    <!-- FINANCE: Grocery spending (compact) -->
     <section class="card finance-card">
-      <div class="finance-head">
-        <div>
-          <div class="finance-title-row">
-            <span class="finance-emoji">💰</span>
-            <div class="finance-title"><b>Finances</b></div>
-          </div>
-          <div class="finance-sub">This month • quick view (tap module for full page)</div>
+      <div class="finance-header">
+        <div class="finance-header-left">
+          <button class="finance-nav-btn" id="financeMonthPrev" type="button" title="Previous month">◀</button>
+          <div class="finance-month-label" id="financeMonthLabel">Month</div>
+          <button class="finance-nav-btn" id="financeMonthNext" type="button" title="Next month">▶</button>
         </div>
-
-        <div class="finance-actions">
-          <button class="chip-btn" id="financeHideMortgage">Hide Mortgage</button>
-          <button class="chip-btn" id="financeHideUtilities">Hide Utilities</button>
-          <button class="chip-btn" id="financeReset">Reset</button>
+        <div class="finance-header-right">
+          <button class="chip-btn" id="financeToggleChart" title="Show/hide chart">👁</button>
         </div>
-      </div>
-
-      <div class="finance-tabs">
-        <button class="tab-btn active" id="financeTabAll">All</button>
-        <button class="tab-btn" id="financeTabGroceries">Groceries</button>
       </div>
 
       <div class="finance-body">
-        <div class="donut-wrap">
-          <canvas id="financeDonut" width="320" height="320" aria-label="Finance donut"></canvas>
+        <div class="donut-wrap" id="financeDonutWrap">
+          <canvas id="financeDonut" width="110" height="110" aria-label="Grocery spending donut"></canvas>
           <div class="donut-center">
             <div class="donut-total" id="financeTotal">$0</div>
-            <div class="donut-caption" id="financeTotalLabel">Total</div>
+            <div class="donut-caption" id="financeTotalLabel">Groceries</div>
           </div>
         </div>
 
         <div class="finance-legend" id="financeLegend"></div>
-        <div class="finance-empty" id="financeEmpty" style="display:none;"></div>
+        <div class="finance-empty" id="financeEmpty"></div>
+        <div class="finance-food-cost" id="financeFoodCost"></div>
+      </div>
+    </section>
+
+    <!-- NUTRITION: Daily summary -->
+    <section class="card nutrition-card" id="nutritionCard">
+      <div class="card-inner">
+        <div class="nutrition-head">
+          <div>
+            <b>Nutrition</b>
+            <span class="nutrition-sub" id="nutritionSub">Today</span>
+          </div>
+          <button class="mini" id="openNutrition">Log Meal</button>
+        </div>
+
+        <div class="nutrition-bars" id="nutritionBars">
+          <div class="nbar-row">
+            <div class="nbar-label">Cal</div>
+            <div class="nbar-track"><div class="nbar-fill nbar-cal" id="nbarCal"></div></div>
+            <div class="nbar-val" id="nvalCal">0 / 2200</div>
+          </div>
+          <div class="nbar-row">
+            <div class="nbar-label">Pro</div>
+            <div class="nbar-track"><div class="nbar-fill nbar-pro" id="nbarPro"></div></div>
+            <div class="nbar-val" id="nvalPro">0g</div>
+          </div>
+          <div class="nbar-row">
+            <div class="nbar-label">Carb</div>
+            <div class="nbar-track"><div class="nbar-fill nbar-carb" id="nbarCarb"></div></div>
+            <div class="nbar-val" id="nvalCarb">0g</div>
+          </div>
+          <div class="nbar-row">
+            <div class="nbar-label">Fat</div>
+            <div class="nbar-track"><div class="nbar-fill nbar-fat" id="nbarFat"></div></div>
+            <div class="nbar-val" id="nvalFat">0g</div>
+          </div>
+        </div>
+
+        <div class="nutrition-vs" id="nutritionVs"></div>
       </div>
     </section>
 

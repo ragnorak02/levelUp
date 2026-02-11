@@ -90,26 +90,34 @@
       overflow:hidden;
     }
 
-    .monthbar{
-      display:flex; align-items:center; justify-content:center; gap:10px;
-      padding:6px 10px 0 10px;
-    
-}
-    .monthbtn{
-      width:40px; height:38px;
-      border-radius:12px;
-      border:1px solid rgba(42,53,67,.70);
-      background: rgba(11,15,20,.35);
-      color:var(--ink);
-      font-weight:900;
-      cursor:pointer;
+    .month-strip{
+      display:flex;
+      gap:8px;
+      padding:8px 10px;
+      overflow-x:auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
-    .monthlabel{
-      font-weight:950;
-      color:var(--ink);
-      letter-spacing:.2px;
-      min-width: 160px;
-      text-align:center;
+    .month-strip::-webkit-scrollbar{display:none}
+    .month-pill{
+      flex:0 0 auto;
+      scroll-snap-align: center;
+      padding:8px 14px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      color:var(--muted);
+      font-weight:900;
+      font-size:13px;
+      cursor:pointer;
+      white-space:nowrap;
+      user-select:none;
+    }
+    .month-pill.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
     }
 
     .stats{
@@ -349,18 +357,14 @@
         <a class="pill active" href="index.html">Finances</a>
         <a class="pill" href="food.html">Food</a>
         <a class="pill" href="search.html">Search</a>
-        <a class="pill" href="receipts.html">Receipts</a>
+        <a class="pill" href="receipts.html" id="receiptsLink">Receipts</a>
       </div>
     </div>
   </div>
 
   <div class="wrap">
     <div class="card" style="margin-top:8px;">
-      <div class="monthbar">
-        <button class="monthbtn" id="monthPrev" type="button">◀</button>
-        <div class="monthlabel" id="monthLabel">Month</div>
-        <button class="monthbtn" id="monthNext" type="button">▶</button>
-      </div>
+      <div class="month-strip" id="monthStrip"></div>
 
       <div class="stats">
         <div class="stat">
@@ -404,7 +408,7 @@
           <div id="storePanel" class="store-panel" style="display:none;"></div>
 
           <div style="margin-top:8px;">
-            <canvas id="donutCanvas" width="620" height="360"></canvas>
+            <canvas id="donutCanvas" width="340" height="240"></canvas>
           </div>
 
           <div class="legend" id="donutLegend"></div>
@@ -552,19 +556,19 @@
       ctx.shadowBlur = 8;
 
       ctx.fillStyle = '#e8eef6';
-      ctx.font = '900 40px system-ui';
-      ctx.fillText(total ? `$${Math.round(total)}` : '$0', centerX, centerY - 6);
+      ctx.font = '900 28px system-ui';
+      ctx.fillText(total ? `$${Math.round(total)}` : '$0', centerX, centerY - 4);
 
       ctx.fillStyle = 'rgba(159,176,199,0.95)';
-      ctx.font = '800 14px system-ui';
-      ctx.fillText('Total', centerX, centerY + 28);
+      ctx.font = '800 12px system-ui';
+      ctx.fillText('Total', centerX, centerY + 20);
 
       // selected label ABOVE donut
       if (selectedIndex != null && categories[selectedIndex]) {
         const c = categories[selectedIndex];
         ctx.fillStyle = '#e8eef6';
-        ctx.font = '900 18px system-ui';
-        ctx.fillText(`${c.name}: ${fmtMoney(c.total)}`, centerX, centerY - (radius + 36));
+        ctx.font = '900 14px system-ui';
+        ctx.fillText(`${c.name}: ${fmtMoney(c.total)}`, centerX, centerY - (radius + 28));
       }
       ctx.restore();
     }
@@ -936,9 +940,30 @@
         return 0;
       }
 
-      const monthLabelEl = document.getElementById('monthLabel');
-      const monthPrevEl = document.getElementById('monthPrev');
-      const monthNextEl = document.getElementById('monthNext');
+      const monthStripEl = document.getElementById('monthStrip');
+
+      // Build month pills: trailing 12 months + current month
+      function buildMonthStrip(){
+        monthStripEl.innerHTML = '';
+        for(let i = -12; i <= 0; i++){
+          const { labelDate } = getMonthRangeFromBase(now, i);
+          const pill = document.createElement('button');
+          pill.type = 'button';
+          pill.className = 'month-pill' + (i === monthOffset ? ' active' : '');
+          pill.textContent = formatMonthLabel(labelDate, now);
+          pill.dataset.offset = i;
+          pill.addEventListener('click', async ()=>{
+            monthOffset = i;
+            const { start: mStart } = getMonthRangeFromBase(now, monthOffset);
+            weekIndex = defaultWeekIndexForMonth(mStart);
+            await refreshAll();
+          });
+          monthStripEl.appendChild(pill);
+        }
+        // Scroll active pill into view
+        const activePill = monthStripEl.querySelector('.active');
+        if(activePill) activePill.scrollIntoView({ inline:'center', behavior:'smooth' });
+      }
 
       const weekPrevEl = document.getElementById('weekPrev');
       const weekNextEl = document.getElementById('weekNext');
@@ -969,8 +994,8 @@
 
       // crisp on mobile
       const dpr = Math.max(1, window.devicePixelRatio || 1);
-      const cssW = canvas.clientWidth || 620;
-      const cssH = 360;
+      const cssW = canvas.clientWidth || 340;
+      const cssH = 240;
       canvas.style.height = cssH + 'px';
       canvas.width = Math.round(cssW * dpr);
       canvas.height = Math.round(cssH * dpr);
@@ -1019,7 +1044,6 @@
 
       function updateTopStats(){
         const { start: mStart, end: mEnd, labelDate } = getMonthRangeFromBase(now, monthOffset);
-        monthLabelEl.textContent = formatMonthLabel(labelDate, now);
 
         // month total (respects mortgage & rental toggles)
         const monthReceipts = applyRentalFilter(applyMortgageFilter(allReceipts.filter(r => inRange(toDate(r.date), mStart, mEnd))));
@@ -1136,12 +1160,13 @@
       }
 
       async function refreshAll(){
+        buildMonthStrip();
         updateTopStats();
         updateModeUI();
         selectedIndex = null;
         await computeCategories();
         redraw();
-        renderRecent(); // keep recent list in sync with the viewed month
+        renderRecent();
       }
 
       async function setTab(newTab){
@@ -1175,18 +1200,7 @@
         redraw();
       });
 
-      monthPrevEl.addEventListener('click', async ()=>{
-        monthOffset -= 1;
-        const { start: mStart } = getMonthRangeFromBase(now, monthOffset);
-        weekIndex = defaultWeekIndexForMonth(mStart);
-        await refreshAll();
-      });
-      monthNextEl.addEventListener('click', async ()=>{
-        monthOffset += 1;
-        const { start: mStart } = getMonthRangeFromBase(now, monthOffset);
-        weekIndex = defaultWeekIndexForMonth(mStart);
-        await refreshAll();
-      });
+      // Month navigation is now handled by month-strip pills
 
       weekPrevEl.addEventListener('click', ()=>{
         weekIndex = Math.max(0, (weekIndex||0) - 1);
@@ -1302,7 +1316,9 @@
 
           row.addEventListener('click', ()=>{
             try{ localStorage.setItem('selectedReceiptId', r.id || ''); }catch(e){}
-            window.location.href = 'receipts.html';
+            const { labelDate } = getMonthRangeFromBase(now, monthOffset);
+            const ym = `${labelDate.getFullYear()}-${String(labelDate.getMonth()+1).padStart(2,'0')}`;
+            window.location.href = `receipts.html?month=${ym}`;
           });
 
           recentWrap.appendChild(row);
