@@ -612,12 +612,12 @@ function weekIdToLabel(weekId){
     if(!match) return weekId;
     const year = parseInt(match[1]);
     const week = parseInt(match[2]);
-    const jan4 = new Date(Date.UTC(year, 0, 4));
-    const dayOfWeek = jan4.getUTCDay() || 7;
-    const monday = new Date(jan4);
-    monday.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1 + (week - 1) * 7);
-    const monthName = monday.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
-    return `Week ${week} \u2014 ${monthName} ${monday.getUTCDate()}`;
+    const jan4 = new Date(year, 0, 4);
+    const dayOfWeek = jan4.getDay() || 7;
+    const monday = new Date(year, 0, 4 - dayOfWeek + 1 + (week - 1) * 7);
+    const tuesday = new Date(monday);
+    tuesday.setDate(monday.getDate() + 1);
+    return 'Tue, ' + tuesday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function offsetWeek(weekId, offset){
@@ -625,11 +625,10 @@ function offsetWeek(weekId, offset){
     if(!match) return weekId;
     const year = parseInt(match[1]);
     const week = parseInt(match[2]);
-    const jan4 = new Date(Date.UTC(year, 0, 4));
-    const dayOfWeek = jan4.getUTCDay() || 7;
-    const monday = new Date(jan4);
-    monday.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1 + (week - 1) * 7);
-    monday.setUTCDate(monday.getUTCDate() + offset * 7);
+    const jan4 = new Date(year, 0, 4);
+    const dayOfWeek = jan4.getDay() || 7;
+    const monday = new Date(year, 0, 4 - dayOfWeek + 1 + (week - 1) * 7);
+    monday.setDate(monday.getDate() + offset * 7);
     return getISOWeek(monday);
 }
 

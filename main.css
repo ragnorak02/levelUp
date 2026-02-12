@@ -278,6 +278,44 @@ body{
 .char-action:hover{background: rgba(255,255,255,.08)}
 .char-action:active{transform: translateY(1px)}
 
+.bowl-section{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.bowl-link{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.bowl-avg{
+  color:var(--muted);
+  font-size:11px;
+}
+.bowl-recent{
+  display:flex;
+  gap:6px;
+  padding:6px 8px;
+}
+.bowl-game{
+  flex:1;
+  text-align:center;
+  padding:4px 2px;
+  border-radius:8px;
+  background: rgba(168,85,247,.08);
+  border:1px solid rgba(168,85,247,.15);
+}
+.bowl-game .bg-score{
+  font-weight:950;
+  font-size:14px;
+  color:var(--ink);
+}
+.bowl-game .bg-label{
+  font-size:9px;
+  font-weight:800;
+  color:var(--muted);
+}
+
 /* Modules right */
 .modules-card{flex:1; min-width:0; display:flex;}
 .modules-card .card-inner{display:flex; flex:1; height:100%;}

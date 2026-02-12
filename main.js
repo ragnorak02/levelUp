@@ -629,6 +629,54 @@ function bowlingVolumeSince(isoDate){
   return Math.round(total);
 }
 
+function getBowlingAverage(){
+  let total = 0, count = 0;
+  listBowlingWeekKeys().forEach(k => {
+    const week = safeParse(k);
+    if(!week || !Array.isArray(week.games)) return;
+    week.games.forEach(g => {
+      if(g.score != null){ total += g.score; count++; }
+    });
+  });
+  return count > 0 ? Math.round(total / count) : null;
+}
+
+function getLastNBowlingGames(n){
+  const games = [];
+  listBowlingWeekKeys().forEach(k => {
+    const week = safeParse(k);
+    if(!week || !Array.isArray(week.games)) return;
+    week.games.forEach(g => {
+      if(g.score != null){
+        games.push({ score: g.score, date: g.completedDate || week.weekId });
+      }
+    });
+  });
+  games.sort((a, b) => (a.date > b.date ? -1 : a.date < b.date ? 1 : 0));
+  return games.slice(0, n);
+}
+
+function renderBowlDashboard(){
+  const avg = getBowlingAverage();
+  const avgEl = $('bowlAvg');
+  if(avgEl){
+    avgEl.textContent = avg != null ? 'Avg ' + avg : '';
+  }
+
+  const recentEl = $('bowlRecent');
+  if(recentEl){
+    const games = getLastNBowlingGames(3);
+    if(games.length){
+      recentEl.style.display = 'flex';
+      recentEl.innerHTML = games.map((g, i) =>
+        `<div class="bowl-game"><div class="bg-score">${g.score}</div><div class="bg-label">Game ${games.length - i}</div></div>`
+      ).join('');
+    } else {
+      recentEl.style.display = 'none';
+    }
+  }
+}
+
 /* --------------------------------
    Render: top + modules + history
 ----------------------------------*/
@@ -840,6 +888,7 @@ function renderAll(){
   renderModulesAndCharacter();
   renderHistory();
   renderFinanceDonut();
+  renderBowlDashboard();
 }
 
 /* --------------------------------
