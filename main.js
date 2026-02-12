@@ -764,10 +764,6 @@ function bindNav(){
     modNutrition.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./nutrition/index.html'); });
   }
 
-  const openBowling = $('openBowling');
-  if(openBowling){
-    openBowling.addEventListener('click', ()=> go('./bowling/index.html'));
-  }
 }
 
 function bindButtons(){
