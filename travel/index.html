@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Travel — Trip Planner</title>
+    <style>
+:root{
+    --bg:#0b0f14;
+    --card:#131a22;
+    --ink:#e8eef6;
+    --muted:#9fb0c7;
+    --ring:#2a3543;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+    --radius:18px;
+    --accent:#06b6d4;
+    --accent2:#22d3ee;
+    --good:#22c55e;
+    --warn:#f59e0b;
+    --danger:#ef4444;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
+    color:var(--ink);
+    background:
+        radial-gradient(1200px 800px at 50% -200px, rgba(6,182,212,.10), transparent 55%),
+        radial-gradient(900px 700px at 10% 0%, rgba(34,197,94,.06), transparent 60%),
+        var(--bg);
+    overflow-x:hidden;
+    padding-bottom:80px;
+}
+
+/* Topbar */
+.topbar{
+    position:sticky;
+    top:0; z-index:20;
+    backdrop-filter:blur(10px);
+    background:linear-gradient(180deg, rgba(11,15,20,.95), rgba(11,15,20,.75));
+    border-bottom:1px solid var(--ring);
+}
+.topbar-inner{
+    width:min(700px, 100%);
+    margin:0 auto;
+    padding:10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+.brand-group{display:flex; align-items:center; gap:10px;}
+.brand{
+    all:unset; cursor:pointer;
+    padding:8px 12px;
+    border-radius:12px;
+    border:1px solid var(--ring);
+    background:var(--card);
+    color:var(--ink);
+    font-weight:950;
+    font-size:13px;
+    box-shadow:var(--shadow);
+}
+.brand:hover{background:rgba(19,26,34,.90)}
+.brand.active{background:rgba(6,182,212,.15); border-color:rgba(6,182,212,.35); color:var(--accent);}
+.nav-pills{display:flex; gap:6px;}
+.nav-pill{
+    all:unset; cursor:pointer;
+    padding:8px 14px;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background:rgba(255,255,255,.06);
+    color:var(--muted);
+    font-weight:900;
+    font-size:12px;
+}
+.nav-pill:hover{background:rgba(255,255,255,.10)}
+.nav-pill.active{background:rgba(6,182,212,.15); border-color:rgba(6,182,212,.35); color:var(--accent);}
+
+/* Wrap */
+.wrap{
+    width:min(700px, 100%);
+    margin:0 auto;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+/* Trip selector */
+.trip-bar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.trip-select{
+    flex:1;
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid var(--ring);
+    background:var(--card);
+    color:var(--ink);
+    font-family:inherit;
+    font-weight:900;
+    font-size:13px;
+    outline:none;
+}
+.trip-select:focus{border-color:var(--accent);}
+.btn-accent{
+    all:unset; cursor:pointer;
+    padding:10px 14px;
+    border-radius:12px;
+    background:linear-gradient(90deg, rgba(6,182,212,.9), rgba(6,182,212,.65));
+    color:#fff;
+    font-weight:950;
+    font-size:13px;
+    white-space:nowrap;
+}
+.btn-accent:hover{filter:brightness(1.08);}
+.btn-accent:active{transform:translateY(1px);}
+.btn-sm{
+    all:unset; cursor:pointer;
+    padding:8px 12px;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background:rgba(255,255,255,.06);
+    color:var(--ink);
+    font-weight:900;
+    font-size:12px;
+    white-space:nowrap;
+}
+.btn-sm:hover{background:rgba(255,255,255,.10)}
+.btn-danger{color:var(--danger); border-color:rgba(239,68,68,.25);}
+.btn-danger:hover{background:rgba(239,68,68,.12);}
+
+/* Card */
+.card{
+    background:var(--card);
+    border:1px solid var(--ring);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+}
+.card-head{
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    border-bottom:1px solid rgba(255,255,255,.10);
+}
+.card-head b{font-size:14px;}
+.card-body{padding:10px 12px; display:flex; flex-direction:column; gap:6px;}
+
+/* Calendar view */
+.cal-nav{
+    padding:10px 12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    border-bottom:1px solid rgba(255,255,255,.10);
+}
+.cal-nav-btn{
+    all:unset; cursor:pointer;
+    width:32px; height:32px;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background:rgba(255,255,255,.06);
+    color:var(--ink);
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.cal-nav-btn:hover{background:rgba(255,255,255,.10)}
+.cal-label{
+    font-weight:950;
+    font-size:14px;
+    min-width:140px;
+    text-align:center;
+}
+.cal-dow-row{
+    display:grid;
+    grid-template-columns:repeat(7, 1fr);
+    padding:8px 10px 0;
+}
+.cal-dow{
+    text-align:center;
+    font-weight:900;
+    font-size:11px;
+    color:var(--muted);
+    padding:4px 0;
+}
+.t-cal-grid{
+    display:grid;
+    grid-template-columns:repeat(7, 1fr);
+    gap:2px;
+    padding:6px 10px 10px;
+}
+.t-cal-cell{
+    min-height:52px;
+    border-radius:8px;
+    background:rgba(255,255,255,.03);
+    border:1px solid transparent;
+    padding:3px;
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    position:relative;
+}
+.t-cal-cell.outside{opacity:.25;}
+.t-cal-cell.today{border-color:var(--warn);}
+.t-cal-num{
+    font-weight:900;
+    font-size:10px;
+    color:var(--muted);
+    padding:0 2px;
+    line-height:1;
+}
+.t-cal-bar{
+    height:6px;
+    border-radius:3px;
+    min-width:0;
+}
+.t-cal-bar.first{border-top-left-radius:3px; border-bottom-left-radius:3px;}
+.t-cal-bar.last{border-top-right-radius:3px; border-bottom-right-radius:3px;}
+.t-cal-bar.mid{border-radius:0;}
+
+/* Details view */
+.list-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:10px 12px;
+    border-radius:12px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+}
+.list-item-left{min-width:0; flex:1;}
+.list-item-name{font-weight:950; font-size:13px; line-height:1.2;}
+.list-item-sub{color:var(--muted); font-weight:800; font-size:11px; margin-top:2px;}
+.list-item-right{display:flex; gap:6px; align-items:center; flex:0 0 auto;}
+.type-badge{
+    padding:3px 8px;
+    border-radius:6px;
+    font-size:10px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+.type-country{background:rgba(6,182,212,.15); color:#06b6d4;}
+.type-city{background:rgba(34,197,94,.15); color:#22c55e;}
+.type-transit{background:rgba(245,158,11,.15); color:#f59e0b;}
+.type-lodging{background:rgba(167,139,250,.15); color:#a78bfa;}
+.type-restaurant{background:rgba(251,113,133,.15); color:#fb7185;}
+.type-attraction{background:rgba(6,182,212,.15); color:#06b6d4;}
+.type-activity{background:rgba(34,197,94,.15); color:#22c55e;}
+.type-shopping{background:rgba(245,158,11,.15); color:#f59e0b;}
+.del-btn{
+    all:unset; cursor:pointer;
+    width:26px; height:26px;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    color:var(--muted);
+}
+.del-btn:hover{background:rgba(239,68,68,.15); color:var(--danger);}
+.map-link{
+    color:var(--accent);
+    font-weight:900;
+    font-size:11px;
+    text-decoration:none;
+}
+.map-link:hover{text-decoration:underline;}
+.add-btn{
+    all:unset; cursor:pointer;
+    padding:10px;
+    border-radius:10px;
+    border:1px dashed rgba(255,255,255,.18);
+    text-align:center;
+    font-weight:900;
+    font-size:12px;
+    color:var(--muted);
+}
+.add-btn:hover{background:rgba(255,255,255,.06); color:var(--ink);}
+
+/* Modal */
+.modal-overlay{
+    position:fixed;
+    inset:0; z-index:100;
+    background:rgba(0,0,0,.6);
+    backdrop-filter:blur(4px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+    width:min(420px, 92%);
+    background:var(--card);
+    border:1px solid var(--ring);
+    border-radius:var(--radius);
+    box-shadow:0 20px 60px rgba(0,0,0,.4);
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    max-height:90vh;
+    overflow-y:auto;
+}
+.modal-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+.modal-head b{font-size:15px;}
+.input-row{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+.input-row label{
+    font-weight:900;
+    font-size:12px;
+    color:var(--muted);
+}
+.input-row input,
+.input-row select,
+.input-row textarea{
+    padding:8px 10px;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background:rgba(255,255,255,.06);
+    color:var(--ink);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:800;
+    outline:none;
+}
+.input-row input:focus,
+.input-row select:focus,
+.input-row textarea:focus{
+    border-color:var(--accent);
+}
+.modal-save{
+    all:unset; cursor:pointer;
+    padding:10px;
+    border-radius:12px;
+    background:linear-gradient(90deg, rgba(6,182,212,.9), rgba(6,182,212,.65));
+    color:#fff;
+    font-weight:950;
+    font-size:13px;
+    text-align:center;
+}
+.modal-save:hover{filter:brightness(1.08);}
+
+/* Empty state */
+.empty{
+    padding:12px;
+    border-radius:14px;
+    border:1px dashed rgba(255,255,255,.18);
+    background:rgba(255,255,255,.04);
+    color:var(--muted);
+    font-weight:850;
+    line-height:1.4;
+    text-align:center;
+}
+
+/* Trip info bar */
+.trip-info{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+}
+.trip-chip{
+    padding:4px 10px;
+    border-radius:8px;
+    font-size:11px;
+    font-weight:900;
+    background:rgba(6,182,212,.10);
+    border:1px solid rgba(6,182,212,.20);
+    color:var(--accent);
+}
+
+/* View containers */
+.view{display:none;}
+.view.active{display:flex; flex-direction:column; gap:10px;}
+
+@media (max-width:480px){
+    .wrap{padding:6px;}
+    .t-cal-cell{min-height:40px;}
+    .t-cal-num{font-size:9px;}
+    .t-cal-bar{height:5px;}
+}
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-inner">
+            <div class="brand-group">
+                <a class="brand" href="../main.html">Home</a>
+                <span class="brand active">✈ Travel</span>
+            </div>
+            <div class="nav-pills">
+                <button class="nav-pill active" id="pillCalendar" data-view="calendar">Calendar</button>
+                <button class="nav-pill" id="pillDetails" data-view="details">Details</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="wrap">
+        <!-- Trip selector -->
+        <div class="trip-bar">
+            <select class="trip-select" id="tripSelect"></select>
+            <button class="btn-accent" id="newTripBtn">+ New Trip</button>
+        </div>
+
+        <div class="trip-info" id="tripInfo"></div>
+
+        <!-- Calendar view -->
+        <div class="view active" id="viewCalendar">
+            <div class="card">
+                <div class="cal-nav">
+                    <button class="cal-nav-btn" id="tCalPrev">◀</button>
+                    <div class="cal-label" id="tCalLabel">Month</div>
+                    <button class="cal-nav-btn" id="tCalNext">▶</button>
+                </div>
+                <div class="cal-dow-row">
+                    <div class="cal-dow">Sun</div>
+                    <div class="cal-dow">Mon</div>
+                    <div class="cal-dow">Tue</div>
+                    <div class="cal-dow">Wed</div>
+                    <div class="cal-dow">Thu</div>
+                    <div class="cal-dow">Fri</div>
+                    <div class="cal-dow">Sat</div>
+                </div>
+                <div class="t-cal-grid" id="tCalGrid"></div>
+            </div>
+
+            <!-- Legend -->
+            <div class="card">
+                <div class="card-body" id="calLegend"></div>
+            </div>
+        </div>
+
+        <!-- Details view -->
+        <div class="view" id="viewDetails">
+            <!-- Destinations -->
+            <div class="card">
+                <div class="card-head">
+                    <b>Destinations</b>
+                    <button class="btn-sm" id="addDestBtn">+ Add</button>
+                </div>
+                <div class="card-body" id="destList"></div>
+            </div>
+
+            <!-- Restaurants -->
+            <div class="card">
+                <div class="card-head">
+                    <b>Restaurants</b>
+                    <button class="btn-sm" id="addRestBtn">+ Add</button>
+                </div>
+                <div class="card-body" id="restList"></div>
+            </div>
+
+            <!-- Lodging -->
+            <div class="card">
+                <div class="card-head">
+                    <b>Lodging</b>
+                    <button class="btn-sm" id="addLodgeBtn">+ Add</button>
+                </div>
+                <div class="card-body" id="lodgeList"></div>
+            </div>
+
+            <!-- Interests -->
+            <div class="card">
+                <div class="card-head">
+                    <b>Interests</b>
+                    <button class="btn-sm" id="addIntBtn">+ Add</button>
+                </div>
+                <div class="card-body" id="intList"></div>
+            </div>
+
+            <!-- Delete trip -->
+            <button class="btn-sm btn-danger" id="deleteTripBtn" style="align-self:flex-end;">Delete Trip</button>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- New Trip Modal -->
+    <div class="modal-overlay" id="tripModal">
+        <div class="modal">
+            <div class="modal-head">
+                <b>New Trip</b>
+                <button class="del-btn" id="tripModalClose">✕</button>
+            </div>
+            <div class="input-row">
+                <label>Trip Name</label>
+                <input type="text" id="tripName" placeholder="Japan 2026" />
+            </div>
+            <div class="input-row">
+                <label>Start Date</label>
+                <input type="date" id="tripStart" />
+            </div>
+            <div class="input-row">
+                <label>End Date</label>
+                <input type="date" id="tripEnd" />
+            </div>
+            <div class="input-row">
+                <label>Color</label>
+                <input type="color" id="tripColor" value="#06b6d4" />
+            </div>
+            <button class="modal-save" id="tripSave">Create Trip</button>
+        </div>
+    </div>
+
+    <!-- Destination Modal -->
+    <div class="modal-overlay" id="destModal">
+        <div class="modal">
+            <div class="modal-head">
+                <b>Add Destination</b>
+                <button class="del-btn" id="destModalClose">✕</button>
+            </div>
+            <div class="input-row">
+                <label>Name</label>
+                <input type="text" id="destName" placeholder="Tokyo" />
+            </div>
+            <div class="input-row">
+                <label>Type</label>
+                <select id="destType">
+                    <option value="country">Country</option>
+                    <option value="city">City</option>
+                    <option value="transit">Transit</option>
+                </select>
+            </div>
+            <div class="input-row">
+                <label>Start Date</label>
+                <input type="date" id="destStart" />
+            </div>
+            <div class="input-row">
+                <label>End Date</label>
+                <input type="date" id="destEnd" />
+            </div>
+            <div class="input-row">
+                <label>Color</label>
+                <input type="color" id="destColor" value="#06b6d4" />
+            </div>
+            <button class="modal-save" id="destSave">Add Destination</button>
+        </div>
+    </div>
+
+    <!-- Restaurant Modal -->
+    <div class="modal-overlay" id="restModal">
+        <div class="modal">
+            <div class="modal-head">
+                <b>Add Restaurant</b>
+                <button class="del-btn" id="restModalClose">✕</button>
+            </div>
+            <div class="input-row">
+                <label>Name</label>
+                <input type="text" id="restName" placeholder="Sushi Dai" />
+            </div>
+            <div class="input-row">
+                <label>Address</label>
+                <input type="text" id="restAddress" placeholder="5-2-1 Tsukiji, Chuo City, Tokyo" />
+            </div>
+            <div class="input-row">
+                <label>Notes</label>
+                <textarea id="restNotes" rows="2" placeholder="Get there early"></textarea>
+            </div>
+            <button class="modal-save" id="restSave">Add Restaurant</button>
+        </div>
+    </div>
+
+    <!-- Lodging Modal -->
+    <div class="modal-overlay" id="lodgeModal">
+        <div class="modal">
+            <div class="modal-head">
+                <b>Add Lodging</b>
+                <button class="del-btn" id="lodgeModalClose">✕</button>
+            </div>
+            <div class="input-row">
+                <label>Name</label>
+                <input type="text" id="lodgeName" placeholder="Hotel Gracery Shinjuku" />
+            </div>
+            <div class="input-row">
+                <label>Address</label>
+                <input type="text" id="lodgeAddress" placeholder="1-19-1 Kabukicho, Shinjuku" />
+            </div>
+            <div class="input-row">
+                <label>Check-in</label>
+                <input type="date" id="lodgeCheckIn" />
+            </div>
+            <div class="input-row">
+                <label>Check-out</label>
+                <input type="date" id="lodgeCheckOut" />
+            </div>
+            <div class="input-row">
+                <label>Notes</label>
+                <textarea id="lodgeNotes" rows="2" placeholder="Optional notes"></textarea>
+            </div>
+            <button class="modal-save" id="lodgeSave">Add Lodging</button>
+        </div>
+    </div>
+
+    <!-- Interest Modal -->
+    <div class="modal-overlay" id="intModal">
+        <div class="modal">
+            <div class="modal-head">
+                <b>Add Interest</b>
+                <button class="del-btn" id="intModalClose">✕</button>
+            </div>
+            <div class="input-row">
+                <label>Name</label>
+                <input type="text" id="intName" placeholder="Tsukiji Fish Market" />
+            </div>
+            <div class="input-row">
+                <label>Type</label>
+                <select id="intType">
+                    <option value="attraction">Attraction</option>
+                    <option value="activity">Activity</option>
+                    <option value="shopping">Shopping</option>
+                </select>
+            </div>
+            <div class="input-row">
+                <label>Notes</label>
+                <textarea id="intNotes" rows="2" placeholder="Morning visit"></textarea>
+            </div>
+            <button class="modal-save" id="intSave">Add Interest</button>
+        </div>
+    </div>
+
+<script>
+'use strict';
+
+/* ===== Helpers ===== */
+const $ = id => document.getElementById(id);
+const todayISO = new Date().toISOString().slice(0, 10);
+
+function escapeHtml(str){
+    return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+}
+
+function uid(prefix){
+    return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+}
+
+/* ===== Data Layer ===== */
+function loadTrips(){
+    try { return JSON.parse(localStorage.getItem('travel:trips') || '[]'); }
+    catch { return []; }
+}
+
+function saveTrips(trips){
+    localStorage.setItem('travel:trips', JSON.stringify(trips));
+}
+
+/* ===== State ===== */
+const state = {
+    selectedTripId: null,
+    calMonthOffset: 0,
+    view: 'calendar'       // calendar | details
+};
+
+function getSelectedTrip(){
+    const trips = loadTrips();
+    return trips.find(t => t.id === state.selectedTripId) || null;
+}
+
+function updateTrip(updated){
+    const trips = loadTrips();
+    const idx = trips.findIndex(t => t.id === updated.id);
+    if(idx >= 0){ trips[idx] = updated; saveTrips(trips); }
+}
+
+/* ===== Trip CRUD ===== */
+function createTrip(){
+    const name = ($('tripName') || {}).value || '';
+    const startDate = ($('tripStart') || {}).value || '';
+    const endDate = ($('tripEnd') || {}).value || '';
+    const color = ($('tripColor') || {}).value || '#06b6d4';
+    if(!name.trim() || !startDate || !endDate) return;
+
+    const trip = {
+        id: uid('trip'),
+        name: name.trim(),
+        startDate,
+        endDate,
+        color,
+        destinations: [],
+        restaurants: [],
+        lodging: [],
+        interests: []
+    };
+    const trips = loadTrips();
+    trips.push(trip);
+    saveTrips(trips);
+    state.selectedTripId = trip.id;
+    closeModal('tripModal');
+    renderAll();
+}
+
+function deleteTrip(){
+    if(!state.selectedTripId) return;
+    if(!confirm('Delete this trip?')) return;
+    const trips = loadTrips().filter(t => t.id !== state.selectedTripId);
+    saveTrips(trips);
+    state.selectedTripId = trips.length ? trips[0].id : null;
+    renderAll();
+}
+
+/* ===== Destination CRUD ===== */
+function addDestination(){
+    const trip = getSelectedTrip();
+    if(!trip) return;
+    const name = ($('destName') || {}).value || '';
+    const type = ($('destType') || {}).value || 'city';
+    const startDate = ($('destStart') || {}).value || trip.startDate;
+    const endDate = ($('destEnd') || {}).value || trip.endDate;
+    const color = ($('destColor') || {}).value || '#06b6d4';
+    if(!name.trim()) return;
+
+    trip.destinations.push({
+        id: uid('dest'), type, name: name.trim(),
+        startDate, endDate, color
+    });
+    updateTrip(trip);
+    closeModal('destModal');
+    renderAll();
+}
+
+function deleteDest(id){
+    const trip = getSelectedTrip();
+    if(!trip) return;
+    trip.destinations = trip.destinations.filter(d => d.id !== id);
+    updateTrip(trip);
+    renderAll();
+}
+
+/* ===== Restaurant CRUD ===== */
+function addRestaurant(){
+    const trip = getSelectedTrip();
+    if(!trip) return;
+    const name = ($('restName') || {}).value || '';
+    const address = ($('restAddress') || {}).value || '';
+    const notes = ($('restNotes') || {}).value || '';
+    if(!name.trim()) return;
+
+    const mapLink = address ? 'https://maps.google.com/?q=' + encodeURIComponent(address) : '';
+
+    trip.restaurants.push({
+        id: uid('rest'), name: name.trim(),
+        address, mapLink, notes, dates: []
+    });
+    updateTrip(trip);
+    closeModal('restModal');
+    renderAll();
+}
+
+function deleteRest(id){
+    const trip = getSelectedTrip();
+    if(!trip) return;
+    trip.restaurants = trip.restaurants.filter(r => r.id !== id);
+    updateTrip(trip);
+    renderAll();
+}
+
+/* ===== Lodging CRUD ===== */
+function addLodging(){
+    const trip = getSelectedTrip();
+    if(!trip) return;
+    const name = ($('lodgeName') || {}).value || '';
+    const address = ($('lodgeAddress') || {}).value || '';
+    const checkIn = ($('lodgeCheckIn') || {}).value || '';
+    const checkOut = ($('lodgeCheckOut') || {}).value || '';
+    const notes = ($('lodgeNotes') || {}).value || '';
+    if(!name.trim()) return;
+
+    trip.lodging.push({
+        id: uid('lodge'), name: name.trim(),
+        address, checkIn, checkOut, notes
+    });
+    updateTrip(trip);
+    closeModal('lodgeModal');
+    renderAll();
+}
+
+function deleteLodge(id){
+    const trip = getSelectedTrip();
+    if(!trip) return;
+    trip.lodging = trip.lodging.filter(l => l.id !== id);
+    updateTrip(trip);
+    renderAll();
+}
+
+/* ===== Interest CRUD ===== */
+function addInterest(){
+    const trip = getSelectedTrip();
+    if(!trip) return;
+    const name = ($('intName') || {}).value || '';
+    const type = ($('intType') || {}).value || 'attraction';
+    const notes = ($('intNotes') || {}).value || '';
+    if(!name.trim()) return;
+
+    trip.interests.push({
+        id: uid('int'), name: name.trim(), type, notes
+    });
+    updateTrip(trip);
+    closeModal('intModal');
+    renderAll();
+}
+
+function deleteInt(id){
+    const trip = getSelectedTrip();
+    if(!trip) return;
+    trip.interests = trip.interests.filter(i => i.id !== id);
+    updateTrip(trip);
+    renderAll();
+}
+
+/* ===== Modal helpers ===== */
+function openModal(id){
+    const el = $(id);
+    if(el) el.classList.add('open');
+}
+
+function closeModal(id){
+    const el = $(id);
+    if(el) el.classList.remove('open');
+}
+
+/* ===== View switching ===== */
+function switchView(view){
+    state.view = view;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const target = $('view' + view.charAt(0).toUpperCase() + view.slice(1));
+    if(target) target.classList.add('active');
+
+    document.querySelectorAll('.nav-pill').forEach(p => {
+        p.classList.toggle('active', p.dataset.view === view);
+    });
+}
+
+/* ===== Render: Trip Selector ===== */
+function renderTripSelect(){
+    const select = $('tripSelect');
+    if(!select) return;
+    const trips = loadTrips();
+
+    if(!trips.length){
+        select.innerHTML = '<option value="">No trips — create one</option>';
+        state.selectedTripId = null;
+        return;
+    }
+
+    if(!state.selectedTripId || !trips.find(t => t.id === state.selectedTripId)){
+        state.selectedTripId = trips[0].id;
+    }
+
+    select.innerHTML = trips.map(t =>
+        `<option value="${escapeHtml(t.id)}" ${t.id === state.selectedTripId ? 'selected' : ''}>${escapeHtml(t.name)}</option>`
+    ).join('');
+}
+
+function renderTripInfo(){
+    const el = $('tripInfo');
+    if(!el) return;
+    const trip = getSelectedTrip();
+    if(!trip){ el.innerHTML = ''; return; }
+
+    const sd = new Date(trip.startDate + 'T12:00:00');
+    const ed = new Date(trip.endDate + 'T12:00:00');
+    const fmt = d => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    const days = Math.round((ed - sd) / 86400000) + 1;
+
+    el.innerHTML = `
+        <span class="trip-chip">${fmt(sd)} — ${fmt(ed)}</span>
+        <span class="trip-chip">${days} day${days !== 1 ? 's' : ''}</span>
+        <span class="trip-chip">${trip.destinations.length} dest</span>
+    `;
+}
+
+/* ===== Render: Travel Calendar ===== */
+function getCalMonth(){
+    const trip = getSelectedTrip();
+    if(trip && state.calMonthOffset === 0){
+        const d = new Date(trip.startDate + 'T12:00:00');
+        return new Date(d.getFullYear(), d.getMonth(), 1);
+    }
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + state.calMonthOffset, 1);
+}
+
+function getDestBarsForDay(trip, dateStr){
+    const bars = [];
+    if(!trip) return bars;
+
+    // Destination bars
+    (trip.destinations || []).forEach(dest => {
+        if(dateStr >= dest.startDate && dateStr <= dest.endDate){
+            const isFirst = dateStr === dest.startDate;
+            const isLast = dateStr === dest.endDate;
+            bars.push({
+                color: dest.color || '#06b6d4',
+                label: dest.name,
+                isFirst, isLast
+            });
+        }
+    });
+
+    // Lodging bars (purple)
+    (trip.lodging || []).forEach(lodge => {
+        if(lodge.checkIn && lodge.checkOut && dateStr >= lodge.checkIn && dateStr <= lodge.checkOut){
+            const isFirst = dateStr === lodge.checkIn;
+            const isLast = dateStr === lodge.checkOut;
+            bars.push({
+                color: '#a78bfa',
+                label: lodge.name,
+                isFirst, isLast
+            });
+        }
+    });
+
+    return bars;
+}
+
+function renderTravelCalendar(){
+    const grid = $('tCalGrid');
+    const label = $('tCalLabel');
+    if(!grid) return;
+
+    const base = getCalMonth();
+    const year = base.getFullYear();
+    const month = base.getMonth();
+
+    if(label){
+        const mName = base.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+        label.textContent = mName;
+    }
+
+    const trip = getSelectedTrip();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevDays = new Date(year, month, 0).getDate();
+
+    let html = '';
+
+    // Prev month overflow
+    for(let i = firstDay - 1; i >= 0; i--){
+        const d = prevDays - i;
+        html += `<div class="t-cal-cell outside"><span class="t-cal-num">${d}</span></div>`;
+    }
+
+    // Current month
+    for(let d = 1; d <= daysInMonth; d++){
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isToday = dateStr === todayISO;
+        let cls = 't-cal-cell';
+        if(isToday) cls += ' today';
+
+        const bars = getDestBarsForDay(trip, dateStr);
+        let barsHtml = '';
+        bars.forEach(b => {
+            let bCls = 't-cal-bar';
+            if(b.isFirst && b.isLast) bCls += ' first last';
+            else if(b.isFirst) bCls += ' first';
+            else if(b.isLast) bCls += ' last';
+            else bCls += ' mid';
+            barsHtml += `<div class="${bCls}" style="background:${b.color}" title="${escapeHtml(b.label)}"></div>`;
+        });
+
+        html += `<div class="${cls}"><span class="t-cal-num">${d}</span>${barsHtml}</div>`;
+    }
+
+    // Next month overflow
+    const totalCells = firstDay + daysInMonth;
+    const remainder = totalCells % 7;
+    if(remainder > 0){
+        for(let d = 1; d <= 7 - remainder; d++){
+            html += `<div class="t-cal-cell outside"><span class="t-cal-num">${d}</span></div>`;
+        }
+    }
+
+    grid.innerHTML = html;
+
+    // Legend
+    renderCalLegend();
+}
+
+function renderCalLegend(){
+    const el = $('calLegend');
+    if(!el) return;
+    const trip = getSelectedTrip();
+    if(!trip){ el.innerHTML = ''; return; }
+
+    let html = '';
+    (trip.destinations || []).forEach(d => {
+        html += `<div class="list-item" style="padding:6px 10px">
+            <div style="width:12px; height:12px; border-radius:4px; background:${d.color}; flex:0 0 auto"></div>
+            <span style="font-weight:900; font-size:12px; flex:1; margin-left:8px">${escapeHtml(d.name)}</span>
+            <span style="font-size:11px; color:var(--muted)">${d.startDate} → ${d.endDate}</span>
+        </div>`;
+    });
+
+    (trip.lodging || []).forEach(l => {
+        if(l.checkIn && l.checkOut){
+            html += `<div class="list-item" style="padding:6px 10px">
+                <div style="width:12px; height:12px; border-radius:4px; background:#a78bfa; flex:0 0 auto"></div>
+                <span style="font-weight:900; font-size:12px; flex:1; margin-left:8px">${escapeHtml(l.name)}</span>
+                <span style="font-size:11px; color:var(--muted)">${l.checkIn} → ${l.checkOut}</span>
+            </div>`;
+        }
+    });
+
+    if(!html) html = '<div class="empty">Add destinations to see them on the calendar</div>';
+    el.innerHTML = html;
+}
+
+/* ===== Render: Details ===== */
+function renderDestinations(){
+    const el = $('destList');
+    if(!el) return;
+    const trip = getSelectedTrip();
+    if(!trip || !trip.destinations.length){
+        el.innerHTML = '<div class="empty">No destinations yet</div>';
+        return;
+    }
+    el.innerHTML = trip.destinations.map(d => `
+        <div class="list-item">
+            <div class="list-item-left">
+                <div class="list-item-name">${escapeHtml(d.name)}</div>
+                <div class="list-item-sub">${d.startDate} → ${d.endDate}</div>
+            </div>
+            <div class="list-item-right">
+                <span class="type-badge type-${d.type}">${d.type}</span>
+                <button class="del-btn" onclick="deleteDest('${d.id}')">✕</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderRestaurants(){
+    const el = $('restList');
+    if(!el) return;
+    const trip = getSelectedTrip();
+    if(!trip || !trip.restaurants.length){
+        el.innerHTML = '<div class="empty">No restaurants yet</div>';
+        return;
+    }
+    el.innerHTML = trip.restaurants.map(r => `
+        <div class="list-item">
+            <div class="list-item-left">
+                <div class="list-item-name">${escapeHtml(r.name)}</div>
+                <div class="list-item-sub">
+                    ${r.address ? escapeHtml(r.address) : ''}
+                    ${r.notes ? ' · ' + escapeHtml(r.notes) : ''}
+                </div>
+                ${r.mapLink ? `<a class="map-link" href="${escapeHtml(r.mapLink)}" target="_blank" rel="noopener">📍 Map</a>` : ''}
+            </div>
+            <div class="list-item-right">
+                <span class="type-badge type-restaurant">restaurant</span>
+                <button class="del-btn" onclick="deleteRest('${r.id}')">✕</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderLodging(){
+    const el = $('lodgeList');
+    if(!el) return;
+    const trip = getSelectedTrip();
+    if(!trip || !trip.lodging.length){
+        el.innerHTML = '<div class="empty">No lodging yet</div>';
+        return;
+    }
+    el.innerHTML = trip.lodging.map(l => `
+        <div class="list-item">
+            <div class="list-item-left">
+                <div class="list-item-name">${escapeHtml(l.name)}</div>
+                <div class="list-item-sub">
+                    ${l.checkIn && l.checkOut ? l.checkIn + ' → ' + l.checkOut : ''}
+                    ${l.address ? ' · ' + escapeHtml(l.address) : ''}
+                    ${l.notes ? ' · ' + escapeHtml(l.notes) : ''}
+                </div>
+            </div>
+            <div class="list-item-right">
+                <span class="type-badge type-lodging">lodging</span>
+                <button class="del-btn" onclick="deleteLodge('${l.id}')">✕</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderInterests(){
+    const el = $('intList');
+    if(!el) return;
+    const trip = getSelectedTrip();
+    if(!trip || !trip.interests.length){
+        el.innerHTML = '<div class="empty">No interests yet</div>';
+        return;
+    }
+    el.innerHTML = trip.interests.map(i => `
+        <div class="list-item">
+            <div class="list-item-left">
+                <div class="list-item-name">${escapeHtml(i.name)}</div>
+                ${i.notes ? `<div class="list-item-sub">${escapeHtml(i.notes)}</div>` : ''}
+            </div>
+            <div class="list-item-right">
+                <span class="type-badge type-${i.type}">${i.type}</span>
+                <button class="del-btn" onclick="deleteInt('${i.id}')">✕</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+/* ===== Render All ===== */
+function renderAll(){
+    renderTripSelect();
+    renderTripInfo();
+    renderTravelCalendar();
+    renderDestinations();
+    renderRestaurants();
+    renderLodging();
+    renderInterests();
+}
+
+/* ===== Bindings ===== */
+function bindAll(){
+    // View pills
+    document.querySelectorAll('.nav-pill').forEach(pill => {
+        pill.addEventListener('click', () => switchView(pill.dataset.view));
+    });
+
+    // Trip select
+    const tripSelect = $('tripSelect');
+    if(tripSelect){
+        tripSelect.addEventListener('change', () => {
+            state.selectedTripId = tripSelect.value;
+            state.calMonthOffset = 0;
+            renderAll();
+        });
+    }
+
+    // New trip
+    $('newTripBtn').addEventListener('click', () => openModal('tripModal'));
+    $('tripModalClose').addEventListener('click', () => closeModal('tripModal'));
+    $('tripSave').addEventListener('click', createTrip);
+    $('tripModal').addEventListener('click', e => { if(e.target.id === 'tripModal') closeModal('tripModal'); });
+
+    // Delete trip
+    $('deleteTripBtn').addEventListener('click', deleteTrip);
+
+    // Calendar nav
+    $('tCalPrev').addEventListener('click', () => { state.calMonthOffset--; renderTravelCalendar(); });
+    $('tCalNext').addEventListener('click', () => { state.calMonthOffset++; renderTravelCalendar(); });
+
+    // Destination modal
+    $('addDestBtn').addEventListener('click', () => {
+        const trip = getSelectedTrip();
+        if(!trip) return;
+        if($('destStart')) $('destStart').value = trip.startDate;
+        if($('destEnd')) $('destEnd').value = trip.endDate;
+        openModal('destModal');
+    });
+    $('destModalClose').addEventListener('click', () => closeModal('destModal'));
+    $('destSave').addEventListener('click', addDestination);
+    $('destModal').addEventListener('click', e => { if(e.target.id === 'destModal') closeModal('destModal'); });
+
+    // Restaurant modal
+    $('addRestBtn').addEventListener('click', () => openModal('restModal'));
+    $('restModalClose').addEventListener('click', () => closeModal('restModal'));
+    $('restSave').addEventListener('click', addRestaurant);
+    $('restModal').addEventListener('click', e => { if(e.target.id === 'restModal') closeModal('restModal'); });
+
+    // Lodging modal
+    $('addLodgeBtn').addEventListener('click', () => {
+        const trip = getSelectedTrip();
+        if(!trip) return;
+        if($('lodgeCheckIn')) $('lodgeCheckIn').value = trip.startDate;
+        if($('lodgeCheckOut')) $('lodgeCheckOut').value = trip.endDate;
+        openModal('lodgeModal');
+    });
+    $('lodgeModalClose').addEventListener('click', () => closeModal('lodgeModal'));
+    $('lodgeSave').addEventListener('click', addLodging);
+    $('lodgeModal').addEventListener('click', e => { if(e.target.id === 'lodgeModal') closeModal('lodgeModal'); });
+
+    // Interest modal
+    $('addIntBtn').addEventListener('click', () => openModal('intModal'));
+    $('intModalClose').addEventListener('click', () => closeModal('intModal'));
+    $('intSave').addEventListener('click', addInterest);
+    $('intModal').addEventListener('click', e => { if(e.target.id === 'intModal') closeModal('intModal'); });
+}
+
+/* ===== Init ===== */
+(function init(){
+    bindAll();
+    renderAll();
+})();
+</script>
+</body>
+</html>

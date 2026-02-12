@@ -678,6 +678,398 @@ function renderBowlDashboard(){
 }
 
 /* --------------------------------
+   Calendar: state + data layer
+----------------------------------*/
+const calendarState = {
+    monthOffset: 0,
+    selectedDate: todayISO,
+    detailOpen: false
+};
+
+function loadCalendarEvents(){
+    try { return JSON.parse(localStorage.getItem('calendar:events') || '[]'); }
+    catch { return []; }
+}
+
+function saveCalendarEvents(events){
+    localStorage.setItem('calendar:events', JSON.stringify(events));
+}
+
+function getEventsForDate(dateStr){
+    return loadCalendarEvents().filter(e => e.date === dateStr);
+}
+
+function addCalendarEvent(event){
+    const events = loadCalendarEvents();
+    events.push(event);
+    saveCalendarEvents(events);
+}
+
+function deleteCalendarEvent(id){
+    const events = loadCalendarEvents().filter(e => e.id !== id);
+    saveCalendarEvents(events);
+}
+
+/* --------------------------------
+   Calendar: activity heatmap
+----------------------------------*/
+function buildDailyActivityMap(year, month){
+    const map = {};
+    const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+
+    // Exercise volume
+    listWorkoutKeys().forEach(k => {
+        if(!k.startsWith('powerUp:' + prefix)) return;
+        const dateStr = k.replace('powerUp:', '');
+        const day = normalizeDay(safeParse(k));
+        if(!day) return;
+        const vol = dayTotals(day).volume;
+        const d = Number(dateStr.slice(8, 10));
+        map[d] = (map[d] || 0) + vol;
+    });
+
+    // Nutrition calories
+    const allMeals = loadNutritionMeals();
+    allMeals.forEach(m => {
+        if(!m.date || !m.date.startsWith(prefix)) return;
+        const d = Number(m.date.slice(8, 10));
+        const cal = (m.totals && m.totals.calories) ? m.totals.calories : 0;
+        map[d] = (map[d] || 0) + Math.min(cal / 10, 300);
+    });
+
+    // Bowling scores
+    listBowlingWeekKeys().forEach(k => {
+        const week = safeParse(k);
+        if(!week || !Array.isArray(week.games)) return;
+        week.games.forEach(g => {
+            if(g.score != null && g.completedDate && g.completedDate.startsWith(prefix)){
+                const d = Number(g.completedDate.slice(8, 10));
+                map[d] = (map[d] || 0) + g.score * BOWL_VOLUME_MULTIPLIER;
+            }
+        });
+    });
+
+    // Calendar events with xpAmount
+    loadCalendarEvents().forEach(e => {
+        if(!e.date || !e.date.startsWith(prefix)) return;
+        if(e.xpAmount > 0){
+            const d = Number(e.date.slice(8, 10));
+            map[d] = (map[d] || 0) + e.xpAmount;
+        }
+    });
+
+    return map;
+}
+
+function activityClass(score){
+    if(score >= 10000) return 'activity-4';
+    if(score >= 5000) return 'activity-3';
+    if(score >= 2000) return 'activity-2';
+    if(score >= 1) return 'activity-1';
+    return '';
+}
+
+/* --------------------------------
+   Calendar: rendering
+----------------------------------*/
+function getCalendarMonth(){
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + calendarState.monthOffset, 1);
+}
+
+function renderCalendarGrid(){
+    const grid = $('calGrid');
+    const label = $('calMonthLabel');
+    if(!grid) return;
+
+    const base = getCalendarMonth();
+    const year = base.getFullYear();
+    const month = base.getMonth();
+
+    if(label){
+        const sameYear = year === new Date().getFullYear();
+        const mName = base.toLocaleString('en-US', { month: 'long' });
+        label.textContent = sameYear ? mName : `${mName} ${year}`;
+    }
+
+    // Pre-build activity map
+    const actMap = buildDailyActivityMap(year, month);
+
+    // Pre-build date lookup sets for dots
+    const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+    const workoutDates = new Set();
+    listWorkoutKeys().forEach(k => {
+        const d = k.replace('powerUp:', '');
+        if(d.startsWith(monthPrefix)) workoutDates.add(d);
+    });
+
+    const mealDates = new Set();
+    loadNutritionMeals().forEach(m => {
+        if(m.date && m.date.startsWith(monthPrefix)) mealDates.add(m.date);
+    });
+
+    const bowlDates = new Set();
+    listBowlingWeekKeys().forEach(k => {
+        const week = safeParse(k);
+        if(!week || !Array.isArray(week.games)) return;
+        week.games.forEach(g => {
+            if(g.completedDate && g.completedDate.startsWith(monthPrefix)) bowlDates.add(g.completedDate);
+        });
+    });
+
+    const eventDates = new Set();
+    loadCalendarEvents().forEach(e => {
+        if(e.date && e.date.startsWith(monthPrefix)) eventDates.add(e.date);
+    });
+
+    // Build grid
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevDays = new Date(year, month, 0).getDate();
+
+    let html = '';
+
+    // Previous month overflow
+    for(let i = firstDay - 1; i >= 0; i--){
+        const d = prevDays - i;
+        html += `<div class="cal-cell outside"><span class="cal-num">${d}</span></div>`;
+    }
+
+    // Current month days
+    for(let d = 1; d <= daysInMonth; d++){
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isToday = dateStr === todayISO;
+        const isSelected = dateStr === calendarState.selectedDate;
+        const score = actMap[d] || 0;
+        const actCls = activityClass(score);
+
+        let cls = 'cal-cell';
+        if(isToday) cls += ' today';
+        if(isSelected) cls += ' selected';
+        if(actCls) cls += ' ' + actCls;
+
+        // Dots
+        let dots = '';
+        if(workoutDates.has(dateStr)) dots += '<span class="cal-dot dot-ex"></span>';
+        if(mealDates.has(dateStr)) dots += '<span class="cal-dot dot-nut"></span>';
+        if(bowlDates.has(dateStr)) dots += '<span class="cal-dot dot-bowl"></span>';
+        if(eventDates.has(dateStr)) dots += '<span class="cal-dot dot-event"></span>';
+
+        html += `<div class="${cls}" data-date="${dateStr}">
+            <span class="cal-num">${d}</span>
+            ${dots ? '<div class="cal-dots">' + dots + '</div>' : ''}
+        </div>`;
+    }
+
+    // Next month overflow
+    const totalCells = firstDay + daysInMonth;
+    const remainder = totalCells % 7;
+    if(remainder > 0){
+        for(let d = 1; d <= 7 - remainder; d++){
+            html += `<div class="cal-cell outside"><span class="cal-num">${d}</span></div>`;
+        }
+    }
+
+    grid.innerHTML = html;
+
+    // Bind cell clicks
+    grid.querySelectorAll('.cal-cell:not(.outside)').forEach(cell => {
+        cell.addEventListener('click', () => {
+            const date = cell.dataset.date;
+            if(calendarState.selectedDate === date && calendarState.detailOpen){
+                calendarState.detailOpen = false;
+            } else {
+                calendarState.selectedDate = date;
+                calendarState.detailOpen = true;
+            }
+            renderCalendarGrid();
+            renderCalendarDayDetail();
+        });
+    });
+
+    // Show/hide detail
+    const detail = $('calDayDetail');
+    if(detail){
+        detail.style.display = calendarState.detailOpen ? 'block' : 'none';
+        if(calendarState.detailOpen) renderCalendarDayDetail();
+    }
+}
+
+function renderCalendarDayDetail(){
+    const detail = $('calDayDetail');
+    if(!detail || !calendarState.detailOpen) return;
+
+    const dateStr = calendarState.selectedDate;
+    const d = new Date(dateStr + 'T12:00:00');
+    const label = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+
+    let html = `<div class="cal-detail-head">
+        <b>${escapeHtml(label)}</b>
+    </div>`;
+
+    // Auto-detected activity
+    const workoutKey = 'powerUp:' + dateStr;
+    const workoutRaw = safeParse(workoutKey);
+    const workout = normalizeDay(workoutRaw);
+    if(workout && workout.exercises.length){
+        const totals = dayTotals(workout);
+        html += `<div class="cal-activity-item">
+            <span class="cal-act-icon" style="color:var(--ex)">💪</span>
+            <span>Workout — ${totals.moves} exercise${totals.moves !== 1 ? 's' : ''}, ${totals.volume.toLocaleString()} lb vol</span>
+        </div>`;
+    }
+
+    // Nutrition
+    const allMeals = loadNutritionMeals();
+    const dateMeals = allMeals.filter(m => m.date === dateStr);
+    if(dateMeals.length){
+        let cal = 0;
+        dateMeals.forEach(m => { cal += (m.totals && m.totals.calories) || 0; });
+        html += `<div class="cal-activity-item">
+            <span class="cal-act-icon" style="color:var(--nut)">🍎</span>
+            <span>${dateMeals.length} meal${dateMeals.length !== 1 ? 's' : ''} — ${Math.round(cal)} cal</span>
+        </div>`;
+    }
+
+    // Bowling
+    listBowlingWeekKeys().forEach(k => {
+        const week = safeParse(k);
+        if(!week || !Array.isArray(week.games)) return;
+        week.games.forEach(g => {
+            if(g.completedDate === dateStr && g.score != null){
+                html += `<div class="cal-activity-item">
+                    <span class="cal-act-icon" style="color:var(--bowl)">🎳</span>
+                    <span>Bowling — Score ${g.score}</span>
+                </div>`;
+            }
+        });
+    });
+
+    // Manual calendar events
+    const events = getEventsForDate(dateStr);
+    if(events.length){
+        html += `<div class="cal-events-label">Events</div>`;
+        events.forEach(evt => {
+            html += `<div class="cal-event-item">
+                <span>${escapeHtml(evt.title)}</span>
+                <button class="cal-event-del" data-id="${escapeHtml(evt.id)}" title="Delete event">✕</button>
+            </div>`;
+        });
+    }
+
+    html += `<button class="cal-add-inline" id="calAddInline">+ Add Event</button>`;
+
+    detail.innerHTML = html;
+
+    // Bind delete buttons
+    detail.querySelectorAll('.cal-event-del').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteCalendarEvent(btn.dataset.id);
+            renderCalendarGrid();
+            renderCalendarDayDetail();
+        });
+    });
+
+    // Bind add inline
+    const addBtn = $('calAddInline');
+    if(addBtn) addBtn.addEventListener('click', openCalendarEventModal);
+}
+
+function openCalendarEventModal(){
+    const overlay = $('calModalOverlay');
+    if(!overlay) return;
+    overlay.classList.add('open');
+
+    const dateInput = $('calEventDate');
+    if(dateInput) dateInput.value = calendarState.selectedDate;
+
+    const titleInput = $('calEventTitle');
+    if(titleInput){ titleInput.value = ''; titleInput.focus(); }
+
+    const catSelect = $('calEventCat');
+    if(catSelect) catSelect.value = 'general';
+
+    const notesInput = $('calEventNotes');
+    if(notesInput) notesInput.value = '';
+}
+
+function closeCalendarEventModal(){
+    const overlay = $('calModalOverlay');
+    if(overlay) overlay.classList.remove('open');
+}
+
+function saveCalendarEvent(){
+    const title = ($('calEventTitle') || {}).value || '';
+    const date = ($('calEventDate') || {}).value || calendarState.selectedDate;
+    const category = ($('calEventCat') || {}).value || 'general';
+    const notes = ($('calEventNotes') || {}).value || '';
+
+    if(!title.trim()) return;
+
+    const id = 'evt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    addCalendarEvent({
+        id,
+        date,
+        title: title.trim(),
+        category,
+        notes,
+        xpCategory: null,
+        xpAmount: 0
+    });
+
+    closeCalendarEventModal();
+    renderCalendarGrid();
+    if(calendarState.detailOpen) renderCalendarDayDetail();
+}
+
+/* --------------------------------
+   Travel: dashboard preview
+----------------------------------*/
+function loadTrips(){
+    try { return JSON.parse(localStorage.getItem('travel:trips') || '[]'); }
+    catch { return []; }
+}
+
+function renderTravelDashboard(){
+    const section = $('travelSection');
+    if(!section) return;
+
+    const trips = loadTrips();
+    // Find nearest upcoming or current trip (endDate >= today)
+    const upcoming = trips
+        .filter(t => t.endDate >= todayISO)
+        .sort((a, b) => a.startDate < b.startDate ? -1 : 1);
+
+    const trip = upcoming[0];
+    if(!trip){
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+
+    const meta = $('travelMeta');
+    if(meta){
+        const sd = new Date(trip.startDate + 'T12:00:00');
+        const label = sd.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        meta.textContent = trip.name + ' · ' + label;
+    }
+
+    const chips = $('travelInterests');
+    if(chips){
+        const interests = (trip.interests || []).slice(0, 3);
+        if(interests.length){
+            chips.innerHTML = interests.map(i =>
+                `<span class="travel-interest-chip">${escapeHtml(i.name)}</span>`
+            ).join('');
+        } else {
+            chips.innerHTML = '';
+        }
+    }
+}
+
+/* --------------------------------
    Render: top + modules + history
 ----------------------------------*/
 function renderTop(){
@@ -868,6 +1260,42 @@ function bindButtons(){
     });
   }
 
+  // Calendar month navigation
+  const calPrev = $('calMonthPrev');
+  const calNext = $('calMonthNext');
+  if(calPrev){
+    calPrev.addEventListener('click', () => {
+      calendarState.monthOffset -= 1;
+      calendarState.detailOpen = false;
+      renderCalendarGrid();
+    });
+  }
+  if(calNext){
+    calNext.addEventListener('click', () => {
+      calendarState.monthOffset += 1;
+      calendarState.detailOpen = false;
+      renderCalendarGrid();
+    });
+  }
+
+  // Calendar + Event button
+  const calAddBtn = $('calAddEvent');
+  if(calAddBtn) calAddBtn.addEventListener('click', openCalendarEventModal);
+
+  // Calendar modal
+  const calModalClose = $('calModalClose');
+  if(calModalClose) calModalClose.addEventListener('click', closeCalendarEventModal);
+
+  const calModalOverlay = $('calModalOverlay');
+  if(calModalOverlay){
+    calModalOverlay.addEventListener('click', (e) => {
+      if(e.target === calModalOverlay) closeCalendarEventModal();
+    });
+  }
+
+  const calSaveBtn = $('calSaveEvent');
+  if(calSaveBtn) calSaveBtn.addEventListener('click', saveCalendarEvent);
+
   // Finance category filter buttons
   document.querySelectorAll('.fin-filter').forEach(btn => {
     btn.addEventListener('click', ()=>{
@@ -889,6 +1317,8 @@ function renderAll(){
   renderHistory();
   renderFinanceDonut();
   renderBowlDashboard();
+  renderCalendarGrid();
+  renderTravelDashboard();
 }
 
 /* --------------------------------

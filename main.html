@@ -72,6 +72,14 @@
             </a>
             <div class="char-action bowl-recent" id="bowlRecent" style="display:none;"></div>
           </div>
+
+          <div class="travel-section" id="travelSection" style="display:none;">
+            <a class="char-action travel-link" href="./travel/index.html">
+              <span>✈ Travel</span>
+              <span class="travel-meta" id="travelMeta"></span>
+            </a>
+            <div class="travel-interests" id="travelInterests"></div>
+          </div>
         </div>
       </div>
 
@@ -106,6 +114,65 @@
         </div>
       </div>
     </section>
+
+    <!-- CALENDAR -->
+    <section class="card calendar-card">
+      <div class="calendar-head">
+        <div class="calendar-nav">
+          <button class="cal-nav-btn" id="calMonthPrev" type="button" title="Previous month">◀</button>
+          <div class="cal-month-label" id="calMonthLabel">Month</div>
+          <button class="cal-nav-btn" id="calMonthNext" type="button" title="Next month">▶</button>
+        </div>
+        <button class="mini" id="calAddEvent">+ Event</button>
+      </div>
+
+      <div class="cal-dow-row">
+        <div class="cal-dow">Sun</div>
+        <div class="cal-dow">Mon</div>
+        <div class="cal-dow">Tue</div>
+        <div class="cal-dow">Wed</div>
+        <div class="cal-dow">Thu</div>
+        <div class="cal-dow">Fri</div>
+        <div class="cal-dow">Sat</div>
+      </div>
+
+      <div class="cal-grid" id="calGrid"></div>
+
+      <div class="cal-day-detail" id="calDayDetail" style="display:none;"></div>
+    </section>
+
+    <!-- Calendar Event Modal -->
+    <div class="cal-modal-overlay" id="calModalOverlay">
+      <div class="cal-modal">
+        <div class="cal-modal-head">
+          <b>New Event</b>
+          <button class="cal-event-del" id="calModalClose" title="Close">✕</button>
+        </div>
+        <div class="cal-input-row">
+          <label>Title</label>
+          <input type="text" id="calEventTitle" placeholder="Event title" />
+        </div>
+        <div class="cal-input-row">
+          <label>Date</label>
+          <input type="date" id="calEventDate" />
+        </div>
+        <div class="cal-input-row">
+          <label>Category</label>
+          <select id="calEventCat">
+            <option value="general">General</option>
+            <option value="workout">Workout</option>
+            <option value="study">Study</option>
+            <option value="travel">Travel</option>
+            <option value="reminder">Reminder</option>
+          </select>
+        </div>
+        <div class="cal-input-row">
+          <label>Notes</label>
+          <textarea id="calEventNotes" rows="2" placeholder="Optional notes"></textarea>
+        </div>
+        <button class="cal-save-btn" id="calSaveEvent">Save Event</button>
+      </div>
+    </div>
 
     <!-- FINANCE: Grocery spending (compact) -->
     <section class="card finance-card">
