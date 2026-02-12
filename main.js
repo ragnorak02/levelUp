@@ -14,6 +14,9 @@ const EX_MAX = 50000;
 /* ===== Finance Threshold (for Fin vertical bar only) ===== */
 const FIN_MAX = 2000;
 
+/* ===== Bowling: score-based volume contribution ===== */
+const BOWL_VOLUME_MULTIPLIER = 10;  // each bowling pin scored = 10 exercise volume
+
 /* ===== Nutrition shared state (set by renderNutritionCard, read by renderModulesAndCharacter) ===== */
 let lastNutritionCal = 0;
 
@@ -171,6 +174,8 @@ function volumeSince(isoDate){
       total += dayTotals(day).volume;
     }
   });
+  // Include bowling scores as exercise volume
+  total += bowlingVolumeSince(isoDate);
   return Math.round(total);
 }
 
@@ -591,6 +596,40 @@ function renderNutritionCard(){
 }
 
 /* --------------------------------
+   Bowling: read scores, contribute to exercise volume
+----------------------------------*/
+function getISOWeek(date){
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+  return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
+
+function listBowlingWeekKeys(){
+  const keys = [];
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(k && k.startsWith('bowling:week:')) keys.push(k);
+  }
+  return keys;
+}
+
+function bowlingVolumeSince(isoDate){
+  let total = 0;
+  listBowlingWeekKeys().forEach(k => {
+    const week = safeParse(k);
+    if(!week || !Array.isArray(week.games)) return;
+    week.games.forEach(g => {
+      if(g.score != null && g.completedDate && g.completedDate > isoDate){
+        total += g.score * BOWL_VOLUME_MULTIPLIER;
+      }
+    });
+  });
+  return Math.round(total);
+}
+
+/* --------------------------------
    Render: top + modules + history
 ----------------------------------*/
 function renderTop(){
@@ -723,6 +762,11 @@ function bindNav(){
   if(modNutrition){
     modNutrition.addEventListener('click', ()=> go('./nutrition/index.html'));
     modNutrition.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./nutrition/index.html'); });
+  }
+
+  const openBowling = $('openBowling');
+  if(openBowling){
+    openBowling.addEventListener('click', ()=> go('./bowling/index.html'));
   }
 }
 

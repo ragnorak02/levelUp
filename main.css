@@ -17,6 +17,7 @@
   --study:#3b82f6;
   --fin:#22c55e;
   --nut:#f59e0b;
+  --bowl:#a855f7;
 }
 
 *{box-sizing:border-box}
@@ -118,7 +119,8 @@ body{
 .card-inner{padding:10px}
 
 /* Character */
-.character-card{flex:1; min-width:0;}
+.character-card{flex:1; min-width:0; display:flex; flex-direction:column;}
+.character-card .card-inner{display:flex; flex-direction:column; flex:1; gap:8px;}
 .section-label{
   font-weight:900;
   font-size:13px;
@@ -131,11 +133,12 @@ body{
   border:1px solid rgba(255,255,255,.10);
   background: rgba(255,255,255,.06);
   overflow:hidden;
+  flex:1;
+  min-height:120px;
 }
 .character-gif{
   width:100%;
-  height: auto;
-  aspect-ratio: 16/9;
+  height:100%;
   display:block;
   object-fit: cover;
 }
@@ -173,16 +176,17 @@ body{
   100%{opacity:0; transform:scale(1.06)}
 }
 
-/* Power strip (below dash-top) */
+/* Power strip (inside character card) */
 .power-strip{
-  background: var(--card);
-  border: 1px solid var(--ring);
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
 }
 .power-strip-inner{
   display:flex;
   align-items:center;
-  gap:10px;
-  padding:8px 12px;
+  gap:8px;
+  padding:6px 10px;
 }
 .power-strip-left{
   display:flex;
@@ -252,6 +256,27 @@ body{
 }
 .transform-btn.ready:hover{filter: brightness(1.03)}
 .transform-btn.ready:active{transform: translateY(1px)}
+
+.char-actions{
+  display:flex;
+  gap:6px;
+}
+.char-action{
+  all:unset;
+  cursor:pointer;
+  flex:1;
+  padding:8px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+  color:var(--ink);
+  font-weight:950;
+  font-size:12px;
+  text-align:center;
+  white-space:nowrap;
+}
+.char-action:hover{background: rgba(255,255,255,.08)}
+.char-action:active{transform: translateY(1px)}
 
 /* Modules right */
 .modules-card{flex:1; min-width:0; display:flex;}

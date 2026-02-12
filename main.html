@@ -39,8 +39,6 @@
       <!-- LEFT: Character -->
       <div class="card character-card">
         <div class="card-inner">
-          <div class="section-label">Character</div>
-
           <div class="character-frame" id="characterFrame">
             <div class="avatar-badge" title="Character icon (replace later)">⚡</div>
             <div class="aura" aria-hidden="true"></div>
@@ -49,6 +47,26 @@
               src="https://giffiles.alphacoders.com/220/220162.gif"
               alt="Character GIF"
             />
+          </div>
+
+          <div class="power-strip">
+            <div class="power-strip-inner">
+              <div class="power-strip-left">
+                <div class="dot" id="statusDot"></div>
+                <div class="power-strip-label" id="statusText">Charging</div>
+              </div>
+              <div class="power-strip-bar">
+                <div class="bar"><div class="fill ex" id="exFill"></div></div>
+              </div>
+              <div class="power-strip-num">
+                <span id="exPowerNow">0</span> / <span id="exPowerMax">50000</span>
+              </div>
+              <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform</button>
+            </div>
+          </div>
+
+          <div class="char-actions">
+            <button class="char-action" id="openBowling">🎳 Bowling</button>
           </div>
         </div>
       </div>
@@ -82,23 +100,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- POWER STRIP: Status + Power Bar + Transform -->
-    <section class="card power-strip">
-      <div class="power-strip-inner">
-        <div class="power-strip-left">
-          <div class="dot" id="statusDot"></div>
-          <div class="power-strip-label" id="statusText">Charging</div>
-        </div>
-        <div class="power-strip-bar">
-          <div class="bar"><div class="fill ex" id="exFill"></div></div>
-        </div>
-        <div class="power-strip-num">
-          <span id="exPowerNow">0</span> / <span id="exPowerMax">50000</span>
-        </div>
-        <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform</button>
       </div>
     </section>
 

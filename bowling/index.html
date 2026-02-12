@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bowling — League Tracker</title>
+<style>
+  :root{
+    --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7;
+    --accent:#a855f7; --accent2:#c084fc;
+    --ring:#2a3543; --good:#22c55e; --warn:#f59e0b; --danger:#ef4444;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
+    background:
+      radial-gradient(1200px 800px at 50% -200px, rgba(168,85,247,.15), transparent 55%),
+      radial-gradient(900px 700px at 10% 0%, rgba(192,132,252,.08), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    padding-bottom:80px;
+  }
+  a{color:inherit; text-decoration:none}
+
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    background: linear-gradient(180deg, rgba(11,15,20,.95), rgba(11,15,20,.75));
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--ring);
+  }
+  .topbar-inner{
+    max-width:700px; margin:0 auto;
+    padding:8px 10px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand-group{display:flex; align-items:center; gap:8px; flex:0 0 auto;}
+  .brand{
+    display:flex; align-items:center; gap:6px;
+    font-weight:900;
+    padding:8px 10px;
+    border-radius:999px;
+    border:1px solid var(--ring);
+    background: rgba(19,26,34,.55);
+    box-shadow: var(--shadow);
+    white-space:nowrap;
+    font-size:13px;
+  }
+  .brand.active{
+    color:#0b0f14;
+    background: linear-gradient(135deg, rgba(168,85,247,1), rgba(192,132,252,1));
+    border-color: transparent;
+  }
+  .nav{
+    margin-left:auto;
+    display:flex; gap:8px;
+    align-items:center;
+  }
+  .nav .pill{
+    padding:8px 12px;
+    border-radius:999px;
+    border:1px solid var(--ring);
+    background: rgba(19,26,34,.55);
+    color:var(--muted);
+    font-weight:800;
+    font-size:13px;
+    cursor:pointer;
+  }
+  .nav .pill.active{
+    color:#0b0f14;
+    background: linear-gradient(135deg, rgba(168,85,247,1), rgba(192,132,252,1));
+    border-color: transparent;
+  }
+
+  .wrap{max-width:700px; margin:0 auto; padding:10px; display:flex; flex-direction:column; gap:10px;}
+
+  .card{
+    background: var(--card);
+    border:1px solid var(--ring);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  .card-inner{padding:12px;}
+
+  /* Week nav */
+  .week-nav{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .week-nav-btn{
+    all:unset;
+    cursor:pointer;
+    width:32px; height:32px;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    color:var(--ink);
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .week-nav-btn:hover{background: rgba(255,255,255,.10)}
+  .week-nav-label{
+    font-weight:950;
+    font-size:14px;
+    min-width:160px;
+    text-align:center;
+  }
+
+  /* Game slots */
+  .games-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .game-slot{
+    background: rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:14px;
+    padding:12px 10px;
+    text-align:center;
+    cursor:pointer;
+    min-height:80px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+  }
+  .game-slot:hover{background: rgba(255,255,255,.06)}
+  .game-slot.complete{
+    border-color: rgba(34,197,94,.35);
+    background: rgba(34,197,94,.06);
+  }
+  .game-slot.active{
+    border-color: rgba(168,85,247,.40);
+    background: rgba(168,85,247,.08);
+  }
+  .game-slot .gs-label{
+    font-weight:950;
+    font-size:13px;
+    color:var(--muted);
+  }
+  .game-slot .gs-score{
+    font-weight:950;
+    font-size:22px;
+    color:var(--ink);
+  }
+  .game-slot.complete .gs-score{color:var(--good)}
+  .game-slot .gs-hint{
+    font-size:11px;
+    color:var(--muted);
+    font-weight:800;
+  }
+
+  /* Weekly average */
+  .week-avg{
+    text-align:center;
+    padding:8px;
+    border-radius:12px;
+    border:1px solid rgba(168,85,247,.25);
+    background: rgba(168,85,247,.06);
+    font-weight:950;
+    font-size:13px;
+    color:var(--accent2);
+    margin-bottom:10px;
+  }
+
+  /* Start game button */
+  .start-game-btn{
+    all:unset; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:12px;
+    border-radius:14px;
+    border:1px dashed rgba(168,85,247,.40);
+    background: rgba(168,85,247,.06);
+    color:var(--accent2);
+    font-weight:950;
+    font-size:14px;
+  }
+  .start-game-btn:active{transform: translateY(1px)}
+  .start-game-btn:disabled{opacity:.4; cursor:not-allowed;}
+
+  /* Modal overlay */
+  .modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:50;
+    background: rgba(0,0,0,.70);
+    backdrop-filter: blur(4px);
+    overflow-y:auto;
+    padding:20px 10px;
+  }
+  .modal-overlay.show{display:flex; justify-content:center; align-items:flex-start;}
+  .modal{
+    width:min(600px, 100%);
+    background: var(--card);
+    border:1px solid var(--ring);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding:16px;
+  }
+  .modal-header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .modal-title{font-weight:950; font-size:16px;}
+  .modal-close{
+    all:unset; cursor:pointer;
+    width:32px; height:32px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    font-weight:900;
+  }
+
+  /* Frame strip */
+  .frame-strip{
+    display:flex;
+    gap:4px;
+    margin-bottom:10px;
+    overflow-x:auto;
+  }
+  .frame-tab{
+    all:unset; cursor:pointer;
+    min-width:36px; height:36px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.04);
+    color:var(--muted);
+    font-weight:900;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:1;
+  }
+  .frame-tab.active{
+    background: rgba(168,85,247,.25);
+    border-color: rgba(168,85,247,.50);
+    color:var(--ink);
+  }
+  .frame-tab.done{
+    background: rgba(34,197,94,.12);
+    border-color: rgba(34,197,94,.30);
+    color:var(--good);
+  }
+
+  /* Score row */
+  .score-row{
+    display:flex;
+    gap:4px;
+    margin-bottom:12px;
+  }
+  .score-cell{
+    flex:1;
+    text-align:center;
+    font-weight:950;
+    font-size:11px;
+    color:var(--muted);
+    padding:4px 2px;
+    border-radius:6px;
+    border:1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.02);
+    min-width:0;
+  }
+  .score-cell .sc-shots{
+    font-size:10px;
+    color:var(--muted);
+    margin-bottom:1px;
+  }
+  .score-cell .sc-cum{
+    font-size:12px;
+    font-weight:950;
+    color:var(--ink);
+  }
+
+  /* Shot entry */
+  .shot-entry{
+    padding:12px;
+    border-radius:14px;
+    border:1px solid rgba(168,85,247,.25);
+    background: rgba(168,85,247,.04);
+  }
+  .shot-label{
+    font-weight:950;
+    font-size:13px;
+    color:var(--accent2);
+    margin-bottom:10px;
+  }
+
+  .input-group{
+    display:flex;
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .input-col{flex:1;}
+  .input-col label{
+    display:block;
+    font-weight:900;
+    font-size:11px;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .input-col input{
+    width:100%;
+    padding:8px 10px;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    color:var(--ink);
+    font-weight:900;
+    font-size:14px;
+    outline:none;
+    text-align:center;
+  }
+  .input-col input:focus{border-color: rgba(168,85,247,.55);}
+
+  /* Pin diagram */
+  .pin-diagram{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    margin:12px 0;
+  }
+  .pin-row{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+  }
+  .pin{
+    all:unset; cursor:pointer;
+    width:44px; height:44px;
+    border-radius:50%;
+    border:2px solid rgba(168,85,247,.45);
+    background: rgba(168,85,247,.15);
+    color:var(--ink);
+    font-weight:950;
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: all .15s ease;
+  }
+  .pin.standing{
+    border-color: var(--accent);
+    background: rgba(168,85,247,.30);
+    box-shadow: 0 0 8px rgba(168,85,247,.25);
+  }
+  .pin.knocked{
+    opacity:.25;
+    border-color: rgba(255,255,255,.10);
+    background: rgba(255,255,255,.04);
+    cursor:default;
+  }
+  .pin.disabled{
+    opacity:.15;
+    cursor:default;
+    pointer-events:none;
+  }
+
+  .shot-actions{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+  }
+  .strike-btn{
+    all:unset; cursor:pointer;
+    padding:10px 16px;
+    border-radius:12px;
+    border:1px solid rgba(168,85,247,.35);
+    background: rgba(168,85,247,.12);
+    color:var(--accent2);
+    font-weight:950;
+    font-size:13px;
+  }
+  .strike-btn:hover{background: rgba(168,85,247,.20)}
+  .strike-btn:active{transform: translateY(1px)}
+  .record-btn{
+    all:unset; cursor:pointer;
+    flex:1;
+    padding:10px 16px;
+    border-radius:12px;
+    background: linear-gradient(135deg, rgba(168,85,247,1), rgba(192,132,252,1));
+    color:#0b0f14;
+    font-weight:950;
+    font-size:13px;
+    text-align:center;
+  }
+  .record-btn:active{transform: translateY(1px)}
+
+  /* Game complete */
+  .game-complete{
+    text-align:center;
+    padding:20px;
+  }
+  .game-complete .final-score{
+    font-size:48px;
+    font-weight:950;
+    color:var(--good);
+    margin:10px 0;
+  }
+  .game-complete .final-label{
+    color:var(--muted);
+    font-weight:800;
+    font-size:13px;
+  }
+  .done-btn{
+    all:unset; cursor:pointer;
+    display:inline-flex;
+    padding:10px 24px;
+    border-radius:12px;
+    background: linear-gradient(135deg, rgba(34,197,94,1), rgba(45,212,191,1));
+    color:#0b0f14;
+    font-weight:950;
+    font-size:14px;
+    margin-top:12px;
+  }
+  .done-btn:active{transform: translateY(1px)}
+
+  .empty-state{
+    text-align:center;
+    padding:20px 12px;
+    color:var(--muted);
+    font-weight:800;
+  }
+
+  @media (max-width: 480px){
+    .games-grid{grid-template-columns: repeat(3, 1fr); gap:6px;}
+    .pin{width:38px; height:38px; font-size:12px;}
+    .pin-row{gap:6px;}
+    .frame-tab{min-width:30px; height:30px; font-size:11px;}
+  }
+</style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-group">
+        <a href="../main.html" class="brand">Home</a>
+        <span class="brand active">🎳 Bowling</span>
+      </div>
+      <div class="nav">
+        <span class="pill active">Games</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <!-- Week navigation -->
+    <div class="week-nav">
+      <button class="week-nav-btn" id="weekPrev" type="button" title="Previous week">◀</button>
+      <div class="week-nav-label" id="weekLabel">Week 7</div>
+      <button class="week-nav-btn" id="weekNext" type="button" title="Next week">▶</button>
+    </div>
+
+    <!-- Week summary -->
+    <div class="card">
+      <div class="card-inner">
+        <div class="games-grid" id="gamesGrid">
+          <!-- 3 game slots rendered by JS -->
+        </div>
+
+        <div class="week-avg" id="weekAvg" style="display:none;">
+          Avg: <span id="weekAvgVal">—</span>
+        </div>
+
+        <button class="start-game-btn" id="startGameBtn">+ Start Game</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Game logging modal -->
+  <div class="modal-overlay" id="gameModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Game 1</div>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+
+      <!-- Frame tabs -->
+      <div class="frame-strip" id="frameStrip"></div>
+
+      <!-- Score display -->
+      <div class="score-row" id="scoreRow"></div>
+
+      <!-- Shot entry area -->
+      <div id="shotArea">
+        <div class="shot-entry">
+          <div class="shot-label" id="shotLabel">Frame 1 — Shot 1</div>
+
+          <div class="input-group">
+            <div class="input-col">
+              <label>Standing Position (board)</label>
+              <input type="number" id="standingPos" min="1" max="39" placeholder="20" />
+            </div>
+            <div class="input-col">
+              <label>Target Board</label>
+              <input type="number" id="targetBoard" min="1" max="39" placeholder="15" />
+            </div>
+          </div>
+
+          <div class="pin-diagram" id="pinDiagram"></div>
+
+          <div class="shot-actions">
+            <button class="strike-btn" id="strikeBtn">Strike!</button>
+            <button class="record-btn" id="recordBtn">Record Shot →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game complete view (hidden until done) -->
+      <div class="game-complete" id="gameComplete" style="display:none;">
+        <div class="final-label">Final Score</div>
+        <div class="final-score" id="finalScore">0</div>
+        <button class="done-btn" id="doneBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+'use strict';
+
+/* --------------------------------
+   Utilities
+----------------------------------*/
+const $ = (id) => document.getElementById(id);
+
+function safeParse(key){
+    try { return JSON.parse(localStorage.getItem(key)); }
+    catch { return null; }
+}
+
+/* --------------------------------
+   ISO Week helpers
+----------------------------------*/
+function getISOWeek(date){
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+    return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
+
+function weekIdToLabel(weekId){
+    // e.g. "2026-W07" → "Week 7 — Feb 9"
+    const match = weekId.match(/^(\d{4})-W(\d{2})$/);
+    if(!match) return weekId;
+    const year = parseInt(match[1]);
+    const week = parseInt(match[2]);
+    // Find Monday of that ISO week
+    const jan4 = new Date(Date.UTC(year, 0, 4));
+    const dayOfWeek = jan4.getUTCDay() || 7;
+    const monday = new Date(jan4);
+    monday.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1 + (week - 1) * 7);
+    const monthName = monday.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+    return `Week ${week} — ${monthName} ${monday.getUTCDate()}`;
+}
+
+function offsetWeek(weekId, offset){
+    const match = weekId.match(/^(\d{4})-W(\d{2})$/);
+    if(!match) return weekId;
+    const year = parseInt(match[1]);
+    const week = parseInt(match[2]);
+    const jan4 = new Date(Date.UTC(year, 0, 4));
+    const dayOfWeek = jan4.getUTCDay() || 7;
+    const monday = new Date(jan4);
+    monday.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1 + (week - 1) * 7);
+    monday.setUTCDate(monday.getUTCDate() + offset * 7);
+    return getISOWeek(monday);
+}
+
+/* --------------------------------
+   Data Layer
+----------------------------------*/
+const STORAGE_PREFIX = 'bowling:week:';
+
+let state = {
+    weekId: getISOWeek(new Date()),
+    currentGame: null,       // index into week.games (0,1,2)
+    currentFrame: 0,         // 0-9
+    currentShot: 0,          // 0-2
+    pinsStanding: [],        // array of pin numbers still standing (1-10)
+};
+
+function storageKey(weekId){ return STORAGE_PREFIX + weekId; }
+
+function loadWeek(weekId){
+    return safeParse(storageKey(weekId));
+}
+
+function saveWeek(weekData){
+    localStorage.setItem(storageKey(weekData.weekId), JSON.stringify(weekData));
+}
+
+function ensureWeek(weekId){
+    let week = loadWeek(weekId);
+    if(!week){
+        week = {
+            weekId,
+            weekLabel: weekIdToLabel(weekId),
+            games: [],
+            created: new Date().toISOString(),
+        };
+        saveWeek(week);
+    }
+    return week;
+}
+
+function createEmptyGame(gameNumber){
+    const frames = [];
+    for(let i = 1; i <= 10; i++){
+        frames.push({ frameNumber: i, shots: [] });
+    }
+    return {
+        id: 'game_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        gameNumber,
+        frames,
+        score: null,
+        completedDate: null,
+    };
+}
+
+/* --------------------------------
+   Scoring
+----------------------------------*/
+function pinsKnocked(shot){
+    // 10 minus pins left standing
+    return 10 - (shot.pinsLeft ? shot.pinsLeft.length : 0);
+}
+
+function pinsKnockedInShot(shot){
+    return pinsKnocked(shot);
+}
+
+function calculateGameScore(frames){
+    const scores = new Array(10).fill(null);
+    // Flatten all shots for look-ahead
+    const allShots = [];
+    frames.forEach(f => {
+        f.shots.forEach(s => {
+            allShots.push(pinsKnockedInShot(s));
+        });
+    });
+
+    let shotIndex = 0;
+    let cumulative = 0;
+
+    for(let f = 0; f < 10; f++){
+        const frame = frames[f];
+        if(!frame.shots.length){
+            // Frame not started
+            break;
+        }
+
+        if(f < 9){
+            // Frames 1-9
+            const shot1 = allShots[shotIndex];
+            if(shot1 === undefined) break;
+
+            if(shot1 === 10){
+                // Strike
+                const next1 = allShots[shotIndex + 1];
+                const next2 = allShots[shotIndex + 2];
+                if(next1 === undefined || next2 === undefined){
+                    // Can't calculate yet
+                    scores[f] = null;
+                    shotIndex += 1;
+                    continue;
+                }
+                cumulative += 10 + next1 + next2;
+                scores[f] = cumulative;
+                shotIndex += 1;
+            } else {
+                const shot2 = allShots[shotIndex + 1];
+                if(shot2 === undefined) break;
+
+                if(shot1 + shot2 === 10){
+                    // Spare
+                    const next1 = allShots[shotIndex + 2];
+                    if(next1 === undefined){
+                        scores[f] = null;
+                        shotIndex += 2;
+                        continue;
+                    }
+                    cumulative += 10 + next1;
+                    scores[f] = cumulative;
+                } else {
+                    // Open
+                    cumulative += shot1 + shot2;
+                    scores[f] = cumulative;
+                }
+                shotIndex += 2;
+            }
+        } else {
+            // 10th frame: just sum all shots (no look-ahead)
+            let frameTotal = 0;
+            for(let s = 0; s < frame.shots.length; s++){
+                frameTotal += allShots[shotIndex + s] || 0;
+            }
+            // Only calculate if frame is complete
+            if(isFrameComplete(frame, 9)){
+                cumulative += frameTotal;
+                scores[f] = cumulative;
+            }
+            shotIndex += frame.shots.length;
+        }
+    }
+
+    return scores;
+}
+
+function isStrike(frame){
+    return frame.shots.length >= 1 && pinsKnockedInShot(frame.shots[0]) === 10;
+}
+
+function isSpare(frame){
+    if(frame.shots.length < 2) return false;
+    return pinsKnockedInShot(frame.shots[0]) + pinsKnockedInShot(frame.shots[1]) === 10;
+}
+
+function isFrameComplete(frame, frameIndex){
+    if(frameIndex < 9){
+        // Frames 1-9: strike = 1 shot, otherwise 2
+        if(frame.shots.length === 0) return false;
+        if(pinsKnockedInShot(frame.shots[0]) === 10) return true;
+        return frame.shots.length >= 2;
+    } else {
+        // 10th frame
+        if(frame.shots.length === 0) return false;
+        if(frame.shots.length < 2) return false;
+        const s1 = pinsKnockedInShot(frame.shots[0]);
+        const s2 = pinsKnockedInShot(frame.shots[1]);
+        if(s1 === 10 || s1 + s2 === 10){
+            // Strike or spare → need 3 shots
+            return frame.shots.length >= 3;
+        }
+        // Open in 10th → 2 shots only
+        return true;
+    }
+}
+
+function isGameComplete(game){
+    return isFrameComplete(game.frames[9], 9);
+}
+
+function getFinalScore(game){
+    const scores = calculateGameScore(game.frames);
+    return scores[9];
+}
+
+/* --------------------------------
+   Shot display helpers
+----------------------------------*/
+function shotDisplay(frame, shotIdx, frameIdx){
+    if(!frame.shots[shotIdx]) return '';
+    const knocked = pinsKnockedInShot(frame.shots[shotIdx]);
+
+    if(frameIdx < 9){
+        if(shotIdx === 0){
+            if(knocked === 10) return 'X';
+            if(knocked === 0) return '-';
+            return String(knocked);
+        }
+        if(shotIdx === 1){
+            const firstKnocked = pinsKnockedInShot(frame.shots[0]);
+            if(firstKnocked + knocked === 10) return '/';
+            if(knocked === 0) return '-';
+            return String(knocked);
+        }
+    } else {
+        // 10th frame
+        if(shotIdx === 0){
+            if(knocked === 10) return 'X';
+            if(knocked === 0) return '-';
+            return String(knocked);
+        }
+        if(shotIdx === 1){
+            const s1 = pinsKnockedInShot(frame.shots[0]);
+            if(s1 === 10){
+                // After a strike, full reset
+                if(knocked === 10) return 'X';
+                if(knocked === 0) return '-';
+                return String(knocked);
+            }
+            if(s1 + knocked === 10) return '/';
+            if(knocked === 0) return '-';
+            return String(knocked);
+        }
+        if(shotIdx === 2){
+            const s1 = pinsKnockedInShot(frame.shots[0]);
+            const s2 = pinsKnockedInShot(frame.shots[1]);
+            // After strike+strike, or spare, pins are reset
+            if(s1 === 10 && s2 === 10){
+                if(knocked === 10) return 'X';
+            } else if(s1 === 10){
+                if(s2 + knocked === 10) return '/';
+            } else if(s1 + s2 === 10){
+                // spare, pins reset
+                if(knocked === 10) return 'X';
+            }
+            if(knocked === 0) return '-';
+            return String(knocked);
+        }
+    }
+    return '';
+}
+
+/* --------------------------------
+   Pin Management
+----------------------------------*/
+function getAllPins(){ return [1,2,3,4,5,6,7,8,9,10]; }
+
+function getAvailablePins(frame, frameIndex){
+    if(frame.shots.length === 0) return getAllPins();
+
+    if(frameIndex < 9){
+        // Shot 2: only pins left from shot 1
+        if(frame.shots.length === 1){
+            return frame.shots[0].pinsLeft ? [...frame.shots[0].pinsLeft] : [];
+        }
+        return [];
+    } else {
+        // 10th frame
+        const shotCount = frame.shots.length;
+        if(shotCount === 0) return getAllPins();
+
+        const s1Knocked = pinsKnockedInShot(frame.shots[0]);
+
+        if(shotCount === 1){
+            if(s1Knocked === 10){
+                // Strike → reset all pins
+                return getAllPins();
+            }
+            // Not a strike → remaining pins
+            return frame.shots[0].pinsLeft ? [...frame.shots[0].pinsLeft] : [];
+        }
+
+        if(shotCount === 2){
+            const s2Knocked = pinsKnockedInShot(frame.shots[1]);
+            if(s1Knocked === 10 && s2Knocked === 10){
+                // Double strike → reset
+                return getAllPins();
+            }
+            if(s1Knocked === 10){
+                // Strike then non-strike → remaining from shot 2
+                if(s2Knocked + (frame.shots[1].pinsLeft ? frame.shots[1].pinsLeft.length : 0) === 10){
+                    // Check if spare after strike
+                    if(frame.shots[1].pinsLeft && frame.shots[1].pinsLeft.length === 0){
+                        return getAllPins(); // spare → reset
+                    }
+                    return frame.shots[1].pinsLeft ? [...frame.shots[1].pinsLeft] : [];
+                }
+                return frame.shots[1].pinsLeft ? [...frame.shots[1].pinsLeft] : [];
+            }
+            if(s1Knocked + s2Knocked === 10){
+                // Spare → reset
+                return getAllPins();
+            }
+            return [];
+        }
+
+        return [];
+    }
+}
+
+/* --------------------------------
+   Rendering
+----------------------------------*/
+function renderAll(){
+    const week = ensureWeek(state.weekId);
+
+    // Week label
+    const label = $('weekLabel');
+    if(label) label.textContent = weekIdToLabel(state.weekId);
+
+    renderGameSlots(week);
+    renderWeekAvg(week);
+    renderStartButton(week);
+}
+
+function renderGameSlots(week){
+    const grid = $('gamesGrid');
+    if(!grid) return;
+
+    let html = '';
+    for(let i = 0; i < 3; i++){
+        const game = week.games[i];
+        if(!game){
+            html += `
+                <div class="game-slot" data-game="${i}">
+                    <div class="gs-label">Game ${i + 1}</div>
+                    <div class="gs-hint">Not started</div>
+                </div>`;
+        } else if(game.score != null){
+            html += `
+                <div class="game-slot complete" data-game="${i}">
+                    <div class="gs-label">Game ${i + 1}</div>
+                    <div class="gs-score">${game.score}</div>
+                </div>`;
+        } else {
+            html += `
+                <div class="game-slot active" data-game="${i}">
+                    <div class="gs-label">Game ${i + 1}</div>
+                    <div class="gs-score">...</div>
+                    <div class="gs-hint">In progress</div>
+                </div>`;
+        }
+    }
+    grid.innerHTML = html;
+
+    // Click handlers for completed/in-progress games
+    grid.querySelectorAll('.game-slot').forEach(slot => {
+        const idx = parseInt(slot.dataset.game);
+        const game = week.games[idx];
+        if(game){
+            slot.addEventListener('click', () => openGameModal(idx));
+        }
+    });
+}
+
+function renderWeekAvg(week){
+    const avgEl = $('weekAvg');
+    const avgVal = $('weekAvgVal');
+    if(!avgEl || !avgVal) return;
+
+    const completed = week.games.filter(g => g.score != null);
+    if(completed.length === 0){
+        avgEl.style.display = 'none';
+        return;
+    }
+    const sum = completed.reduce((s, g) => s + g.score, 0);
+    const avg = Math.round(sum / completed.length);
+    avgVal.textContent = avg;
+    avgEl.style.display = 'block';
+}
+
+function renderStartButton(week){
+    const btn = $('startGameBtn');
+    if(!btn) return;
+
+    const completedOrInProgress = week.games.length;
+    if(completedOrInProgress >= 3){
+        btn.disabled = true;
+        btn.textContent = 'All 3 games logged';
+    } else {
+        btn.disabled = false;
+        btn.textContent = '+ Start Game ' + (completedOrInProgress + 1);
+    }
+}
+
+/* --------------------------------
+   Game Modal
+----------------------------------*/
+function openGameModal(gameIndex){
+    const week = ensureWeek(state.weekId);
+    const game = week.games[gameIndex];
+    if(!game) return;
+
+    state.currentGame = gameIndex;
+
+    // Find current frame/shot position
+    if(isGameComplete(game)){
+        state.currentFrame = 9;
+        state.currentShot = game.frames[9].shots.length;
+    } else {
+        for(let f = 0; f < 10; f++){
+            if(!isFrameComplete(game.frames[f], f)){
+                state.currentFrame = f;
+                state.currentShot = game.frames[f].shots.length;
+                break;
+            }
+        }
+    }
+
+    state.pinsStanding = getAvailablePins(game.frames[state.currentFrame], state.currentFrame);
+
+    const modal = $('gameModal');
+    if(modal) modal.classList.add('show');
+
+    $('modalTitle').textContent = 'Game ' + game.gameNumber;
+
+    renderModal(game);
+}
+
+function closeModal(){
+    const modal = $('gameModal');
+    if(modal) modal.classList.remove('show');
+    state.currentGame = null;
+    renderAll();
+}
+
+function renderModal(game){
+    renderFrameStrip(game);
+    renderScoreRow(game);
+
+    if(isGameComplete(game)){
+        $('shotArea').style.display = 'none';
+        $('gameComplete').style.display = 'block';
+        $('finalScore').textContent = getFinalScore(game) || 0;
+    } else {
+        $('shotArea').style.display = 'block';
+        $('gameComplete').style.display = 'none';
+        renderShotEntry(game);
+    }
+}
+
+function renderFrameStrip(game){
+    const strip = $('frameStrip');
+    if(!strip) return;
+
+    let html = '';
+    for(let f = 0; f < 10; f++){
+        const frame = game.frames[f];
+        let cls = 'frame-tab';
+        if(f === state.currentFrame) cls += ' active';
+        else if(isFrameComplete(frame, f)) cls += ' done';
+        html += `<button class="${cls}" data-frame="${f}">${f + 1}</button>`;
+    }
+    strip.innerHTML = html;
+
+    // Click to review frame (read-only for completed, navigate for current)
+    strip.querySelectorAll('.frame-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const f = parseInt(tab.dataset.frame);
+            // Only allow navigating to current incomplete frame
+            if(f === state.currentFrame){
+                // Already there
+            }
+        });
+    });
+}
+
+function renderScoreRow(game){
+    const row = $('scoreRow');
+    if(!row) return;
+
+    const scores = calculateGameScore(game.frames);
+
+    let html = '';
+    for(let f = 0; f < 10; f++){
+        const frame = game.frames[f];
+        let shotsStr = '';
+
+        if(f < 9){
+            const s1 = shotDisplay(frame, 0, f);
+            const s2 = shotDisplay(frame, 1, f);
+            shotsStr = s1 + (s2 ? ' ' + s2 : '');
+        } else {
+            const s1 = shotDisplay(frame, 0, f);
+            const s2 = shotDisplay(frame, 1, f);
+            const s3 = shotDisplay(frame, 2, f);
+            shotsStr = [s1, s2, s3].filter(Boolean).join(' ');
+        }
+
+        const cumStr = scores[f] != null ? scores[f] : '';
+
+        html += `<div class="score-cell">
+            <div class="sc-shots">${shotsStr || '&nbsp;'}</div>
+            <div class="sc-cum">${cumStr}</div>
+        </div>`;
+    }
+    row.innerHTML = html;
+}
+
+function renderShotEntry(game){
+    const frame = game.frames[state.currentFrame];
+    const shotNum = frame.shots.length + 1;
+    const frameNum = state.currentFrame + 1;
+
+    $('shotLabel').textContent = `Frame ${frameNum} — Shot ${shotNum}`;
+    $('standingPos').value = '';
+    $('targetBoard').value = '';
+
+    // Update available pins
+    state.pinsStanding = getAvailablePins(frame, state.currentFrame);
+
+    renderPinDiagram(state.pinsStanding);
+
+    // Update strike button visibility
+    const strikeBtn = $('strikeBtn');
+    if(strikeBtn){
+        // Show strike button only if all 10 pins are available
+        strikeBtn.style.display = state.pinsStanding.length === 10 ? 'block' : 'none';
+    }
+}
+
+function renderPinDiagram(available){
+    const diagram = $('pinDiagram');
+    if(!diagram) return;
+
+    // Pin layout: rows from back to front
+    // Row 4: 7, 8, 9, 10
+    // Row 3: 4, 5, 6
+    // Row 2: 2, 3
+    // Row 1: 1
+    const rows = [
+        [7, 8, 9, 10],
+        [4, 5, 6],
+        [2, 3],
+        [1],
+    ];
+
+    // All available pins start as "standing" (user toggles to mark knocked down)
+    // pinsStanding tracks which are currently toggled as standing
+    let html = '';
+    rows.forEach(row => {
+        html += '<div class="pin-row">';
+        row.forEach(pin => {
+            if(available.includes(pin)){
+                const isStanding = state.pinsStanding.includes(pin);
+                html += `<button class="pin ${isStanding ? 'standing' : ''}" data-pin="${pin}">${pin}</button>`;
+            } else {
+                html += `<button class="pin knocked" data-pin="${pin}" disabled>${pin}</button>`;
+            }
+        });
+        html += '</div>';
+    });
+    diagram.innerHTML = html;
+
+    // Click to toggle standing/knocked
+    diagram.querySelectorAll('.pin:not(.knocked)').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const pin = parseInt(btn.dataset.pin);
+            const idx = state.pinsStanding.indexOf(pin);
+            if(idx >= 0){
+                state.pinsStanding.splice(idx, 1);
+                btn.classList.remove('standing');
+            } else {
+                state.pinsStanding.push(pin);
+                btn.classList.add('standing');
+            }
+        });
+    });
+}
+
+/* --------------------------------
+   Recording shots
+----------------------------------*/
+function recordShot(){
+    const week = ensureWeek(state.weekId);
+    const game = week.games[state.currentGame];
+    if(!game || isGameComplete(game)) return;
+
+    const frame = game.frames[state.currentFrame];
+    const standingPos = parseInt($('standingPos').value) || null;
+    const targetBoard = parseInt($('targetBoard').value) || null;
+
+    const shot = {
+        standingPosition: standingPos,
+        targetBoard: targetBoard,
+        pinsLeft: [...state.pinsStanding].sort((a, b) => a - b),
+    };
+
+    frame.shots.push(shot);
+
+    // Check if frame is complete and advance
+    if(isFrameComplete(frame, state.currentFrame)){
+        if(state.currentFrame < 9){
+            state.currentFrame++;
+            state.currentShot = 0;
+        } else {
+            // Game complete
+            const finalScore = getFinalScore(game);
+            game.score = finalScore;
+            game.completedDate = new Date().toISOString().slice(0, 10);
+        }
+    } else {
+        state.currentShot = frame.shots.length;
+    }
+
+    saveWeek(week);
+    renderModal(game);
+}
+
+function handleStrike(){
+    // Clear all pins (none left standing)
+    state.pinsStanding = [];
+    recordShot();
+}
+
+function startNewGame(){
+    const week = ensureWeek(state.weekId);
+    if(week.games.length >= 3) return;
+
+    const gameNumber = week.games.length + 1;
+    const game = createEmptyGame(gameNumber);
+    week.games.push(game);
+    saveWeek(week);
+
+    openGameModal(week.games.length - 1);
+}
+
+/* --------------------------------
+   Event Bindings
+----------------------------------*/
+function bindEvents(){
+    // Week nav
+    $('weekPrev').addEventListener('click', () => {
+        state.weekId = offsetWeek(state.weekId, -1);
+        renderAll();
+    });
+    $('weekNext').addEventListener('click', () => {
+        state.weekId = offsetWeek(state.weekId, 1);
+        renderAll();
+    });
+
+    // Start game
+    $('startGameBtn').addEventListener('click', startNewGame);
+
+    // Modal
+    $('modalClose').addEventListener('click', closeModal);
+    $('gameModal').addEventListener('click', (e) => {
+        if(e.target === $('gameModal')) closeModal();
+    });
+
+    // Shot recording
+    $('recordBtn').addEventListener('click', recordShot);
+    $('strikeBtn').addEventListener('click', handleStrike);
+    $('doneBtn').addEventListener('click', closeModal);
+}
+
+/* --------------------------------
+   Init
+----------------------------------*/
+(function init(){
+    bindEvents();
+    renderAll();
+})();
+</script>
+</body>
+</html>
