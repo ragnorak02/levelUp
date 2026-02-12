@@ -13,10 +13,9 @@
     --shadow: 0 10px 30px rgba(0,0,0,.35);
     --radius:18px;
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box; margin:0; padding:0;}
   html,body{height:100%}
   body{
-    margin:0;
     font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
     background:
       radial-gradient(1200px 800px at 50% -200px, rgba(168,85,247,.15), transparent 55%),
@@ -26,6 +25,7 @@
     padding-bottom:80px;
   }
   a{color:inherit; text-decoration:none}
+  button{font-family:inherit; border:none; background:none; color:inherit; cursor:pointer;}
 
   .topbar{
     position:sticky; top:0; z-index:20;
@@ -40,7 +40,7 @@
   }
   .brand-group{display:flex; align-items:center; gap:8px; flex:0 0 auto;}
   .brand{
-    display:flex; align-items:center; gap:6px;
+    display:inline-flex; align-items:center; gap:6px;
     font-weight:900;
     padding:8px 10px;
     border-radius:999px;
@@ -68,7 +68,6 @@
     color:var(--muted);
     font-weight:800;
     font-size:13px;
-    cursor:pointer;
   }
   .nav .pill.active{
     color:#0b0f14;
@@ -96,14 +95,13 @@
     margin-bottom:10px;
   }
   .week-nav-btn{
-    all:unset;
-    cursor:pointer;
     width:32px; height:32px;
     border-radius:10px;
     border:1px solid var(--ring);
     background: rgba(255,255,255,.06);
     color:var(--ink);
     font-weight:900;
+    font-size:14px;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -166,7 +164,6 @@
 
   /* Start game button */
   .start-game-btn{
-    all:unset; cursor:pointer;
     display:flex; align-items:center; justify-content:center; gap:8px;
     width:100%; padding:12px;
     border-radius:14px;
@@ -178,6 +175,56 @@
   }
   .start-game-btn:active{transform: translateY(1px)}
   .start-game-btn:disabled{opacity:.4; cursor:not-allowed;}
+
+  /* ========== Stats Panel ========== */
+  .stats-panel{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:8px;
+  }
+  .stats-panel.compact{
+    grid-template-columns: repeat(4, 1fr);
+    gap:6px;
+  }
+  .stat-box{
+    padding:10px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.03);
+    text-align:center;
+  }
+  .stat-box .sv{
+    font-weight:950;
+    font-size:20px;
+    color:var(--ink);
+    line-height:1.2;
+  }
+  .stats-panel.compact .stat-box .sv{font-size:16px;}
+  .stat-box .sl{
+    font-size:11px;
+    font-weight:800;
+    color:var(--muted);
+    margin-top:2px;
+  }
+  .stat-box.highlight{
+    border-color: rgba(168,85,247,.25);
+    background: rgba(168,85,247,.06);
+  }
+  .stat-box.highlight .sv{color:var(--accent2);}
+  .stats-empty{
+    text-align:center;
+    padding:16px 12px;
+    color:var(--muted);
+    font-weight:800;
+    font-size:13px;
+    line-height:1.5;
+  }
+  .stats-title{
+    font-weight:950;
+    font-size:14px;
+    margin-bottom:8px;
+    color:var(--ink);
+  }
 
   /* Modal overlay */
   .modal-overlay{
@@ -205,7 +252,6 @@
   }
   .modal-title{font-weight:950; font-size:16px;}
   .modal-close{
-    all:unset; cursor:pointer;
     width:32px; height:32px;
     display:flex; align-items:center; justify-content:center;
     border-radius:10px;
@@ -291,15 +337,8 @@
     gap:16px;
     margin-bottom:14px;
   }
-  .si-score{
-    font-weight:950;
-    font-size:20px;
-  }
-  .si-frame-ball{
-    font-weight:900;
-    font-size:16px;
-    color:var(--muted);
-  }
+  .si-score{font-weight:950; font-size:20px;}
+  .si-frame-ball{font-weight:900; font-size:16px; color:var(--muted);}
   .si-frame-ball b{color:var(--ink);}
 
   /* Pin diagram */
@@ -310,13 +349,8 @@
     gap:8px;
     margin:16px 0;
   }
-  .pin-row{
-    display:flex;
-    gap:10px;
-    justify-content:center;
-  }
+  .pin-row{display:flex; gap:10px; justify-content:center;}
   .pin{
-    all:unset; cursor:pointer;
     width:48px; height:48px;
     border-radius:50%;
     border:2px solid var(--goldDim);
@@ -369,6 +403,7 @@
     font-size:14px;
     outline:none;
     text-align:center;
+    font-family:inherit;
   }
   .input-col input:focus{border-color: rgba(168,85,247,.55);}
 
@@ -379,7 +414,6 @@
     margin-top:14px;
   }
   .strike-btn{
-    all:unset; cursor:pointer;
     padding:10px 18px;
     border-radius:12px;
     border:2px solid var(--goldDim);
@@ -391,7 +425,6 @@
   .strike-btn:hover{background: rgba(212,168,67,.15)}
   .strike-btn:active{transform: translateY(1px)}
   .record-btn{
-    all:unset; cursor:pointer;
     flex:1;
     padding:10px 16px;
     border-radius:12px;
@@ -430,7 +463,6 @@
     font-size:13px;
   }
   .done-btn{
-    all:unset; cursor:pointer;
     display:inline-flex;
     padding:10px 24px;
     border-radius:12px;
@@ -449,6 +481,8 @@
     .sc-frame-num{font-size:8px;}
     .sc-shot-box{font-size:10px;}
     .sc-cumulative{font-size:11px;}
+    .stats-panel{grid-template-columns: repeat(2, 1fr);}
+    .stats-panel.compact{grid-template-columns: repeat(2, 1fr);}
   }
   @media (max-width: 360px){
     .pin{width:36px; height:36px; font-size:12px;}
@@ -474,7 +508,7 @@
     <!-- Week navigation -->
     <div class="week-nav">
       <button class="week-nav-btn" id="weekPrev" type="button" title="Previous week">◀</button>
-      <div class="week-nav-label" id="weekLabel">Week 7</div>
+      <div class="week-nav-label" id="weekLabel">Week</div>
       <button class="week-nav-btn" id="weekNext" type="button" title="Next week">▶</button>
     </div>
 
@@ -487,7 +521,15 @@
           Avg: <span id="weekAvgVal">—</span>
         </div>
 
-        <button class="start-game-btn" id="startGameBtn">+ Start Game</button>
+        <button class="start-game-btn" id="startGameBtn" type="button">+ Start Game</button>
+      </div>
+    </div>
+
+    <!-- Stats panel -->
+    <div class="card" id="statsCard">
+      <div class="card-inner">
+        <div class="stats-title" id="statsTitle">Career Stats</div>
+        <div id="statsBody"></div>
       </div>
     </div>
   </main>
@@ -497,14 +539,14 @@
     <div class="modal">
       <div class="modal-header">
         <div class="modal-title" id="modalTitle">Game 1</div>
-        <button class="modal-close" id="modalClose">✕</button>
+        <button class="modal-close" id="modalClose" type="button">✕</button>
       </div>
 
       <!-- Bowling scorecard -->
       <div class="scorecard" id="scorecard"></div>
 
       <!-- Score + Frame/Ball indicator -->
-      <div class="score-indicator" id="scoreIndicator">
+      <div class="score-indicator">
         <div class="si-score">Score: <b id="siScoreVal">0</b></div>
         <div class="si-frame-ball">Frame <b id="siFrame">1</b> &nbsp; Ball <b id="siBall">1</b></div>
       </div>
@@ -525,8 +567,8 @@
         <div class="pin-diagram" id="pinDiagram"></div>
 
         <div class="shot-actions">
-          <button class="strike-btn" id="strikeBtn">Strike</button>
-          <button class="record-btn" id="recordBtn">Next Ball →</button>
+          <button class="strike-btn" id="strikeBtn" type="button">Strike</button>
+          <button class="record-btn" id="recordBtn" type="button">Next Ball →</button>
         </div>
 
         <div class="shot-status" id="shotStatus"></div>
@@ -536,7 +578,7 @@
       <div class="game-complete" id="gameComplete" style="display:none;">
         <div class="final-label">Final Score</div>
         <div class="final-score" id="finalScore">0</div>
-        <button class="done-btn" id="doneBtn">Done</button>
+        <button class="done-btn" id="doneBtn" type="button">Done</button>
       </div>
     </div>
   </div>
@@ -575,7 +617,7 @@ function weekIdToLabel(weekId){
     const monday = new Date(jan4);
     monday.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1 + (week - 1) * 7);
     const monthName = monday.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
-    return `Week ${week} — ${monthName} ${monday.getUTCDate()}`;
+    return `Week ${week} \u2014 ${monthName} ${monday.getUTCDate()}`;
 }
 
 function offsetWeek(weekId, offset){
@@ -636,6 +678,127 @@ function createEmptyGame(gameNumber){
         frames,
         score: null,
         completedDate: null,
+    };
+}
+
+/* --------------------------------
+   All-time data access
+----------------------------------*/
+function listAllWeekKeys(){
+    const keys = [];
+    for(let i = 0; i < localStorage.length; i++){
+        const k = localStorage.key(i);
+        if(k && k.startsWith(STORAGE_PREFIX)) keys.push(k);
+    }
+    return keys;
+}
+
+function getAllCompletedGames(){
+    const games = [];
+    listAllWeekKeys().forEach(k => {
+        const week = safeParse(k);
+        if(!week || !Array.isArray(week.games)) return;
+        week.games.forEach(g => {
+            if(g.score != null) games.push({ ...g, weekId: week.weekId });
+        });
+    });
+    return games;
+}
+
+/* --------------------------------
+   Stats calculation
+----------------------------------*/
+function computeStats(games){
+    if(!games.length) return null;
+
+    const scores = games.map(g => g.score);
+    const total = scores.reduce((s, v) => s + v, 0);
+    const avg = Math.round(total / scores.length);
+    const high = Math.max(...scores);
+    const low = Math.min(...scores);
+
+    // First-ball stats: analyze frame-by-frame
+    let totalFirstBalls = 0;
+    let strikes = 0;
+    let spares = 0;
+    let splits = 0;
+    let opens = 0;
+    let pinCounts = {};  // pinsLeft count after first ball
+    let totalPinsFirstBall = 0;
+
+    games.forEach(g => {
+        if(!g.frames) return;
+        g.frames.forEach((frame, fi) => {
+            if(!frame.shots || !frame.shots.length) return;
+            const shot1 = frame.shots[0];
+            const knocked = 10 - (shot1.pinsLeft ? shot1.pinsLeft.length : 0);
+            totalFirstBalls++;
+            totalPinsFirstBall += knocked;
+
+            if(knocked === 10){
+                strikes++;
+            } else {
+                const left = shot1.pinsLeft ? shot1.pinsLeft.length : (10 - knocked);
+                const key = String(left);
+                pinCounts[key] = (pinCounts[key] || 0) + 1;
+
+                // Detect splits: pin 1 (headpin) down + non-adjacent pins remaining
+                if(shot1.pinsLeft && !shot1.pinsLeft.includes(1) && shot1.pinsLeft.length >= 2){
+                    splits++;
+                }
+
+                // Spare or open (check second shot)
+                if(frame.shots.length >= 2){
+                    const shot2 = frame.shots[1];
+                    const knocked2 = 10 - (shot2.pinsLeft ? shot2.pinsLeft.length : 0);
+                    if(fi < 9){
+                        if(knocked + knocked2 === 10) spares++;
+                        else opens++;
+                    } else {
+                        // 10th frame: first two shots
+                        if(knocked + knocked2 >= 10) spares++;
+                        else opens++;
+                    }
+                }
+            }
+        });
+    });
+
+    const strikeRate = totalFirstBalls > 0 ? Math.round((strikes / totalFirstBalls) * 100) : 0;
+    const spareRate = (totalFirstBalls - strikes) > 0 ? Math.round((spares / (totalFirstBalls - strikes)) * 100) : 0;
+    const avgFirstBall = totalFirstBalls > 0 ? (totalPinsFirstBall / totalFirstBalls).toFixed(1) : '0';
+    const splitsPerGame = games.length > 0 ? (splits / games.length).toFixed(1) : '0';
+
+    // 3-game averages (group sequential games into sets of 3)
+    let seriesScores = [];
+    // Group by week
+    const byWeek = {};
+    games.forEach(g => {
+        const wk = g.weekId || 'unknown';
+        if(!byWeek[wk]) byWeek[wk] = [];
+        byWeek[wk].push(g.score);
+    });
+    Object.values(byWeek).forEach(weekScores => {
+        if(weekScores.length === 3){
+            seriesScores.push(weekScores[0] + weekScores[1] + weekScores[2]);
+        }
+    });
+    const avgSeries = seriesScores.length > 0 ? Math.round(seriesScores.reduce((s, v) => s + v, 0) / seriesScores.length) : null;
+    const highSeries = seriesScores.length > 0 ? Math.max(...seriesScores) : null;
+
+    // Pin-leave distribution (top entries)
+    const pinLeaves = Object.entries(pinCounts)
+        .map(([pins, count]) => ({ pins: parseInt(pins), count }))
+        .sort((a, b) => b.count - a.count);
+
+    return {
+        games: games.length,
+        avg, high, low,
+        strikeRate, spareRate,
+        avgFirstBall, splitsPerGame,
+        avgSeries, highSeries,
+        pinLeaves,
+        opens,
     };
 }
 
@@ -847,6 +1010,7 @@ function renderAll(){
     renderGameSlots(week);
     renderWeekAvg(week);
     renderStartButton(week);
+    renderStats(week);
 }
 
 function renderGameSlots(week){
@@ -908,6 +1072,67 @@ function renderStartButton(week){
     } else {
         btn.disabled = false;
         btn.textContent = '+ Start Game ' + (week.games.length + 1);
+    }
+}
+
+/* --------------------------------
+   Stats rendering
+----------------------------------*/
+function renderStats(week){
+    const body = $('statsBody');
+    const title = $('statsTitle');
+    if(!body) return;
+
+    const allGames = getAllCompletedGames();
+    const hasActiveGame = week.games.some(g => g.score == null && g.frames && g.frames.some(f => f.shots.length > 0));
+
+    if(!allGames.length){
+        title.textContent = 'Career Stats';
+        body.innerHTML = '<div class="stats-empty">No completed games yet.<br>Start a game to begin tracking your stats.</div>';
+        return;
+    }
+
+    const stats = computeStats(allGames);
+    if(!stats) return;
+
+    if(hasActiveGame){
+        // Compact view: just the key numbers
+        title.textContent = 'Career';
+        body.innerHTML = `
+            <div class="stats-panel compact">
+                <div class="stat-box highlight"><div class="sv">${stats.avg}</div><div class="sl">Average</div></div>
+                <div class="stat-box"><div class="sv">${stats.high}</div><div class="sl">High Game</div></div>
+                <div class="stat-box"><div class="sv">${stats.strikeRate}%</div><div class="sl">Strikes</div></div>
+                <div class="stat-box"><div class="sv">${stats.spareRate}%</div><div class="sl">Spare Conv.</div></div>
+            </div>`;
+    } else {
+        // Full stats view
+        title.textContent = 'Career Stats \u2014 ' + stats.games + ' Game' + (stats.games !== 1 ? 's' : '');
+        let html = '<div class="stats-panel">';
+        html += `<div class="stat-box highlight"><div class="sv">${stats.avg}</div><div class="sl">Average</div></div>`;
+        html += `<div class="stat-box"><div class="sv">${stats.high}</div><div class="sl">High Game</div></div>`;
+        html += `<div class="stat-box"><div class="sv">${stats.low}</div><div class="sl">Low Game</div></div>`;
+        html += `<div class="stat-box"><div class="sv">${stats.strikeRate}%</div><div class="sl">Strike Rate</div></div>`;
+        html += `<div class="stat-box"><div class="sv">${stats.spareRate}%</div><div class="sl">Spare Conversion</div></div>`;
+        html += `<div class="stat-box"><div class="sv">${stats.avgFirstBall}</div><div class="sl">Avg 1st Ball Pins</div></div>`;
+        html += `<div class="stat-box"><div class="sv">${stats.splitsPerGame}</div><div class="sl">Splits / Game</div></div>`;
+        html += `<div class="stat-box"><div class="sv">${stats.opens}</div><div class="sl">Total Opens</div></div>`;
+
+        if(stats.avgSeries != null){
+            html += `<div class="stat-box highlight"><div class="sv">${stats.avgSeries}</div><div class="sl">Avg 3-Game Series</div></div>`;
+            html += `<div class="stat-box"><div class="sv">${stats.highSeries}</div><div class="sl">High Series</div></div>`;
+        }
+
+        // Pin leave distribution (top 3)
+        if(stats.pinLeaves.length){
+            const top = stats.pinLeaves.slice(0, 2);
+            top.forEach(pl => {
+                html += `<div class="stat-box"><div class="sv">${pl.count}</div><div class="sl">${pl.pins}-Pin Leaves</div></div>`;
+            });
+        }
+
+        html += '</div>';
+        body.innerHTML = html;
     }
 }
 
@@ -983,20 +1208,16 @@ function renderScorecard(game){
         html += '<div class="sc-shots-row">';
 
         if(f < 9){
-            // 2 shot boxes
             const s1 = shotDisplay(frame, 0, f);
             const s2 = shotDisplay(frame, 1, f);
-
-            // For a strike, first box empty, second box shows X
             if(s1 === 'X'){
-                html += `<div class="sc-shot-box"></div>`;
-                html += `<div class="sc-shot-box strike">X</div>`;
+                html += '<div class="sc-shot-box"></div>';
+                html += '<div class="sc-shot-box strike">X</div>';
             } else {
                 html += `<div class="sc-shot-box ${shotBoxClass(s1)}">${s1}</div>`;
                 html += `<div class="sc-shot-box ${shotBoxClass(s2)}">${s2}</div>`;
             }
         } else {
-            // 10th frame: 3 shot boxes
             const s1 = shotDisplay(frame, 0, f);
             const s2 = shotDisplay(frame, 1, f);
             const s3 = shotDisplay(frame, 2, f);
@@ -1039,11 +1260,8 @@ function renderShotEntry(game){
     $('standingPos').value = '';
     $('targetBoard').value = '';
 
-    // Strike button: only when all 10 pins available
     $('strikeBtn').style.display = state.pinsStanding.length === 10 ? 'block' : 'none';
 
-    // Status text
-    const knocked = 10 - state.pinsStanding.length;
     const ballNum = frame.shots.length + 1;
     if(ballNum === 1){
         $('shotStatus').innerHTML = 'Tap pins that are <b>still standing</b> after your throw';
@@ -1069,9 +1287,9 @@ function renderPinDiagram(available){
         row.forEach(pin => {
             if(available.includes(pin)){
                 const standing = state.pinsStanding.includes(pin);
-                html += `<button class="pin ${standing ? 'standing' : ''}" data-pin="${pin}">${pin}</button>`;
+                html += `<button class="pin ${standing ? 'standing' : ''}" data-pin="${pin}" type="button">${pin}</button>`;
             } else {
-                html += `<button class="pin knocked" data-pin="${pin}" disabled>${pin}</button>`;
+                html += `<button class="pin knocked" data-pin="${pin}" type="button" disabled>${pin}</button>`;
             }
         });
         html += '</div>';
@@ -1089,9 +1307,7 @@ function renderPinDiagram(available){
                 state.pinsStanding.push(pin);
                 btn.classList.add('standing');
             }
-            // Update status
-            const totalStanding = state.pinsStanding.length;
-            const totalKnocked = available.length - totalStanding;
+            const totalKnocked = available.length - state.pinsStanding.length;
             $('shotStatus').innerHTML = `<b>${totalKnocked}</b> pin${totalKnocked !== 1 ? 's' : ''} knocked down`;
         });
     });
@@ -1150,25 +1366,23 @@ function startNewGame(){
    Event Bindings
 ----------------------------------*/
 function bindEvents(){
-    $('weekPrev').addEventListener('click', () => {
+    $('weekPrev').onclick = function(){
         state.weekId = offsetWeek(state.weekId, -1);
         renderAll();
-    });
-    $('weekNext').addEventListener('click', () => {
+    };
+    $('weekNext').onclick = function(){
         state.weekId = offsetWeek(state.weekId, 1);
         renderAll();
-    });
+    };
 
-    $('startGameBtn').addEventListener('click', startNewGame);
-
-    $('modalClose').addEventListener('click', closeModal);
-    $('gameModal').addEventListener('click', (e) => {
+    $('startGameBtn').onclick = startNewGame;
+    $('modalClose').onclick = closeModal;
+    $('gameModal').onclick = function(e){
         if(e.target === $('gameModal')) closeModal();
-    });
-
-    $('recordBtn').addEventListener('click', recordShot);
-    $('strikeBtn').addEventListener('click', handleStrike);
-    $('doneBtn').addEventListener('click', closeModal);
+    };
+    $('recordBtn').onclick = recordShot;
+    $('strikeBtn').onclick = handleStrike;
+    $('doneBtn').onclick = closeModal;
 }
 
 /* --------------------------------
