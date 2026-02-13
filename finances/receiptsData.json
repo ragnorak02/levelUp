@@ -2891,19 +2891,533 @@
   "tax": 0.0,
   "total": 29.20,
   "notes": "Walmart receipt - gift card redemption, 02/04/26 16:49"
+},
+{
+  "id": "receipt_starbucks_20260204_mobile",
+  "date": "2026-02-04",
+  "store": "Starbucks",
+  "storeLocation": "Glenmont Plaza",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Mobile Order",
+      "code": "",
+      "price": 6.10,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 6.10,
+      "pricePerUnit": 6.10
+    }
+  ],
+  "subtotal": 6.10,
+  "tax": 0.0,
+  "total": 6.10,
+  "notes": "Starbucks mobile order — 11.3★ earned"
+},
+{
+  "id": "receipt_traderjoes_20260206",
+  "date": "2026-02-06",
+  "store": "Trader Joe's",
+  "storeLocation": "388 Feura Bush Rd, Glenmont, NY 12077 (Store #0579)",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Spizzico Di Pizza",
+      "code": "",
+      "price": 3.99,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Trader Joe's",
+      "storePrice": 3.99,
+      "pricePerUnit": 3.99
+    },
+    {
+      "name": "R-Salad Baby Spinach Organic",
+      "code": "",
+      "price": 2.29,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Trader Joe's",
+      "storePrice": 2.29,
+      "pricePerUnit": 2.29
+    },
+    {
+      "name": "Cucumbers Persian (1 lb)",
+      "code": "",
+      "price": 2.49,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Trader Joe's",
+      "storePrice": 2.49,
+      "pricePerUnit": 2.49
+    },
+    {
+      "name": "Rice Cakes Korean Tteok",
+      "code": "",
+      "price": 3.99,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Grains",
+      "store": "Trader Joe's",
+      "storePrice": 3.99,
+      "pricePerUnit": 3.99
+    }
+  ],
+  "subtotal": 12.76,
+  "tax": 0.0,
+  "total": 12.76,
+  "notes": "Trader Joe's receipt — 02/06/2026 16:45"
+},
+{
+  "id": "receipt_walmart_20260206",
+  "date": "2026-02-06",
+  "store": "Walmart",
+  "storeLocation": "Walmart Glenmont, NY (ST# 3583)",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Whole Milk",
+      "code": "093966513000",
+      "price": 6.26,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 6.26,
+      "pricePerUnit": 6.26
+    },
+    {
+      "name": "GF BLK Cheddar",
+      "code": "014100054670",
+      "price": 7.98,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Walmart",
+      "storePrice": 7.98,
+      "pricePerUnit": 7.98
+    },
+    {
+      "name": "Kiwi (2 lb)",
+      "code": "756110195750",
+      "price": 4.62,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 4.62,
+      "pricePerUnit": 4.62
+    },
+    {
+      "name": "Strawberries",
+      "code": "854877007000",
+      "price": 5.96,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 5.96,
+      "pricePerUnit": 5.96
+    },
+    {
+      "name": "NE12LFRBRWN (Brown Eggs, 12ct)",
+      "code": "815652004180",
+      "price": 5.74,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 5.74,
+      "pricePerUnit": 5.74
+    }
+  ],
+  "subtotal": 30.56,
+  "tax": 0.0,
+  "total": 30.56,
+  "notes": "Walmart receipt - gift card redemption, 02/06/26 16:28"
+},
+{
+  "id": "receipt_starbucks_20260206_mobile",
+  "date": "2026-02-06",
+  "store": "Starbucks",
+  "storeLocation": "Glenmont Plaza",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Mobile Order",
+      "code": "",
+      "price": 3.25,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 3.25,
+      "pricePerUnit": 3.25
+    }
+  ],
+  "subtotal": 3.25,
+  "tax": 0.0,
+  "total": 3.25,
+  "notes": "Starbucks mobile order — 6.5★ earned"
+},
+{
+  "id": "receipt_starbucks_20260207_0630",
+  "date": "2026-02-07",
+  "store": "Starbucks",
+  "storeLocation": "Glenmont Plaza",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Mobile Order",
+      "code": "",
+      "price": 6.10,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 6.10,
+      "pricePerUnit": 6.10
+    }
+  ],
+  "subtotal": 6.10,
+  "tax": 0.0,
+  "total": 6.10,
+  "notes": "Starbucks mobile order — 11.3★ earned"
+},
+{
+  "id": "receipt_starbucks_20260207_mobile2",
+  "date": "2026-02-07",
+  "store": "Starbucks",
+  "storeLocation": "Glenmont Plaza",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Mobile Order",
+      "code": "",
+      "price": 9.35,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 9.35,
+      "pricePerUnit": 9.35
+    }
+  ],
+  "subtotal": 9.35,
+  "tax": 0.0,
+  "total": 9.35,
+  "notes": "Starbucks mobile order — 17.8★ earned"
+},
+{
+  "id": "receipt_starbucks_20260208_mobile",
+  "date": "2026-02-08",
+  "store": "Starbucks",
+  "storeLocation": "Glenmont Plaza",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Mobile Order",
+      "code": "",
+      "price": 6.10,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 6.10,
+      "pricePerUnit": 6.10
+    }
+  ],
+  "subtotal": 6.10,
+  "tax": 0.0,
+  "total": 6.10,
+  "notes": "Starbucks mobile order — 11.3★ earned"
+},
+{
+  "id": "receipt_starbucks_20260208_instore",
+  "date": "2026-02-08",
+  "store": "Starbucks",
+  "storeLocation": "Glenmont Plaza",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "In-Store Order",
+      "code": "",
+      "price": 9.14,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 9.14,
+      "pricePerUnit": 9.14
+    }
+  ],
+  "subtotal": 9.14,
+  "tax": 0.0,
+  "total": 9.14,
+  "notes": "Starbucks in-store order — 17.4★ earned"
+},
+{
+  "id": "receipt_walmart_20260210",
+  "date": "2026-02-10",
+  "store": "Walmart",
+  "storeLocation": "Walmart Glenmont, NY (ST# 3583)",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Bananas",
+      "code": "000000004011",
+      "price": 1.57,
+      "quantity": 1,
+      "weight": 3.13,
+      "unit": "lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "pricePerPound": 0.50
+    },
+    {
+      "name": "Onions",
+      "code": "050269041360",
+      "price": 5.03,
+      "quantity": 1,
+      "weight": 3.42,
+      "unit": "lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "pricePerPound": 1.47
+    },
+    {
+      "name": "OV Gallon Milk (2%)",
+      "code": "093966009380",
+      "price": 6.67,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 6.67,
+      "pricePerUnit": 6.67
+    },
+    {
+      "name": "Mandarin Oranges (3 lb bag)",
+      "code": "399734002360",
+      "price": 3.57,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 3.57,
+      "pricePerUnit": 3.57
+    },
+    {
+      "name": "Reese's Peanut Butter Cups (12pk)",
+      "code": "034000405310",
+      "price": 3.16,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Walmart",
+      "storePrice": 3.16,
+      "pricePerUnit": 3.16
+    },
+    {
+      "name": "Grape Tomatoes",
+      "code": "751666881050",
+      "price": 2.27,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 2.27,
+      "pricePerUnit": 2.27
+    },
+    {
+      "name": "Cosmic Crisp Apples",
+      "code": "304305035070",
+      "price": 5.69,
+      "quantity": 1,
+      "weight": 3.27,
+      "unit": "lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "pricePerPound": 1.74
+    },
+    {
+      "name": "Avocado",
+      "code": "000000004225",
+      "price": 4.08,
+      "quantity": 6,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 0.68,
+      "pricePerUnit": 0.68,
+      "notes": "6 at 1 for $0.68"
+    },
+    {
+      "name": "Cucumber",
+      "code": "711069440320",
+      "price": 0.68,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 0.68,
+      "pricePerUnit": 0.68
+    }
+  ],
+  "subtotal": 32.72,
+  "tax": 0.25,
+  "total": 32.97,
+  "notes": "Walmart receipt - gift card redemption, 02/10/26 15:35"
+},
+{
+  "id": "receipt_starbucks_20260210_mobile",
+  "date": "2026-02-10",
+  "store": "Starbucks",
+  "storeLocation": "Glenmont Plaza",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Mobile Order",
+      "code": "",
+      "price": 6.10,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 6.10,
+      "pricePerUnit": 6.10
+    }
+  ],
+  "subtotal": 6.10,
+  "tax": 0.0,
+  "total": 6.10,
+  "notes": "Starbucks mobile order — 11.3★ earned"
+},
+{
+  "id": "receipt_starbucks_20260211_mobile",
+  "date": "2026-02-11",
+  "store": "Starbucks",
+  "storeLocation": "Glenmont Plaza",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Mobile Order",
+      "code": "",
+      "price": 6.10,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 6.10,
+      "pricePerUnit": 6.10
+    }
+  ],
+  "subtotal": 6.10,
+  "tax": 0.0,
+  "total": 6.10,
+  "notes": "Starbucks mobile order — 11.3★ earned"
+},
+{
+  "id": "receipt_walmart_20260213",
+  "date": "2026-02-13",
+  "store": "Walmart",
+  "storeLocation": "Walmart Glenmont, NY (ST# 3583)",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "OV Gallon Milk (2%)",
+      "code": "093966005860",
+      "price": 6.67,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 6.67,
+      "pricePerUnit": 6.67
+    },
+    {
+      "name": "Cosmic Crisp Apples",
+      "code": "804305035070",
+      "price": 6.25,
+      "quantity": 1,
+      "weight": 3.59,
+      "unit": "lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "pricePerPound": 1.74
+    },
+    {
+      "name": "Cucumber",
+      "code": "711069440620",
+      "price": 1.36,
+      "quantity": 2,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 0.68,
+      "pricePerUnit": 0.68,
+      "notes": "2 at 1 for $0.68"
+    },
+    {
+      "name": "Arnold Whole Grains Oatnut Bread",
+      "code": "073410013550",
+      "price": 3.98,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Bakery",
+      "store": "Walmart",
+      "storePrice": 3.98,
+      "pricePerUnit": 3.98
+    },
+    {
+      "name": "NE12LFRBRWN (Brown Eggs, 12ct)",
+      "code": "815652004180",
+      "price": 4.96,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 4.96,
+      "pricePerUnit": 4.96
+    },
+    {
+      "name": "NE12LFRBRWN (Brown Eggs, 12ct)",
+      "code": "815652004180",
+      "price": 4.96,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 4.96,
+      "pricePerUnit": 4.96
+    }
+  ],
+  "subtotal": 28.18,
+  "tax": 0.0,
+  "total": 28.18,
+  "notes": "Walmart receipt - gift card redemption, 02/13/26 10:08"
 }
 
-]
-,
+],
   "metadata": {
     "version": "1.0",
-    "lastUpdated": "2026-01-17",
-    "totalReceipts": 15,
-    "totalItems": 128,
-    "totalSpent": 637.46,
+    "lastUpdated": "2026-02-13",
+    "totalReceipts": 28,
+    "totalItems": 162,
+    "totalSpent": 808.42,
     "stores": [
       "Trader Joe's",
-      "Walmart"
+      "Walmart",
+      "Starbucks"
     ]
   }
 }

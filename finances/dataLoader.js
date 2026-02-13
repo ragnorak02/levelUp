@@ -16,7 +16,7 @@
   };
   
   // Bump this whenever receiptsData.json changes so all devices refresh localStorage
-  const CURRENT_VERSION = '1.3';
+  const CURRENT_VERSION = '1.4';
 
   // Expose a stable loader object so pages can reliably await seeding/merging.
   // Pages should: await window.FinancesDataLoader.ready
