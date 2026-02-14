@@ -3405,19 +3405,79 @@
   "tax": 0.0,
   "total": 28.18,
   "notes": "Walmart receipt - gift card redemption, 02/13/26 10:08"
+},
+
+{
+  "id": "receipt_ktownplaza_20260214",
+  "date": "2026-02-14",
+  "store": "K-Town Plaza",
+  "storeLocation": "K-Town Plaza",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Kimchi",
+      "price": 22.00,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "K-Town Plaza",
+      "storePrice": 22.00,
+      "pricePerUnit": 22.00
+    },
+    {
+      "name": "Chocolate Moon Pie",
+      "price": 5.00,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "K-Town Plaza",
+      "storePrice": 5.00,
+      "pricePerUnit": 5.00
+    }
+  ],
+  "subtotal": 27.00,
+  "tax": 0.0,
+  "total": 27.00,
+  "notes": "K-Town Plaza receipt — 02/14/2026"
+},
+
+{
+  "id": "receipt_starbucks_20260214_mobile",
+  "date": "2026-02-14",
+  "store": "Starbucks",
+  "storeLocation": "Glenmont Plaza",
+  "category": "Cafe",
+  "items": [
+    {
+      "name": "Mobile Order",
+      "code": "",
+      "price": 6.10,
+      "quantity": 1,
+      "category": "Cafe",
+      "subcategory": "Coffee",
+      "store": "Starbucks",
+      "storePrice": 6.10,
+      "pricePerUnit": 6.10
+    }
+  ],
+  "subtotal": 6.10,
+  "tax": 0.0,
+  "total": 6.10,
+  "notes": "Starbucks mobile order — 11.3★ earned"
 }
 
 ],
   "metadata": {
     "version": "1.0",
-    "lastUpdated": "2026-02-13",
-    "totalReceipts": 28,
-    "totalItems": 162,
-    "totalSpent": 808.42,
+    "lastUpdated": "2026-02-14",
+    "totalReceipts": 30,
+    "totalItems": 166,
+    "totalSpent": 841.52,
     "stores": [
       "Trader Joe's",
       "Walmart",
-      "Starbucks"
+      "Starbucks",
+      "K-Town Plaza"
     ]
   }
 }
