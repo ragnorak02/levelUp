@@ -44,30 +44,23 @@
 
   /* top cards */
   #powerCard{grid-column: span 3}
-  #lastWorkoutCard{grid-column: span 9; display:grid; grid-template-columns: 1.15fr 1fr; gap:12px}
+  #lastWorkoutCard{grid-column: span 9}
   .val{display:flex; align-items:baseline; gap:8px; font-size:1.6rem; font-weight:700}
   .trend{font-size:.8rem; color:var(--muted)}
     
-/* Today's Workout tiles (compact, square-ish) */
-.meta-tiles{display:flex; gap:8px; flex-wrap:wrap; align-items:stretch; margin-top:6px}
-.tile{
-  background:#0f1720;
-  border:1px solid var(--ring);
-  border-radius:12px;
+/* Workout header bar (blue tinted) */
+.workout-header{
+  background:rgba(30,58,95,.45);
+  border:1px solid rgba(59,130,246,.25);
+  border-radius:10px;
   padding:8px 10px;
-  min-width:84px;
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-  justify-content:center;
-  text-align:center;
-  color:var(--muted);
-  font-size:.82rem;
+  margin-bottom:6px;
 }
-.tile b{color:var(--ink); font-size:1rem}
-.tile .t-label{font-size:.72rem; letter-spacing:.02em}
-  .ex-list{display:grid; gap:6px}
-  .cta-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.workout-stats{display:flex; gap:14px; margin-top:4px}
+.wstat{display:flex; align-items:baseline; gap:5px; font-size:.82rem; color:var(--muted)}
+.wstat b{color:var(--ink); font-size:.95rem}
+  .ex-list{display:flex; flex-direction:column; gap:4px}
+  .cta-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px}
   .cta{
     all:unset; cursor:pointer; background:linear-gradient(90deg, var(--accent), #22c55e);
     color:#04130a; padding:.65rem .9rem; border-radius:10px; font-weight:700; box-shadow:0 6px 20px rgba(34,197,94,.25)
@@ -128,10 +121,9 @@
 
   /* Workout navigation */
   .workout-nav{
-    display:flex; 
-    align-items:center; 
-    gap:8px; 
-    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
   }
   .nav-btn{
     all:unset; 
@@ -203,7 +195,6 @@
     #powerCard{grid-column:span 12}
     #lastWorkoutCard{grid-column:span 12}
     .calendar{grid-column:span 12}
-    #lastWorkoutCard{grid-template-columns:1fr}
   }
   @media (max-width: 480px){
     .wrap{gap:8px; padding:8px 8px 12px}
@@ -215,43 +206,33 @@
     :root{ --cal-font:.85rem; --cal-count:.7rem }
   }
 
-  /* Grouped exercise list (no reps) */
-  .group-chip {
+  /* Exercise list: 2-column rows */
+  .ex-row{
     display:flex;
-    align-items:flex-start;
-    flex-wrap:wrap;
-    gap:8px 10px;
-    padding:8px 10px;
+    align-items:center;
+    justify-content:space-between;
+    padding:7px 10px;
     border:1px dashed #223143;
-    border-radius:10px;
+    border-radius:8px;
     background:#0f141b;
-    margin-bottom:6px;
   }
-
-  .group-chip h4{
-    margin:0;
-    font-size:.95rem;
-    color:#e8eef6;
-    flex:0 0 auto;
+  .ex-bp{
+    font-size:.88rem;
+    font-weight:650;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    gap:5px;
   }
-
-  .group-chip .names{
-    flex:1 1 100%;
-    color:#9fb0c7;
-    font-size:.9rem;
-    white-space:normal;
-    overflow:visible;
-    word-break:break-word;
+  .ex-bp .bp-dot{
+    width:8px; height:8px;
+    border-radius:3px;
+    display:inline-block;
   }
-
-  .group-chip .count{
-    margin-left:auto;
-    font-size:.8rem;
-    color:#9fb0c7;
-    border:1px solid #213043;
-    border-radius:999px;
-    padding:2px 8px;
-    background:#0c1117;
+  .ex-name{
+    font-size:.88rem;
+    color:var(--ink);
+    text-align:right;
   }
 
   #lastWorkoutCard { overflow-x: hidden; }
@@ -290,7 +271,7 @@
 </head>
 <body>
   <header>
-    <button class="home" onclick="location.href='../main.html'"></button>
+    <button class="home" onclick="location.href='../main.html'" aria-label="Menu">☰</button>
     <h1>Power Up!</h1>
     <div style="width:60px"></div>
   </header>
@@ -312,23 +293,21 @@
         </article>
 
       <article class="card" id="lastWorkoutCard">
-        <div>
+        <div class="workout-header">
           <div class="workout-nav">
             <button class="nav-btn" id="prevWorkout">←</button>
             <h3 id="workoutPanelTitle">Today's Workout</h3>
             <button class="nav-btn" id="nextWorkout">→</button>
           </div>
-          <div class="meta-tiles">
-  <div class="tile"><div class="t-label">Total</div><b id="lastVolume">—</b></div>
-  <div class="tile"><div class="t-label">Exercises</div><b id="lastMoves">—</b></div>
-</div>
-<div class="ex-list" id="exList"></div>
+          <div class="workout-stats">
+            <div class="wstat"><span>Total</span> <b id="lastVolume">—</b></div>
+            <div class="wstat"><span>Exercises</span> <b id="lastMoves">—</b></div>
+          </div>
         </div>
+        <div class="ex-list" id="exList"></div>
         <div class="cta-row">
-          <button class="cta" id="startToday">Start Today's Workout</button>
+          <button class="cta" id="startToday">Start Workout</button>
           <button class="ghost" id="analytics">Analytics</button>
-          <button class="ghost" id="importDataBtn" style="color:#4caf50; border-color:rgba(76,175,80,.3)">Import Data</button>
-          <input type="file" id="importFileInput" accept=".json" style="display:none">
         </div>
       </article>
 
@@ -491,7 +470,7 @@ function renderWorkoutPanel(){
   // Update button text
   const startBtn = document.getElementById('startToday');
   if (isToday) {
-    startBtn.textContent = inProgress ? 'Continue Workout' : 'Start Today\'s Workout';
+    startBtn.textContent = inProgress ? 'Continue Workout' : 'Start Workout';
   } else if (workout.exercises.length > 0) {
     startBtn.textContent = 'View Workout';
   } else {
@@ -502,21 +481,25 @@ function renderWorkoutPanel(){
   title.textContent = isToday ? 'Today\'s Workout' : shortDate(selectedWorkoutDate);
   document.getElementById('lastVolume').textContent = totalVolume(workout).toLocaleString()+' lb';
   document.getElementById('lastMoves').textContent = workout.exercises.length;
-  // Grouped list
+  // 2-column exercise rows
   const exList = document.getElementById('exList');
   exList.innerHTML = '';
-  const groups = new Map();
+  const seen = new Set();
   workout.exercises.forEach(ex=>{
     const bp = ex.bodyPart || 'Other';
     const name = ex.name || 'Exercise';
-    if(!groups.has(bp)) groups.set(bp, new Set());
-    groups.get(bp).add(name);
-  });
-  [...groups.entries()].forEach(([bp, nameSet])=>{
-    const names = [...nameSet];
+    const key = bp + '|' + name;
+    if(seen.has(key)) return;
+    seen.add(key);
     const row = document.createElement('div');
-    row.className = 'group-chip';
-    row.innerHTML = `<h4>${bp}</h4><div class="names" title="${names.join(', ')}">${names.join(', ')}</div><span class="count">${names.length}</span>`;
+    row.className = 'ex-row';
+    const bpLower = bp.toLowerCase();
+    const dotColor = bpLower.includes('chest') || bpLower.includes('pec') ? 'var(--mg-chest)' :
+                     bpLower.includes('back') || bpLower.includes('lat') ? 'var(--mg-back)' :
+                     bpLower.includes('leg') || bpLower.includes('quad') || bpLower.includes('ham') || bpLower.includes('glute') || bpLower.includes('calf') ? 'var(--mg-legs)' :
+                     bpLower.includes('shoulder') || bpLower.includes('delt') ? 'var(--mg-shoulders)' :
+                     'var(--muted)';
+    row.innerHTML = `<div class="ex-bp"><span class="bp-dot" style="background:${dotColor}"></span>${bp}</div><div class="ex-name">${name}</div>`;
     exList.appendChild(row);
   });
 }
@@ -700,37 +683,6 @@ document.getElementById('analytics').addEventListener('click', ()=>{
   window.location.href = 'analytics.html';
 });
 
-// Import data
-document.getElementById('importDataBtn').addEventListener('click', ()=>{
-  document.getElementById('importFileInput').click();
-});
-document.getElementById('importFileInput').addEventListener('change', (e)=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev){
-    try{
-      const data = JSON.parse(ev.target.result);
-      if(!Array.isArray(data)){
-        alert('Invalid file: expected a JSON array of workouts.');
-        return;
-      }
-      let added = 0, skipped = 0;
-      data.forEach(day => {
-        if(!day || !day.date || !/^\d{4}-\d{2}-\d{2}$/.test(day.date)) return;
-        const key = 'powerUp:' + day.date;
-        if(localStorage.getItem(key)){ skipped++; return; }
-        try{ localStorage.setItem(key, JSON.stringify(day)); added++; }catch(err){}
-      });
-      alert(`Import complete!\n${added} workout(s) added.\n${skipped} skipped (already exist).`);
-      if(added > 0) location.reload();
-    }catch(err){
-      alert('Failed to parse file: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
-});
 
 
 // Workout navigation
