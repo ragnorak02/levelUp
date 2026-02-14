@@ -327,6 +327,8 @@
         <div class="cta-row">
           <button class="cta" id="startToday">Start Today's Workout</button>
           <button class="ghost" id="analytics">Analytics</button>
+          <button class="ghost" id="importDataBtn" style="color:#4caf50; border-color:rgba(76,175,80,.3)">Import Data</button>
+          <input type="file" id="importFileInput" accept=".json" style="display:none">
         </div>
       </article>
 
@@ -696,6 +698,38 @@ document.getElementById('startToday').addEventListener('click', ()=>{
 
 document.getElementById('analytics').addEventListener('click', ()=>{
   window.location.href = 'analytics.html';
+});
+
+// Import data
+document.getElementById('importDataBtn').addEventListener('click', ()=>{
+  document.getElementById('importFileInput').click();
+});
+document.getElementById('importFileInput').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!Array.isArray(data)){
+        alert('Invalid file: expected a JSON array of workouts.');
+        return;
+      }
+      let added = 0, skipped = 0;
+      data.forEach(day => {
+        if(!day || !day.date || !/^\d{4}-\d{2}-\d{2}$/.test(day.date)) return;
+        const key = 'powerUp:' + day.date;
+        if(localStorage.getItem(key)){ skipped++; return; }
+        try{ localStorage.setItem(key, JSON.stringify(day)); added++; }catch(err){}
+      });
+      alert(`Import complete!\n${added} workout(s) added.\n${skipped} skipped (already exist).`);
+      if(added > 0) location.reload();
+    }catch(err){
+      alert('Failed to parse file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
 });
 
 

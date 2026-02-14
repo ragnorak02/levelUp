@@ -210,6 +210,8 @@
   <div class="wrap">
     <div class="top-actions">
       <button class="download-btn" id="downloadDataBtn">Download Data</button>
+      <button class="download-btn" id="importDataBtn" style="background:rgba(76,175,80,.15); color:#4caf50; border:1px solid rgba(76,175,80,.3)">Import Data</button>
+      <input type="file" id="importFileInput" accept=".json" style="display:none">
     </div>
 
     <div id="overviewTab" class="tab-content">
@@ -578,6 +580,29 @@ function exportAllWorkoutData(){
   }
   all.sort((a,b)=> new Date(a.date) - new Date(b.date));
   return all;
+}
+
+function importWorkoutData(jsonArray){
+  if(!Array.isArray(jsonArray)){
+    alert('Invalid file: expected a JSON array of workouts.');
+    return {added:0, skipped:0};
+  }
+  let added = 0, skipped = 0;
+  jsonArray.forEach(day => {
+    if(!day || !day.date || !/^\d{4}-\d{2}-\d{2}$/.test(day.date)) return;
+    const key = 'powerUp:' + day.date;
+    if(localStorage.getItem(key)){
+      skipped++;
+      return;
+    }
+    try{
+      localStorage.setItem(key, JSON.stringify(day));
+      added++;
+    }catch(e){
+      console.error('Failed to import ' + day.date, e);
+    }
+  });
+  return {added, skipped};
 }
 
 function downloadJSON(filename, dataObj){
@@ -1242,6 +1267,31 @@ function renderOverview(){
       const data = exportAllWorkoutData();
       const stamp = new Date().toISOString().slice(0,10).replace(/-/g,'');
       downloadJSON(`powerup-workouts-${stamp}.json`, data);
+    });
+  }
+
+  // Import button
+  const importBtn = document.getElementById('importDataBtn');
+  const importFile = document.getElementById('importFileInput');
+  if(importBtn && importFile && !importBtn.dataset.bound){
+    importBtn.dataset.bound = '1';
+    importBtn.addEventListener('click', ()=> importFile.click());
+    importFile.addEventListener('change', (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev){
+        try{
+          const data = JSON.parse(ev.target.result);
+          const {added, skipped} = importWorkoutData(data);
+          alert(`Import complete!\n${added} workout(s) added.\n${skipped} skipped (already exist).`);
+          if(added > 0) location.reload();
+        }catch(err){
+          alert('Failed to parse file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      importFile.value = '';
     });
   }
 }
