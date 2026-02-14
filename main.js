@@ -669,11 +669,10 @@ function renderBowlDashboard(){
     if(games.length){
       recentEl.style.display = 'flex';
       recentEl.innerHTML = games.map((g, i) =>
-        `<div class="bowl-game"><div class="bg-score">${g.score}</div><div class="bg-label">Game ${games.length - i}</div></div>`
+        `<div class="bowl-game"><div class="bg-score">${g.score}</div><div class="bg-label">G${games.length - i}</div></div>`
       ).join('');
     } else {
-      recentEl.style.display = 'block';
-      recentEl.innerHTML = '<div class="bowl-empty">No games yet — bowl your first game!</div>';
+      recentEl.style.display = 'none';
     }
   }
 }
@@ -1027,44 +1026,18 @@ function saveCalendarEvent(){
 /* --------------------------------
    Travel: dashboard preview
 ----------------------------------*/
-function loadTrips(){
-    try { return JSON.parse(localStorage.getItem('travel:trips') || '[]'); }
-    catch { return []; }
-}
+/* --------------------------------
+   Calendar Toggle
+----------------------------------*/
+let calendarVisible = false;
 
-function renderTravelDashboard(){
-    const section = $('travelSection');
-    if(!section) return;
-
-    // Always show travel section
-    section.style.display = 'block';
-
-    const trips = loadTrips();
-    // Find nearest upcoming or current trip (endDate >= today)
-    const upcoming = trips
-        .filter(t => t.endDate >= todayISO)
-        .sort((a, b) => a.startDate < b.startDate ? -1 : 1);
-
-    const trip = upcoming[0];
-
-    const meta = $('travelMeta');
-    if(meta){
-        const sd = new Date(trip.startDate + 'T12:00:00');
-        const label = sd.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-        meta.textContent = trip.name + ' · ' + label;
-    }
-
-    const chips = $('travelInterests');
-    if(chips){
-        const interests = (trip.interests || []).slice(0, 3);
-        if(interests.length){
-            chips.innerHTML = interests.map(i =>
-                `<span class="travel-interest-chip">${escapeHtml(i.name)}</span>`
-            ).join('');
-        } else {
-            chips.innerHTML = '';
-        }
-    }
+function toggleCalendar(){
+  calendarVisible = !calendarVisible;
+  const card = $('calendarCard');
+  const btn = $('calToggleBtn');
+  if(card) card.style.display = calendarVisible ? 'block' : 'none';
+  if(btn) btn.classList.toggle('active', calendarVisible);
+  if(calendarVisible) renderCalendarGrid();
 }
 
 /* --------------------------------
@@ -1230,6 +1203,10 @@ function bindButtons(){
   if(openNutrition){
     openNutrition.addEventListener('click', ()=> location.href = './nutrition/index.html');
   }
+
+  // Calendar toggle
+  const calToggle = $('calToggleBtn');
+  if(calToggle) calToggle.addEventListener('click', toggleCalendar);
 
   // Finance month navigation
   const monthPrev = $('financeMonthPrev');
@@ -1472,8 +1449,7 @@ function renderAll(){
   renderHistory();
   renderFinanceDonut();
   renderBowlDashboard();
-  renderCalendarGrid();
-  renderTravelDashboard();
+  if(calendarVisible) renderCalendarGrid();
 }
 
 /* --------------------------------

@@ -48,20 +48,20 @@
           </div>
 
           <div class="bowl-section">
-            <a class="char-action bowl-link" href="./bowling/index.html">
-              <span>🎳 Bowl</span>
-              <span class="bowl-avg" id="bowlAvg"></span>
+            <a class="bowl-compact" href="./bowling/index.html">
+              <span class="bowl-icon">🎳</span>
+              <span class="bowl-info">
+                <span class="bowl-title">Bowl</span>
+                <span class="bowl-avg" id="bowlAvg"></span>
+              </span>
             </a>
-            <div class="char-action bowl-recent" id="bowlRecent" style="display:none;"></div>
+            <div class="bowl-scores" id="bowlRecent" style="display:none;"></div>
           </div>
 
-          <div class="travel-section" id="travelSection" style="display:none;">
-            <div class="travel-link-row">
-              <a class="micon travel" href="./travel/index.html" title="Open Travel module">✈️</a>
-              <span class="travel-label">Travel</span>
-              <span class="travel-meta" id="travelMeta"></span>
-            </div>
-            <div class="travel-interests" id="travelInterests"></div>
+          <div class="quick-icons">
+            <a class="qicon" href="./travel/index.html" title="Travel">✈️</a>
+            <button class="qicon" id="calToggleBtn" title="Toggle Calendar">📅</button>
+            <a class="qicon" href="#" title="Recipes">🍳</a>
           </div>
         </div>
       </div>
@@ -106,8 +106,8 @@
       </div>
     </section>
 
-    <!-- CALENDAR -->
-    <section class="card calendar-card">
+    <!-- CALENDAR (hidden by default, toggled by calendar icon) -->
+    <section class="card calendar-card" id="calendarCard" style="display:none;">
       <div class="calendar-head">
         <div class="calendar-nav">
           <button class="cal-nav-btn" id="calMonthPrev" type="button" title="Previous month">◀</button>
