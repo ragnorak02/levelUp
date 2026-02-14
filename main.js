@@ -1477,12 +1477,14 @@ function bindButtons(){
     monthPrev.addEventListener('click', ()=>{
       financeState.monthOffset -= 1;
       renderFinanceDonut();
+      if(focusModule === 'finance') renderFocusHeader();
     });
   }
   if(monthNext){
     monthNext.addEventListener('click', ()=>{
       financeState.monthOffset += 1;
       renderFinanceDonut();
+      if(focusModule === 'finance') renderFocusHeader();
     });
   }
 
@@ -1539,6 +1541,7 @@ function bindButtons(){
       document.querySelectorAll('.fin-filter').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       renderFinanceDonut();
+      if(focusModule === 'finance') renderFocusHeader();
     });
   });
 }
@@ -1623,6 +1626,11 @@ function updateFocusMode(){
     detail.style.display = 'block';
     detail.classList.add('visible');
   }
+
+  // Re-render finance chart now that canvas is visible (fixes first-render zero-size bug)
+  if(focusModule === 'finance'){
+    requestAnimationFrame(() => renderFinanceDonut());
+  }
 }
 
 function renderFocusHeader(){
@@ -1672,15 +1680,19 @@ function renderFocusHeader(){
   }
 
   if(focusModule === 'finance'){
+    const offset = financeState.monthOffset;
     const receipts = loadFinanceReceipts();
     const entries = receiptsToEntries(receipts);
-    const monthEntries = filterByMonthOffset(entries, 0);
+    const monthEntries = filterByMonthOffset(entries, offset);
     const total = monthEntries.reduce((s,e) => s + (Number(e.amount) || 0), 0);
-    const todayEntries = entries.filter(e => e.date === todayISO);
-    const todayTotal = todayEntries.reduce((s,e) => s + (Number(e.amount) || 0), 0);
+    const monthLabel = getMonthLabel(offset);
 
-    stats.push(`<b>${formatMoney2(todayTotal)}</b> today`);
-    stats.push(`<b>${formatMoney(total)}</b> this month`);
+    if(offset === 0){
+      const todayEntries = entries.filter(e => e.date === todayISO);
+      const todayTotal = todayEntries.reduce((s,e) => s + (Number(e.amount) || 0), 0);
+      stats.push(`<b>${formatMoney2(todayTotal)}</b> today`);
+    }
+    stats.push(`<b>${formatMoney(total)}</b> ${monthLabel}`);
     stats.push(`<b>${monthEntries.length}</b> items`);
   }
 
