@@ -672,7 +672,8 @@ function renderBowlDashboard(){
         `<div class="bowl-game"><div class="bg-score">${g.score}</div><div class="bg-label">Game ${games.length - i}</div></div>`
       ).join('');
     } else {
-      recentEl.style.display = 'none';
+      recentEl.style.display = 'block';
+      recentEl.innerHTML = '<div class="bowl-empty">No games yet — bowl your first game!</div>';
     }
   }
 }
@@ -1035,6 +1036,9 @@ function renderTravelDashboard(){
     const section = $('travelSection');
     if(!section) return;
 
+    // Always show travel section
+    section.style.display = 'block';
+
     const trips = loadTrips();
     // Find nearest upcoming or current trip (endDate >= today)
     const upcoming = trips
@@ -1042,12 +1046,6 @@ function renderTravelDashboard(){
         .sort((a, b) => a.startDate < b.startDate ? -1 : 1);
 
     const trip = upcoming[0];
-    if(!trip){
-        section.style.display = 'none';
-        return;
-    }
-
-    section.style.display = 'block';
 
     const meta = $('travelMeta');
     if(meta){
@@ -1073,15 +1071,14 @@ function renderTravelDashboard(){
    Render: top + modules + history
 ----------------------------------*/
 function renderTop(){
-  setText('overallLevel', 'Lv ' + getLevel());
+  setText('levelNum', String(getLevel()));
 }
 
 function renderModulesAndCharacter(){
   const exPower = volumeSince(getExerciseResetAt());
 
-  setText('exPowerNow', exPower.toLocaleString());
-  setText('exPowerMax', EX_MAX.toLocaleString());
-  setWidth('exFill', pct(exPower, EX_MAX));
+  // Thin level bar (replaces old power strip)
+  setWidth('levelFill', pct(exPower, EX_MAX));
 
   setHeight('modExFill', pct(exPower, EX_MAX));
 
@@ -1093,18 +1090,17 @@ function renderModulesAndCharacter(){
   setHeight('modNutFill', pct(lastNutritionCal, nutTargets.dailyCalories));
 
   const ready = exPower >= EX_MAX && EX_MAX > 0;
-  const statusText = $('statusText');
-  const dot = $('statusDot');
   const btn = $('exTransform');
-
-  if(statusText) statusText.textContent = ready ? 'READY' : 'Charging';
-  if(dot) dot.classList.toggle('ready', ready);
 
   if(btn){
     btn.classList.toggle('ready', ready);
     btn.disabled = !ready;
+    btn.style.display = ready ? '' : 'none';
     btn.style.cursor = ready ? 'pointer' : 'not-allowed';
   }
+
+  // "Improved today" highlight
+  highlightImprovedToday();
 }
 
 function renderHistory(){
@@ -1178,38 +1174,40 @@ function renderHistory(){
 /* --------------------------------
    UI Bindings
 ----------------------------------*/
+/* --------------------------------
+   Focus Mode State
+----------------------------------*/
+let focusModule = null; // 'exercise' | 'study' | 'finance' | 'nutrition' | null
+
+const MODULE_FOCUS_MAP = {
+  exercise: 'exercise',
+  study: 'study',
+  finance: 'finance',
+  nutrition: 'nutrition'
+};
+
 function bindNav(){
-  const go = (url)=>{ location.href = url; };
+  // Icons are now <a> links in HTML — no JS navigation needed.
+  // Stop icon clicks from bubbling to the modv bar (which triggers focus).
+  document.querySelectorAll('.micon').forEach(icon => {
+    icon.addEventListener('click', (e) => e.stopPropagation());
+  });
 
-  const modExercise = $('modExercise');
-  const modStudy = $('modStudy');
-  const modFin = $('modFin');
-
-  if(modExercise){
-    modExercise.addEventListener('click', ()=> go('./powerUp/index.html'));
-    modExercise.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./powerUp/index.html'); });
-  }
-  if(modStudy){
-    modStudy.addEventListener('click', ()=> go('./study/studyHome.html'));
-    modStudy.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./study/studyHome.html'); });
-  }
-  if(modFin){
-    modFin.addEventListener('click', ()=> go('./finances/index.html'));
-    modFin.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./finances/index.html'); });
-  }
-
-  const modNutrition = $('modNutrition');
-  if(modNutrition){
-    modNutrition.addEventListener('click', ()=> go('./nutrition/index.html'));
-    modNutrition.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') go('./nutrition/index.html'); });
-  }
-
+  // Module bar click → focus mode
+  document.querySelectorAll('.modv[data-module]').forEach(modv => {
+    modv.addEventListener('click', () => {
+      const mod = modv.dataset.module;
+      if(focusModule === mod){
+        focusModule = null; // toggle off
+      } else {
+        focusModule = mod;
+      }
+      updateFocusMode();
+    });
+  });
 }
 
 function bindButtons(){
-  const refreshBtn = $('refreshBtn');
-  if(refreshBtn) refreshBtn.addEventListener('click', ()=>location.reload());
-
   const exTransform = $('exTransform');
   if(exTransform) exTransform.addEventListener('click', doExerciseTransform);
 
@@ -1305,6 +1303,163 @@ function bindButtons(){
       renderFinanceDonut();
     });
   });
+}
+
+/* --------------------------------
+   Improved Today Detection
+----------------------------------*/
+function highlightImprovedToday(){
+  // Exercise: has a workout logged today
+  const exToday = !!safeParse('powerUp:' + todayISO);
+  const modEx = $('modExercise');
+  if(modEx) modEx.classList.toggle('improved-today', exToday);
+
+  // Study: has flashcard activity today
+  let studyToday = false;
+  try{
+    const flashData = JSON.parse(localStorage.getItem('levelupFlashData') || '{}');
+    if(flashData.cards){
+      studyToday = flashData.cards.some(c => c.lastStudied && c.lastStudied.startsWith(todayISO));
+    }
+  }catch(e){}
+  const modSt = $('modStudy');
+  if(modSt) modSt.classList.toggle('improved-today', studyToday);
+
+  // Finance: has receipt dated today
+  let finToday = false;
+  try{
+    const receipts = JSON.parse(localStorage.getItem('finances:receipts') || '[]');
+    finToday = receipts.some(r => r.date === todayISO);
+  }catch(e){}
+  const modFn = $('modFin');
+  if(modFn) modFn.classList.toggle('improved-today', finToday);
+
+  // Nutrition: has meal logged today
+  let nutToday = false;
+  try{
+    const meals = JSON.parse(localStorage.getItem('nutrition:meals') || '[]');
+    nutToday = meals.some(m => m.date === todayISO);
+  }catch(e){}
+  const modNt = $('modNutrition');
+  if(modNt) modNt.classList.toggle('improved-today', nutToday);
+}
+
+/* --------------------------------
+   Focus Mode
+----------------------------------*/
+function updateFocusMode(){
+  // Update modv selected state
+  document.querySelectorAll('.modv[data-module]').forEach(m => {
+    m.classList.toggle('selected', m.dataset.module === focusModule);
+  });
+
+  // Hide all detail panels
+  document.querySelectorAll('.detail-panel').forEach(p => {
+    p.style.display = 'none';
+    p.classList.remove('visible');
+  });
+
+  const focusPanel = $('focusPanel');
+
+  if(!focusModule){
+    if(focusPanel) focusPanel.style.display = 'none';
+    return;
+  }
+
+  // Show focus panel with stats
+  if(focusPanel) focusPanel.style.display = 'block';
+  renderFocusHeader();
+
+  // Show matching detail panel
+  const detail = document.querySelector(`.detail-panel[data-focus="${focusModule}"]`);
+  if(detail){
+    detail.style.display = 'block';
+    detail.classList.add('visible');
+  }
+}
+
+function renderFocusHeader(){
+  const header = $('focusHeader');
+  if(!header) return;
+
+  const names = { exercise: 'Strength', study: 'Wisdom', finance: 'Finance', nutrition: 'Nutrition' };
+  const name = names[focusModule] || focusModule;
+
+  let stats = [];
+
+  if(focusModule === 'exercise'){
+    const exPower = volumeSince(getExerciseResetAt());
+    const todayWork = safeParse('powerUp:' + todayISO);
+    const todayVol = todayWork ? dayTotals(normalizeDay(todayWork)).volume : 0;
+    const allW = getAllWorkouts();
+    const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+    const weekISO = weekAgo.toISOString().slice(0,10);
+    const weekWorkouts = allW.filter(w => w.date >= weekISO).length;
+    const remaining = Math.max(0, EX_MAX - exPower);
+
+    stats.push(`<b>${todayVol.toLocaleString()}</b> vol today`);
+    stats.push(`<b>${weekWorkouts}</b> workouts this week`);
+    stats.push(`<b>${remaining.toLocaleString()}</b> vol to transform`);
+  }
+
+  if(focusModule === 'study'){
+    let total = 0, mastered = 0;
+    try{
+      const flashData = JSON.parse(localStorage.getItem('levelupFlashData') || '{}');
+      if(flashData.cards){
+        total = flashData.cards.length;
+        mastered = flashData.cards.filter(c => c.state === 'mastered').length;
+      }
+    }catch(e){}
+    stats.push(`<b>${total}</b> total cards`);
+    stats.push(`<b>${mastered}</b> mastered`);
+  }
+
+  if(focusModule === 'finance'){
+    const receipts = loadFinanceReceipts();
+    const entries = receiptsToEntries(receipts);
+    const monthEntries = filterByMonthOffset(entries, 0);
+    const total = monthEntries.reduce((s,e) => s + (Number(e.amount) || 0), 0);
+    const todayEntries = entries.filter(e => e.date === todayISO);
+    const todayTotal = todayEntries.reduce((s,e) => s + (Number(e.amount) || 0), 0);
+
+    stats.push(`<b>${formatMoney2(todayTotal)}</b> today`);
+    stats.push(`<b>${formatMoney(total)}</b> this month`);
+    stats.push(`<b>${monthEntries.length}</b> items`);
+  }
+
+  if(focusModule === 'nutrition'){
+    const meals = loadNutritionMeals();
+    const todayMeals = meals.filter(m => m.date === todayISO);
+    let cal = 0, pro = 0;
+    todayMeals.forEach(m => { if(m.totals){ cal += m.totals.calories || 0; pro += m.totals.protein || 0; } });
+    const targets = loadNutritionTargets();
+    const streak = getNutritionStreak(meals);
+
+    stats.push(`<b>${Math.round(cal)}</b> / ${targets.dailyCalories} cal today`);
+    stats.push(`<b>${Math.round(pro)}g</b> protein`);
+    if(streak > 0) stats.push(`<b>${streak}</b> day streak`);
+  }
+
+  header.innerHTML = `
+    <span class="focus-attr-name">${name}</span>
+    <div class="focus-stats">
+      ${stats.map(s => `<span class="focus-stat">${s}</span>`).join('')}
+    </div>
+  `;
+}
+
+function getNutritionStreak(meals){
+  let streak = 0;
+  const d = new Date();
+  while(true){
+    const iso = d.toISOString().slice(0,10);
+    if(meals.some(m => m.date === iso)){
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else break;
+  }
+  return streak;
 }
 
 /* --------------------------------

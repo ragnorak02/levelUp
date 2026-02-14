@@ -22,14 +22,6 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="title">Journal</div>
-
-      <div class="top-right">
-        <div class="pill" title="Overall character level (increases on transform)">
-          <small>Overall</small>
-          <span id="overallLevel">Lv 1</span>
-        </div>
-        <button class="btn" id="refreshBtn" title="Refresh dashboard">↻ Refresh</button>
-      </div>
     </div>
   </div>
 
@@ -49,20 +41,10 @@
             />
           </div>
 
-          <div class="power-strip">
-            <div class="power-strip-inner">
-              <div class="power-strip-left">
-                <div class="dot" id="statusDot"></div>
-                <div class="power-strip-label" id="statusText">Charging</div>
-              </div>
-              <div class="power-strip-bar">
-                <div class="bar"><div class="fill ex" id="exFill"></div></div>
-              </div>
-              <div class="power-strip-num">
-                <span id="exPowerNow">0</span> / <span id="exPowerMax">50000</span>
-              </div>
-              <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform</button>
-            </div>
+          <div class="level-strip">
+            <span class="level-num" id="levelNum">1</span>
+            <div class="level-bar"><div class="level-fill" id="levelFill"></div></div>
+            <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform</button>
           </div>
 
           <div class="bowl-section">
@@ -74,10 +56,11 @@
           </div>
 
           <div class="travel-section" id="travelSection" style="display:none;">
-            <a class="char-action travel-link" href="./travel/index.html">
-              <span>✈ Travel</span>
+            <div class="travel-link-row">
+              <a class="micon travel" href="./travel/index.html" title="Open Travel module">✈️</a>
+              <span class="travel-label">Travel</span>
               <span class="travel-meta" id="travelMeta"></span>
-            </a>
+            </div>
             <div class="travel-interests" id="travelInterests"></div>
           </div>
         </div>
@@ -87,31 +70,39 @@
       <div class="card modules-card">
         <div class="card-inner">
           <div class="modules-grid" aria-label="Modules">
-            <div class="modv" id="modExercise" role="button" tabindex="0" title="Open Exercise module">
-              <div class="modv-top"><div class="micon ex">💪</div></div>
+            <div class="modv" id="modExercise" data-module="exercise">
+              <div class="modv-top"><a class="micon ex" href="./powerUp/index.html" title="Open Exercise module">💪</a></div>
               <div class="vbar"><div class="vfill ex" id="modExFill"></div></div>
               <div class="abbr">Str</div>
             </div>
 
-            <div class="modv" id="modStudy" role="button" tabindex="0" title="Open Study module">
-              <div class="modv-top"><div class="micon study">📘</div></div>
+            <div class="modv" id="modStudy" data-module="study">
+              <div class="modv-top"><a class="micon study" href="./study/studyHome.html" title="Open Study module">📘</a></div>
               <div class="vbar"><div class="vfill study" id="modStudyFill"></div></div>
               <div class="abbr">Wis</div>
             </div>
 
-            <div class="modv" id="modFin" role="button" tabindex="0" title="Open Finances module">
-              <div class="modv-top"><div class="micon fin">💰</div></div>
+            <div class="modv" id="modFin" data-module="finance">
+              <div class="modv-top"><a class="micon fin" href="./finances/index.html" title="Open Finances module">💰</a></div>
               <div class="vbar"><div class="vfill fin" id="modFinFill"></div></div>
               <div class="abbr">Fin</div>
             </div>
 
-            <div class="modv" id="modNutrition" role="button" tabindex="0" title="Open Nutrition module">
-              <div class="modv-top"><div class="micon nut">🍎</div></div>
+            <div class="modv" id="modNutrition" data-module="nutrition">
+              <div class="modv-top"><a class="micon nut" href="./nutrition/index.html" title="Open Nutrition module">🍎</a></div>
               <div class="vbar"><div class="vfill nut" id="modNutFill"></div></div>
               <div class="abbr">Nut</div>
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- FOCUS PANEL (shown when a module bar is tapped) -->
+    <section class="card focus-panel" id="focusPanel" style="display:none;">
+      <div class="card-inner">
+        <div class="focus-header" id="focusHeader"></div>
+        <div class="focus-body" id="focusBody"></div>
       </div>
     </section>
 
@@ -175,7 +166,7 @@
     </div>
 
     <!-- FINANCE: Grocery spending (compact) -->
-    <section class="card finance-card">
+    <section class="card finance-card detail-panel" data-focus="finance" style="display:none;">
       <div class="finance-header">
         <div class="finance-header-left">
           <button class="finance-nav-btn" id="financeMonthPrev" type="button" title="Previous month">◀</button>
@@ -207,7 +198,7 @@
     </section>
 
     <!-- NUTRITION: Daily summary -->
-    <section class="card nutrition-card" id="nutritionCard">
+    <section class="card nutrition-card detail-panel" data-focus="nutrition" id="nutritionCard" style="display:none;">
       <div class="card-inner">
         <div class="nutrition-head">
           <div>
@@ -244,8 +235,8 @@
       </div>
     </section>
 
-    <!-- Exercise History Section (leave logic as-is; still below) -->
-    <section class="card history">
+    <!-- Exercise History Section -->
+    <section class="card history detail-panel" data-focus="exercise" style="display:none;">
       <div class="card-inner">
         <div class="history-head">
           <div class="history-title">
