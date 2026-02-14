@@ -19,12 +19,6 @@
 </head>
 
 <body>
-  <div class="topbar">
-    <div class="topbar-inner">
-      <div class="title">Journal</div>
-    </div>
-  </div>
-
   <main class="wrap">
     <!-- TOP DASHBOARD ROW -->
     <section class="dash-top">
@@ -32,19 +26,26 @@
       <div class="card character-card">
         <div class="card-inner">
           <div class="character-frame" id="characterFrame">
-            <div class="avatar-badge" title="Character icon (replace later)">⚡</div>
             <div class="aura" aria-hidden="true"></div>
             <img
-              class="character-gif"
-              src="https://giffiles.alphacoders.com/220/220162.gif"
-              alt="Character GIF"
+              class="character-sprite"
+              id="characterSprite"
+              src="./images/character/character_frame_01.png"
+              alt="Character"
             />
           </div>
 
-          <div class="level-strip">
-            <span class="level-num" id="levelNum">1</span>
-            <div class="level-bar"><div class="level-fill" id="levelFill"></div></div>
-            <button class="transform-btn" id="exTransform" title="Unlocks when Exercise reaches max">Transform</button>
+          <div class="level-block">
+            <div class="level-row-title">
+              <button class="level-bolt-btn" id="exTransform" title="Power Up!">⚡</button>
+              <span class="level-label">Lv</span>
+              <span class="level-num" id="levelNum">1</span>
+              <span class="level-name" id="levelName">Novice</span>
+            </div>
+            <div class="level-row-bar">
+              <div class="level-bar"><div class="level-fill" id="levelFill"></div></div>
+              <span class="level-bar-badge" id="levelBadge">🛡️</span>
+            </div>
           </div>
 
           <div class="bowl-section">
@@ -54,14 +55,14 @@
                 <span class="bowl-title">Bowl</span>
                 <span class="bowl-avg" id="bowlAvg"></span>
               </span>
+              <div class="bowl-scores" id="bowlRecent" style="display:none;"></div>
             </a>
-            <div class="bowl-scores" id="bowlRecent" style="display:none;"></div>
           </div>
 
           <div class="quick-icons">
-            <a class="qicon" href="./travel/index.html" title="Travel">✈️</a>
+            <button class="qicon" id="travelToggleBtn" title="Travel">✈️</button>
             <button class="qicon" id="calToggleBtn" title="Toggle Calendar">📅</button>
-            <a class="qicon" href="#" title="Recipes">🍳</a>
+            <button class="qicon" id="recipesToggleBtn" title="Recipes">🍳</button>
           </div>
         </div>
       </div>
@@ -257,6 +258,25 @@
         </div>
 
         <div id="historyBody"></div>
+      </div>
+    </section>
+
+    <!-- TRAVEL: Dashboard preview -->
+    <section class="card travel-card detail-panel" data-focus="travel" style="display:none;">
+      <div class="card-inner">
+        <div class="travel-head"><div><b>Travel</b><span class="travel-sub" id="travelSub">No trips</span></div></div>
+        <div id="travelBody"></div>
+      </div>
+    </section>
+
+    <!-- RECIPES: Dashboard preview -->
+    <section class="card recipes-card detail-panel" data-focus="recipes" style="display:none;">
+      <div class="card-inner">
+        <div class="recipes-head"><div><b>Recipes</b><span class="recipes-sub" id="recipesSub">No recipes</span></div></div>
+        <div class="recipes-filter-row">
+          <input type="text" class="recipes-search" id="recipesSearch" placeholder="Search recipes..." />
+        </div>
+        <div id="recipesBody"></div>
       </div>
     </section>
   </main>

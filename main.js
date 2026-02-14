@@ -186,6 +186,9 @@ function flashTransform(){
   void frame.offsetWidth;
   frame.classList.add('transforming');
   setTimeout(()=>frame.classList.remove('transforming'), 950);
+
+  // Trigger power-up animation
+  triggerPowerUpAnimation();
 }
 
 function doExerciseTransform(){
@@ -200,6 +203,91 @@ function doExerciseTransform(){
 
   flashTransform();
   renderAll();
+}
+
+/* --------------------------------
+   Character Animation System
+----------------------------------*/
+const CHAR_FRAMES = 12;
+const CHAR_PATH = './images/character/character_frame_';
+const IDLE_FRAMES = [1, 2, 3, 4];
+const POWERUP_FRAMES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+const CHARGED_FRAMES = [8, 9, 10, 11, 12, 11, 10, 9]; // ping-pong
+
+const charState = {
+  mode: 'idle',        // 'idle' | 'powerup' | 'charged'
+  frameIdx: 0,
+  lastTick: 0,
+  rafId: null
+};
+
+// Preload all frames
+const charImages = [];
+for(let i = 1; i <= CHAR_FRAMES; i++){
+  const img = new Image();
+  img.src = `${CHAR_PATH}${String(i).padStart(2, '0')}.png`;
+  charImages.push(img);
+}
+
+function getCharFrameRate(){
+  if(charState.mode === 'idle') return 320;      // ms per frame — slow idle
+  if(charState.mode === 'powerup') return 120;   // faster power-up
+  if(charState.mode === 'charged') return 180;    // medium charged loop
+  return 320;
+}
+
+function getCharFrameList(){
+  if(charState.mode === 'idle') return IDLE_FRAMES;
+  if(charState.mode === 'powerup') return POWERUP_FRAMES;
+  if(charState.mode === 'charged') return CHARGED_FRAMES;
+  return IDLE_FRAMES;
+}
+
+function tickCharAnimation(timestamp){
+  const elapsed = timestamp - charState.lastTick;
+  const rate = getCharFrameRate();
+
+  if(elapsed >= rate){
+    charState.lastTick = timestamp;
+    const frames = getCharFrameList();
+    charState.frameIdx++;
+
+    // When powerup finishes, switch to charged loop
+    if(charState.mode === 'powerup' && charState.frameIdx >= frames.length){
+      charState.mode = 'charged';
+      charState.frameIdx = 0;
+    }
+
+    // Wrap index for looping modes
+    const list = getCharFrameList();
+    const idx = charState.frameIdx % list.length;
+    const frameNum = list[idx];
+
+    const sprite = $('characterSprite');
+    if(sprite){
+      sprite.src = charImages[frameNum - 1].src;
+    }
+  }
+
+  charState.rafId = requestAnimationFrame(tickCharAnimation);
+}
+
+function startCharAnimation(){
+  if(charState.rafId) cancelAnimationFrame(charState.rafId);
+  charState.lastTick = 0;
+  charState.rafId = requestAnimationFrame(tickCharAnimation);
+}
+
+function triggerPowerUpAnimation(){
+  charState.mode = 'powerup';
+  charState.frameIdx = 0;
+  charState.lastTick = 0;
+}
+
+function resetToIdle(){
+  charState.mode = 'idle';
+  charState.frameIdx = 0;
+  charState.lastTick = 0;
 }
 
 /* --------------------------------
@@ -1026,6 +1114,114 @@ function saveCalendarEvent(){
 /* --------------------------------
    Travel: dashboard preview
 ----------------------------------*/
+function loadTravelTrips(){
+  try { return JSON.parse(localStorage.getItem('travel:trips') || '[]'); }
+  catch { return []; }
+}
+
+function renderTravelCard(){
+  const trips = loadTravelTrips();
+  const sub = $('travelSub');
+  const body = $('travelBody');
+
+  if(sub){
+    sub.textContent = trips.length ? `${trips.length} trip${trips.length !== 1 ? 's' : ''}` : 'No trips';
+  }
+
+  if(!body) return;
+
+  if(!trips.length){
+    body.innerHTML = '<div class="empty">No trips saved yet. Add trips in the Travel module.</div>';
+    return;
+  }
+
+  // Sort by start date descending
+  const sorted = [...trips].sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''));
+
+  body.innerHTML = sorted.slice(0, 5).map(trip => {
+    const name = escapeHtml(trip.name || trip.title || 'Untitled Trip');
+    const start = trip.startDate || '';
+    const end = trip.endDate || '';
+    let dateLabel = '';
+    if(start && end){
+      const s = new Date(start + 'T12:00:00');
+      const e = new Date(end + 'T12:00:00');
+      dateLabel = s.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' – ' + e.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    } else if(start){
+      dateLabel = new Date(start + 'T12:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    }
+    const destCount = Array.isArray(trip.destinations) ? trip.destinations.length : 0;
+    const statsText = destCount > 0 ? `${destCount} dest.` : '';
+
+    return `<div class="travel-trip">
+      <div><div class="travel-trip-name">${name}</div><div class="travel-trip-dates">${escapeHtml(dateLabel)}</div></div>
+      <div class="travel-trip-stats">${escapeHtml(statsText)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* --------------------------------
+   Recipes: dashboard preview
+----------------------------------*/
+function loadDashboardRecipes(){
+  try { return JSON.parse(localStorage.getItem('nutrition:recipes') || '[]'); }
+  catch { return []; }
+}
+
+function renderRecipesCard(){
+  const recipes = loadDashboardRecipes();
+  const sub = $('recipesSub');
+  const body = $('recipesBody');
+  const searchEl = $('recipesSearch');
+  const query = (searchEl ? searchEl.value : '').trim().toLowerCase();
+
+  let filtered = recipes;
+  if(query){
+    filtered = recipes.filter(r => {
+      const name = (r.name || r.title || '').toLowerCase();
+      if(name.includes(query)) return true;
+      const ingredients = Array.isArray(r.ingredients) ? r.ingredients : [];
+      return ingredients.some(ing => {
+        const ingName = (typeof ing === 'string' ? ing : (ing.name || '')).toLowerCase();
+        return ingName.includes(query);
+      });
+    });
+  }
+
+  if(sub){
+    if(query && filtered.length !== recipes.length){
+      sub.textContent = `${filtered.length} of ${recipes.length} recipes`;
+    } else {
+      sub.textContent = recipes.length ? `${recipes.length} recipe${recipes.length !== 1 ? 's' : ''}` : 'No recipes';
+    }
+  }
+
+  if(!body) return;
+
+  if(!filtered.length){
+    body.innerHTML = query
+      ? '<div class="empty">No recipes match your search.</div>'
+      : '<div class="empty">No recipes saved yet. Add recipes in the Nutrition module.</div>';
+    return;
+  }
+
+  body.innerHTML = filtered.slice(0, 8).map(r => {
+    const name = escapeHtml(r.name || r.title || 'Untitled');
+    const cal = (r.totals && r.totals.calories) ? Math.round(r.totals.calories) : null;
+    const servings = r.servings || null;
+    const cost = (r.totals && r.totals.cost) ? r.totals.cost : null;
+
+    let meta = [];
+    if(cal != null && servings) meta.push(`${cal} cal / ${servings} serv`);
+    else if(cal != null) meta.push(`${cal} cal`);
+    if(cost != null) meta.push(formatMoney2(cost));
+
+    return `<div class="recipe-dash-card">
+      <div><div class="recipe-dash-name">${name}</div>${meta.length ? `<div class="recipe-dash-meta">${escapeHtml(meta.join(' · '))}</div>` : ''}</div>
+    </div>`;
+  }).join('');
+}
+
 /* --------------------------------
    Calendar Toggle
 ----------------------------------*/
@@ -1041,10 +1237,35 @@ function toggleCalendar(){
 }
 
 /* --------------------------------
+   Level Names & Badges
+----------------------------------*/
+const LEVEL_NAMES = [
+  'Novice','Adept','Scout','Warrior','Knight',
+  'Champion','Master','Grandmaster','Legend','Mythic'
+];
+const LEVEL_BADGES = ['🛡️','⚔️','🏹','🔥','👑','💎','🌟','⚜️','🐉','✨'];
+
+function getLevelName(level){
+  if(level <= 0) return LEVEL_NAMES[0];
+  if(level > LEVEL_NAMES.length) return LEVEL_NAMES[LEVEL_NAMES.length - 1];
+  return LEVEL_NAMES[level - 1];
+}
+
+function getLevelBadge(level){
+  if(level <= 0) return LEVEL_BADGES[0];
+  if(level > LEVEL_BADGES.length) return LEVEL_BADGES[LEVEL_BADGES.length - 1];
+  return LEVEL_BADGES[level - 1];
+}
+
+/* --------------------------------
    Render: top + modules + history
 ----------------------------------*/
 function renderTop(){
-  setText('levelNum', String(getLevel()));
+  const level = getLevel();
+  setText('levelNum', String(level));
+  setText('levelName', getLevelName(level));
+  const badgeEl = $('levelBadge');
+  if(badgeEl) badgeEl.textContent = getLevelBadge(level);
 }
 
 function renderModulesAndCharacter(){
@@ -1067,9 +1288,6 @@ function renderModulesAndCharacter(){
 
   if(btn){
     btn.classList.toggle('ready', ready);
-    btn.disabled = !ready;
-    btn.style.display = ready ? '' : 'none';
-    btn.style.cursor = ready ? 'pointer' : 'not-allowed';
   }
 
   // "Improved today" highlight
@@ -1156,7 +1374,9 @@ const MODULE_FOCUS_MAP = {
   exercise: 'exercise',
   study: 'study',
   finance: 'finance',
-  nutrition: 'nutrition'
+  nutrition: 'nutrition',
+  travel: 'travel',
+  recipes: 'recipes'
 };
 
 function bindNav(){
@@ -1182,7 +1402,18 @@ function bindNav(){
 
 function bindButtons(){
   const exTransform = $('exTransform');
-  if(exTransform) exTransform.addEventListener('click', doExerciseTransform);
+  if(exTransform){
+    exTransform.addEventListener('click', () => {
+      const exPower = volumeSince(getExerciseResetAt());
+      if(exPower >= EX_MAX){
+        doExerciseTransform();
+      } else {
+        // Play power-up animation preview, then reset to idle
+        triggerPowerUpAnimation();
+        setTimeout(resetToIdle, 3000);
+      }
+    });
+  }
 
   const openExercise = $('openExercise');
   if(openExercise){
@@ -1202,6 +1433,36 @@ function bindButtons(){
   const openNutrition = $('openNutrition');
   if(openNutrition){
     openNutrition.addEventListener('click', ()=> location.href = './nutrition/index.html');
+  }
+
+  // Travel toggle
+  const travelToggle = $('travelToggleBtn');
+  if(travelToggle){
+    travelToggle.addEventListener('click', () => {
+      focusModule = focusModule === 'travel' ? null : 'travel';
+      if(focusModule === 'travel') renderTravelCard();
+      updateFocusMode();
+    });
+  }
+
+  // Recipes toggle
+  const recipesToggle = $('recipesToggleBtn');
+  if(recipesToggle){
+    recipesToggle.addEventListener('click', () => {
+      focusModule = focusModule === 'recipes' ? null : 'recipes';
+      if(focusModule === 'recipes') renderRecipesCard();
+      updateFocusMode();
+    });
+  }
+
+  // Recipes search with debounce
+  const recipesSearch = $('recipesSearch');
+  if(recipesSearch){
+    let searchTimer = null;
+    recipesSearch.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => renderRecipesCard(), 150);
+    });
   }
 
   // Calendar toggle
@@ -1325,10 +1586,19 @@ function highlightImprovedToday(){
    Focus Mode
 ----------------------------------*/
 function updateFocusMode(){
-  // Update modv selected state
+  const isQiconFocus = focusModule === 'travel' || focusModule === 'recipes';
+  const isModvFocus = focusModule && !isQiconFocus;
+
+  // Update modv selected state — clear when a qicon is focused
   document.querySelectorAll('.modv[data-module]').forEach(m => {
-    m.classList.toggle('selected', m.dataset.module === focusModule);
+    m.classList.toggle('selected', isModvFocus && m.dataset.module === focusModule);
   });
+
+  // Update qicon active state — clear when a modv is focused
+  const travelBtn = $('travelToggleBtn');
+  const recipesBtn = $('recipesToggleBtn');
+  if(travelBtn) travelBtn.classList.toggle('active', focusModule === 'travel');
+  if(recipesBtn) recipesBtn.classList.toggle('active', focusModule === 'recipes');
 
   // Hide all detail panels
   document.querySelectorAll('.detail-panel').forEach(p => {
@@ -1359,8 +1629,17 @@ function renderFocusHeader(){
   const header = $('focusHeader');
   if(!header) return;
 
-  const names = { exercise: 'Strength', study: 'Wisdom', finance: 'Finance', nutrition: 'Nutrition' };
+  const names = { exercise: 'Strength', study: 'Wisdom', finance: 'Finance', nutrition: 'Nutrition', travel: 'Travel', recipes: 'Recipes' };
+  const hrefs = {
+    exercise: './powerUp/index.html',
+    study: './study/studyHome.html',
+    finance: './finances/index.html',
+    nutrition: './nutrition/index.html',
+    travel: './travel/index.html',
+    recipes: './nutrition/recipes.html'
+  };
   const name = names[focusModule] || focusModule;
+  const href = hrefs[focusModule] || '#';
 
   let stats = [];
 
@@ -1418,8 +1697,36 @@ function renderFocusHeader(){
     if(streak > 0) stats.push(`<b>${streak}</b> day streak`);
   }
 
+  if(focusModule === 'travel'){
+    const trips = loadTravelTrips();
+    const now = todayISO;
+    const upcoming = trips.filter(t => t.startDate && t.startDate > now);
+    stats.push(`<b>${trips.length}</b> trip${trips.length !== 1 ? 's' : ''}`);
+    if(upcoming.length){
+      stats.push(`<b>${upcoming.length}</b> upcoming`);
+      const nextTrip = upcoming.sort((a, b) => a.startDate.localeCompare(b.startDate))[0];
+      const daysUntil = Math.ceil((new Date(nextTrip.startDate) - new Date(now)) / 86400000);
+      if(daysUntil > 0) stats.push(`<b>${daysUntil}</b> days to next`);
+    }
+  }
+
+  if(focusModule === 'recipes'){
+    const recipes = loadDashboardRecipes();
+    let totalCal = 0;
+    let totalCost = 0;
+    recipes.forEach(r => {
+      if(r.totals){
+        totalCal += r.totals.calories || 0;
+        if(r.totals.cost) totalCost += r.totals.cost;
+      }
+    });
+    stats.push(`<b>${recipes.length}</b> recipe${recipes.length !== 1 ? 's' : ''}`);
+    if(totalCal > 0) stats.push(`<b>${Math.round(totalCal).toLocaleString()}</b> total cal`);
+    if(totalCost > 0) stats.push(`<b>${formatMoney2(totalCost)}</b> est. cost`);
+  }
+
   header.innerHTML = `
-    <span class="focus-attr-name">${name}</span>
+    <a class="focus-attr-name" href="${href}">${escapeHtml(name)}</a>
     <div class="focus-stats">
       ${stats.map(s => `<span class="focus-stat">${s}</span>`).join('')}
     </div>
@@ -1463,4 +1770,7 @@ function renderAll(){
   await ensureFinanceSeeded();
 
   renderAll();
+
+  // Start character idle animation
+  startCharAnimation();
 })();

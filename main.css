@@ -33,48 +33,18 @@ body{
   overflow-x:hidden;
 }
 
-/* Header */
-.topbar{
-  position:sticky;
-  top:0;
-  z-index:20;
-  backdrop-filter: blur(10px);
-  background: linear-gradient(180deg, rgba(11,15,20,.95), rgba(11,15,20,.75));
-  border-bottom: 1px solid var(--ring);
-}
-.topbar-inner{
-  width:min(980px, 100%);
-  margin:0 auto;
-  padding:10px 10px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-.title{
-  flex:1;
-  font-weight:950;
-  font-size:22px;
-  padding:10px 12px;
-  border-radius:12px;
-  color:var(--ink);
-  background:var(--card);
-  border:1px solid var(--ring);
-  box-shadow: var(--shadow);
-}
-
 /* Main */
 .wrap{
   width:min(980px, 100%);
   margin:0 auto;
-  padding:10px;
+  padding:6px;
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:8px;
 }
 .dash-top{
   display:flex;
-  gap:10px;
+  gap:8px;
   align-items:stretch;
 }
 .card{
@@ -88,7 +58,7 @@ body{
 
 /* Character */
 .character-card{flex:1; min-width:0; display:flex; flex-direction:column;}
-.character-card .card-inner{display:flex; flex-direction:column; flex:1; gap:6px;}
+.character-card .card-inner{display:flex; flex-direction:column; flex:1; gap:4px;}
 .section-label{
   font-weight:900;
   font-size:13px;
@@ -104,25 +74,12 @@ body{
   flex:1;
   min-height:120px;
 }
-.character-gif{
+.character-sprite{
   width:100%;
   height:100%;
   display:block;
   object-fit: cover;
-}
-.avatar-badge{
-  position:absolute;
-  top:8px; left:8px;
-  width:34px; height:34px;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.15);
-  background: rgba(19,26,34,.80);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-  box-shadow: 0 10px 18px rgba(0,0,0,.25);
-  user-select:none;
+  image-rendering: auto;
 }
 .aura{
   position:absolute;
@@ -131,7 +88,7 @@ body{
   pointer-events:none;
   background:
     radial-gradient(closest-side, rgba(255,255,255,.9), transparent 60%),
-    radial-gradient(closest-side, rgba(239,68,68,.55), transparent 62%),
+    radial-gradient(closest-side, rgba(45,212,191,.55), transparent 62%),
     radial-gradient(closest-side, rgba(59,130,246,.35), transparent 62%);
   filter: blur(10px);
   transform: scale(.98);
@@ -144,21 +101,70 @@ body{
   100%{opacity:0; transform:scale(1.06)}
 }
 
-/* Level strip (inside character card) */
-.level-strip{
+/* Level block (compact 2-row) */
+.level-block{
   display:flex;
-  align-items:center;
-  gap:10px;
-  padding:5px 10px;
+  flex-direction:column;
+  gap:4px;
+  padding:6px 8px;
   border-radius:12px;
   border:1px solid rgba(255,255,255,.10);
   background: rgba(255,255,255,.04);
 }
+.level-row-title{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.level-bolt-btn{
+  all:unset;
+  cursor:pointer;
+  width:28px; height:28px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  flex:0 0 auto;
+  opacity:.55;
+  transition: opacity .2s, background .2s, box-shadow .2s;
+}
+.level-bolt-btn.ready{
+  cursor:pointer;
+  opacity:1;
+  background: linear-gradient(135deg, rgba(245,158,11,.3), rgba(34,197,94,.3));
+  border-color: rgba(245,158,11,.35);
+  box-shadow: 0 0 10px rgba(245,158,11,.2);
+  animation: boltPulse 2s ease-in-out infinite;
+}
+.level-bolt-btn.ready:active{transform: translateY(1px)}
+@keyframes boltPulse{
+  0%,100%{box-shadow: 0 0 10px rgba(245,158,11,.2)}
+  50%{box-shadow: 0 0 16px rgba(245,158,11,.4)}
+}
+.level-label{
+  font-weight:900;
+  font-size:13px;
+  color:var(--muted);
+}
 .level-num{
   font-weight:1000;
-  font-size:20px;
+  font-size:18px;
   flex:0 0 auto;
   line-height:1;
+}
+.level-name{
+  font-weight:950;
+  font-size:14px;
+  color:var(--muted);
+  margin-left:2px;
+}
+.level-row-bar{
+  display:flex;
+  align-items:center;
+  gap:4px;
 }
 .level-bar{
   flex:1;
@@ -167,6 +173,7 @@ body{
   background: rgba(255,255,255,.08);
   border:1px solid rgba(255,255,255,.10);
   overflow:hidden;
+  position:relative;
 }
 .level-fill{
   height:100%;
@@ -176,39 +183,24 @@ body{
   background: linear-gradient(90deg, #22c55e 0%, #86efac 40%, #fbbf24 70%, #f59e0b 100%);
   box-shadow: 0 0 8px rgba(245,158,11,.25);
 }
-.transform-btn{
-  all:unset;
-  padding:8px 12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.12);
-  font-weight:950;
-  font-size:13px;
-  cursor:not-allowed;
-  opacity:.55;
-  background: rgba(255,255,255,.06);
-  white-space:nowrap;
+.level-bar-badge{
   flex:0 0 auto;
+  font-size:14px;
+  line-height:1;
+  opacity:.7;
 }
-.transform-btn.ready{
-  cursor:pointer;
-  opacity:1;
-  background: linear-gradient(90deg, rgba(34,197,94,.95), rgba(34,197,94,.72));
-  box-shadow: 0 10px 22px rgba(34,197,94,.24);
-  color: rgba(0,0,0,.82);
-}
-.transform-btn.ready:hover{filter: brightness(1.03)}
-.transform-btn.ready:active{transform: translateY(1px)}
 
 .bowl-section{
   display:flex;
   flex-direction:column;
-  gap:4px;
+  gap:0;
 }
 .bowl-compact{
   all:unset;
   cursor:pointer;
   display:flex;
   align-items:center;
+  flex-wrap:wrap;
   gap:8px;
   padding:6px 8px;
   border-radius:10px;
@@ -224,7 +216,9 @@ body{
 .bowl-scores{
   display:flex;
   gap:4px;
-  padding:0 4px;
+  flex:0 0 100%;
+  padding:0;
+  margin-top:2px;
 }
 .bowl-game{
   flex:1;
@@ -254,14 +248,14 @@ body{
 .qicon{
   all:unset;
   cursor:pointer;
-  width:42px; height:42px;
+  width:48px; height:48px;
   border-radius:12px;
   border:1px solid rgba(255,255,255,.10);
   background: rgba(255,255,255,.06);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:20px;
+  font-size:22px;
   text-decoration:none;
   transition: background .15s, border-color .15s;
 }
@@ -977,9 +971,131 @@ body{
 .detail-panel{display:none;}
 .detail-panel.visible{display:block;}
 
+/* Focus header link */
+a.focus-attr-name{
+  color:inherit;
+  text-decoration:none;
+  transition: color .15s;
+}
+a.focus-attr-name:hover{
+  color:#a78bfa;
+  text-decoration:underline;
+}
+
+/* Travel card */
+.travel-card .card-inner{padding:10px;}
+.travel-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.travel-head b{font-size:15px;}
+.travel-sub{
+  display:block;
+  color:var(--muted);
+  font-weight:800;
+  font-size:12px;
+  margin-top:2px;
+}
+.travel-trip{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(45,212,191,.15);
+  background: rgba(45,212,191,.06);
+  margin-bottom:6px;
+}
+.travel-trip-name{
+  font-weight:950;
+  font-size:13px;
+  color:var(--ink);
+}
+.travel-trip-dates{
+  color:var(--muted);
+  font-weight:800;
+  font-size:11px;
+  margin-top:2px;
+}
+.travel-trip-stats{
+  text-align:right;
+  font-weight:950;
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+/* Recipes card */
+.recipes-card .card-inner{padding:10px;}
+.recipes-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+.recipes-head b{font-size:15px;}
+.recipes-sub{
+  display:block;
+  color:var(--muted);
+  font-weight:800;
+  font-size:12px;
+  margin-top:2px;
+}
+.recipes-filter-row{
+  margin-bottom:8px;
+}
+.recipes-search{
+  width:100%;
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid var(--ring);
+  background: rgba(255,255,255,.06);
+  color:var(--ink);
+  font-family:inherit;
+  font-size:13px;
+  font-weight:800;
+  outline:none;
+}
+.recipes-search:focus{border-color: var(--nut);}
+.recipes-search::placeholder{color:var(--muted);}
+.recipe-dash-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(245,158,11,.15);
+  background: rgba(245,158,11,.06);
+  margin-bottom:6px;
+}
+.recipe-dash-name{
+  font-weight:950;
+  font-size:13px;
+  color:var(--ink);
+}
+.recipe-dash-meta{
+  color:var(--muted);
+  font-weight:800;
+  font-size:11px;
+  margin-top:2px;
+}
+.recipe-dash-stats{
+  text-align:right;
+  font-weight:950;
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
 @media (max-width: 480px){
-  .wrap{padding:6px;}
-  .card-inner{padding:8px;}
+  .wrap{padding:4px;}
+  .card-inner{padding:6px;}
   .modules-grid{gap:6px;}
   .modv{padding:8px 4px; gap:6px;}
   .micon{width:30px; height:30px; font-size:14px; border-radius:10px;}
@@ -989,6 +1105,10 @@ body{
   .cal-cell{min-height:34px;}
   .cal-num{font-size:11px;}
   .cal-grid{gap:2px; padding:4px 6px 8px;}
+  .level-block{padding:4px 6px;}
+  .level-bolt-btn{width:24px; height:24px; font-size:14px;}
+  .level-num{font-size:16px;}
+  .level-name{font-size:12px;}
 }
 @media (max-width: 360px){
   .modules-grid{gap:4px}
