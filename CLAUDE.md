@@ -22,6 +22,9 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 │   ├── budget.html, food.html, search.html
 │   ├── dataLoader.js         ← Seeds localStorage from receiptsData on first visit
 │   └── receiptsData.json     ← Receipt seed data
+├── tests/                    ← Automated tests & data seeding (see Testing section)
+│   ├── runner.html           ← Browser test runner
+│   └── nodeRunner.js         ← Terminal runner (node tests/nodeRunner.js)
 └── images/                   ← PNGs and GIFs (character, icons)
 ```
 
@@ -116,8 +119,89 @@ Namespaced with colon prefix:
 - try-catch around localStorage reads (non-fatal)
 - Graceful fallback when optional data files are missing
 
+## Testing & Data Seeding (`tests/`)
+
+### File Structure
+```
+tests/
+├── prng.js              ← Deterministic PRNG (mulberry32, seed-resettable)
+├── dataPools.js         ← Realistic value pools (exercises, stores, groceries, flashcards, etc.)
+├── seedGenerator.js     ← Data factory — generates full objects matching each localStorage schema
+├── seedInjector.js      ← Writes generated data into localStorage (reset or append mode)
+├── testFramework.js     ← Minimal assertion library (describe/it/assert)
+├── testSuiteData.js     ← Schema validation tests (30 tests)
+├── testSuiteAggregation.js ← Computation tests (10 tests)
+├── testSuiteUI.js       ← Data round-trip & append mode tests (10 tests)
+├── runner.html          ← Browser test runner UI (dark themed, click-to-run)
+└── nodeRunner.js        ← Terminal runner (node tests/nodeRunner.js)
+```
+
+### Running Tests
+- **Browser**: Open `tests/runner.html`, click "Run Tests" — safe, read-only, won't change data
+- **Terminal**: `node tests/nodeRunner.js` — mocks localStorage, runs all 62 tests, exits 0/1
+- **Seed Data**: Click "Seed Data" in runner.html (confirms before wiping) or call `SeedGenerator.generateFullDataset(42)` in console
+
+### Test Framework API
+```js
+describe('Suite Name', function() {
+    it('test name', function() {
+        assert.equal(actual, expected);      // strict ===
+        assert.deepEqual(a, b);             // JSON deep equality
+        assert.ok(val);                     // truthy
+        assert.throws(fn);                  // expects error
+        assert.arrayLength(arr, n);         // array length
+        assert.typeOf(val, 'string');       // typeof check
+        assert.hasKeys(obj, ['a', 'b']);    // key presence
+        assert.greaterThan(a, b);           // a > b
+        assert.includes(arr, val);          // array contains
+        assert.closeTo(a, b, delta);        // within delta
+    });
+});
+window.TestFramework.runAllSuites();        // returns { passed, failed, total }
+```
+
+### Seed Generator API
+```js
+// All functions use the deterministic PRNG — same seed = same data
+window.TestPRNG.reset(42);
+SeedGenerator.generateWorkout('2026-02-10');           // single workout
+SeedGenerator.generateReceipt('2026-02-10', 'Walmart'); // single receipt
+SeedGenerator.generateFlashcardSet(50);                 // 50 flashcards
+SeedGenerator.generateMeal('2026-02-10', 'Lunch');     // single meal
+SeedGenerator.generateNutritionDay('2026-02-10');      // 3-4 meals for one day
+SeedGenerator.generateTrip();                           // trip with destinations
+SeedGenerator.generateBowlingWeek('2026-W06');         // 3 games
+SeedGenerator.generateCalendarEvent('2026-02-10');     // single event
+SeedGenerator.generateFullDataset(42, {                // everything at once
+    workoutDays: 30, receiptCount: 18, flashcardCount: 50,
+    nutritionDays: 20, tripCount: 2, bowlingWeeks: 8, eventCount: 10
+});
+```
+
+### Seed Injector API
+```js
+SeedInjector.injectFullReset(dataset);  // clears all app data, writes dataset (confirms first)
+SeedInjector.injectAppend(dataset);     // merges new data alongside existing (skips duplicates)
+SeedInjector.clearAllData();            // wipes all known app keys (confirms first)
+SeedInjector.printDataSummary();        // console.table of key counts/sizes
+```
+
+### Adding New Tests
+1. Create a new `tests/testSuiteXxx.js` file
+2. Use `describe()` / `it()` / `assert.*` (globally available)
+3. Add `<script src="testSuiteXxx.js"></script>` to `runner.html` before the inline script
+4. Add `require('./testSuiteXxx.js');` to `nodeRunner.js` before the `runAllSuites()` call
+
+### Data Pools (`dataPools.js`)
+All exposed via `window.DataPools`:
+- `BODY_PARTS` (9), `EXERCISES_BY_PART` (map), `WEIGHT_RANGES`, `REP_RANGES`
+- `STORES` (10), `GROCERY_ITEMS` (40), `CAFE_ITEMS` (8), `RECEIPT_CATEGORIES`
+- `FLASH_PAIRS` (25 Korean vocab), `CARD_STATES` (5)
+- `INGREDIENTS` (20 with macros), `MEAL_NAMES` (4)
+- `TRIP_NAMES` (8), `DEST_NAMES` (15)
+- `EVENT_TITLES` (15), `EVENT_CATEGORIES` (5)
+
 ## Known Gaps
 - Study power meter on dashboard is hardcoded to 0% (not yet integrated)
-- No automated tests
 - No CI/CD pipeline
 - Mortgage/utility detection uses string matching (fragile)
