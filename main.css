@@ -18,6 +18,7 @@
   --fin:#22c55e;
   --nut:#f59e0b;
   --bowl:#a855f7;
+  --garden:#22c55e;
 }
 
 *{box-sizing:border-box}
@@ -251,6 +252,105 @@ body{
   font-size:8px;
   font-weight:800;
   color:var(--muted);
+}
+
+/* Mini carousel (bowling + garden) */
+.mini-carousel{
+  position:relative;
+  overflow:hidden;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+}
+.carousel-track{
+  display:flex;
+  transition: transform .3s ease;
+  width:100%;
+}
+.carousel-slide{
+  flex:0 0 100%;
+  min-width:0;
+}
+.carousel-slide .bowl-compact{
+  border:none;
+  border-radius:0;
+  background:transparent;
+}
+.carousel-arrow{
+  all:unset;
+  cursor:pointer;
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:2;
+  width:22px; height:22px;
+  border-radius:6px;
+  background:rgba(0,0,0,.45);
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:9px;
+  opacity:.6;
+  transition: opacity .15s;
+}
+.carousel-arrow:hover{opacity:1}
+.carousel-arrow-left{left:2px}
+.carousel-arrow-right{right:2px}
+.carousel-dots{
+  display:flex;
+  justify-content:center;
+  gap:5px;
+  padding:4px 0 3px;
+}
+.carousel-dot{
+  width:6px; height:6px;
+  border-radius:999px;
+  background:var(--ring);
+  cursor:pointer;
+  transition: background .2s;
+}
+.carousel-dot.active{background:var(--ink)}
+.dot-garden{background:var(--garden)}
+
+/* Garden compact card (inside carousel) */
+.garden-compact{
+  all:unset;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  padding:6px 8px;
+  border-radius:0;
+  background:transparent;
+}
+.garden-compact:hover{background: rgba(255,255,255,.08)}
+.garden-compact:active{transform: translateY(1px)}
+.garden-icon{font-size:18px; flex:0 0 auto;}
+.garden-info{display:flex; flex-direction:column; gap:1px;}
+.garden-title{font-weight:950; font-size:12px;}
+.garden-sub{color:var(--muted); font-size:10px; font-weight:800;}
+.garden-status{
+  display:flex;
+  gap:4px;
+  flex:0 0 100%;
+  padding:0;
+  margin-top:2px;
+}
+.garden-chip{
+  flex:1;
+  text-align:center;
+  padding:3px 2px;
+  border-radius:6px;
+  background: rgba(34,197,94,.08);
+  border:1px solid rgba(34,197,94,.15);
+  font-weight:950;
+  font-size:11px;
+  color:var(--ink);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 /* Quick icon row (travel, calendar, recipes) */
@@ -805,6 +905,7 @@ body{
 .dot-nut{background: var(--nut);}
 .dot-bowl{background: var(--bowl);}
 .dot-event{background: var(--study);}
+.dot-garden{background: var(--garden);}
 
 /* Day detail panel */
 .cal-day-detail{

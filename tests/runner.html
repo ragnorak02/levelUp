@@ -334,7 +334,7 @@
             var toRemove = [];
             for (var i = 0; i < localStorage.length; i++) {
                 var k = localStorage.key(i);
-                if (k && (k.startsWith('powerUp:') || k.startsWith('bowling:week:') || k === 'finances:receipts' || k === 'finances:dataLoaded' || k === 'finances:dataVersion' || k === 'levelupFlashData' || k === 'nutrition:meals' || k === 'nutrition:targets' || k === 'nutrition:recipes' || k === 'calendar:events' || k === 'travel:trips' || k.startsWith('levelUp:'))) {
+                if (k && (k.startsWith('powerUp:') || k.startsWith('bowling:week:') || k.startsWith('garden:') || k === 'finances:receipts' || k === 'finances:dataLoaded' || k === 'finances:dataVersion' || k === 'levelupFlashData' || k === 'nutrition:meals' || k === 'nutrition:targets' || k === 'nutrition:recipes' || k === 'calendar:events' || k === 'travel:trips' || k.startsWith('levelUp:'))) {
                     toRemove.push(k);
                 }
             }
@@ -367,6 +367,11 @@
             }
             if (dataset.events) {
                 localStorage.setItem('calendar:events', JSON.stringify(dataset.events));
+            }
+            if (dataset.gardenData) {
+                localStorage.setItem('garden:plants', JSON.stringify(dataset.gardenData.plants || []));
+                localStorage.setItem('garden:activities', JSON.stringify(dataset.gardenData.activities || []));
+                localStorage.setItem('garden:totalXp', String(dataset.gardenData.totalXp || 0));
             }
             if (dataset.character) {
                 localStorage.setItem('levelUp:characterLevel', String(dataset.character.level));

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Garden</title>
+<link rel="stylesheet" href="garden.css" />
+</head>
+<body>
+  <header>
+    <button class="home" onclick="location.href='../main.html'" aria-label="Menu">&#9776;</button>
+    <h1>Garden</h1>
+    <div class="header-actions">
+      <button class="small-btn" id="btnExport" title="Export data">Export</button>
+      <button class="small-btn" id="btnImport" title="Import data">Import</button>
+      <input type="file" id="importFile" class="file-input-hidden" accept=".json" />
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- Summary Grid -->
+    <div class="summary-grid">
+      <div class="stat-card">
+        <div class="stat-val" id="statActive">0</div>
+        <div class="stat-label">Active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="statYield">0</div>
+        <div class="stat-label">Yield</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="statXP">0</div>
+        <div class="stat-label">XP</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="statBreakdown" style="font-size:.75rem">None</div>
+        <div class="stat-label">Stages</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="cta-row">
+      <button class="cta" id="btnAddPlant">Add Plant</button>
+    </div>
+
+    <!-- Plant Grid -->
+    <div class="plant-grid" id="plantGrid"></div>
+  </div>
+
+  <!-- Add Plant Modal -->
+  <div class="popup" id="addPlantModal">
+    <div class="popup-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="sheet-title">Add Plant</div>
+        <button class="sheet-close" id="addModalClose" type="button">&#10005;</button>
+      </div>
+      <div class="form-row">
+        <label for="addPlantType">Plant Type</label>
+        <select id="addPlantType"></select>
+      </div>
+      <div class="form-row">
+        <label for="addPlantVariety">Variety</label>
+        <select id="addPlantVariety">
+          <option value="">-- Select variety --</option>
+        </select>
+      </div>
+      <button class="cta" id="btnSavePlant" style="width:100%; text-align:center; margin-top:8px">Plant It!</button>
+    </div>
+  </div>
+
+  <!-- Plant Detail Modal -->
+  <div class="popup" id="detailModal">
+    <div class="popup-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="sheet-title" id="detailTitle">Plant Details</div>
+        <button class="sheet-close" id="detailModalClose" type="button">&#10005;</button>
+      </div>
+
+      <!-- Lifecycle Timeline -->
+      <div class="lifecycle-timeline" id="lifecycleTimeline"></div>
+
+      <!-- Actions -->
+      <div class="cta-row" id="detailActions"></div>
+
+      <!-- Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tabMeasurements">Measurements</button>
+        <button class="tab-btn" data-tab="tabYield">Yield</button>
+        <button class="tab-btn" data-tab="tabNotes">Notes</button>
+      </div>
+      <div class="tab-panel active" id="tabMeasurements"></div>
+      <div class="tab-panel" id="tabYield"></div>
+      <div class="tab-panel" id="tabNotes"></div>
+    </div>
+  </div>
+
+<script src="garden.js"></script>
+</body>
+</html>

@@ -16,6 +16,7 @@ const FIN_MAX = 2000;
 
 /* ===== Bowling: score-based volume contribution ===== */
 const BOWL_VOLUME_MULTIPLIER = 10;  // each bowling pin scored = 10 exercise volume
+const GARDEN_VOLUME_MULTIPLIER = 50;  // each garden XP = 50 exercise volume
 
 /* ===== Nutrition shared state (set by renderNutritionCard, read by renderModulesAndCharacter) ===== */
 let lastNutritionCal = 0;
@@ -176,6 +177,8 @@ function volumeSince(isoDate){
   });
   // Include bowling scores as exercise volume
   total += bowlingVolumeSince(isoDate);
+  // Include garden XP as exercise volume
+  total += gardenVolumeSince(isoDate);
   return Math.round(total);
 }
 
@@ -766,6 +769,117 @@ function renderBowlDashboard(){
 }
 
 /* --------------------------------
+   Garden: read data, contribute to exercise volume
+----------------------------------*/
+function loadGardenPlants(){
+  try { return JSON.parse(localStorage.getItem('garden:plants') || '[]'); }
+  catch { return []; }
+}
+
+function loadGardenActivities(){
+  try { return JSON.parse(localStorage.getItem('garden:activities') || '[]'); }
+  catch { return []; }
+}
+
+function getGardenTotalXP(){
+  return Number(localStorage.getItem('garden:totalXp')) || 0;
+}
+
+function gardenVolumeSince(isoDate){
+  let total = 0;
+  loadGardenActivities().forEach(function(a){
+    if(a.date && a.date > isoDate && a.xp > 0){
+      total += a.xp * GARDEN_VOLUME_MULTIPLIER;
+    }
+  });
+  return Math.round(total);
+}
+
+function renderGardenDashboard(){
+  const plants = loadGardenPlants();
+  const active = plants.filter(function(p){ return p.status !== 'Completed' && p.status !== 'Failed'; });
+  const totalXP = getGardenTotalXP();
+
+  const subEl = $('gardenSub');
+  if(subEl){
+    subEl.textContent = active.length ? active.length + ' active, ' + totalXP + ' XP' : totalXP > 0 ? totalXP + ' XP' : '';
+  }
+
+  const statusEl = $('gardenStatus');
+  if(statusEl){
+    if(active.length){
+      // Show up to 3 active plants as chips
+      statusEl.style.display = 'flex';
+      statusEl.innerHTML = active.slice(0, 3).map(function(p){
+        return '<div class="garden-chip">' + (p.emoji || '\ud83c\udf31') + ' ' + escapeHtml(p.type) + '</div>';
+      }).join('');
+    } else {
+      statusEl.style.display = 'none';
+    }
+  }
+}
+
+/* --------------------------------
+   Carousel: swipe between bowling + garden
+----------------------------------*/
+let carouselIndex = 0;
+const CAROUSEL_SLIDE_COUNT = 2;
+
+function initCarousel(){
+  const prev = $('carouselPrev');
+  const next = $('carouselNext');
+
+  if(prev) prev.addEventListener('click', function(){ goToSlide(carouselIndex - 1); });
+  if(next) next.addEventListener('click', function(){ goToSlide(carouselIndex + 1); });
+
+  // Dot clicks
+  var dots = document.querySelectorAll('#carouselDots .carousel-dot');
+  dots.forEach(function(dot){
+    dot.addEventListener('click', function(){
+      goToSlide(Number(dot.dataset.slide));
+    });
+  });
+
+  // Touch/swipe support
+  var track = $('carouselTrack');
+  if(track){
+    var startX = 0, diffX = 0;
+    track.addEventListener('touchstart', function(e){
+      startX = e.touches[0].clientX;
+      diffX = 0;
+    }, { passive: true });
+    track.addEventListener('touchmove', function(e){
+      diffX = e.touches[0].clientX - startX;
+    }, { passive: true });
+    track.addEventListener('touchend', function(){
+      if(Math.abs(diffX) > 40){
+        goToSlide(diffX > 0 ? carouselIndex - 1 : carouselIndex + 1);
+      }
+    });
+  }
+
+  updateCarouselUI();
+}
+
+function goToSlide(idx){
+  if(idx < 0) idx = CAROUSEL_SLIDE_COUNT - 1;
+  if(idx >= CAROUSEL_SLIDE_COUNT) idx = 0;
+  carouselIndex = idx;
+  updateCarouselUI();
+}
+
+function updateCarouselUI(){
+  var track = $('carouselTrack');
+  if(track){
+    track.style.transform = 'translateX(-' + (carouselIndex * 100) + '%)';
+  }
+
+  document.querySelectorAll('#carouselDots .carousel-dot').forEach(function(dot, i){
+    dot.classList.toggle('active', i === carouselIndex);
+  });
+}
+
+/* --------------------------------
    Calendar: state + data layer
 ----------------------------------*/
 const calendarState = {
@@ -846,6 +960,15 @@ function buildDailyActivityMap(year, month){
         }
     });
 
+    // Garden activities
+    loadGardenActivities().forEach(a => {
+        if(!a.date || !a.date.startsWith(prefix)) return;
+        if(a.xp > 0){
+            const d = Number(a.date.slice(8, 10));
+            map[d] = (map[d] || 0) + a.xp * GARDEN_VOLUME_MULTIPLIER;
+        }
+    });
+
     return map;
 }
 
@@ -910,6 +1033,11 @@ function renderCalendarGrid(){
         if(e.date && e.date.startsWith(monthPrefix)) eventDates.add(e.date);
     });
 
+    const gardenDates = new Set();
+    loadGardenActivities().forEach(a => {
+        if(a.date && a.date.startsWith(monthPrefix)) gardenDates.add(a.date);
+    });
+
     // Build grid
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -941,6 +1069,7 @@ function renderCalendarGrid(){
         if(workoutDates.has(dateStr)) dots += '<span class="cal-dot dot-ex"></span>';
         if(mealDates.has(dateStr)) dots += '<span class="cal-dot dot-nut"></span>';
         if(bowlDates.has(dateStr)) dots += '<span class="cal-dot dot-bowl"></span>';
+        if(gardenDates.has(dateStr)) dots += '<span class="cal-dot dot-garden"></span>';
         if(eventDates.has(dateStr)) dots += '<span class="cal-dot dot-event"></span>';
 
         html += `<div class="${cls}" data-date="${dateStr}">
@@ -1032,6 +1161,17 @@ function renderCalendarDayDetail(){
             }
         });
     });
+
+    // Garden activities
+    const gardenActs = loadGardenActivities().filter(a => a.date === dateStr);
+    if(gardenActs.length){
+        let gardenXP = 0;
+        gardenActs.forEach(a => { gardenXP += a.xp || 0; });
+        html += `<div class="cal-activity-item">
+            <span class="cal-act-icon" style="color:var(--garden)">\ud83c\udf31</span>
+            <span>${gardenActs.length} garden activit${gardenActs.length !== 1 ? 'ies' : 'y'} \u2014 ${gardenXP} XP</span>
+        </div>`;
+    }
 
     // Manual calendar events
     const events = getEventsForDate(dateStr);
@@ -1768,6 +1908,7 @@ function renderAll(){
   renderHistory();
   renderFinanceDonut();
   renderBowlDashboard();
+  renderGardenDashboard();
   if(calendarVisible) renderCalendarGrid();
 }
 
@@ -1782,6 +1923,9 @@ function renderAll(){
   await ensureFinanceSeeded();
 
   renderAll();
+
+  // Init carousel
+  initCarousel();
 
   // Start character idle animation
   startCharAnimation();

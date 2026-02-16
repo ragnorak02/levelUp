@@ -183,6 +183,34 @@
 
     const EVENT_CATEGORIES = ['general', 'workout', 'study', 'travel', 'reminder'];
 
+    const PLANT_TYPES = ['Tomato', 'Pepper', 'Green Onion', 'Potato', 'Carrot', 'Lettuce', 'Spinach', 'Herbs'];
+
+    const PLANT_VARIETIES = {
+        'Tomato': ['Cherry', 'Roma', 'Beefsteak', 'Heirloom'],
+        'Pepper': ['Bell', 'Jalapeno', 'Habanero', 'Cayenne'],
+        'Green Onion': ['Scallion', 'Bunching', 'Red Spring'],
+        'Potato': ['Russet', 'Yukon Gold', 'Red', 'Fingerling'],
+        'Carrot': ['Nantes', 'Danvers', 'Imperator', 'Chantenay'],
+        'Lettuce': ['Romaine', 'Iceberg', 'Butterhead', 'Red Leaf'],
+        'Spinach': ['Savoy', 'Flat-Leaf', 'Semi-Savoy'],
+        'Herbs': ['Basil', 'Cilantro', 'Parsley', 'Mint', 'Rosemary']
+    };
+
+    const PLANT_STATUSES = ['Seeded', 'Germinated', 'Indoor', 'Hardened', 'In Ground', 'Harvesting', 'Completed'];
+
+    const PLANT_EMOJIS = {
+        'Tomato': '\ud83c\udf45',
+        'Pepper': '\ud83c\udf36\ufe0f',
+        'Green Onion': '\ud83e\uddc5',
+        'Potato': '\ud83e\udd54',
+        'Carrot': '\ud83e\udd55',
+        'Lettuce': '\ud83e\udd6c',
+        'Spinach': '\ud83e\udd6c',
+        'Herbs': '\ud83c\udf3f'
+    };
+
+    const YIELD_UNITS = ['items', 'lbs', 'oz', 'bunches'];
+
     window.DataPools = {
         BODY_PARTS,
         EXERCISES_BY_PART,
@@ -199,6 +227,11 @@
         TRIP_NAMES,
         DEST_NAMES,
         EVENT_TITLES,
-        EVENT_CATEGORIES
+        EVENT_CATEGORIES,
+        PLANT_TYPES,
+        PLANT_VARIETIES,
+        PLANT_STATUSES,
+        PLANT_EMOJIS,
+        YIELD_UNITS
     };
 })();

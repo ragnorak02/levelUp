@@ -19,7 +19,10 @@
         'nutrition:targets',
         'nutrition:recipes',
         'calendar:events',
-        'travel:trips'
+        'travel:trips',
+        'garden:plants',
+        'garden:totalXp',
+        'garden:activities'
     ];
 
     const KNOWN_PREFIXES = [
@@ -78,7 +81,8 @@
             meals: 0,
             trips: 0,
             bowlingWeeks: 0,
-            events: 0
+            events: 0,
+            plants: 0
         };
 
         // --- Workouts ---
@@ -192,6 +196,37 @@
             }
         }
 
+        // --- Garden ---
+        if (dataset.gardenData) {
+            if (appendMode) {
+                const existPlants = safeParse('garden:plants') || [];
+                const existIds = new Set(existPlants.map(function(p) { return p.id; }));
+                var gardenAdded = 0;
+                (dataset.gardenData.plants || []).forEach(function(p) {
+                    if (!existIds.has(p.id)) {
+                        existPlants.push(p);
+                        gardenAdded++;
+                    }
+                });
+                localStorage.setItem('garden:plants', JSON.stringify(existPlants));
+
+                const existActs = safeParse('garden:activities') || [];
+                (dataset.gardenData.activities || []).forEach(function(a) {
+                    existActs.push(a);
+                });
+                localStorage.setItem('garden:activities', JSON.stringify(existActs));
+
+                var existXP = Number(localStorage.getItem('garden:totalXp')) || 0;
+                localStorage.setItem('garden:totalXp', String(existXP + (dataset.gardenData.totalXp || 0)));
+                counts.plants = gardenAdded;
+            } else {
+                localStorage.setItem('garden:plants', JSON.stringify(dataset.gardenData.plants || []));
+                localStorage.setItem('garden:activities', JSON.stringify(dataset.gardenData.activities || []));
+                localStorage.setItem('garden:totalXp', String(dataset.gardenData.totalXp || 0));
+                counts.plants = (dataset.gardenData.plants || []).length;
+            }
+        }
+
         // --- Character ---
         if (dataset.character) {
             if (!appendMode || !localStorage.getItem('levelUp:characterLevel')) {
@@ -286,6 +321,12 @@
         // Events
         const events = safeParse('calendar:events') || [];
         summary['Events'] = events.length + ' events';
+
+        // Garden
+        const plants = safeParse('garden:plants') || [];
+        const gardenXP = Number(localStorage.getItem('garden:totalXp')) || 0;
+        const activePlants = plants.filter(function(p) { return p.status !== 'Completed' && p.status !== 'Failed'; }).length;
+        summary['Garden'] = plants.length + ' plants (' + activePlants + ' active), ' + gardenXP + ' XP';
 
         // Character
         const level = localStorage.getItem('levelUp:characterLevel') || 'none';

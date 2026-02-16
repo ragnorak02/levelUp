@@ -48,15 +48,35 @@
             </div>
           </div>
 
-          <div class="bowl-section">
-            <a class="bowl-compact" href="./bowling/index.html">
-              <span class="bowl-icon">🎳</span>
-              <span class="bowl-info">
-                <span class="bowl-title">Bowl</span>
-                <span class="bowl-avg" id="bowlAvg"></span>
-              </span>
-              <div class="bowl-scores" id="bowlRecent" style="display:none;"></div>
-            </a>
+          <div class="mini-carousel" id="miniCarousel">
+            <button class="carousel-arrow carousel-arrow-left" id="carouselPrev" type="button" aria-label="Previous">&#9664;</button>
+            <div class="carousel-track" id="carouselTrack">
+              <div class="carousel-slide">
+                <a class="bowl-compact" href="./bowling/index.html">
+                  <span class="bowl-icon">🎳</span>
+                  <span class="bowl-info">
+                    <span class="bowl-title">Bowl</span>
+                    <span class="bowl-avg" id="bowlAvg"></span>
+                  </span>
+                  <div class="bowl-scores" id="bowlRecent" style="display:none;"></div>
+                </a>
+              </div>
+              <div class="carousel-slide">
+                <a class="garden-compact" href="./garden/index.html">
+                  <span class="garden-icon">🌱</span>
+                  <span class="garden-info">
+                    <span class="garden-title">Garden</span>
+                    <span class="garden-sub" id="gardenSub"></span>
+                  </span>
+                  <div class="garden-status" id="gardenStatus"></div>
+                </a>
+              </div>
+            </div>
+            <button class="carousel-arrow carousel-arrow-right" id="carouselNext" type="button" aria-label="Next">&#9654;</button>
+            <div class="carousel-dots" id="carouselDots">
+              <span class="carousel-dot active" data-slide="0"></span>
+              <span class="carousel-dot" data-slide="1"></span>
+            </div>
           </div>
 
           <div class="quick-icons">
