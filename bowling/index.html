@@ -378,34 +378,115 @@
     cursor:default;
   }
 
-  /* Shot entry inputs */
-  .input-group{
-    display:flex;
-    gap:8px;
-    margin-bottom:8px;
+  /* Lane section — aim arrows + board strip */
+  .lane-section{
+    margin:12px 0;
   }
-  .input-col{flex:1;}
-  .input-col label{
-    display:block;
+
+  /* Aim selector (target arrows) */
+  .aim-selector{margin-bottom:10px;}
+  .aim-label{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
     font-weight:900;
     font-size:11px;
     color:var(--muted);
-    margin-bottom:4px;
+    margin-bottom:6px;
+    padding:0 4px;
   }
-  .input-col input{
-    width:100%;
-    padding:8px 10px;
-    border-radius:10px;
-    border:1px solid var(--ring);
-    background: rgba(255,255,255,.06);
-    color:var(--ink);
+  .aim-label .aim-val{color:var(--accent2); font-size:13px;}
+  .aim-arrows{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+  }
+  .aim-arrow{
+    width:36px; height:36px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.04);
+    color:var(--muted);
     font-weight:900;
-    font-size:14px;
-    outline:none;
-    text-align:center;
-    font-family:inherit;
+    font-size:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition: all .15s ease;
+    user-select:none;
+    gap:1px;
+    line-height:1;
   }
-  .input-col input:focus{border-color: rgba(168,85,247,.55);}
+  .aim-arrow .arrow-icon{font-size:12px;}
+  .aim-arrow .arrow-num{font-size:8px; font-weight:800;}
+  .aim-arrow:active{transform:scale(.93);}
+  .aim-arrow.selected{
+    border-color:var(--accent);
+    background: rgba(168,85,247,.18);
+    color:var(--accent2);
+    box-shadow: 0 0 10px rgba(168,85,247,.35);
+  }
+
+  /* Stand selector (board strip) */
+  .stand-selector{}
+  .stand-label{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-weight:900;
+    font-size:11px;
+    color:var(--muted);
+    margin-bottom:6px;
+    padding:0 4px;
+  }
+  .stand-label .stand-center{
+    color:var(--muted);
+    font-size:10px;
+    font-weight:800;
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+  }
+  .stand-label{position:relative;}
+  .stand-label .stand-val{color:var(--gold); font-size:13px;}
+  .board-strip{
+    display:flex;
+    height:32px;
+    border-radius:6px;
+    overflow:hidden;
+    border:1px solid rgba(212,168,67,.25);
+    background: linear-gradient(90deg, #7a5c12, #b8892e, #c4963a, #b8892e, #7a5c12);
+    position:relative;
+    cursor:pointer;
+  }
+  .board-cell{
+    flex:1;
+    border-right:1px solid rgba(0,0,0,.15);
+    transition: background .1s ease;
+    position:relative;
+  }
+  .board-cell:last-child{border-right:none;}
+  .board-cell:hover{background: rgba(255,255,255,.10);}
+  .board-cell.selected{
+    background: rgba(212,168,67,.55);
+    box-shadow: inset 0 0 8px rgba(212,168,67,.40);
+  }
+  .board-labels{
+    display:flex;
+    padding:0;
+    margin-top:3px;
+    position:relative;
+    height:14px;
+  }
+  .board-lbl{
+    position:absolute;
+    font-size:9px;
+    font-weight:800;
+    color:var(--muted);
+    transform:translateX(-50%);
+  }
 
   /* Shot actions */
   .shot-actions{
@@ -505,10 +586,18 @@
     .sc-cumulative{font-size:11px;}
     .stats-panel{grid-template-columns: repeat(2, 1fr);}
     .stats-panel.compact{grid-template-columns: repeat(2, 1fr);}
+    .aim-arrow{width:32px; height:32px;}
+    .aim-arrow .arrow-icon{font-size:10px;}
+    .aim-arrow .arrow-num{font-size:7px;}
+    .board-strip{height:28px;}
   }
   @media (max-width: 360px){
     .pin{width:36px; height:36px; font-size:12px;}
     .pin-row{gap:6px;}
+    .aim-arrow{width:28px; height:28px;}
+    .aim-arrows{gap:4px;}
+    .board-strip{height:24px;}
+    .board-lbl{font-size:8px;}
   }
 </style>
 </head>
@@ -575,18 +664,19 @@
 
       <!-- Shot entry area -->
       <div id="shotArea">
-        <div class="input-group">
-          <div class="input-col">
-            <label>Standing Position</label>
-            <input type="number" id="standingPos" min="1" max="39" placeholder="20" />
+        <div class="pin-diagram" id="pinDiagram"></div>
+
+        <div class="lane-section">
+          <div class="aim-selector">
+            <div class="aim-label"><span>Target</span><span class="aim-val" id="aimVal"></span></div>
+            <div class="aim-arrows" id="aimArrows"></div>
           </div>
-          <div class="input-col">
-            <label>Target Board</label>
-            <input type="number" id="targetBoard" min="1" max="39" placeholder="15" />
+          <div class="stand-selector">
+            <div class="stand-label"><span>Stand</span><span class="stand-center">center</span><span class="stand-val" id="standVal"></span></div>
+            <div class="board-strip" id="boardStrip"></div>
+            <div class="board-labels" id="boardLabels"></div>
           </div>
         </div>
-
-        <div class="pin-diagram" id="pinDiagram"></div>
 
         <div class="shot-actions">
           <button class="strike-btn" id="strikeBtn" type="button">Strike</button>
@@ -1290,16 +1380,104 @@ function renderScoreIndicator(game){
 }
 
 /* --------------------------------
+   Lane Selectors (Aim + Stand)
+----------------------------------*/
+function renderLaneSelectors(){
+    renderAimArrows();
+    renderBoardStrip();
+}
+
+function renderAimArrows(){
+    const container = $('aimArrows');
+    const label = $('aimVal');
+    if(!container) return;
+
+    const arrows = [5, 10, 15, 20, 25, 30, 35];
+    // Find closest arrow to current target
+    let selected = state.lastTargetBoard;
+    if(selected != null){
+        let closest = arrows[0];
+        let minDiff = Math.abs(selected - closest);
+        arrows.forEach(a => {
+            const diff = Math.abs(selected - a);
+            if(diff < minDiff){ minDiff = diff; closest = a; }
+        });
+        selected = closest;
+        state.lastTargetBoard = selected;
+    }
+
+    let html = '';
+    arrows.forEach(board => {
+        const sel = board === selected ? ' selected' : '';
+        html += `<button class="aim-arrow${sel}" data-board="${board}" type="button">` +
+            `<span class="arrow-icon">▲</span>` +
+            `<span class="arrow-num">${board}</span>` +
+            `</button>`;
+    });
+    container.innerHTML = html;
+    if(label) label.textContent = selected != null ? 'Board ' + selected : '';
+
+    container.querySelectorAll('.aim-arrow').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const board = parseInt(btn.dataset.board);
+            state.lastTargetBoard = board;
+            container.querySelectorAll('.aim-arrow').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            if(label) label.textContent = 'Board ' + board;
+        });
+    });
+}
+
+function renderBoardStrip(){
+    const strip = $('boardStrip');
+    const labelsEl = $('boardLabels');
+    const valLabel = $('standVal');
+    if(!strip) return;
+
+    const totalBoards = 39;
+    const keyBoards = [39, 35, 30, 25, 20, 15, 10, 5, 1];
+    const selected = state.lastStandingPos;
+
+    let html = '';
+    // Board 39 on left → board 1 on right
+    for(let i = totalBoards; i >= 1; i--){
+        const sel = i === selected ? ' selected' : '';
+        html += `<div class="board-cell${sel}" data-board="${i}"></div>`;
+    }
+    strip.innerHTML = html;
+    if(valLabel) valLabel.textContent = selected != null ? 'Board ' + selected : '';
+
+    // Board labels below strip
+    if(labelsEl){
+        let labelsHtml = '';
+        keyBoards.forEach(board => {
+            // Position: board 39 is at index 0, board 1 is at index 38
+            const idx = totalBoards - board;
+            const pct = ((idx + 0.5) / totalBoards) * 100;
+            labelsHtml += `<span class="board-lbl" style="left:${pct}%">${board}</span>`;
+        });
+        labelsEl.innerHTML = labelsHtml;
+    }
+
+    strip.querySelectorAll('.board-cell').forEach(cell => {
+        cell.addEventListener('click', () => {
+            const board = parseInt(cell.dataset.board);
+            state.lastStandingPos = board;
+            strip.querySelectorAll('.board-cell').forEach(c => c.classList.remove('selected'));
+            cell.classList.add('selected');
+            if(valLabel) valLabel.textContent = 'Board ' + board;
+        });
+    });
+}
+
+/* --------------------------------
    Shot Entry + Pin Diagram
 ----------------------------------*/
 function renderShotEntry(game){
     const frame = game.frames[state.currentFrame];
     state.pinsStanding = getAvailablePins(frame, state.currentFrame);
     renderPinDiagram(state.pinsStanding);
-
-    // Pre-fill with previous shot's values (defaults persist across shots)
-    $('standingPos').value = state.lastStandingPos != null ? state.lastStandingPos : '';
-    $('targetBoard').value = state.lastTargetBoard != null ? state.lastTargetBoard : '';
+    renderLaneSelectors();
 
     // Strike shows on ball 1 (all 10), Spare shows on ball 2 (fewer pins)
     const allTen = state.pinsStanding.length === 10;
@@ -1367,16 +1545,10 @@ function recordShot(){
     if(!game || isGameComplete(game)) return;
 
     const frame = game.frames[state.currentFrame];
-    const standingPos = parseInt($('standingPos').value) || null;
-    const targetBoard = parseInt($('targetBoard').value) || null;
-
-    // Persist defaults for next shot pre-fill
-    state.lastStandingPos = standingPos;
-    state.lastTargetBoard = targetBoard;
 
     frame.shots.push({
-        standingPosition: standingPos,
-        targetBoard: targetBoard,
+        standingPosition: state.lastStandingPos,
+        targetBoard: state.lastTargetBoard,
         pinsLeft: [...state.pinsStanding].sort((a, b) => a - b),
     });
 
