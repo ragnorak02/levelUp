@@ -599,6 +599,191 @@
     .board-strip{height:24px;}
     .board-lbl{font-size:8px;}
   }
+
+  /* ========== View Toggle ========== */
+  .hidden{display:none !important;}
+
+  /* ========== History View ========== */
+  .history-toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .history-toolbar .stats-title{margin-bottom:0;}
+  .import-btn{
+    padding:8px 14px;
+    border-radius:12px;
+    border:1px solid rgba(168,85,247,.35);
+    background: rgba(168,85,247,.08);
+    color:var(--accent2);
+    font-weight:950;
+    font-size:12px;
+  }
+  .import-btn:active{transform:translateY(1px);}
+
+  .history-list{display:flex; flex-direction:column; gap:6px;}
+  .history-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.03);
+  }
+  .hi-date{
+    font-weight:900;
+    font-size:13px;
+    color:var(--muted);
+    min-width:52px;
+  }
+  .hi-game{
+    font-weight:800;
+    font-size:12px;
+    color:var(--muted);
+    min-width:48px;
+  }
+  .hi-score{
+    font-weight:950;
+    font-size:18px;
+    color:var(--ink);
+    min-width:36px;
+  }
+  .hi-source{
+    font-size:10px;
+    font-weight:800;
+    padding:3px 8px;
+    border-radius:999px;
+    background: rgba(168,85,247,.12);
+    color:var(--accent2);
+    border:1px solid rgba(168,85,247,.25);
+  }
+  .hi-actions{
+    margin-left:auto;
+    display:flex;
+    gap:6px;
+  }
+  .hi-btn{
+    width:30px; height:30px;
+    border-radius:8px;
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+  }
+  .hi-btn:hover{background: rgba(255,255,255,.10);}
+  .hi-btn.danger:hover{background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.35);}
+  .history-empty{
+    text-align:center;
+    padding:24px 12px;
+    color:var(--muted);
+    font-weight:800;
+    font-size:13px;
+    line-height:1.5;
+  }
+
+  /* ========== Import Modal ========== */
+  .import-textarea{
+    width:100%;
+    min-height:140px;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background: rgba(0,0,0,.30);
+    color:var(--ink);
+    font-family:monospace;
+    font-size:12px;
+    resize:vertical;
+    margin-bottom:10px;
+  }
+  .import-textarea::placeholder{color:var(--muted);}
+  .import-preview{
+    max-height:200px;
+    overflow-y:auto;
+    margin-bottom:10px;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background: rgba(0,0,0,.20);
+  }
+  .ip-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:6px 10px;
+    font-size:12px;
+    font-weight:800;
+    border-bottom:1px solid rgba(255,255,255,.04);
+  }
+  .ip-row:last-child{border-bottom:none;}
+  .ip-row .ip-week{color:var(--muted); min-width:40px;}
+  .ip-row .ip-date{color:var(--muted); min-width:52px;}
+  .ip-row .ip-scores{color:var(--ink); flex:1;}
+  .ip-row .ip-series{color:var(--accent2); min-width:40px; text-align:right;}
+  .import-overwrite-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:10px;
+    font-size:12px;
+    font-weight:800;
+    color:var(--muted);
+  }
+  .import-overwrite-row input[type="checkbox"]{
+    accent-color:var(--accent);
+  }
+  .import-actions{
+    display:flex;
+    gap:8px;
+  }
+  .import-execute-btn{
+    flex:1;
+    padding:10px 16px;
+    border-radius:12px;
+    background: linear-gradient(135deg, rgba(168,85,247,1), rgba(192,132,252,1));
+    color:#0b0f14;
+    font-weight:950;
+    font-size:13px;
+    text-align:center;
+  }
+  .import-execute-btn:disabled{opacity:.4; cursor:not-allowed;}
+  .import-execute-btn:active{transform:translateY(1px);}
+  .import-cancel-btn{
+    padding:10px 16px;
+    border-radius:12px;
+    border:1px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    font-weight:950;
+    font-size:13px;
+  }
+  .import-status{
+    margin-top:8px;
+    font-size:12px;
+    font-weight:800;
+    text-align:center;
+    color:var(--good);
+  }
+
+  /* ========== Copy Modal ========== */
+  .copy-date-input{
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid var(--ring);
+    background: rgba(0,0,0,.30);
+    color:var(--ink);
+    font-family:inherit;
+    font-size:14px;
+    margin-bottom:12px;
+    color-scheme: dark;
+  }
+
+  @media (max-width: 480px){
+    .history-item{flex-wrap:wrap; gap:6px;}
+    .hi-actions{margin-left:0; width:100%; justify-content:flex-end;}
+  }
 </style>
 </head>
 
@@ -610,37 +795,54 @@
         <span class="brand active">🎳 Bowling</span>
       </div>
       <div class="nav">
-        <span class="pill active">Games</span>
+        <span class="pill active" id="navGames" data-view="games">Games</span>
+        <span class="pill" id="navHistory" data-view="history">History</span>
       </div>
     </div>
   </div>
 
   <main class="wrap">
-    <!-- Week navigation -->
-    <div class="week-nav">
-      <button class="week-nav-btn" id="weekPrev" type="button" title="Previous week">◀</button>
-      <div class="week-nav-label" id="weekLabel">Week</div>
-      <button class="week-nav-btn" id="weekNext" type="button" title="Next week">▶</button>
-    </div>
+    <!-- ===== Games (Week) View ===== -->
+    <div id="weekView">
+      <!-- Week navigation -->
+      <div class="week-nav">
+        <button class="week-nav-btn" id="weekPrev" type="button" title="Previous week">◀</button>
+        <div class="week-nav-label" id="weekLabel">Week</div>
+        <button class="week-nav-btn" id="weekNext" type="button" title="Next week">▶</button>
+      </div>
 
-    <!-- Week summary -->
-    <div class="card">
-      <div class="card-inner">
-        <div class="games-grid" id="gamesGrid"></div>
+      <!-- Week summary -->
+      <div class="card">
+        <div class="card-inner">
+          <div class="games-grid" id="gamesGrid"></div>
 
-        <div class="week-avg" id="weekAvg" style="display:none;">
-          Avg: <span id="weekAvgVal">—</span>
+          <div class="week-avg" id="weekAvg" style="display:none;">
+            Avg: <span id="weekAvgVal">—</span>
+          </div>
+
+          <button class="start-game-btn" id="startGameBtn" type="button">+ Start Game</button>
         </div>
+      </div>
 
-        <button class="start-game-btn" id="startGameBtn" type="button">+ Start Game</button>
+      <!-- Stats panel -->
+      <div class="card" id="statsCard">
+        <div class="card-inner">
+          <div class="stats-title" id="statsTitle">Career Stats</div>
+          <div id="statsBody"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Stats panel -->
-    <div class="card" id="statsCard">
-      <div class="card-inner">
-        <div class="stats-title" id="statsTitle">Career Stats</div>
-        <div id="statsBody"></div>
+    <!-- ===== History View ===== -->
+    <div id="historyView" class="hidden">
+      <div class="history-toolbar">
+        <div class="stats-title">Game History</div>
+        <button class="import-btn" id="importBtn" type="button">Import Standings</button>
+      </div>
+      <div class="card">
+        <div class="card-inner">
+          <div class="history-list" id="historyList"></div>
+        </div>
       </div>
     </div>
   </main>
@@ -693,6 +895,43 @@
         <div class="final-label">Final Score</div>
         <div class="final-score" id="finalScore">0</div>
         <button class="done-btn" id="doneBtn" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import standings modal -->
+  <div class="modal-overlay" id="importModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Import League Standings</div>
+        <button class="modal-close" id="importClose" type="button">✕</button>
+      </div>
+      <textarea class="import-textarea" id="importText" placeholder="Paste your league standings data here...&#10;Week  Date  Gm1  Gm2  Gm3  SS  HCP  HS  AvgBefore  AvgAfter  AvgToday  +/-Avg"></textarea>
+      <div class="import-preview" id="importPreview" style="display:none;"></div>
+      <label class="import-overwrite-row">
+        <input type="checkbox" id="importOverwrite" />
+        Full overwrite — replace all existing bowling data
+      </label>
+      <div class="import-actions">
+        <button class="import-execute-btn" id="importExecuteBtn" type="button" disabled>Import</button>
+        <button class="import-cancel-btn" id="importCancelBtn" type="button">Cancel</button>
+      </div>
+      <div class="import-status" id="importStatus"></div>
+    </div>
+  </div>
+
+  <!-- Copy game modal -->
+  <div class="modal-overlay" id="copyModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Copy Game to Date</div>
+        <button class="modal-close" id="copyClose" type="button">✕</button>
+      </div>
+      <p style="font-size:13px; color:var(--muted); font-weight:800; margin-bottom:10px;">Choose a date to copy this game to:</p>
+      <input type="date" class="copy-date-input" id="copyDate" />
+      <div class="import-actions">
+        <button class="import-execute-btn" id="copyExecuteBtn" type="button">Copy</button>
+        <button class="import-cancel-btn" id="copyCancelBtn" type="button">Cancel</button>
       </div>
     </div>
   </div>
@@ -753,12 +992,14 @@ const STORAGE_PREFIX = 'bowling:week:';
 
 let state = {
     weekId: getISOWeek(new Date()),
+    viewMode: 'games',
     currentGame: null,
     currentFrame: 0,
     currentShot: 0,
     pinsStanding: [],
     lastStandingPos: null,
     lastTargetBoard: null,
+    copySource: null,
 };
 
 function storageKey(weekId){ return STORAGE_PREFIX + weekId; }
@@ -1299,7 +1540,11 @@ function closeModal(){
     state.currentGame = null;
     state.lastStandingPos = null;
     state.lastTargetBoard = null;
-    renderAll();
+    if(state.viewMode === 'history'){
+        renderHistory();
+    } else {
+        renderAll();
+    }
 }
 
 function renderModal(game){
@@ -1603,6 +1848,329 @@ function startNewGame(){
 }
 
 /* --------------------------------
+   View Switching
+----------------------------------*/
+function switchView(mode){
+    state.viewMode = mode;
+    const weekView = $('weekView');
+    const historyView = $('historyView');
+    const navGames = $('navGames');
+    const navHistory = $('navHistory');
+
+    if(mode === 'history'){
+        weekView.classList.add('hidden');
+        historyView.classList.remove('hidden');
+        navGames.classList.remove('active');
+        navHistory.classList.add('active');
+        renderHistory();
+    } else {
+        historyView.classList.add('hidden');
+        weekView.classList.remove('hidden');
+        navHistory.classList.remove('active');
+        navGames.classList.add('active');
+        renderAll();
+    }
+}
+
+/* --------------------------------
+   History View
+----------------------------------*/
+function renderHistory(){
+    const list = $('historyList');
+    if(!list) return;
+
+    const games = getAllCompletedGames();
+    if(!games.length){
+        list.innerHTML = '<div class="history-empty">No completed games yet.<br>Start a game or import league standings.</div>';
+        return;
+    }
+
+    // Sort newest first
+    games.sort((a, b) => {
+        if(a.completedDate && b.completedDate) return b.completedDate.localeCompare(a.completedDate);
+        return 0;
+    });
+
+    let html = '';
+    games.forEach(g => {
+        const dateStr = g.completedDate ? formatHistoryDate(g.completedDate) : '—';
+        const source = g.imported ? '<span class="hi-source">League</span>' : '';
+        html += `<div class="history-item">
+            <span class="hi-date">${dateStr}</span>
+            <span class="hi-game">Game ${g.gameNumber}</span>
+            <span class="hi-score">${g.score}</span>
+            ${source}
+            <span class="hi-actions">
+                <button class="hi-btn" title="View" data-action="view" data-week="${g.weekId}" data-game="${g.gameNumber - 1}">👁</button>
+                <button class="hi-btn" title="Copy" data-action="copy" data-week="${g.weekId}" data-game="${g.gameNumber - 1}">📋</button>
+                <button class="hi-btn danger" title="Delete" data-action="delete" data-week="${g.weekId}" data-game="${g.gameNumber - 1}">🗑</button>
+            </span>
+        </div>`;
+    });
+    list.innerHTML = html;
+
+    list.querySelectorAll('.hi-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const action = btn.dataset.action;
+            const weekId = btn.dataset.week;
+            const gameIdx = parseInt(btn.dataset.game);
+            if(action === 'view') openGameFromHistory(weekId, gameIdx);
+            else if(action === 'copy') openCopyModal(weekId, gameIdx);
+            else if(action === 'delete') deleteGame(weekId, gameIdx);
+        });
+    });
+}
+
+function formatHistoryDate(isoDate){
+    const parts = isoDate.split('-');
+    if(parts.length < 3) return isoDate;
+    return parts[1] + '/' + parts[2];
+}
+
+/* --------------------------------
+   Game Actions (History)
+----------------------------------*/
+function openGameFromHistory(weekId, gameIdx){
+    const savedWeekId = state.weekId;
+    state.weekId = weekId;
+    const week = loadWeek(weekId);
+    if(!week || !week.games[gameIdx]) {
+        state.weekId = savedWeekId;
+        return;
+    }
+    openGameModal(gameIdx);
+}
+
+function deleteGame(weekId, gameIdx){
+    if(!confirm('Delete this game? This cannot be undone.')) return;
+    const week = loadWeek(weekId);
+    if(!week || !week.games[gameIdx]) return;
+
+    week.games.splice(gameIdx, 1);
+    // Renumber remaining games
+    week.games.forEach((g, i) => { g.gameNumber = i + 1; });
+
+    if(week.games.length === 0){
+        localStorage.removeItem(storageKey(weekId));
+    } else {
+        saveWeek(week);
+    }
+    renderHistory();
+}
+
+function openCopyModal(weekId, gameIdx){
+    state.copySource = { weekId, gameIdx };
+    $('copyDate').value = new Date().toISOString().slice(0, 10);
+    $('copyModal').classList.add('show');
+}
+
+function closeCopyModal(){
+    $('copyModal').classList.remove('show');
+    state.copySource = null;
+}
+
+function executeCopy(){
+    if(!state.copySource) return;
+    const dateVal = $('copyDate').value;
+    if(!dateVal){
+        alert('Please select a date.');
+        return;
+    }
+
+    const srcWeek = loadWeek(state.copySource.weekId);
+    if(!srcWeek || !srcWeek.games[state.copySource.gameIdx]) return;
+    const srcGame = srcWeek.games[state.copySource.gameIdx];
+
+    // Determine target week
+    const dateParts = dateVal.split('-');
+    const targetDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+    const targetWeekId = getISOWeek(targetDate);
+    const targetWeek = ensureWeek(targetWeekId);
+
+    if(targetWeek.games.length >= 3){
+        alert('Target week already has 3 games. Cannot add more.');
+        return;
+    }
+
+    // Deep copy
+    const newGame = JSON.parse(JSON.stringify(srcGame));
+    newGame.id = 'game_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    newGame.gameNumber = targetWeek.games.length + 1;
+    newGame.completedDate = dateVal;
+
+    targetWeek.games.push(newGame);
+    saveWeek(targetWeek);
+    closeCopyModal();
+    renderHistory();
+}
+
+/* --------------------------------
+   Standings Parser & Import
+----------------------------------*/
+function parseStandings(text){
+    if(!text || !text.trim()) return [];
+
+    const lines = text.trim().split('\n');
+    const results = [];
+
+    lines.forEach(line => {
+        const trimmed = line.trim();
+        if(!trimmed) return;
+
+        // Split on tabs first, fallback to 2+ spaces
+        let cols = trimmed.split('\t');
+        if(cols.length < 6){
+            cols = trimmed.split(/\s{2,}/);
+        }
+        if(cols.length < 6) return;
+
+        const weekNum = parseInt(cols[0]);
+        if(isNaN(weekNum)) return; // Skip headers
+
+        const dateStr = cols[1].trim();
+        const gm1 = parseInt(cols[2]);
+        const gm2 = parseInt(cols[3]);
+        const gm3 = parseInt(cols[4]);
+        const ss = parseInt(cols[5]);
+
+        // Skip absent weeks (SS=0)
+        if(ss === 0 || isNaN(ss)) return;
+        if(isNaN(gm1) || isNaN(gm2) || isNaN(gm3)) return;
+
+        // Parse date MM/DD/YYYY → ISO
+        const dateParts = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if(!dateParts) return;
+        const month = dateParts[1].padStart(2, '0');
+        const day = dateParts[2].padStart(2, '0');
+        const year = dateParts[3];
+        const isoDate = `${year}-${month}-${day}`;
+
+        const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        const weekId = getISOWeek(dateObj);
+        const leagueDate = month + '/' + day;
+
+        results.push({
+            weekNum,
+            leagueDate,
+            isoDate,
+            weekId,
+            scores: [gm1, gm2, gm3],
+            seriesScore: ss,
+        });
+    });
+
+    return results;
+}
+
+function importStandings(parsed, fullOverwrite){
+    if(fullOverwrite){
+        // Remove all bowling week keys
+        const keys = listAllWeekKeys();
+        keys.forEach(k => localStorage.removeItem(k));
+    }
+
+    parsed.forEach(entry => {
+        const games = entry.scores.map((score, i) => {
+            const frames = [];
+            for(let f = 1; f <= 10; f++){
+                frames.push({ frameNumber: f, shots: [] });
+            }
+            return {
+                id: 'game_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                gameNumber: i + 1,
+                frames,
+                score,
+                completedDate: entry.isoDate,
+                imported: true,
+            };
+        });
+
+        const weekData = {
+            weekId: entry.weekId,
+            weekLabel: weekIdToLabel(entry.weekId),
+            leagueDate: entry.leagueDate,
+            games,
+            created: new Date().toISOString(),
+        };
+        saveWeek(weekData);
+    });
+}
+
+/* --------------------------------
+   Import Modal UI
+----------------------------------*/
+function openImportModal(){
+    $('importText').value = '';
+    $('importPreview').style.display = 'none';
+    $('importPreview').innerHTML = '';
+    $('importOverwrite').checked = false;
+    $('importExecuteBtn').disabled = true;
+    $('importExecuteBtn').textContent = 'Import';
+    $('importStatus').textContent = '';
+    $('importModal').classList.add('show');
+}
+
+function closeImportModal(){
+    $('importModal').classList.remove('show');
+}
+
+function onImportTextChange(){
+    const text = $('importText').value;
+    const parsed = parseStandings(text);
+    const preview = $('importPreview');
+    const btn = $('importExecuteBtn');
+
+    if(!parsed.length){
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+        btn.disabled = true;
+        btn.textContent = 'Import';
+        return;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Import ' + parsed.length + ' Week' + (parsed.length !== 1 ? 's' : '');
+
+    let html = '';
+    parsed.forEach(entry => {
+        html += `<div class="ip-row">
+            <span class="ip-week">W${entry.weekNum}</span>
+            <span class="ip-date">${entry.leagueDate}</span>
+            <span class="ip-scores">${entry.scores.join(' / ')}</span>
+            <span class="ip-series">${entry.seriesScore}</span>
+        </div>`;
+    });
+    preview.innerHTML = html;
+    preview.style.display = 'block';
+}
+
+function executeImport(){
+    const text = $('importText').value;
+    const parsed = parseStandings(text);
+    if(!parsed.length) return;
+
+    const fullOverwrite = $('importOverwrite').checked;
+    if(fullOverwrite){
+        if(!confirm('This will DELETE all existing bowling data and replace it with the imported standings. Continue?')) return;
+    }
+
+    importStandings(parsed, fullOverwrite);
+
+    $('importStatus').textContent = 'Imported ' + parsed.length + ' weeks (' + (parsed.length * 3) + ' games)';
+    $('importExecuteBtn').disabled = true;
+    $('importText').value = '';
+    $('importPreview').style.display = 'none';
+
+    // Refresh views after a brief moment
+    setTimeout(() => {
+        closeImportModal();
+        renderHistory();
+        // Also refresh games view stats
+        renderAll();
+    }, 800);
+}
+
+/* --------------------------------
    Event Bindings
 ----------------------------------*/
 function bindEvents(){
@@ -1625,6 +2193,28 @@ function bindEvents(){
     $('spareBtn').onclick = handleSpare;
     $('shotBtn').onclick = handleShot;
     $('doneBtn').onclick = closeModal;
+
+    // Nav view switching
+    $('navGames').onclick = function(){ switchView('games'); };
+    $('navHistory').onclick = function(){ switchView('history'); };
+
+    // Import modal
+    $('importBtn').onclick = openImportModal;
+    $('importClose').onclick = closeImportModal;
+    $('importCancelBtn').onclick = closeImportModal;
+    $('importModal').onclick = function(e){
+        if(e.target === $('importModal')) closeImportModal();
+    };
+    $('importText').oninput = onImportTextChange;
+    $('importExecuteBtn').onclick = executeImport;
+
+    // Copy modal
+    $('copyClose').onclick = closeCopyModal;
+    $('copyCancelBtn').onclick = closeCopyModal;
+    $('copyModal').onclick = function(e){
+        if(e.target === $('copyModal')) closeCopyModal();
+    };
+    $('copyExecuteBtn').onclick = executeCopy;
 }
 
 /* --------------------------------
