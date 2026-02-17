@@ -2075,17 +2075,32 @@ function parseStandings(text){
         const trimmed = line.trim();
         if(!trimmed) return;
 
-        // Split on tabs first, fallback to 2+ spaces
+        // Skip header/footer lines
+        if(/^(Week|League|Page)\b/i.test(trimmed)) return;
+
+        // Split on tabs first, fallback to 2+ spaces, then single spaces
         let cols = trimmed.split('\t');
         if(cols.length < 6){
             cols = trimmed.split(/\s{2,}/);
         }
-        if(cols.length < 6) return;
+        if(cols.length < 6){
+            cols = trimmed.split(/\s+/);
+        }
+        if(cols.length < 5) return;
 
         const weekNum = parseInt(cols[0]);
-        if(isNaN(weekNum)) return; // Skip headers
+        if(isNaN(weekNum)) return;
 
-        const dateStr = cols[1].trim();
+        // Handle concatenated date+score (e.g., "02/10/2026141" from League Secretary)
+        let dateStr = cols[1].trim();
+        const dateGm1 = dateStr.match(/^(\d{1,2}\/\d{1,2}\/\d{4})(\d+)$/);
+        if(dateGm1){
+            dateStr = dateGm1[1];
+            cols.splice(1, 1, dateStr, dateGm1[2]);
+        }
+
+        if(cols.length < 6) return;
+
         const gm1 = parseInt(cols[2]);
         const gm2 = parseInt(cols[3]);
         const gm3 = parseInt(cols[4]);
