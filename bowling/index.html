@@ -424,6 +424,28 @@
   }
   .strike-btn:hover{background: rgba(212,168,67,.15)}
   .strike-btn:active{transform: translateY(1px)}
+  .spare-btn{
+    padding:10px 18px;
+    border-radius:12px;
+    border:2px solid rgba(168,85,247,.35);
+    background: rgba(168,85,247,.08);
+    color:var(--accent2);
+    font-weight:950;
+    font-size:13px;
+  }
+  .spare-btn:hover{background: rgba(168,85,247,.15)}
+  .spare-btn:active{transform: translateY(1px)}
+  .shot-btn{
+    padding:10px 18px;
+    border-radius:12px;
+    border:2px solid var(--ring);
+    background: rgba(255,255,255,.06);
+    color:var(--ink);
+    font-weight:950;
+    font-size:13px;
+  }
+  .shot-btn:hover{background: rgba(255,255,255,.10)}
+  .shot-btn:active{transform: translateY(1px)}
   .record-btn{
     flex:1;
     padding:10px 16px;
@@ -568,7 +590,9 @@
 
         <div class="shot-actions">
           <button class="strike-btn" id="strikeBtn" type="button">Strike</button>
-          <button class="record-btn" id="recordBtn" type="button">Next Ball →</button>
+          <button class="spare-btn" id="spareBtn" type="button">Spare</button>
+          <button class="shot-btn" id="shotBtn" type="button">Shot</button>
+          <button class="record-btn" id="recordBtn" type="button">Record →</button>
         </div>
 
         <div class="shot-status" id="shotStatus"></div>
@@ -643,6 +667,8 @@ let state = {
     currentFrame: 0,
     currentShot: 0,
     pinsStanding: [],
+    lastStandingPos: null,
+    lastTargetBoard: null,
 };
 
 function storageKey(weekId){ return STORAGE_PREFIX + weekId; }
@@ -1160,6 +1186,19 @@ function openGameModal(gameIndex){
 
     state.pinsStanding = getAvailablePins(game.frames[state.currentFrame], state.currentFrame);
 
+    // Load stand/aim defaults from last recorded shot in this game
+    state.lastStandingPos = null;
+    state.lastTargetBoard = null;
+    for(let f = state.currentFrame; f >= 0; f--){
+        const shots = game.frames[f].shots;
+        if(shots.length > 0){
+            const lastShot = shots[shots.length - 1];
+            state.lastStandingPos = lastShot.standingPosition;
+            state.lastTargetBoard = lastShot.targetBoard;
+            break;
+        }
+    }
+
     $('gameModal').classList.add('show');
     $('modalTitle').textContent = 'Game ' + game.gameNumber;
     renderModal(game);
@@ -1168,6 +1207,8 @@ function openGameModal(gameIndex){
 function closeModal(){
     $('gameModal').classList.remove('show');
     state.currentGame = null;
+    state.lastStandingPos = null;
+    state.lastTargetBoard = null;
     renderAll();
 }
 
@@ -1256,10 +1297,15 @@ function renderShotEntry(game){
     state.pinsStanding = getAvailablePins(frame, state.currentFrame);
     renderPinDiagram(state.pinsStanding);
 
-    $('standingPos').value = '';
-    $('targetBoard').value = '';
+    // Pre-fill with previous shot's values (defaults persist across shots)
+    $('standingPos').value = state.lastStandingPos != null ? state.lastStandingPos : '';
+    $('targetBoard').value = state.lastTargetBoard != null ? state.lastTargetBoard : '';
 
-    $('strikeBtn').style.display = state.pinsStanding.length === 10 ? 'block' : 'none';
+    // Strike shows on ball 1 (all 10), Spare shows on ball 2 (fewer pins)
+    const allTen = state.pinsStanding.length === 10;
+    $('strikeBtn').style.display = allTen ? 'block' : 'none';
+    $('spareBtn').style.display = allTen ? 'none' : 'block';
+    $('shotBtn').style.display = 'block';
 
     const ballNum = frame.shots.length + 1;
     if(ballNum === 1){
@@ -1324,6 +1370,10 @@ function recordShot(){
     const standingPos = parseInt($('standingPos').value) || null;
     const targetBoard = parseInt($('targetBoard').value) || null;
 
+    // Persist defaults for next shot pre-fill
+    state.lastStandingPos = standingPos;
+    state.lastTargetBoard = targetBoard;
+
     frame.shots.push({
         standingPosition: standingPos,
         targetBoard: targetBoard,
@@ -1349,6 +1399,25 @@ function recordShot(){
 function handleStrike(){
     state.pinsStanding = [];
     recordShot();
+}
+
+function handleSpare(){
+    state.pinsStanding = [];
+    recordShot();
+}
+
+function handleShot(){
+    const week = ensureWeek(state.weekId);
+    const game = week.games[state.currentGame];
+    if(!game || isGameComplete(game)) return;
+
+    const frame = game.frames[state.currentFrame];
+    const available = getAvailablePins(frame, state.currentFrame);
+
+    // All pins knocked down by default — user toggles back the leave
+    state.pinsStanding = [];
+    renderPinDiagram(available);
+    $('shotStatus').innerHTML = 'Tap pins that are <b>still standing</b>';
 }
 
 function startNewGame(){
@@ -1381,6 +1450,8 @@ function bindEvents(){
     };
     $('recordBtn').onclick = recordShot;
     $('strikeBtn').onclick = handleStrike;
+    $('spareBtn').onclick = handleSpare;
+    $('shotBtn').onclick = handleShot;
     $('doneBtn').onclick = closeModal;
 }
 
