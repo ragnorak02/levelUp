@@ -576,6 +576,23 @@
     margin-top:12px;
   }
   .done-btn:active{transform: translateY(1px)}
+  .delete-game-btn{
+    display:inline-flex;
+    padding:10px 18px;
+    border-radius:12px;
+    border:1px solid rgba(239,68,68,.35);
+    background: rgba(239,68,68,.08);
+    color:var(--danger);
+    font-weight:950;
+    font-size:13px;
+    margin-top:12px;
+    margin-left:8px;
+  }
+  .delete-game-btn:active{transform: translateY(1px)}
+  .game-slot.long-press{
+    border-color: rgba(239,68,68,.50);
+    background: rgba(239,68,68,.10);
+  }
 
   @media (max-width: 480px){
     .games-grid{gap:6px;}
@@ -895,6 +912,7 @@
         <div class="final-label">Final Score</div>
         <div class="final-score" id="finalScore">0</div>
         <button class="done-btn" id="doneBtn" type="button">Done</button>
+        <button class="delete-game-btn" id="deleteGameBtn" type="button">Delete</button>
       </div>
     </div>
   </div>
@@ -1398,9 +1416,28 @@ function renderGameSlots(week){
 
     grid.querySelectorAll('.game-slot').forEach(slot => {
         const idx = parseInt(slot.dataset.game);
-        if(week.games[idx]){
-            slot.addEventListener('click', () => openGameModal(idx));
-        }
+        if(!week.games[idx]) return;
+
+        let pressTimer = null;
+        let didLongPress = false;
+
+        slot.addEventListener('pointerdown', () => {
+            didLongPress = false;
+            pressTimer = setTimeout(() => {
+                didLongPress = true;
+                slot.classList.add('long-press');
+                deleteGameFromWeek(state.weekId, idx);
+                slot.classList.remove('long-press');
+            }, 600);
+        });
+        slot.addEventListener('pointerup', () => {
+            clearTimeout(pressTimer);
+            if(!didLongPress) openGameModal(idx);
+        });
+        slot.addEventListener('pointerleave', () => {
+            clearTimeout(pressTimer);
+            slot.classList.remove('long-press');
+        });
     });
 }
 
@@ -1943,11 +1980,33 @@ function openGameFromHistory(weekId, gameIdx){
 
 function deleteGame(weekId, gameIdx){
     if(!confirm('Delete this game? This cannot be undone.')) return;
+    removeGameFromWeek(weekId, gameIdx);
+    renderHistory();
+}
+
+function deleteGameFromWeek(weekId, gameIdx){
+    if(!confirm('Delete this game? This cannot be undone.')) return;
+    removeGameFromWeek(weekId, gameIdx);
+    renderAll();
+}
+
+function deleteCurrentGame(){
+    if(state.currentGame == null) return;
+    if(!confirm('Delete this game? This cannot be undone.')) return;
+    const weekId = state.weekId;
+    const gameIdx = state.currentGame;
+    $('gameModal').classList.remove('show');
+    state.currentGame = null;
+    removeGameFromWeek(weekId, gameIdx);
+    if(state.viewMode === 'history') renderHistory();
+    else renderAll();
+}
+
+function removeGameFromWeek(weekId, gameIdx){
     const week = loadWeek(weekId);
     if(!week || !week.games[gameIdx]) return;
 
     week.games.splice(gameIdx, 1);
-    // Renumber remaining games
     week.games.forEach((g, i) => { g.gameNumber = i + 1; });
 
     if(week.games.length === 0){
@@ -1955,7 +2014,6 @@ function deleteGame(weekId, gameIdx){
     } else {
         saveWeek(week);
     }
-    renderHistory();
 }
 
 function openCopyModal(weekId, gameIdx){
@@ -2193,6 +2251,7 @@ function bindEvents(){
     $('spareBtn').onclick = handleSpare;
     $('shotBtn').onclick = handleShot;
     $('doneBtn').onclick = closeModal;
+    $('deleteGameBtn').onclick = deleteCurrentGame;
 
     // Nav view switching
     $('navGames').onclick = function(){ switchView('games'); };
