@@ -3464,20 +3464,335 @@
   "tax": 0.0,
   "total": 6.10,
   "notes": "Starbucks mobile order — 11.3★ earned"
+},
+
+{
+  "id": "receipt_walmart_20260214",
+  "date": "2026-02-14",
+  "store": "Walmart",
+  "storeLocation": "Walmart Glenmont, NY (ST# 3583)",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Reese's Peanut Butter Cups (12pk)",
+      "code": "034000405310",
+      "price": 3.16,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Walmart",
+      "storePrice": 3.16,
+      "pricePerUnit": 3.16
+    },
+    {
+      "name": "Romaine Hearts",
+      "code": "716519080000",
+      "price": 6.28,
+      "quantity": 2,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 3.14,
+      "pricePerUnit": 3.14
+    },
+    {
+      "name": "Peanut Butter Snack 4-Pack",
+      "code": "818290019600",
+      "price": 4.78,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Walmart",
+      "storePrice": 4.78,
+      "pricePerUnit": 4.78
+    },
+    {
+      "name": "OV Gallon Milk",
+      "code": "093966009980",
+      "price": 20.01,
+      "quantity": 3,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 6.67,
+      "pricePerUnit": 6.67
+    },
+    {
+      "name": "Oatly Oat Milk",
+      "code": "190646630180",
+      "price": 5.27,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 5.27,
+      "pricePerUnit": 5.27
+    },
+    {
+      "name": "Fage Greek Yogurt",
+      "code": "689544083000",
+      "price": 6.96,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 6.96,
+      "pricePerUnit": 6.96
+    },
+    {
+      "name": "Cosmic Crisp Apples",
+      "code": "804305035070",
+      "price": 5.99,
+      "quantity": 1,
+      "weight": 3.44,
+      "unit": "lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "pricePerPound": 1.74
+    },
+    {
+      "name": "Brown Eggs (12ct)",
+      "code": "815652004180",
+      "price": 4.96,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 4.96,
+      "pricePerUnit": 4.96
+    },
+    {
+      "name": "Bananas",
+      "code": "000000040110",
+      "price": 1.25,
+      "quantity": 1,
+      "weight": 2.50,
+      "unit": "lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "pricePerPound": 0.50
+    },
+    {
+      "name": "Kinder Joy",
+      "code": "009800000520",
+      "price": 1.97,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Walmart",
+      "storePrice": 1.97,
+      "pricePerUnit": 1.97
+    }
+  ],
+  "subtotal": 60.63,
+  "tax": 0.41,
+  "total": 61.04,
+  "notes": "Walmart receipt — gift card, 02/14/26 12:21"
+},
+
+{
+  "id": "receipt_traderjoes_20260214",
+  "date": "2026-02-14",
+  "store": "Trader Joe's",
+  "storeLocation": "388 Feura Bush Rd, Glenmont, NY 12077 (Store #0579)",
+  "category": "Other",
+  "items": [
+    {
+      "name": "Small Seasonal Bouquet",
+      "price": 7.99,
+      "quantity": 1,
+      "category": "Other",
+      "subcategory": "Gifts",
+      "store": "Trader Joe's",
+      "storePrice": 7.99,
+      "pricePerUnit": 7.99
+    },
+    {
+      "name": "Medium Seasonal Bouquet",
+      "price": 10.99,
+      "quantity": 1,
+      "category": "Other",
+      "subcategory": "Gifts",
+      "store": "Trader Joe's",
+      "storePrice": 10.99,
+      "pricePerUnit": 10.99
+    }
+  ],
+  "subtotal": 18.98,
+  "tax": 1.52,
+  "total": 20.50,
+  "notes": "Trader Joe's receipt — 02/14/2026 12:35 — AMEX — Valentine's Day flowers"
+},
+
+{
+  "id": "receipt_walmart_20260218",
+  "date": "2026-02-18",
+  "store": "Walmart",
+  "storeLocation": "Walmart Glenmont, NY (ST# 3583)",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Belgian Snack Cookies",
+      "code": "031142006680",
+      "price": 6.46,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Walmart",
+      "storePrice": 6.46,
+      "pricePerUnit": 6.46
+    },
+    {
+      "name": "Mandarin Oranges (3 lb bag)",
+      "code": "096704001600",
+      "price": 3.48,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "storePrice": 3.48,
+      "pricePerUnit": 3.48
+    },
+    {
+      "name": "Cosmic Crisp Apples",
+      "code": "804305035070",
+      "price": 5.88,
+      "quantity": 1,
+      "weight": 3.38,
+      "unit": "lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "pricePerPound": 1.74
+    },
+    {
+      "name": "Green Cabbage",
+      "code": "000000040690",
+      "price": 2.46,
+      "quantity": 1,
+      "weight": 3.15,
+      "unit": "lb",
+      "category": "Groceries",
+      "subcategory": "Produce",
+      "store": "Walmart",
+      "pricePerPound": 0.78
+    },
+    {
+      "name": "Suave Refreshing (18 oz)",
+      "code": "079400323710",
+      "price": 2.97,
+      "quantity": 1,
+      "category": "Other",
+      "subcategory": "Personal Care",
+      "store": "Walmart",
+      "storePrice": 2.97,
+      "pricePerUnit": 2.97
+    },
+    {
+      "name": "Nutri-Grain Strawberry Bars",
+      "code": "052800062420",
+      "price": 9.97,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Walmart",
+      "storePrice": 9.97,
+      "pricePerUnit": 9.97
+    },
+    {
+      "name": "Peanut Butter Snack 4-Pack",
+      "code": "818290019600",
+      "price": 4.78,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Walmart",
+      "storePrice": 4.78,
+      "pricePerUnit": 4.78
+    },
+    {
+      "name": "Lollipops",
+      "code": "834706000420",
+      "price": 5.96,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Snacks",
+      "store": "Walmart",
+      "storePrice": 5.96,
+      "pricePerUnit": 5.96
+    },
+    {
+      "name": "Arnold Whole Grains Oatnut Bread",
+      "code": "073410013550",
+      "price": 3.98,
+      "quantity": 1,
+      "category": "Groceries",
+      "subcategory": "Bakery",
+      "store": "Walmart",
+      "storePrice": 3.98,
+      "pricePerUnit": 3.98
+    },
+    {
+      "name": "Brown Eggs (12ct)",
+      "code": "815652004180",
+      "price": 9.92,
+      "quantity": 2,
+      "category": "Groceries",
+      "subcategory": "Dairy",
+      "store": "Walmart",
+      "storePrice": 4.96,
+      "pricePerUnit": 4.96
+    }
+  ],
+  "subtotal": 55.86,
+  "tax": 1.51,
+  "total": 57.37,
+  "notes": "Walmart receipt — AMEX 1009, 02/18/26 17:03"
+},
+
+{
+  "id": "receipt_cvs_20260220",
+  "date": "2026-02-20",
+  "store": "CVS Pharmacy",
+  "storeLocation": "416 Route 9W, Glenmont, NY 12077",
+  "category": "Medical",
+  "items": [
+    {
+      "name": "Prescription (RX ****087)",
+      "price": 16.67,
+      "quantity": 1,
+      "category": "Medical",
+      "subcategory": "Medicine"
+    },
+    {
+      "name": "Prescription (RX ****088)",
+      "price": 14.99,
+      "quantity": 1,
+      "category": "Medical",
+      "subcategory": "Medicine"
+    }
+  ],
+  "subtotal": 31.66,
+  "tax": 0.0,
+  "total": 31.66,
+  "notes": "CVS Pharmacy — 02/20/2026 10:16 AM"
 }
 
 ],
   "metadata": {
     "version": "1.0",
-    "lastUpdated": "2026-02-14",
-    "totalReceipts": 30,
-    "totalItems": 166,
-    "totalSpent": 841.52,
+    "lastUpdated": "2026-02-22",
+    "totalReceipts": 34,
+    "totalItems": 190,
+    "totalSpent": 1012.09,
     "stores": [
       "Trader Joe's",
       "Walmart",
       "Starbucks",
-      "K-Town Plaza"
+      "K-Town Plaza",
+      "CVS Pharmacy"
     ]
   }
 }
