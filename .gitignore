@@ -1,3 +1,7 @@
 # Ignore node modules
 node_modules/
 
+# Receipt images
+finances/*.jpg
+finances/*.png
+
