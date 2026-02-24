@@ -1,6 +1,6 @@
 /* --------------------------------
    GardenApp — UI Controller (SPA)
-   Single-page app with 6 tabs
+   Single-page app with 5 tabs
 ----------------------------------*/
 (function() {
     'use strict';
@@ -76,7 +76,6 @@
             case 'tabTrays': renderTrayList(); break;
             case 'tabPlants': renderPlantList(); break;
             case 'tabAnalytics': renderAnalytics(); break;
-            case 'tabSettings': renderSettings(); break;
         }
     }
 
@@ -880,55 +879,57 @@
                 }
             }
         }
+
+        renderSeasonList();
     }
 
-    /* ===== Tab 6: Settings ===== */
-    function renderSettings() {
+    /* ===== Season List (inside Analytics tab) ===== */
+    function renderSeasonList() {
         var seasons = dm.getAllSeasons();
         var list = $('seasonList');
-        if (list) {
-            if (seasons.length) {
-                list.innerHTML = seasons.map(function(s) {
-                    return '<div class="season-item' + (s.isActive ? ' active' : '') + '">' +
-                        '<div>' +
-                            '<div class="season-item-info">' + escapeHtml(s.label) + (s.isActive ? ' (Active)' : '') + '</div>' +
-                            '<div class="season-item-dates">' + (s.startDate || '') + (s.endDate ? ' — ' + s.endDate : '') + '</div>' +
-                        '</div>' +
-                        '<div class="season-item-actions">' +
-                            (!s.isActive ? '<button class="small-btn" data-activate="' + s.id + '">Activate</button>' : '') +
-                            '<button class="small-btn" data-edit-season="' + s.id + '">Edit</button>' +
-                            '<button class="small-btn" data-delete-season="' + s.id + '" style="color:var(--bad)">Del</button>' +
-                        '</div>' +
-                    '</div>';
-                }).join('');
+        if (!list) return;
 
-                list.querySelectorAll('[data-activate]').forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        dm.setActiveSeason(btn.dataset.activate);
+        if (seasons.length) {
+            list.innerHTML = seasons.map(function(s) {
+                return '<div class="season-item' + (s.isActive ? ' active' : '') + '">' +
+                    '<div>' +
+                        '<div class="season-item-info">' + escapeHtml(s.label) + (s.isActive ? ' (Active)' : '') + '</div>' +
+                        '<div class="season-item-dates">' + (s.startDate || '') + (s.endDate ? ' — ' + s.endDate : '') + '</div>' +
+                    '</div>' +
+                    '<div class="season-item-actions">' +
+                        (!s.isActive ? '<button class="small-btn" data-activate="' + s.id + '">Activate</button>' : '') +
+                        '<button class="small-btn" data-edit-season="' + s.id + '">Edit</button>' +
+                        '<button class="small-btn" data-delete-season="' + s.id + '" style="color:var(--bad)">Del</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            list.querySelectorAll('[data-activate]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    dm.setActiveSeason(btn.dataset.activate);
+                    renderSeasonSelector();
+                    renderSeasonList();
+                });
+            });
+            list.querySelectorAll('[data-edit-season]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    openSeasonModal(btn.dataset.editSeason);
+                });
+            });
+            list.querySelectorAll('[data-delete-season]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (!confirm('Delete this season? (Only works if no trays/plants reference it)')) return;
+                    var ok = dm.deleteSeason(btn.dataset.deleteSeason);
+                    if (!ok) {
+                        alert('Cannot delete: trays or plants reference this season.');
+                    } else {
                         renderSeasonSelector();
-                        renderSettings();
-                    });
+                        renderSeasonList();
+                    }
                 });
-                list.querySelectorAll('[data-edit-season]').forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        openSeasonModal(btn.dataset.editSeason);
-                    });
-                });
-                list.querySelectorAll('[data-delete-season]').forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        if (!confirm('Delete this season? (Only works if no trays/plants reference it)')) return;
-                        var ok = dm.deleteSeason(btn.dataset.deleteSeason);
-                        if (!ok) {
-                            alert('Cannot delete: trays or plants reference this season.');
-                        } else {
-                            renderSeasonSelector();
-                            renderSettings();
-                        }
-                    });
-                });
-            } else {
-                list.innerHTML = '<div class="empty-state">No seasons created yet</div>';
-            }
+            });
+        } else {
+            list.innerHTML = '<div class="empty-state">No seasons created yet</div>';
         }
 
         var data = dm.load();
@@ -988,7 +989,6 @@
 
         closeModal('seasonModal');
         renderSeasonSelector();
-        renderSettings();
         renderCurrentTab();
     }
 

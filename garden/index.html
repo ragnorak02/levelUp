@@ -15,6 +15,7 @@
       <select id="seasonSelect">
         <option value="">No Season</option>
       </select>
+      <button class="season-add-btn" id="btnCreateSeason" aria-label="New Season">+</button>
     </div>
     <div class="nav-pills" id="navPills">
       <button class="nav-pill active" data-tab="tabDashboard">Home</button>
@@ -22,7 +23,6 @@
       <button class="nav-pill" data-tab="tabTrays">Trays</button>
       <button class="nav-pill" data-tab="tabPlants">Plants</button>
       <button class="nav-pill" data-tab="tabAnalytics">Stats</button>
-      <button class="nav-pill" data-tab="tabSettings">&#9881;</button>
     </div>
   </header>
 
@@ -106,15 +106,9 @@
       <div class="analytics-compare" id="analyticsCompare">
         <div class="empty-state">Need 2+ seasons with matching labels to compare</div>
       </div>
-    </section>
-
-    <!-- Tab 6: Settings -->
-    <section class="tab-section" id="tabSettings">
-      <h2>Settings</h2>
 
       <h3 class="section-heading">Seasons</h3>
       <div class="season-list" id="seasonList"></div>
-      <button class="cta-sm" id="btnCreateSeason" style="margin-top:8px">+ New Season</button>
 
       <h3 class="section-heading">Data</h3>
       <div class="settings-row">
@@ -125,9 +119,9 @@
       <div class="settings-row" style="margin-top:8px">
         <button class="ghost danger" id="btnClearData">Clear All Garden Data</button>
       </div>
-
       <div class="xp-total" id="settingsXP">Total XP: 0</div>
     </section>
+
   </div>
 
   <!-- Seed Modal -->

@@ -34,7 +34,19 @@ header{
 header .home{all:unset; cursor:pointer; padding:.35rem .6rem; border-radius:.6rem; border:1px solid var(--ring); flex-shrink:0}
 header .home:focus-visible{outline:2px solid var(--accent-2)}
 
-.season-selector{flex-shrink:0}
+.season-selector{flex-shrink:0; display:flex; align-items:center; gap:4px}
+.season-add-btn{
+    all:unset; cursor:pointer;
+    width:28px; height:28px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--accent), #22c55e);
+    color:#04130a;
+    font-size:1.1rem; font-weight:900; line-height:1;
+    box-shadow:0 2px 8px rgba(34,197,94,.3);
+    flex-shrink:0;
+}
+.season-add-btn:active{transform:scale(.92)}
 .season-selector select{
     padding:5px 8px; border-radius:8px; border:1px solid var(--ring);
     background:rgba(255,255,255,.06); color:var(--ink);
@@ -460,7 +472,7 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
 .analytics-seed-row .metric{color:var(--muted); font-size:.75rem; min-width:50px; text-align:right}
 .analytics-compare{display:flex; flex-direction:column; gap:8px}
 
-/* ===== Season list (settings) ===== */
+/* ===== Season list ===== */
 .season-list{display:flex; flex-direction:column; gap:6px}
 .season-item{
     display:flex;
