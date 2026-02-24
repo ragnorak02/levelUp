@@ -2,6 +2,18 @@
     --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7; --accent:#4CAF50; --accent-2:#2dd4bf;
     --ring:#2a3543; --warn:#f59e0b; --good:#22c55e; --bad:#ef4444;
     --garden:#22c55e;
+    --stage-planted:rgba(245,158,11,.8);
+    --stage-germinated:rgba(34,197,94,.8);
+    --stage-trueLeaves:rgba(59,130,246,.8);
+    --stage-ready:rgba(168,85,247,.8);
+    --stage-transplanted:rgba(34,197,94,.5);
+    --stage-failed:rgba(239,68,68,.6);
+    --stage-vegetative:#4ade80;
+    --stage-flowering:#a78bfa;
+    --stage-fruiting:#f97316;
+    --stage-harvesting:#f59e0b;
+    --stage-dormant:#64748b;
+    --stage-dead:#ef4444;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -11,32 +23,57 @@ body{
     display:flex; flex-direction:column;
 }
 
+/* ===== Header / Navigation ===== */
 header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:.6rem .9rem; border-bottom:1px solid var(--ring);
+    display:flex; align-items:center; gap:8px;
+    padding:.5rem .7rem; border-bottom:1px solid var(--ring);
     background: linear-gradient(180deg, rgba(11,15,20,.95), rgba(11,15,20,.75));
     backdrop-filter: blur(10px);
     position:sticky; top:0; z-index:20;
 }
-header h1{margin:0; font-size:1.05rem; letter-spacing:.2px}
-header .home{all:unset; cursor:pointer; padding:.35rem .6rem; border-radius:.6rem; border:1px solid var(--ring)}
+header .home{all:unset; cursor:pointer; padding:.35rem .6rem; border-radius:.6rem; border:1px solid var(--ring); flex-shrink:0}
 header .home:focus-visible{outline:2px solid var(--accent-2)}
 
-.header-actions{display:flex; gap:8px; align-items:center;}
-
-.wrap{width:min(1100px, 100%); margin-inline:auto; padding:8px 12px 12px; flex:1; display:flex; flex-direction:column; gap:8px}
-
-.card{
-    background:var(--card); border:1px solid rgba(42,53,67,.70); border-radius:16px;
-    padding:10px; box-shadow:0 4px 20px rgba(0,0,0,.20);
+.season-selector{flex-shrink:0}
+.season-selector select{
+    padding:5px 8px; border-radius:8px; border:1px solid var(--ring);
+    background:rgba(255,255,255,.06); color:var(--ink);
+    font-size:.78rem; font-weight:700; font-family:inherit; outline:none;
 }
+.season-selector select:focus{border-color:var(--good)}
 
-/* Summary grid */
+.nav-pills{
+    display:flex; gap:2px; overflow-x:auto; flex:1;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+}
+.nav-pills::-webkit-scrollbar{display:none}
+.nav-pill{
+    all:unset; cursor:pointer;
+    padding:5px 10px; border-radius:8px;
+    font-size:.75rem; font-weight:900; color:var(--muted);
+    white-space:nowrap;
+    transition: color .15s, background .15s;
+}
+.nav-pill:hover{color:var(--ink); background:rgba(255,255,255,.06)}
+.nav-pill.active{color:var(--good); background:rgba(34,197,94,.12)}
+
+/* ===== Layout ===== */
+.wrap{width:min(1100px, 100%); margin-inline:auto; padding:8px 12px 16px; flex:1; display:flex; flex-direction:column; gap:8px}
+
+.tab-section{display:none}
+.tab-section.active{display:block}
+
+.section-header{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px}
+.section-header h2{margin:0; font-size:1rem}
+.section-heading{font-size:.85rem; font-weight:900; color:var(--muted); margin:10px 0 6px; letter-spacing:.3px}
+
+/* ===== Summary grid ===== */
 .summary-grid{
     display:grid;
     grid-template-columns: repeat(4, 1fr);
     gap:8px;
-    margin-bottom:8px;
+    margin-bottom:4px;
 }
 .stat-card{
     background:rgba(255,255,255,.06);
@@ -52,69 +89,38 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
     color:var(--ink);
 }
 .stat-label{
-    font-size:.75rem;
+    font-size:.7rem;
     font-weight:800;
     color:var(--muted);
     margin-top:2px;
 }
 
-/* Action row */
-.cta-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px}
+/* ===== Card row (horizontal scroll) ===== */
+.card-row{display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch}
+.card-row::-webkit-scrollbar{height:4px}
+.card-row::-webkit-scrollbar-thumb{background:var(--ring); border-radius:2px}
+
+/* ===== Buttons ===== */
 .cta{
     all:unset; cursor:pointer; background:linear-gradient(90deg, var(--accent), #22c55e);
-    color:#04130a; padding:.65rem .9rem; border-radius:10px; font-weight:700; box-shadow:0 6px 20px rgba(34,197,94,.25)
+    color:#04130a; padding:.6rem .9rem; border-radius:10px; font-weight:700; box-shadow:0 6px 20px rgba(34,197,94,.25)
 }
 .cta:active{transform:translateY(1px)}
-.ghost{all:unset; cursor:pointer; color:var(--muted); padding:.5rem .7rem; border-radius:9px; border:1px solid var(--ring)}
-.small-btn{all:unset; cursor:pointer; color:var(--muted); padding:.4rem .6rem; border-radius:8px; border:1px solid var(--ring); font-size:.85rem}
+.cta-sm{
+    all:unset; cursor:pointer; background:linear-gradient(90deg, var(--accent), #22c55e);
+    color:#04130a; padding:.45rem .7rem; border-radius:8px; font-weight:700; font-size:.82rem;
+}
+.cta-sm:active{transform:translateY(1px)}
+.ghost{all:unset; cursor:pointer; color:var(--muted); padding:.45rem .7rem; border-radius:9px; border:1px solid var(--ring); font-size:.85rem; font-weight:700}
+.ghost:hover{background:rgba(255,255,255,.06)}
+.ghost.danger{color:var(--bad); border-color:rgba(239,68,68,.3)}
+.ghost.danger:hover{background:rgba(239,68,68,.08)}
+.small-btn{all:unset; cursor:pointer; color:var(--muted); padding:.4rem .6rem; border-radius:8px; border:1px solid var(--ring); font-size:.85rem; font-weight:700}
 .small-btn:hover{background:rgba(255,255,255,.06)}
+.cta-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px}
 
-/* Plant grid */
-.plant-grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap:8px;
-}
-
-.plant-card{
-    background:rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.10);
-    border-radius:14px;
-    padding:12px;
-    cursor:pointer;
-    transition: border-color .2s, box-shadow .2s;
-    position:relative;
-}
-.plant-card:hover{border-color:rgba(34,197,94,.35); box-shadow:0 0 10px rgba(34,197,94,.12)}
-.plant-card:active{transform:translateY(1px)}
-
-.plant-emoji{font-size:1.8rem; line-height:1; margin-bottom:6px}
-.plant-name{font-weight:900; font-size:.9rem; margin-bottom:2px}
-.plant-variety{font-size:.78rem; color:var(--muted); font-weight:700}
-.plant-card-bottom{display:flex; justify-content:space-between; align-items:center; margin-top:8px}
-
-.status-badge{
-    display:inline-block;
-    padding:2px 8px;
-    border-radius:999px;
-    font-size:.7rem;
-    font-weight:900;
-    text-transform:uppercase;
-    letter-spacing:.3px;
-}
-.status-badge.seeded{background:rgba(245,158,11,.15); color:var(--warn)}
-.status-badge.germinated{background:rgba(34,197,94,.15); color:#4ade80}
-.status-badge.indoor{background:rgba(59,130,246,.15); color:#60a5fa}
-.status-badge.hardened{background:rgba(168,85,247,.15); color:#a78bfa}
-.status-badge.in-ground{background:rgba(34,197,94,.25); color:var(--good)}
-.status-badge.harvesting{background:rgba(245,158,11,.25); color:var(--warn)}
-.status-badge.completed{background:rgba(34,197,94,.35); color:var(--good)}
-.status-badge.failed{background:rgba(239,68,68,.15); color:var(--bad)}
-
-.plant-xp{font-size:.75rem; color:var(--muted); font-weight:800}
-
-/* Empty state */
-.empty{
+/* ===== Empty / misc ===== */
+.empty-state{
     padding:16px;
     border-radius:14px;
     border:1px dashed rgba(255,255,255,.18);
@@ -123,9 +129,145 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
     font-weight:850;
     line-height:1.4;
     text-align:center;
+    width:100%;
 }
+.settings-row{display:flex; gap:8px; flex-wrap:wrap}
+.xp-total{margin-top:16px; font-size:.85rem; font-weight:900; color:var(--muted)}
 
-/* Lifecycle timeline */
+/* ===== Filter pills ===== */
+.filter-pills{display:flex; gap:4px; flex-wrap:wrap; margin-bottom:8px}
+.filter-pill{
+    all:unset; cursor:pointer;
+    padding:4px 10px; border-radius:999px;
+    font-size:.72rem; font-weight:900; text-transform:uppercase;
+    color:var(--muted); border:1px solid var(--ring);
+    transition: color .15s, border-color .15s, background .15s;
+}
+.filter-pill:hover{color:var(--ink); background:rgba(255,255,255,.06)}
+.filter-pill.active{color:var(--good); border-color:var(--good); background:rgba(34,197,94,.1)}
+
+/* ===== Seed grid ===== */
+.seed-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap:8px;
+}
+.seed-card{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:14px;
+    padding:12px;
+    cursor:pointer;
+    transition: border-color .2s, box-shadow .2s;
+}
+.seed-card:hover{border-color:rgba(34,197,94,.35); box-shadow:0 0 10px rgba(34,197,94,.12)}
+.seed-card:active{transform:translateY(1px)}
+.seed-emoji{font-size:1.6rem; line-height:1; margin-bottom:4px}
+.seed-name{font-weight:900; font-size:.88rem; margin-bottom:2px}
+.seed-variety{font-size:.75rem; color:var(--muted); font-weight:700}
+.seed-stats{display:flex; gap:8px; margin-top:6px; font-size:.72rem; color:var(--muted); font-weight:800}
+
+/* ===== Tray list ===== */
+.tray-list{display:flex; flex-direction:column; gap:8px}
+.tray-card{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:14px;
+    padding:12px;
+    cursor:pointer;
+    transition: border-color .2s;
+}
+.tray-card:hover{border-color:rgba(34,197,94,.35)}
+.tray-card:active{transform:translateY(1px)}
+.tray-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px}
+.tray-title{font-weight:900; font-size:.9rem}
+.tray-fill{font-size:.75rem; color:var(--muted); font-weight:800}
+.tray-mini-cells{display:flex; flex-wrap:wrap; gap:2px}
+.tray-mini-cell{
+    width:10px; height:10px; border-radius:2px;
+    background:rgba(255,255,255,.08);
+}
+.tray-mini-cell.planted{background:var(--stage-planted)}
+.tray-mini-cell.germinated{background:var(--stage-germinated)}
+.tray-mini-cell.trueLeaves{background:var(--stage-trueLeaves)}
+.tray-mini-cell.readyToTransplant{background:var(--stage-ready)}
+.tray-mini-cell.transplanted{background:var(--stage-transplanted)}
+.tray-mini-cell.failed{background:var(--stage-failed)}
+
+/* ===== Cell grid (tray detail) ===== */
+.cell-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    gap:4px;
+    margin-bottom:10px;
+}
+.cell{
+    aspect-ratio:1;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    font-size:.85rem;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    line-height:1;
+    transition: border-color .15s, background .15s;
+    position:relative;
+}
+.cell:hover{border-color:rgba(34,197,94,.4)}
+.cell.planted{background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.3)}
+.cell.germinated{background:rgba(34,197,94,.12); border-color:rgba(34,197,94,.3)}
+.cell.trueLeaves{background:rgba(59,130,246,.12); border-color:rgba(59,130,246,.3)}
+.cell.readyToTransplant{background:rgba(168,85,247,.12); border-color:rgba(168,85,247,.3)}
+.cell.transplanted{background:rgba(34,197,94,.06); border-color:rgba(34,197,94,.15); opacity:.5; cursor:default}
+.cell.failed{background:rgba(239,68,68,.08); border-color:rgba(239,68,68,.2); opacity:.4; cursor:default}
+.tray-actions{display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap}
+
+/* ===== Plant grid ===== */
+.plant-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap:8px;
+}
+.plant-card{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:14px;
+    padding:12px;
+    cursor:pointer;
+    transition: border-color .2s, box-shadow .2s;
+}
+.plant-card:hover{border-color:rgba(34,197,94,.35); box-shadow:0 0 10px rgba(34,197,94,.12)}
+.plant-card:active{transform:translateY(1px)}
+.plant-emoji{font-size:1.8rem; line-height:1; margin-bottom:6px}
+.plant-name{font-weight:900; font-size:.9rem; margin-bottom:2px}
+.plant-variety{font-size:.78rem; color:var(--muted); font-weight:700}
+.plant-card-bottom{display:flex; justify-content:space-between; align-items:center; margin-top:8px}
+.plant-yield{font-size:.75rem; color:var(--muted); font-weight:800}
+
+/* ===== Status/Stage badges ===== */
+.status-badge{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:.68rem;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+}
+.status-badge.vegetative{background:rgba(74,222,128,.15); color:var(--stage-vegetative)}
+.status-badge.flowering{background:rgba(167,139,250,.15); color:var(--stage-flowering)}
+.status-badge.fruiting{background:rgba(249,115,22,.15); color:var(--stage-fruiting)}
+.status-badge.harvesting{background:rgba(245,158,11,.20); color:var(--stage-harvesting)}
+.status-badge.dormant{background:rgba(100,116,139,.15); color:var(--stage-dormant)}
+.status-badge.dead{background:rgba(239,68,68,.15); color:var(--stage-dead)}
+.status-badge.archived{background:rgba(100,116,139,.10); color:#64748b}
+
+/* ===== Lifecycle timeline ===== */
 .lifecycle-timeline{
     display:flex;
     align-items:center;
@@ -164,7 +306,7 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
     background:var(--bad);
 }
 .lifecycle-label{
-    font-size:.65rem;
+    font-size:.6rem;
     font-weight:800;
     color:var(--muted);
     text-align:center;
@@ -179,7 +321,7 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
 }
 .lifecycle-connector.completed{background:var(--good)}
 
-/* Modal / Sheet */
+/* ===== Modal / Sheet ===== */
 .popup{
     position:fixed; inset:0; display:none; z-index:50;
 }
@@ -187,7 +329,8 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
 .popup-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55)}
 .sheet{
     position:relative;
-    max-width:600px;
+    max-width:500px;
+    width:calc(100% - 24px);
     max-height:90vh;
     overflow-y:auto;
     margin:5vh auto;
@@ -197,6 +340,7 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
     padding:16px;
     box-shadow:0 20px 60px rgba(0,0,0,.45);
 }
+.sheet-lg{max-width:700px}
 .sheet-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px}
 .sheet-title{font-weight:900; font-size:1rem; letter-spacing:.02em}
 .sheet-close{
@@ -205,7 +349,7 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
 }
 .sheet-close:hover{background:#142033}
 
-/* Form fields */
+/* ===== Form fields ===== */
 .form-row{display:flex; flex-direction:column; gap:4px; margin-bottom:10px}
 .form-row label{font-weight:900; font-size:.78rem; color:var(--muted)}
 .form-row input,
@@ -220,12 +364,18 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
     font-size:.88rem;
     font-weight:700;
     outline:none;
+    color-scheme:dark;
 }
 .form-row input:focus,
 .form-row select:focus,
 .form-row textarea:focus{border-color:var(--good)}
+.form-row select option{
+    background:#131a22;
+    color:#e8eef6;
+}
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px}
 
-/* Tabs */
+/* ===== Tabs (inside modals) ===== */
 .tab-bar{
     display:flex;
     gap:0;
@@ -247,7 +397,7 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
 
-/* Detail items list */
+/* ===== Detail items list ===== */
 .detail-list{display:flex; flex-direction:column; gap:6px}
 .detail-item{
     display:flex;
@@ -262,7 +412,87 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
 }
 .detail-item .date{color:var(--muted); font-size:.75rem}
 
-/* XP toast */
+/* ===== Activity feed ===== */
+.activity-feed{display:flex; flex-direction:column; gap:4px}
+.activity-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:6px 10px;
+    border-radius:8px;
+    background:rgba(255,255,255,.03);
+    font-size:.78rem;
+    font-weight:700;
+}
+.activity-item .xp-badge{
+    background:rgba(34,197,94,.15);
+    color:var(--good);
+    padding:2px 6px;
+    border-radius:6px;
+    font-size:.7rem;
+    font-weight:900;
+}
+
+/* ===== Analytics ===== */
+.analytics-summary{display:grid; grid-template-columns:repeat(3, 1fr); gap:8px}
+.analytics-card{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:12px;
+    padding:10px;
+    text-align:center;
+}
+.analytics-val{font-size:1.3rem; font-weight:800; color:var(--ink)}
+.analytics-label{font-size:.7rem; font-weight:800; color:var(--muted); margin-top:2px}
+.analytics-seeds{display:flex; flex-direction:column; gap:6px}
+.analytics-seed-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 10px;
+    border-radius:10px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    font-size:.82rem;
+    font-weight:700;
+}
+.analytics-seed-row .name{flex:1; font-weight:900}
+.analytics-seed-row .metric{color:var(--muted); font-size:.75rem; min-width:50px; text-align:right}
+.analytics-compare{display:flex; flex-direction:column; gap:8px}
+
+/* ===== Season list (settings) ===== */
+.season-list{display:flex; flex-direction:column; gap:6px}
+.season-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 10px;
+    border-radius:10px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+}
+.season-item.active{border-color:rgba(34,197,94,.3); background:rgba(34,197,94,.06)}
+.season-item-info{font-weight:900; font-size:.85rem}
+.season-item-dates{font-size:.72rem; color:var(--muted); font-weight:700}
+.season-item-actions{display:flex; gap:6px}
+
+/* ===== Dashboard tray/plant previews ===== */
+.dash-tray-card, .dash-plant-card{
+    flex-shrink:0;
+    min-width:140px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:12px;
+    padding:10px;
+    cursor:pointer;
+}
+.dash-tray-card:hover, .dash-plant-card:hover{border-color:rgba(34,197,94,.3)}
+.dash-tray-title{font-weight:900; font-size:.8rem; margin-bottom:4px}
+.dash-plant-emoji{font-size:1.2rem}
+.dash-plant-name{font-weight:900; font-size:.78rem}
+.dash-plant-stage{font-size:.68rem; color:var(--muted); font-weight:800}
+
+/* ===== XP toast ===== */
 .xp-toast{
     position:fixed;
     bottom:20px;
@@ -285,7 +515,7 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
     opacity:1;
 }
 
-/* Import file input (hidden) */
+/* ===== Hidden elements ===== */
 .file-input-hidden{
     position:absolute;
     opacity:0;
@@ -294,14 +524,18 @@ header .home:focus-visible{outline:2px solid var(--accent-2)}
     overflow:hidden;
 }
 
+/* ===== Responsive ===== */
 @media (max-width: 480px){
     .summary-grid{grid-template-columns: repeat(2, 1fr)}
-    .plant-grid{grid-template-columns: repeat(2, 1fr)}
-    .wrap{gap:8px; padding:8px 8px 12px}
-    .card{padding:10px; border-radius:12px}
-    .stat-val{font-size:1.2rem}
+    .plant-grid, .seed-grid{grid-template-columns: repeat(2, 1fr)}
+    .analytics-summary{grid-template-columns:repeat(2, 1fr)}
+    .form-grid{grid-template-columns:1fr}
+    .wrap{padding:8px 8px 12px}
+    .nav-pill{padding:4px 8px; font-size:.7rem}
+    .cell-grid{grid-template-columns: repeat(auto-fill, minmax(36px, 1fr))}
 }
 @media (max-width: 360px){
-    .plant-grid{grid-template-columns: 1fr}
+    .plant-grid, .seed-grid{grid-template-columns: 1fr}
     .summary-grid{grid-template-columns: repeat(2, 1fr)}
+    .analytics-summary{grid-template-columns:1fr}
 }
