@@ -1423,12 +1423,21 @@ function renderMedicineCard(){
 
   body.innerHTML = html;
 
-  // Bind pill clicks
+  // Bind pill clicks — untaken
   body.querySelectorAll('.med-pill:not(.taken):not(.locked)').forEach(btn => {
     btn.addEventListener('click', () => {
       const medName = btn.dataset.med;
       const slotIndex = Number(btn.dataset.slot);
       openMedicineModal(medName, slotIndex);
+    });
+  });
+
+  // Bind pill clicks — taken (edit mode)
+  body.querySelectorAll('.med-pill.taken').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const medName = btn.dataset.med;
+      const slotIndex = Number(btn.dataset.slot);
+      openMedicineEditModal(medName, slotIndex);
     });
   });
 
@@ -1451,17 +1460,23 @@ function openMedicineModal(medName, slotIndex){
     return;
   }
 
-  medicineState.activeModal = { medName, slotIndex };
+  medicineState.activeModal = { medName, slotIndex, editMode: false };
 
   const overlay = $('medModalOverlay');
   const title = $('medModalTitle');
   const reminderRow = $('medReminderRow');
+  const editRow = $('medEditRow');
+  const takeBtn = $('medMarkTaken');
+  const remindBtn = $('medSetReminder');
 
   if(title){
     const labels = { antibiotics: 'Antibiotics', tylenol: 'Tylenol' };
     title.textContent = (labels[medName] || medName) + ' — Dose ' + (slotIndex + 1);
   }
   if(reminderRow) reminderRow.style.display = 'none';
+  if(editRow) editRow.style.display = 'none';
+  if(takeBtn) takeBtn.style.display = '';
+  if(remindBtn) remindBtn.style.display = '';
   if(overlay) overlay.classList.add('open');
 }
 
@@ -1469,6 +1484,16 @@ function closeMedicineModal(){
   const overlay = $('medModalOverlay');
   if(overlay) overlay.classList.remove('open');
   medicineState.activeModal = null;
+
+  // Reset all modal content visibility
+  const editRow = $('medEditRow');
+  const reminderRow = $('medReminderRow');
+  const takeBtn = $('medMarkTaken');
+  const remindBtn = $('medSetReminder');
+  if(editRow) editRow.style.display = 'none';
+  if(reminderRow) reminderRow.style.display = 'none';
+  if(takeBtn) takeBtn.style.display = '';
+  if(remindBtn) remindBtn.style.display = '';
 }
 
 function handleMarkTaken(){
@@ -1514,6 +1539,90 @@ function handleClearToday(){
   clearTodayMeds();
   renderMedicineCard();
   showMedToast('Today\'s doses cleared');
+}
+
+function openMedicineEditModal(medName, slotIndex){
+  medicineState.activeModal = { medName, slotIndex, editMode: true };
+
+  const overlay = $('medModalOverlay');
+  const title = $('medModalTitle');
+  const editRow = $('medEditRow');
+  const reminderRow = $('medReminderRow');
+  const takeBtn = $('medMarkTaken');
+  const remindBtn = $('medSetReminder');
+  const timeInput = $('medEditTime');
+
+  if(title){
+    const labels = { antibiotics: 'Antibiotics', tylenol: 'Tylenol' };
+    title.textContent = (labels[medName] || medName) + ' — Dose ' + (slotIndex + 1);
+  }
+
+  // Hide normal buttons, show edit row
+  if(takeBtn) takeBtn.style.display = 'none';
+  if(remindBtn) remindBtn.style.display = 'none';
+  if(reminderRow) reminderRow.style.display = 'none';
+  if(editRow) editRow.style.display = '';
+
+  // Pre-fill time from current takenAt
+  if(timeInput){
+    const today = getTodayMeds();
+    const med = today[medName];
+    if(med && med.doses[slotIndex] && med.doses[slotIndex].takenAt){
+      const dt = new Date(med.doses[slotIndex].takenAt);
+      const hh = String(dt.getHours()).padStart(2, '0');
+      const mm = String(dt.getMinutes()).padStart(2, '0');
+      timeInput.value = hh + ':' + mm;
+    }
+  }
+
+  if(overlay) overlay.classList.add('open');
+}
+
+function handleUndoDose(){
+  if(!medicineState.activeModal) return;
+  const { medName, slotIndex } = medicineState.activeModal;
+
+  const state = loadMedicineState();
+  const today = state[todayISO];
+  if(!today || !today[medName]) return;
+
+  today[medName].doses[slotIndex].takenAt = null;
+
+  // Tylenol cleanup: remove trailing empty slots to prevent buildup
+  if(medName === 'tylenol'){
+    const doses = today.tylenol.doses;
+    while(doses.length > 1 && !doses[doses.length - 1].takenAt){
+      doses.pop();
+    }
+    // Always keep at least one empty slot if none remain
+    if(doses.every(d => d.takenAt)){
+      doses.push({ takenAt: null, reminder: null });
+    }
+  }
+
+  saveMedicineState(state);
+  closeMedicineModal();
+  renderMedicineCard();
+  showMedToast('Dose undone');
+}
+
+function handleEditTimeSave(){
+  if(!medicineState.activeModal) return;
+  const { medName, slotIndex } = medicineState.activeModal;
+  const timeInput = $('medEditTime');
+  if(!timeInput || !timeInput.value) return;
+
+  const state = loadMedicineState();
+  const today = state[todayISO];
+  if(!today || !today[medName]) return;
+
+  const newISO = todayISO + 'T' + timeInput.value + ':00';
+  today[medName].doses[slotIndex].takenAt = newISO;
+  saveMedicineState(state);
+
+  closeMedicineModal();
+  renderMedicineCard();
+  showMedToast('Time updated to ' + formatTime12(newISO));
 }
 
 /* Medicine Reminders */
@@ -1969,6 +2078,12 @@ function bindButtons(){
 
   const medReminderSave = $('medReminderSave');
   if(medReminderSave) medReminderSave.addEventListener('click', handleReminderSave);
+
+  const medUndoDose = $('medUndoDose');
+  if(medUndoDose) medUndoDose.addEventListener('click', handleUndoDose);
+
+  const medEditTimeSave = $('medEditTimeSave');
+  if(medEditTimeSave) medEditTimeSave.addEventListener('click', handleEditTimeSave);
 
   const medClear = $('medClearToday');
   if(medClear) medClear.addEventListener('click', handleClearToday);
