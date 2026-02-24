@@ -83,6 +83,7 @@
             <button class="qicon" id="travelToggleBtn" title="Travel">✈️</button>
             <button class="qicon" id="calToggleBtn" title="Toggle Calendar">📅</button>
             <button class="qicon" id="recipesToggleBtn" title="Recipes">🍳</button>
+            <button class="qicon" id="medToggleBtn" title="Medicine">💊</button>
           </div>
         </div>
       </div>
@@ -299,6 +300,38 @@
         <div id="recipesBody"></div>
       </div>
     </section>
+
+    <!-- MEDICINE: Post-surgery tracker -->
+    <section class="card med-card detail-panel" data-focus="medicine" style="display:none;">
+      <div class="card-inner">
+        <div class="med-head">
+          <div><b>Medicine</b><span class="med-sub" id="medSub">Today</span></div>
+          <button class="mini med-clear-btn" id="medClearToday">Clear Today</button>
+        </div>
+        <div id="medBody"></div>
+      </div>
+    </section>
+
+    <!-- Medicine Pill Modal -->
+    <div class="med-modal-overlay" id="medModalOverlay">
+      <div class="med-modal">
+        <div class="med-modal-head">
+          <b id="medModalTitle">Take Dose</b>
+          <button class="cal-event-del" id="medModalClose" title="Close">✕</button>
+        </div>
+        <div class="med-modal-body">
+          <button class="med-action-btn med-take-btn" id="medMarkTaken">Mark Taken Now</button>
+          <button class="med-action-btn med-remind-btn" id="medSetReminder">Set Reminder</button>
+          <div class="med-reminder-row" id="medReminderRow" style="display:none;">
+            <input type="time" id="medReminderTime" />
+            <button class="mini" id="medReminderSave">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medicine Toast -->
+    <div class="med-toast" id="medToast"></div>
   </main>
 
   <script src="./main.js"></script>
