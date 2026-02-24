@@ -831,7 +831,7 @@ function renderGardenDashboard(){
    Carousel: swipe between bowling + garden
 ----------------------------------*/
 let carouselIndex = 0;
-const CAROUSEL_SLIDE_COUNT = 2;
+const CAROUSEL_SLIDE_COUNT = 3;
 
 function initCarousel(){
   const prev = $('carouselPrev');
@@ -1628,6 +1628,29 @@ function renderTravelCard(){
   }).join('');
 }
 
+function renderTravelCompact(){
+  const trips = loadTravelTrips();
+  const sub = $('travelCompactSub');
+  if(!sub) return;
+
+  if(!trips.length){
+    sub.textContent = 'No trips';
+    return;
+  }
+
+  const now = todayISO;
+  const upcoming = trips.filter(t => t.startDate && t.startDate >= now)
+    .sort((a, b) => a.startDate.localeCompare(b.startDate));
+
+  if(upcoming.length){
+    const next = upcoming[0];
+    const name = next.name || next.title || 'Untitled';
+    sub.textContent = `${trips.length} trip${trips.length !== 1 ? 's' : ''} · Next: ${name}`;
+  } else {
+    sub.textContent = `${trips.length} trip${trips.length !== 1 ? 's' : ''}`;
+  }
+}
+
 /* --------------------------------
    Recipes: dashboard preview
 ----------------------------------*/
@@ -1904,16 +1927,6 @@ function bindButtons(){
     openNutrition.addEventListener('click', ()=> location.href = './nutrition/index.html');
   }
 
-  // Travel toggle
-  const travelToggle = $('travelToggleBtn');
-  if(travelToggle){
-    travelToggle.addEventListener('click', () => {
-      focusModule = focusModule === 'travel' ? null : 'travel';
-      if(focusModule === 'travel') renderTravelCard();
-      updateFocusMode();
-    });
-  }
-
   // Recipes toggle
   const recipesToggle = $('recipesToggleBtn');
   if(recipesToggle){
@@ -2094,7 +2107,7 @@ function highlightImprovedToday(){
    Focus Mode
 ----------------------------------*/
 function updateFocusMode(){
-  const isQiconFocus = focusModule === 'travel' || focusModule === 'recipes' || focusModule === 'medicine';
+  const isQiconFocus = focusModule === 'recipes' || focusModule === 'medicine';
   const isModvFocus = focusModule && !isQiconFocus;
 
   // Update modv selected state — clear when a qicon is focused
@@ -2103,10 +2116,8 @@ function updateFocusMode(){
   });
 
   // Update qicon active state — clear when a modv is focused
-  const travelBtn = $('travelToggleBtn');
   const recipesBtn = $('recipesToggleBtn');
   const medBtn = $('medToggleBtn');
-  if(travelBtn) travelBtn.classList.toggle('active', focusModule === 'travel');
   if(recipesBtn) recipesBtn.classList.toggle('active', focusModule === 'recipes');
   if(medBtn) medBtn.classList.toggle('active', focusModule === 'medicine');
 
@@ -2291,6 +2302,7 @@ function renderAll(){
   renderFinanceDonut();
   renderBowlDashboard();
   renderGardenDashboard();
+  renderTravelCompact();
   if(calendarVisible) renderCalendarGrid();
 }
 
