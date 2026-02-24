@@ -5,97 +5,298 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Garden</title>
 <link rel="stylesheet" href="garden.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
+  <!-- Top Nav Bar -->
   <header>
-    <button class="home" onclick="location.href='../main.html'" aria-label="Menu">&#9776;</button>
-    <h1>Garden</h1>
-    <div class="header-actions">
-      <button class="small-btn" id="btnExport" title="Export data">Export</button>
-      <button class="small-btn" id="btnImport" title="Import data">Import</button>
-      <input type="file" id="importFile" class="file-input-hidden" accept=".json" />
+    <button class="home" onclick="location.href='../main.html'" aria-label="Home">&#9776;</button>
+    <div class="season-selector">
+      <select id="seasonSelect">
+        <option value="">No Season</option>
+      </select>
+    </div>
+    <div class="nav-pills" id="navPills">
+      <button class="nav-pill active" data-tab="tabDashboard">Home</button>
+      <button class="nav-pill" data-tab="tabSeeds">Seeds</button>
+      <button class="nav-pill" data-tab="tabTrays">Trays</button>
+      <button class="nav-pill" data-tab="tabPlants">Plants</button>
+      <button class="nav-pill" data-tab="tabAnalytics">Stats</button>
+      <button class="nav-pill" data-tab="tabSettings">&#9881;</button>
     </div>
   </header>
 
   <div class="wrap">
-    <!-- Summary Grid -->
-    <div class="summary-grid">
-      <div class="stat-card">
-        <div class="stat-val" id="statActive">0</div>
-        <div class="stat-label">Active</div>
+    <!-- Tab 1: Dashboard -->
+    <section class="tab-section active" id="tabDashboard">
+      <div class="summary-grid">
+        <div class="stat-card"><div class="stat-val" id="dashSeeds">0</div><div class="stat-label">Seeds Started</div></div>
+        <div class="stat-card"><div class="stat-val" id="dashGerm">0</div><div class="stat-label">Germinated</div></div>
+        <div class="stat-card"><div class="stat-val" id="dashTransplant">0</div><div class="stat-label">Transplanted</div></div>
+        <div class="stat-card"><div class="stat-val" id="dashHarvest">0</div><div class="stat-label">Harvesting</div></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-val" id="statYield">0</div>
-        <div class="stat-label">Yield</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="statXP">0</div>
-        <div class="stat-label">XP</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="statBreakdown" style="font-size:.75rem">None</div>
-        <div class="stat-label">Stages</div>
-      </div>
-    </div>
 
-    <!-- Actions -->
-    <div class="cta-row">
-      <button class="cta" id="btnAddPlant">Add Plant</button>
-    </div>
+      <h3 class="section-heading">Active Trays</h3>
+      <div class="card-row" id="dashTrays">
+        <div class="empty-state">No trays yet</div>
+      </div>
 
-    <!-- Plant Grid -->
-    <div class="plant-grid" id="plantGrid"></div>
+      <h3 class="section-heading">Active Plants</h3>
+      <div class="card-row" id="dashPlants">
+        <div class="empty-state">No plants yet</div>
+      </div>
+
+      <h3 class="section-heading">Recent Activity</h3>
+      <div class="activity-feed" id="dashActivity">
+        <div class="empty-state">No activity yet</div>
+      </div>
+    </section>
+
+    <!-- Tab 2: Seed Bank -->
+    <section class="tab-section" id="tabSeeds">
+      <div class="section-header">
+        <h2>Seed Bank</h2>
+        <button class="cta-sm" id="btnAddSeed">+ Add Seed</button>
+      </div>
+      <div class="seed-grid" id="seedGrid">
+        <div class="empty-state">No seeds in the bank. Add your first seed!</div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Trays -->
+    <section class="tab-section" id="tabTrays">
+      <div class="section-header">
+        <h2>Trays</h2>
+        <button class="cta-sm" id="btnAddTray">+ New Tray</button>
+      </div>
+      <div class="tray-list" id="trayList">
+        <div class="empty-state">No trays for this season</div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Plants -->
+    <section class="tab-section" id="tabPlants">
+      <div class="section-header">
+        <h2>Plants</h2>
+      </div>
+      <div class="filter-pills" id="plantFilters">
+        <button class="filter-pill active" data-filter="all">All</button>
+        <button class="filter-pill" data-filter="vegetative">Vegetative</button>
+        <button class="filter-pill" data-filter="flowering">Flowering</button>
+        <button class="filter-pill" data-filter="fruiting">Fruiting</button>
+        <button class="filter-pill" data-filter="harvesting">Harvesting</button>
+        <button class="filter-pill" data-filter="archived">Archived</button>
+      </div>
+      <div class="plant-grid" id="plantGrid">
+        <div class="empty-state">No plants for this season</div>
+      </div>
+    </section>
+
+    <!-- Tab 5: Analytics -->
+    <section class="tab-section" id="tabAnalytics">
+      <h2>Analytics</h2>
+
+      <h3 class="section-heading">Season Summary</h3>
+      <div class="analytics-summary" id="analyticsSeason"></div>
+
+      <h3 class="section-heading">Seed Performance</h3>
+      <div class="analytics-seeds" id="analyticsSeedTable"></div>
+
+      <h3 class="section-heading">Season Comparison</h3>
+      <div class="analytics-compare" id="analyticsCompare">
+        <div class="empty-state">Need 2+ seasons with matching labels to compare</div>
+      </div>
+    </section>
+
+    <!-- Tab 6: Settings -->
+    <section class="tab-section" id="tabSettings">
+      <h2>Settings</h2>
+
+      <h3 class="section-heading">Seasons</h3>
+      <div class="season-list" id="seasonList"></div>
+      <button class="cta-sm" id="btnCreateSeason" style="margin-top:8px">+ New Season</button>
+
+      <h3 class="section-heading">Data</h3>
+      <div class="settings-row">
+        <button class="ghost" id="btnExport">Export Data</button>
+        <button class="ghost" id="btnImport">Import Data</button>
+        <input type="file" id="importFile" class="file-input-hidden" accept=".json" />
+      </div>
+      <div class="settings-row" style="margin-top:8px">
+        <button class="ghost danger" id="btnClearData">Clear All Garden Data</button>
+      </div>
+
+      <div class="xp-total" id="settingsXP">Total XP: 0</div>
+    </section>
   </div>
 
-  <!-- Add Plant Modal -->
-  <div class="popup" id="addPlantModal">
+  <!-- Seed Modal -->
+  <div class="popup" id="seedModal">
     <div class="popup-backdrop"></div>
     <div class="sheet">
       <div class="sheet-head">
-        <div class="sheet-title">Add Plant</div>
-        <button class="sheet-close" id="addModalClose" type="button">&#10005;</button>
+        <div class="sheet-title" id="seedModalTitle">Add Seed</div>
+        <button class="sheet-close" id="seedModalClose" type="button">&#10005;</button>
       </div>
       <div class="form-row">
-        <label for="addPlantType">Plant Type</label>
-        <select id="addPlantType"></select>
+        <label for="seedName">Plant Name</label>
+        <input type="text" id="seedName" placeholder="e.g. Tomato" />
       </div>
       <div class="form-row">
-        <label for="addPlantVariety">Variety</label>
-        <select id="addPlantVariety">
-          <option value="">-- Select variety --</option>
+        <label for="seedVariety">Variety</label>
+        <input type="text" id="seedVariety" placeholder="e.g. Cherry" />
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label>Days to Germ</label><input type="number" id="seedDaysGerm" min="0" placeholder="7" /></div>
+        <div class="form-row"><label>Days to Transplant</label><input type="number" id="seedDaysTransplant" min="0" placeholder="30" /></div>
+        <div class="form-row"><label>Days to Flower</label><input type="number" id="seedDaysFlower" min="0" placeholder="60" /></div>
+        <div class="form-row"><label>Days to Fruit</label><input type="number" id="seedDaysFruit" min="0" placeholder="90" /></div>
+      </div>
+      <div class="form-row">
+        <label for="seedNotes">Notes</label>
+        <textarea id="seedNotes" rows="2" placeholder="Planting tips, source, etc."></textarea>
+      </div>
+      <input type="hidden" id="seedEditId" value="" />
+      <button class="cta" id="btnSaveSeed" style="width:100%; text-align:center; margin-top:8px">Save Seed</button>
+    </div>
+  </div>
+
+  <!-- Tray Modal -->
+  <div class="popup" id="trayModal">
+    <div class="popup-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="sheet-title">New Tray</div>
+        <button class="sheet-close" id="trayModalClose" type="button">&#10005;</button>
+      </div>
+      <div class="form-row">
+        <label for="traySize">Tray Size (cells)</label>
+        <select id="traySize">
+          <option value="6">6</option>
+          <option value="12">12</option>
+          <option value="24">24</option>
+          <option value="36">36</option>
+          <option value="48">48</option>
+          <option value="72" selected>72</option>
+          <option value="128">128</option>
         </select>
       </div>
-      <button class="cta" id="btnSavePlant" style="width:100%; text-align:center; margin-top:8px">Plant It!</button>
+      <button class="cta" id="btnSaveTray" style="width:100%; text-align:center; margin-top:8px">Create Tray</button>
+    </div>
+  </div>
+
+  <!-- Tray Detail Modal -->
+  <div class="popup" id="trayDetailModal">
+    <div class="popup-backdrop"></div>
+    <div class="sheet sheet-lg">
+      <div class="sheet-head">
+        <div class="sheet-title" id="trayDetailTitle">Tray Detail</div>
+        <button class="sheet-close" id="trayDetailClose" type="button">&#10005;</button>
+      </div>
+      <div class="tray-actions">
+        <button class="ghost" id="btnWaterAll">Water All</button>
+        <button class="ghost danger" id="btnDeleteTray">Delete Tray</button>
+      </div>
+      <div class="cell-grid" id="cellGrid"></div>
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="trayCarePnl">Care Log</button>
+      </div>
+      <div class="tab-panel active" id="trayCarePnl">
+        <div class="form-row" style="flex-direction:row; gap:8px; align-items:flex-end; margin-bottom:8px">
+          <div style="flex:1"><label>Action</label><input type="text" id="trayCareAction" placeholder="e.g. Fertilize" /></div>
+          <button class="small-btn" id="btnAddTrayCare">Add</button>
+        </div>
+        <div class="detail-list" id="trayCareList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cell Action Modal -->
+  <div class="popup" id="cellModal">
+    <div class="popup-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="sheet-title" id="cellModalTitle">Cell</div>
+        <button class="sheet-close" id="cellModalClose" type="button">&#10005;</button>
+      </div>
+      <div id="cellModalBody"></div>
     </div>
   </div>
 
   <!-- Plant Detail Modal -->
-  <div class="popup" id="detailModal">
+  <div class="popup" id="plantDetailModal">
     <div class="popup-backdrop"></div>
-    <div class="sheet">
+    <div class="sheet sheet-lg">
       <div class="sheet-head">
-        <div class="sheet-title" id="detailTitle">Plant Details</div>
-        <button class="sheet-close" id="detailModalClose" type="button">&#10005;</button>
+        <div class="sheet-title" id="plantDetailTitle">Plant Details</div>
+        <button class="sheet-close" id="plantDetailClose" type="button">&#10005;</button>
       </div>
-
-      <!-- Lifecycle Timeline -->
-      <div class="lifecycle-timeline" id="lifecycleTimeline"></div>
-
-      <!-- Actions -->
-      <div class="cta-row" id="detailActions"></div>
-
-      <!-- Tabs -->
-      <div class="tab-bar">
-        <button class="tab-btn active" data-tab="tabMeasurements">Measurements</button>
-        <button class="tab-btn" data-tab="tabYield">Yield</button>
-        <button class="tab-btn" data-tab="tabNotes">Notes</button>
+      <div class="lifecycle-timeline" id="plantLifecycle"></div>
+      <div class="cta-row" id="plantActions"></div>
+      <div class="tab-bar" id="plantTabBar">
+        <button class="tab-btn active" data-tab="plantYieldPnl">Yield</button>
+        <button class="tab-btn" data-tab="plantCarePnl">Care</button>
+        <button class="tab-btn" data-tab="plantHealthPnl">Health</button>
       </div>
-      <div class="tab-panel active" id="tabMeasurements"></div>
-      <div class="tab-panel" id="tabYield"></div>
-      <div class="tab-panel" id="tabNotes"></div>
+      <div class="tab-panel active" id="plantYieldPnl"></div>
+      <div class="tab-panel" id="plantCarePnl"></div>
+      <div class="tab-panel" id="plantHealthPnl"></div>
     </div>
   </div>
 
-<script src="garden.js"></script>
+  <!-- Season Modal -->
+  <div class="popup" id="seasonModal">
+    <div class="popup-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="sheet-title" id="seasonModalTitle">New Season</div>
+        <button class="sheet-close" id="seasonModalClose" type="button">&#10005;</button>
+      </div>
+      <div class="form-row">
+        <label for="seasonLabel">Label</label>
+        <input type="text" id="seasonLabel" placeholder="e.g. Spring 2026" />
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label>Start Date</label><input type="date" id="seasonStart" /></div>
+        <div class="form-row"><label>End Date</label><input type="date" id="seasonEnd" /></div>
+      </div>
+      <div class="form-row">
+        <label for="seasonNotes">Notes</label>
+        <textarea id="seasonNotes" rows="2" placeholder="Season goals, etc."></textarea>
+      </div>
+      <input type="hidden" id="seasonEditId" value="" />
+      <button class="cta" id="btnSaveSeason" style="width:100%; text-align:center; margin-top:8px">Save Season</button>
+    </div>
+  </div>
+
+  <!-- Transplant Modal -->
+  <div class="popup" id="transplantModal">
+    <div class="popup-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="sheet-title">Transplant</div>
+        <button class="sheet-close" id="transplantModalClose" type="button">&#10005;</button>
+      </div>
+      <div class="form-row">
+        <label for="transplantLocType">Location Type</label>
+        <select id="transplantLocType">
+          <option value="ground">In Ground</option>
+          <option value="container">Container / Pot</option>
+          <option value="raised-bed">Raised Bed</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="transplantLocLabel">Location Label</label>
+        <input type="text" id="transplantLocLabel" placeholder="e.g. Garden bed A, Window box" />
+      </div>
+      <button class="cta" id="btnDoTransplant" style="width:100%; text-align:center; margin-top:8px">Transplant</button>
+    </div>
+  </div>
+
+  <!-- XP Toast -->
+  <div class="xp-toast" id="xpToast"></div>
+
+<script src="js/gardenData.js"></script>
+<script src="js/gardenApp.js"></script>
 </body>
 </html>

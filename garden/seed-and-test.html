@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Seed Garden Data</title>
+<style>
+body { background: #0b0f14; color: #e8eef6; font-family: system-ui; padding: 40px; text-align: center; }
+pre { text-align: left; background: #131a22; padding: 16px; border-radius: 12px; font-size: .85rem; overflow-x: auto; max-width: 700px; margin: 16px auto; }
+button { background: linear-gradient(90deg, #4CAF50, #22c55e); color: #04130a; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; margin: 8px; }
+button:hover { opacity: .9; }
+.status { margin-top: 16px; font-weight: 700; }
+a { color: #22c55e; }
+</style>
+</head>
+<body>
+<h1>Garden v2 — Seed Test Data</h1>
+<p>This will generate realistic garden data and store it in localStorage.</p>
+
+<button id="btnSeed">Seed Garden Data</button>
+<button id="btnClear">Clear Garden Data</button>
+<button onclick="location.href='index.html'">Open Garden</button>
+<button onclick="location.href='../main.html'">Open Dashboard</button>
+
+<div class="status" id="status"></div>
+<pre id="output"></pre>
+
+<script src="../tests/prng.js"></script>
+<script src="../tests/dataPools.js"></script>
+<script src="../tests/seedGenerator.js"></script>
+<script>
+document.getElementById('btnSeed').addEventListener('click', function() {
+    window.TestPRNG.reset(42);
+    var dataset = SeedGenerator.generateGardenDataset({ seedCount: 6, trayCount: 3, plantCount: 8 }, '2026-01-20');
+    localStorage.setItem('gardenData_v2', JSON.stringify(dataset));
+
+    var summary = {
+        seasons: dataset.seasons.length,
+        seeds: dataset.seeds.length,
+        trays: dataset.trays.length,
+        plants: dataset.plants.length,
+        totalXp: dataset.totalXp,
+        xpLogEntries: dataset.xpLog.length
+    };
+
+    document.getElementById('status').textContent = 'Data seeded successfully!';
+    document.getElementById('output').textContent = JSON.stringify(summary, null, 2);
+});
+
+document.getElementById('btnClear').addEventListener('click', function() {
+    localStorage.removeItem('gardenData_v2');
+    localStorage.removeItem('garden:plants');
+    localStorage.removeItem('garden:totalXp');
+    localStorage.removeItem('garden:activities');
+    document.getElementById('status').textContent = 'Garden data cleared.';
+    document.getElementById('output').textContent = '';
+});
+</script>
+</body>
+</html>
