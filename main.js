@@ -777,49 +777,57 @@ function renderBowlDashboard(){
 }
 
 /* --------------------------------
-   Garden: read data, contribute to exercise volume
+   Garden: read data from gardenData_v2
 ----------------------------------*/
-function loadGardenPlants(){
-  try { return JSON.parse(localStorage.getItem('garden:plants') || '[]'); }
-  catch { return []; }
-}
-
-function loadGardenActivities(){
-  try { return JSON.parse(localStorage.getItem('garden:activities') || '[]'); }
-  catch { return []; }
+function loadGardenData(){
+  try { return JSON.parse(localStorage.getItem('gardenData_v2') || '{}'); }
+  catch { return {}; }
 }
 
 function getGardenTotalXP(){
-  return Number(localStorage.getItem('garden:totalXp')) || 0;
+  return loadGardenData().totalXp || 0;
+}
+
+function loadGardenXpLog(){
+  return loadGardenData().xpLog || [];
 }
 
 function gardenVolumeSince(isoDate){
   let total = 0;
-  loadGardenActivities().forEach(function(a){
-    if(a.date && a.date > isoDate && a.xp > 0){
-      total += a.xp * GARDEN_VOLUME_MULTIPLIER;
+  loadGardenXpLog().forEach(function(entry){
+    if(entry.date && entry.date > isoDate && entry.amount > 0){
+      total += entry.amount * GARDEN_VOLUME_MULTIPLIER;
     }
   });
   return Math.round(total);
 }
 
 function renderGardenDashboard(){
-  const plants = loadGardenPlants();
-  const active = plants.filter(function(p){ return p.status !== 'Completed' && p.status !== 'Failed'; });
-  const totalXP = getGardenTotalXP();
+  const data = loadGardenData();
+  const season = (data.seasons || []).find(s => s.isActive);
+  const plants = (data.plants || []).filter(p => season && p.seasonId === season.id && !p.isArchived);
+  const active = plants.filter(p => !['dead', 'archived'].includes(p.lifecycleStage));
+  const harvesting = plants.filter(p => p.lifecycleStage === 'harvesting');
+  const totalXP = data.totalXp || 0;
 
   const subEl = $('gardenSub');
   if(subEl){
-    subEl.textContent = active.length ? active.length + ' active, ' + totalXP + ' XP' : totalXP > 0 ? totalXP + ' XP' : '';
+    const parts = [];
+    if(season) parts.push(season.label);
+    if(active.length) parts.push(active.length + ' active');
+    if(harvesting.length) parts.push(harvesting.length + ' harvesting');
+    subEl.textContent = parts.join(' \u00b7 ') || (totalXP > 0 ? totalXP + ' XP' : '');
   }
 
   const statusEl = $('gardenStatus');
   if(statusEl){
     if(active.length){
-      // Show up to 3 active plants as chips
       statusEl.style.display = 'flex';
+      const seeds = data.seeds || [];
       statusEl.innerHTML = active.slice(0, 3).map(function(p){
-        return '<div class="garden-chip">' + (p.emoji || '\ud83c\udf31') + ' ' + escapeHtml(p.type) + '</div>';
+        const seed = seeds.find(s => s.id === p.seedId);
+        const name = seed ? seed.plantName : 'Plant';
+        return '<div class="garden-chip">\ud83c\udf31 ' + escapeHtml(name) + '</div>';
       }).join('');
     } else {
       statusEl.style.display = 'none';
@@ -968,12 +976,12 @@ function buildDailyActivityMap(year, month){
         }
     });
 
-    // Garden activities
-    loadGardenActivities().forEach(a => {
-        if(!a.date || !a.date.startsWith(prefix)) return;
-        if(a.xp > 0){
-            const d = Number(a.date.slice(8, 10));
-            map[d] = (map[d] || 0) + a.xp * GARDEN_VOLUME_MULTIPLIER;
+    // Garden xpLog
+    loadGardenXpLog().forEach(entry => {
+        if(!entry.date || !entry.date.startsWith(prefix)) return;
+        if(entry.amount > 0){
+            const d = Number(entry.date.slice(8, 10));
+            map[d] = (map[d] || 0) + entry.amount * GARDEN_VOLUME_MULTIPLIER;
         }
     });
 
@@ -1042,8 +1050,8 @@ function renderCalendarGrid(){
     });
 
     const gardenDates = new Set();
-    loadGardenActivities().forEach(a => {
-        if(a.date && a.date.startsWith(monthPrefix)) gardenDates.add(a.date);
+    loadGardenXpLog().forEach(entry => {
+        if(entry.date && entry.date.startsWith(monthPrefix)) gardenDates.add(entry.date);
     });
 
     // Build grid
@@ -1170,11 +1178,11 @@ function renderCalendarDayDetail(){
         });
     });
 
-    // Garden activities
-    const gardenActs = loadGardenActivities().filter(a => a.date === dateStr);
+    // Garden xpLog entries
+    const gardenActs = loadGardenXpLog().filter(entry => entry.date === dateStr);
     if(gardenActs.length){
         let gardenXP = 0;
-        gardenActs.forEach(a => { gardenXP += a.xp || 0; });
+        gardenActs.forEach(entry => { gardenXP += entry.amount || 0; });
         html += `<div class="cal-activity-item">
             <span class="cal-act-icon" style="color:var(--garden)">\ud83c\udf31</span>
             <span>${gardenActs.length} garden activit${gardenActs.length !== 1 ? 'ies' : 'y'} \u2014 ${gardenXP} XP</span>

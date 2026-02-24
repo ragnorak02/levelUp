@@ -308,112 +308,306 @@
         };
     }
 
-    /* ===== Plant Generator ===== */
-    function generatePlant(date) {
-        var type = rng.pick(pools.PLANT_TYPES);
+    /* ===== Garden v2 Generator ===== */
+    function generateGardenSeed(type) {
+        type = type || rng.pick(pools.PLANT_TYPES);
         var varieties = pools.PLANT_VARIETIES[type] || [];
         var variety = varieties.length ? rng.pick(varieties) : '';
         var emoji = pools.PLANT_EMOJIS[type] || '\ud83c\udf31';
 
-        // Randomly pick a status along the progression
-        var statusIdx = rng.randInt(0, pools.PLANT_STATUSES.length - 1);
-        var status = pools.PLANT_STATUSES[statusIdx];
-
-        // Build dates based on status
-        var dates = {
-            seeded: date,
-            germinated: null,
-            transplantedContainer: null,
-            hardened: null,
-            transplantedGround: null,
-            firstHarvest: null,
-            completed: null
-        };
-
-        var dateKeys = ['seeded', 'germinated', 'transplantedContainer', 'hardened', 'transplantedGround', 'firstHarvest', 'completed'];
-        for (var i = 1; i <= statusIdx; i++) {
-            dates[dateKeys[i]] = addDays(date, i * rng.randInt(3, 10));
-        }
-
-        // Generate measurements
-        var numMeasurements = rng.randInt(0, Math.min(statusIdx + 1, 5));
-        var measurements = [];
-        for (var m = 0; m < numMeasurements; m++) {
-            measurements.push({
-                date: addDays(date, rng.randInt(1, 30)),
-                height_in: parseFloat((rng.randFloat(0.5, 24)).toFixed(1))
-            });
-        }
-
-        // Generate yield for harvesting/completed
-        var yieldCount = 0;
-        var yieldUnit = rng.pick(pools.YIELD_UNITS);
-        if (statusIdx >= 5) { // Harvesting or Completed
-            yieldCount = rng.randInt(1, 30);
-        }
-
-        // Generate notes
-        var numNotes = rng.randInt(0, 3);
-        var notes = [];
-        var noteTexts = ['Looking healthy', 'Needs more water', 'First leaves appeared', 'Transplanted successfully', 'Strong growth this week'];
-        for (var n = 0; n < numNotes; n++) {
-            notes.push({
-                date: addDays(date, rng.randInt(1, 30)),
-                text: rng.pick(noteTexts)
-            });
-        }
-
-        // XP calculation
-        var xpValues = { 'Seeded': 3, 'Germinated': 5, 'Indoor': 5, 'Hardened': 3, 'In Ground': 8, 'Harvesting': 10, 'Completed': 5 };
-        var xpAwarded = 0;
-        for (var x = 0; x <= statusIdx; x++) {
-            xpAwarded += xpValues[pools.PLANT_STATUSES[x]] || 0;
-        }
-        xpAwarded += numMeasurements; // 1 XP per measurement
-        xpAwarded += numNotes; // 1 XP per note
-        if (yieldCount > 0) xpAwarded += 5; // additionalHarvest
-
         return {
-            id: 'plant_' + Date.now() + '_' + randomSuffix(),
-            type: type,
+            id: 'seed_' + Date.now() + '_' + randomSuffix(),
+            plantName: type,
             variety: variety,
             emoji: emoji,
-            status: status,
-            dates: dates,
-            measurements: measurements,
-            yield: { count: yieldCount, unit: yieldUnit },
-            notes: notes,
-            xpAwarded: xpAwarded
+            daysToGerm: rng.randInt(3, 14),
+            daysToTransplant: rng.randInt(21, 45),
+            daysToFlower: rng.randInt(45, 90),
+            daysToFruit: rng.randInt(60, 120),
+            notes: '',
+            historicalStats: {
+                timesPlanted: 0,
+                timesGerminated: 0,
+                timesTransplanted: 0,
+                totalYieldCount: 0,
+                totalYieldWeight: 0
+            },
+            createdAt: new Date().toISOString()
         };
     }
 
-    function generateGardenDataset(count, startDate) {
-        count = count || 8;
-        startDate = startDate || '2026-01-20';
-        var plants = [];
-        var activities = [];
-        var totalXp = 0;
+    function generateGardenTray(seasonId, seeds, startDate) {
+        var size = rng.pick([12, 24, 36, 72]);
+        var cells = [];
+        var filledCount = rng.randInt(Math.floor(size * 0.3), size);
 
-        for (var i = 0; i < count; i++) {
-            var pDate = addDays(startDate, rng.randInt(0, 30));
-            var plant = generatePlant(pDate);
-            plants.push(plant);
-            totalXp += plant.xpAwarded;
+        for (var i = 0; i < size; i++) {
+            if (i < filledCount) {
+                var seed = rng.pick(seeds);
+                // Random stage progression
+                var progression = ['planted', 'germinated', 'trueLeaves', 'readyToTransplant'];
+                var stageIdx = rng.randInt(0, progression.length - 1);
+                // Some cells fail
+                var failed = rng.chance(0.1);
+                var stage = failed ? 'failed' : progression[stageIdx];
+                var cellDates = { planted: addDays(startDate, rng.randInt(0, 10)) };
+                if (stageIdx >= 1 && !failed) cellDates.germinated = addDays(cellDates.planted, rng.randInt(3, 10));
+                if (stageIdx >= 2 && !failed) cellDates.trueLeaves = addDays(cellDates.germinated, rng.randInt(3, 7));
+                if (stageIdx >= 3 && !failed) cellDates.readyToTransplant = addDays(cellDates.trueLeaves, rng.randInt(5, 14));
 
-            // Generate activity log entries for this plant
-            activities.push({
-                date: pDate,
-                type: 'xp',
-                detail: 'Planted ' + plant.type,
-                xp: 3,
-                timestamp: pDate + 'T12:00:00.000Z'
+                cells.push({
+                    seedId: seed.id,
+                    stage: stage,
+                    plantedDate: cellDates.planted,
+                    dates: cellDates
+                });
+            } else {
+                cells.push({ seedId: null, stage: 'empty', plantedDate: null, dates: {} });
+            }
+        }
+
+        var careLog = [];
+        var numCare = rng.randInt(1, 5);
+        for (var c = 0; c < numCare; c++) {
+            careLog.push({
+                date: addDays(startDate, rng.randInt(0, 30)),
+                action: rng.pick(pools.CARE_ACTIONS),
+                notes: '',
+                timestamp: addDays(startDate, rng.randInt(0, 30)) + 'T12:00:00.000Z'
             });
         }
 
         return {
+            id: 'tray_' + Date.now() + '_' + randomSuffix(),
+            seasonId: seasonId,
+            size: size,
+            cells: cells,
+            careLog: careLog,
+            createdAt: new Date().toISOString()
+        };
+    }
+
+    function generateGardenPlant(seedId, seasonId, trayId, startDate) {
+        var stageIdx = rng.randInt(0, pools.PLANT_STAGES_V2.length - 2); // usually not dead
+        var stage = pools.PLANT_STAGES_V2[stageIdx];
+        var locType = rng.pick(pools.LOCATION_TYPES);
+
+        var dates = { transplanted: startDate };
+        if (stageIdx >= 1) dates.flowering = addDays(startDate, rng.randInt(14, 30));
+        if (stageIdx >= 2) dates.fruiting = addDays(dates.flowering || startDate, rng.randInt(10, 25));
+        if (stageIdx >= 3) dates.harvesting = addDays(dates.fruiting || startDate, rng.randInt(7, 20));
+
+        var yieldEvents = [];
+        if (stageIdx >= 3) { // harvesting or beyond
+            var numYields = rng.randInt(1, 4);
+            for (var y = 0; y < numYields; y++) {
+                yieldEvents.push({
+                    id: 'yield_' + Date.now() + '_' + randomSuffix(),
+                    date: addDays(dates.harvesting || startDate, rng.randInt(0, 14)),
+                    count: rng.randInt(1, 20),
+                    weightGrams: rng.randInt(50, 2000),
+                    notes: '',
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+
+        var careLog = [];
+        var numCare = rng.randInt(0, 5);
+        for (var c = 0; c < numCare; c++) {
+            careLog.push({
+                date: addDays(startDate, rng.randInt(0, 40)),
+                action: rng.pick(pools.CARE_ACTIONS),
+                notes: '',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        var healthNotes = [];
+        var noteTexts = ['Looking healthy', 'Needs more water', 'Some yellowing', 'Strong growth', 'Pests noticed'];
+        var numNotes = rng.randInt(0, 3);
+        for (var n = 0; n < numNotes; n++) {
+            healthNotes.push({
+                date: addDays(startDate, rng.randInt(1, 30)),
+                text: rng.pick(noteTexts),
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        return {
+            id: 'plant_' + Date.now() + '_' + randomSuffix(),
+            seedId: seedId,
+            seasonId: seasonId,
+            trayId: trayId,
+            cellIndex: 0,
+            locationType: locType,
+            locationLabel: locType === 'ground' ? 'Garden bed ' + rng.pick(['A', 'B', 'C']) : 'Pot ' + rng.randInt(1, 8),
+            lifecycleStage: stage,
+            transplantDate: startDate,
+            dates: dates,
+            yieldEvents: yieldEvents,
+            careLog: careLog,
+            healthNotes: healthNotes,
+            isArchived: false,
+            createdAt: new Date().toISOString()
+        };
+    }
+
+    function generateGardenDataset(options, startDate) {
+        options = options || {};
+        startDate = startDate || '2026-01-20';
+        var seedCount = options.seedCount || 6;
+        var trayCount = options.trayCount || 3;
+        var plantCount = options.plantCount || 8;
+
+        // Seeds
+        var seeds = [];
+        var usedTypes = rng.pickN(pools.PLANT_TYPES, Math.min(seedCount, pools.PLANT_TYPES.length));
+        for (var i = 0; i < seedCount; i++) {
+            seeds.push(generateGardenSeed(usedTypes[i % usedTypes.length]));
+        }
+
+        // Seasons (1-2)
+        var seasons = [{
+            id: 'season_' + Date.now() + '_' + randomSuffix(),
+            label: 'Spring 2026',
+            startDate: startDate,
+            endDate: addDays(startDate, 90),
+            notes: '',
+            isActive: true,
+            createdAt: new Date().toISOString()
+        }];
+        if (rng.chance(0.4)) {
+            seasons.push({
+                id: 'season_' + Date.now() + '_' + randomSuffix(),
+                label: 'Winter 2025',
+                startDate: addDays(startDate, -90),
+                endDate: addDays(startDate, -1),
+                notes: '',
+                isActive: false,
+                createdAt: new Date().toISOString()
+            });
+        }
+        var activeSeasonId = seasons[0].id;
+
+        // Trays
+        var trays = [];
+        for (var t = 0; t < trayCount; t++) {
+            trays.push(generateGardenTray(activeSeasonId, seeds, addDays(startDate, rng.randInt(0, 14))));
+        }
+
+        // Plants (transplanted from trays)
+        var plants = [];
+        for (var p = 0; p < plantCount; p++) {
+            var seed = rng.pick(seeds);
+            var tray = rng.pick(trays);
+            plants.push(generateGardenPlant(seed.id, activeSeasonId, tray.id, addDays(startDate, rng.randInt(14, 40))));
+        }
+
+        // Mark some tray cells as transplanted for consistency
+        plants.forEach(function(plant, idx) {
+            var tray = trays.find(function(tr) { return tr.id === plant.trayId; });
+            if (tray) {
+                // Find an appropriate cell to mark as transplanted
+                for (var ci = 0; ci < tray.cells.length; ci++) {
+                    if (tray.cells[ci].stage === 'readyToTransplant') {
+                        tray.cells[ci].stage = 'transplanted';
+                        tray.cells[ci].dates.transplanted = plant.transplantDate;
+                        plant.cellIndex = ci;
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Update seed historicalStats
+        seeds.forEach(function(seed) {
+            var planted = 0, germinated = 0, transplanted = 0, yieldCount = 0, yieldWeight = 0;
+            trays.forEach(function(tray) {
+                tray.cells.forEach(function(cell) {
+                    if (cell.seedId !== seed.id) return;
+                    planted++;
+                    if (cell.stage !== 'planted' && cell.stage !== 'empty' && cell.stage !== 'failed') germinated++;
+                    if (cell.stage === 'transplanted') transplanted++;
+                });
+            });
+            plants.forEach(function(pl) {
+                if (pl.seedId !== seed.id) return;
+                (pl.yieldEvents || []).forEach(function(y) {
+                    yieldCount += y.count || 0;
+                    yieldWeight += y.weightGrams || 0;
+                });
+            });
+            seed.historicalStats = {
+                timesPlanted: planted,
+                timesGerminated: germinated,
+                timesTransplanted: transplanted,
+                totalYieldCount: yieldCount,
+                totalYieldWeight: yieldWeight
+            };
+        });
+
+        // Build XP log
+        var xpLog = [];
+        var totalXp = 0;
+
+        function addXP(date, amount, reason) {
+            totalXp += amount;
+            xpLog.push({ date: date, amount: amount, reason: reason, timestamp: date + 'T12:00:00.000Z' });
+        }
+
+        // XP for seeds
+        seeds.forEach(function(s) { addXP(startDate, 2, 'Added seed: ' + s.plantName); });
+
+        // XP for tray cells
+        trays.forEach(function(tray) {
+            tray.cells.forEach(function(cell) {
+                if (cell.stage === 'empty') return;
+                var seed = seeds.find(function(s) { return s.id === cell.seedId; });
+                var name = seed ? seed.plantName : 'Seed';
+                addXP(cell.plantedDate || startDate, 3, 'Planted ' + name);
+                if (['germinated', 'trueLeaves', 'readyToTransplant', 'transplanted'].indexOf(cell.stage) !== -1) {
+                    addXP(cell.dates.germinated || startDate, 5, name + ' germinated');
+                }
+                if (['trueLeaves', 'readyToTransplant', 'transplanted'].indexOf(cell.stage) !== -1) {
+                    addXP(cell.dates.trueLeaves || startDate, 3, name + ' true leaves');
+                }
+                if (['readyToTransplant', 'transplanted'].indexOf(cell.stage) !== -1) {
+                    addXP(cell.dates.readyToTransplant || startDate, 3, name + ' ready');
+                }
+                if (cell.stage === 'transplanted') {
+                    addXP(cell.dates.transplanted || startDate, 8, 'Transplanted ' + name);
+                }
+            });
+        });
+
+        // XP for plant stages
+        plants.forEach(function(plant) {
+            var seed = seeds.find(function(s) { return s.id === plant.seedId; });
+            var name = seed ? seed.plantName : 'Plant';
+            var stages = ['vegetative', 'flowering', 'fruiting', 'harvesting', 'dormant'];
+            var currentIdx = stages.indexOf(plant.lifecycleStage);
+            for (var si = 1; si <= currentIdx; si++) {
+                addXP(plant.dates[stages[si]] || startDate, 5, name + ' → ' + stages[si]);
+            }
+            (plant.yieldEvents || []).forEach(function(y) { addXP(y.date, 5, name + ' yield +' + y.count); });
+            (plant.careLog || []).forEach(function(c) { addXP(c.date, 1, 'Plant care: ' + c.action); });
+            (plant.healthNotes || []).forEach(function(h) { addXP(h.date, 1, 'Health note added'); });
+        });
+
+        // XP for tray care
+        trays.forEach(function(tray) {
+            (tray.careLog || []).forEach(function(c) { addXP(c.date, 1, 'Tray care: ' + c.action); });
+        });
+
+        return {
+            seasons: seasons,
+            seeds: seeds,
+            trays: trays,
             plants: plants,
-            activities: activities,
-            totalXp: totalXp
+            totalXp: totalXp,
+            xpLog: xpLog,
+            analyticsCache: {}
         };
     }
 
@@ -494,8 +688,8 @@
             events.push(generateCalendarEvent(eDate));
         }
 
-        // --- Garden ---
-        var gardenData = generateGardenDataset(plantCount, startDate);
+        // --- Garden (v2) ---
+        var gardenData = generateGardenDataset({ seedCount: 6, trayCount: 3, plantCount: plantCount }, startDate);
 
         // --- Character ---
         var characterLevel = rng.randInt(3, 5);
@@ -527,7 +721,9 @@
         generateTrip: generateTrip,
         generateBowlingWeek: generateBowlingWeek,
         generateCalendarEvent: generateCalendarEvent,
-        generatePlant: generatePlant,
+        generateGardenSeed: generateGardenSeed,
+        generateGardenTray: generateGardenTray,
+        generateGardenPlant: generateGardenPlant,
         generateGardenDataset: generateGardenDataset,
         generateFullDataset: generateFullDataset
     };

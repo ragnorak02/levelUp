@@ -198,6 +198,12 @@
 
     const PLANT_STATUSES = ['Seeded', 'Germinated', 'Indoor', 'Hardened', 'In Ground', 'Harvesting', 'Completed'];
 
+    // v2 garden stages
+    const CELL_STAGES_V2 = ['empty', 'planted', 'germinated', 'trueLeaves', 'readyToTransplant', 'transplanted', 'failed'];
+    const PLANT_STAGES_V2 = ['vegetative', 'flowering', 'fruiting', 'harvesting', 'dormant', 'dead'];
+    const LOCATION_TYPES = ['ground', 'container', 'raised-bed'];
+    const CARE_ACTIONS = ['Watered', 'Fertilized', 'Pruned', 'Weeded', 'Sprayed', 'Mulched', 'Staked'];
+
     const PLANT_EMOJIS = {
         'Tomato': '\ud83c\udf45',
         'Pepper': '\ud83c\udf36\ufe0f',
@@ -232,6 +238,10 @@
         PLANT_VARIETIES,
         PLANT_STATUSES,
         PLANT_EMOJIS,
-        YIELD_UNITS
+        YIELD_UNITS,
+        CELL_STAGES_V2,
+        PLANT_STAGES_V2,
+        LOCATION_TYPES,
+        CARE_ACTIONS
     };
 })();

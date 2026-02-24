@@ -20,9 +20,7 @@
         'nutrition:recipes',
         'calendar:events',
         'travel:trips',
-        'garden:plants',
-        'garden:totalXp',
-        'garden:activities'
+        'gardenData_v2'
     ];
 
     const KNOWN_PREFIXES = [
@@ -196,35 +194,47 @@
             }
         }
 
-        // --- Garden ---
+        // --- Garden (v2) ---
         if (dataset.gardenData) {
             if (appendMode) {
-                const existPlants = safeParse('garden:plants') || [];
-                const existIds = new Set(existPlants.map(function(p) { return p.id; }));
+                const existing = safeParse('gardenData_v2') || { seasons: [], seeds: [], trays: [], plants: [], totalXp: 0, xpLog: [] };
+                // Merge plants by ID
+                const existPlantIds = new Set((existing.plants || []).map(function(p) { return p.id; }));
                 var gardenAdded = 0;
                 (dataset.gardenData.plants || []).forEach(function(p) {
-                    if (!existIds.has(p.id)) {
-                        existPlants.push(p);
+                    if (!existPlantIds.has(p.id)) {
+                        existing.plants.push(p);
                         gardenAdded++;
                     }
                 });
-                localStorage.setItem('garden:plants', JSON.stringify(existPlants));
-
-                const existActs = safeParse('garden:activities') || [];
-                (dataset.gardenData.activities || []).forEach(function(a) {
-                    existActs.push(a);
+                // Merge seeds
+                const existSeedIds = new Set((existing.seeds || []).map(function(s) { return s.id; }));
+                (dataset.gardenData.seeds || []).forEach(function(s) {
+                    if (!existSeedIds.has(s.id)) existing.seeds.push(s);
                 });
-                localStorage.setItem('garden:activities', JSON.stringify(existActs));
-
-                var existXP = Number(localStorage.getItem('garden:totalXp')) || 0;
-                localStorage.setItem('garden:totalXp', String(existXP + (dataset.gardenData.totalXp || 0)));
+                // Merge seasons
+                const existSeasonIds = new Set((existing.seasons || []).map(function(s) { return s.id; }));
+                (dataset.gardenData.seasons || []).forEach(function(s) {
+                    if (!existSeasonIds.has(s.id)) existing.seasons.push(s);
+                });
+                // Merge trays
+                const existTrayIds = new Set((existing.trays || []).map(function(t) { return t.id; }));
+                (dataset.gardenData.trays || []).forEach(function(t) {
+                    if (!existTrayIds.has(t.id)) existing.trays.push(t);
+                });
+                // Merge xpLog and totalXp
+                existing.xpLog = (existing.xpLog || []).concat(dataset.gardenData.xpLog || []);
+                existing.totalXp = (existing.totalXp || 0) + (dataset.gardenData.totalXp || 0);
+                localStorage.setItem('gardenData_v2', JSON.stringify(existing));
                 counts.plants = gardenAdded;
             } else {
-                localStorage.setItem('garden:plants', JSON.stringify(dataset.gardenData.plants || []));
-                localStorage.setItem('garden:activities', JSON.stringify(dataset.gardenData.activities || []));
-                localStorage.setItem('garden:totalXp', String(dataset.gardenData.totalXp || 0));
+                localStorage.setItem('gardenData_v2', JSON.stringify(dataset.gardenData));
                 counts.plants = (dataset.gardenData.plants || []).length;
             }
+            // Remove old garden keys
+            localStorage.removeItem('garden:plants');
+            localStorage.removeItem('garden:totalXp');
+            localStorage.removeItem('garden:activities');
         }
 
         // --- Character ---
@@ -322,11 +332,15 @@
         const events = safeParse('calendar:events') || [];
         summary['Events'] = events.length + ' events';
 
-        // Garden
-        const plants = safeParse('garden:plants') || [];
-        const gardenXP = Number(localStorage.getItem('garden:totalXp')) || 0;
-        const activePlants = plants.filter(function(p) { return p.status !== 'Completed' && p.status !== 'Failed'; }).length;
-        summary['Garden'] = plants.length + ' plants (' + activePlants + ' active), ' + gardenXP + ' XP';
+        // Garden (v2)
+        const gardenData = safeParse('gardenData_v2') || {};
+        const gSeasons = (gardenData.seasons || []).length;
+        const gSeeds = (gardenData.seeds || []).length;
+        const gTrays = (gardenData.trays || []).length;
+        const gPlants = (gardenData.plants || []).length;
+        const gardenXP = gardenData.totalXp || 0;
+        const activePlants = (gardenData.plants || []).filter(function(p) { return !p.isArchived && p.lifecycleStage !== 'dead'; }).length;
+        summary['Garden'] = gSeasons + ' seasons, ' + gSeeds + ' seeds, ' + gTrays + ' trays, ' + gPlants + ' plants (' + activePlants + ' active), ' + gardenXP + ' XP';
 
         // Character
         const level = localStorage.getItem('levelUp:characterLevel') || 'none';
