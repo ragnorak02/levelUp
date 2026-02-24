@@ -1,6 +1,6 @@
 # LevelUp
 
-Gamified personal productivity app tracking **Exercise**, **Study**, and **Finances** through an RPG-style character progression system. Vanilla HTML/CSS/JS — no framework, no build tools.
+Gamified personal productivity app tracking **Exercise**, **Study**, **Finances**, and **Garden** through an RPG-style character progression system. Vanilla HTML/CSS/JS — no framework, no build tools.
 
 ## Architecture
 
@@ -22,6 +22,13 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 │   ├── budget.html, food.html, search.html
 │   ├── dataLoader.js         ← Seeds localStorage from receiptsData on first visit
 │   └── receiptsData.json     ← Receipt seed data
+├── garden/                   ← Plant lifecycle tracking & garden management
+│   ├── index.html            ← Single-page app (6 tabs: Dashboard, Seeds, Trays, Plants, Analytics, Settings)
+│   ├── garden.css            ← Dark theme with green accent (#22c55e)
+│   ├── seed-and-test.html    ← Standalone data seeding utility
+│   └── js/
+│       ├── gardenData.js     ← GardenDataManager class (data layer, XP awards, analytics)
+│       └── gardenApp.js      ← GardenApp UI controller (tabs, modals, rendering)
 ├── tests/                    ← Automated tests & data seeding (see Testing section)
 │   ├── runner.html           ← Browser test runner
 │   └── nodeRunner.js         ← Terminal runner (node tests/nodeRunner.js)
@@ -52,6 +59,7 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 - **Dashboard** (`main.js`): Top-level functions, state in module-scope objects (`financeState`)
 - **Study module**: Class-based — constructor calls `init()`, uses `setupEventListeners()`, `render*()` methods, exposed via `window.ClassName`
 - **Finance dataLoader**: IIFE with `'use strict'`
+- **Garden module**: IIFE with `'use strict'` — `GardenDataManager` class for data layer, `GardenApp` for UI; exposed via `window.GardenDataManager` and `window.GardenConstants`
 - **No ES module imports** — all scripts use global scope or window attachment
 
 ### CSS
@@ -91,6 +99,7 @@ Namespaced with colon prefix:
 - `finances:dataLoaded` — "true"/"false" string
 - `finances:dataVersion` — version string (e.g., "1.3")
 - `levelupFlashData` — JSON flashcard data (legacy key, no colon)
+- `gardenData_v2` — JSON garden data (seeds, trays, plants, seasons, XP log)
 
 ### Data Shapes
 ```js
@@ -103,6 +112,20 @@ Namespaced with colon prefix:
 // Flashcard
 { id: "card_1705017634123_abc", front: "house", back: "집", category: "noun", state: "new", timesStudied: 0, timesCorrect: 0, lastStudied: null, created: "2025-01-10T12:00:00Z", difficulty: 1 }
 // Card states: new → studied → learning → learned → mastered (3 correct = learned, 5 = mastered)
+
+// Garden Season
+{ id: "season_<ts>_<rand>", label: "Spring 2026", startDate: "2026-03-01", endDate: "2026-05-31", notes: "", isActive: true, createdAt: ISO8601 }
+
+// Garden Seed (catalog entry)
+{ id: "seed_<ts>_<rand>", plantName: "Tomato", variety: "Cherry", emoji: "🍅", daysToGerm: 7, daysToTransplant: 30, daysToFlower: 60, daysToFruit: 90, notes: "", historicalStats: { timesPlanted: 0, timesGerminated: 0, timesTransplanted: 0, totalYieldCount: 0, totalYieldWeight: 0 }, createdAt: ISO8601 }
+
+// Garden Tray (seedling container)
+{ id: "tray_<ts>_<rand>", seasonId: "season_...", size: 72, cells: [{ seedId: null, stage: "empty", plantedDate: null, dates: {} }], careLog: [], createdAt: ISO8601 }
+// Cell stages: empty → planted → germinated → trueLeaves → readyToTransplant → transplanted | failed
+
+// Garden Plant (transplanted, in-ground/container)
+{ id: "plant_<ts>_<rand>", seedId: "seed_...", seasonId: "season_...", trayId: "tray_...", cellIndex: 0, locationType: "ground|container|raised-bed", locationLabel: "", lifecycleStage: "vegetative", transplantDate: "2026-04-15", dates: {}, yieldEvents: [{ id: "yield_...", date: "2026-07-01", count: 5, weightGrams: 250, notes: "" }], careLog: [], healthNotes: [], isArchived: false, createdAt: ISO8601 }
+// Plant stages: vegetative → flowering → fruiting → harvesting → dormant | dead
 ```
 
 ## Game System
@@ -112,6 +135,12 @@ Namespaced with colon prefix:
 - **Transform**: Unlocks when exercise volume since last reset >= EX_MAX; increments character level, resets exercise meter
 - **Character**: Visual GIF + aura effect, level displayed on dashboard
 - **Module meters**: Vertical progress bars on dashboard cards (study meter currently placeholder at 0%)
+- **Garden XP**: Contributes to character progression at 50:1 volume ratio (`GARDEN_VOLUME_MULTIPLIER`); tracked on dashboard calendar with `--garden: #22c55e` dot color
+
+### Garden XP Awards
+```js
+{ plantSeed: 3, cellGerminated: 5, cellTrueLeaves: 3, cellReady: 3, transplant: 8, plantAdvance: 5, yieldEvent: 5, careLog: 1, healthNote: 1, newSeed: 2 }
+```
 
 ## Error Handling Patterns
 - `safeParse()` returns `null` on JSON parse failure
@@ -172,6 +201,10 @@ SeedGenerator.generateNutritionDay('2026-02-10');      // 3-4 meals for one day
 SeedGenerator.generateTrip();                           // trip with destinations
 SeedGenerator.generateBowlingWeek('2026-W06');         // 3 games
 SeedGenerator.generateCalendarEvent('2026-02-10');     // single event
+SeedGenerator.generateGardenSeed('Tomato');             // single seed catalog entry
+SeedGenerator.generateGardenTray(seasonId, seeds, '2026-03-01'); // tray with cells
+SeedGenerator.generateGardenPlant(seedId, seasonId, trayId, '2026-04-15'); // transplanted plant
+SeedGenerator.generateGardenDataset({ seedCount: 6, trayCount: 3, plantCount: 8 }, '2026-03-01'); // full garden dataset
 SeedGenerator.generateFullDataset(42, {                // everything at once
     workoutDays: 30, receiptCount: 18, flashcardCount: 50,
     nutritionDays: 20, tripCount: 2, bowlingWeeks: 8, eventCount: 10
@@ -200,6 +233,7 @@ All exposed via `window.DataPools`:
 - `INGREDIENTS` (20 with macros), `MEAL_NAMES` (4)
 - `TRIP_NAMES` (8), `DEST_NAMES` (15)
 - `EVENT_TITLES` (15), `EVENT_CATEGORIES` (5)
+- `PLANT_TYPES` (8), `PLANT_VARIETIES` (map), `PLANT_EMOJIS` (map)
 
 ## Known Gaps
 - Study power meter on dashboard is hardcoded to 0% (not yet integrated)
