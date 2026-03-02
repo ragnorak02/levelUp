@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cashflow Dashboard</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7;
+      --accent:#4CAF50; --accent2:#2dd4bf;
+      --ring:#2a3543; --good:#22c55e; --danger:#ef4444; --warn:#f59e0b;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 800px at 50% -200px, rgba(76,175,80,.20), transparent 55%),
+        radial-gradient(900px 700px at 10% 0%, rgba(45,212,191,.12), transparent 60%),
+        var(--bg);
+      color:var(--ink);
+      min-height:100vh;
+      padding-bottom:40px;
+    }
+    a{color:inherit; text-decoration:none}
+
+    /* --- TOPBAR (copied from index.html) --- */
+    .topbar{
+      position:sticky; top:0; z-index:20;
+      background: linear-gradient(180deg, rgba(11,15,20,.92), rgba(11,15,20,.72));
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(42,53,67,.55);
+    }
+    .topbar-inner{
+      max-width:1120px; margin:0 auto;
+      padding:6px 10px;
+      display:flex; align-items:center; gap:10px;
+      flex-wrap:nowrap;
+    }
+    .brand-group{display:flex; align-items:center; gap:8px; flex:0 0 auto;}
+    .brand{
+      display:flex; align-items:center; gap:8px;
+      font-weight:900;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      box-shadow: var(--shadow);
+      flex:0 0 auto;
+      white-space:nowrap;
+    }
+    .brand-group .brand.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
+    }
+    .nav{
+      margin-left:auto;
+      display:flex; gap:8px;
+      align-items:center;
+      flex:1 1 auto;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling: touch;
+      white-space:nowrap;
+      padding-bottom:2px;
+    }
+    .nav::-webkit-scrollbar{height:6px}
+    .nav::-webkit-scrollbar-thumb{background:rgba(42,53,67,.6); border-radius:999px}
+    .pill{
+      flex:0 0 auto;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
+    }
+    .pill.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
+    }
+
+    /* --- Page layout --- */
+    .wrap{
+      max-width:1120px; margin:0 auto; padding:16px;
+      display:flex; flex-direction:column; gap:16px;
+    }
+    .card{
+      background: rgba(19,26,34,.72);
+      border:1px solid rgba(42,53,67,.70);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .card-head{
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .card-head h3{margin:0; font-size:14px; color:var(--muted); font-weight:900; letter-spacing:.2px;}
+    .add-btn{
+      all:unset; cursor:pointer;
+      display:inline-flex; align-items:center; gap:6px;
+      padding:8px 14px;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      color:#0b0f14;
+      border-radius:12px;
+      font-weight:950;
+      font-size:13px;
+    }
+
+    /* --- Summary Grid --- */
+    .summary-grid{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+    }
+    .summary-card{
+      padding:12px 14px;
+      background: rgba(11,15,20,.35);
+      border:1px solid rgba(42,53,67,.55);
+      border-radius:14px;
+      text-align:center;
+    }
+    .summary-value{font-size:22px; font-weight:950; color:var(--good); line-height:1.1}
+    .summary-value.negative{color:var(--danger)}
+    .summary-value.warn{color:var(--warn)}
+    .summary-label{font-size:11px; color:var(--muted); margin-top:4px; font-weight:800}
+
+    /* --- Item rows --- */
+    .item-row{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      background: rgba(11,15,20,.35);
+      border:1px solid rgba(42,53,67,.55);
+      border-radius:14px;
+      margin-bottom:8px;
+    }
+    .item-row:last-child{margin-bottom:0}
+    .item-info{flex:1; min-width:0}
+    .item-name{font-weight:950; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+    .item-sub{font-size:12px; color:var(--muted); font-weight:800; margin-top:2px}
+    .item-amount{font-weight:950; font-size:16px; color:var(--good); white-space:nowrap}
+    .item-amount.expense{color:var(--danger)}
+    .item-actions{display:flex; gap:6px; flex-shrink:0}
+    .icon-btn{
+      all:unset; cursor:pointer;
+      width:32px; height:32px;
+      display:inline-flex; align-items:center; justify-content:center;
+      border-radius:10px;
+      border:1px solid rgba(42,53,67,.70);
+      background: rgba(11,15,20,.35);
+      color:var(--muted);
+      font-size:14px;
+    }
+    .icon-btn:hover{border-color:rgba(76,175,80,.65); color:var(--ink)}
+    .icon-btn.danger:hover{border-color:rgba(239,68,68,.65); color:var(--danger)}
+
+    .type-badge{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+      background:rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.25);
+      color:var(--good);
+    }
+    .type-badge.debt{background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.25); color:var(--danger)}
+    .type-badge.expense{background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.25); color:var(--warn)}
+    .type-badge.income{background:rgba(59,130,246,.12); border-color:rgba(59,130,246,.25); color:#3b82f6}
+
+    .group-label{
+      font-size:12px; font-weight:900; color:var(--muted);
+      margin:12px 0 6px; padding-left:4px;
+      letter-spacing:.3px;
+    }
+    .group-label:first-child{margin-top:0}
+
+    /* --- Paid toggle --- */
+    .paid-toggle{
+      position:relative; width:42px; height:24px;
+      flex-shrink:0; cursor:pointer;
+    }
+    .paid-toggle input{opacity:0; width:0; height:0; position:absolute}
+    .paid-slider{
+      position:absolute; inset:0;
+      background:rgba(42,53,67,.70);
+      border-radius:999px;
+      transition: background .2s;
+    }
+    .paid-slider::after{
+      content:'';
+      position:absolute; top:3px; left:3px;
+      width:18px; height:18px;
+      background:var(--muted);
+      border-radius:50%;
+      transition: transform .2s, background .2s;
+    }
+    .paid-toggle input:checked + .paid-slider{background:var(--good)}
+    .paid-toggle input:checked + .paid-slider::after{transform:translateX(18px); background:#fff}
+
+    /* --- Sub-tabs --- */
+    .sub-tabs{display:flex; gap:6px; margin-bottom:12px}
+    .sub-tab{
+      all:unset; cursor:pointer;
+      padding:6px 14px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
+    }
+    .sub-tab.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
+    }
+
+    /* --- Top-level tab bar --- */
+    .tab-bar{
+      display:flex; gap:8px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling: touch;
+      white-space:nowrap;
+      padding-bottom:2px;
+    }
+    .tab-bar::-webkit-scrollbar{height:6px}
+    .tab-bar::-webkit-scrollbar-thumb{background:rgba(42,53,67,.6); border-radius:999px}
+    .tab-pill{
+      all:unset; cursor:pointer;
+      flex:0 0 auto;
+      padding:8px 14px;
+      border-radius:999px;
+      border:1px solid rgba(42,53,67,.75);
+      background: rgba(19,26,34,.55);
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
+    }
+    .tab-pill.active{
+      color:#0b0f14;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      border-color: transparent;
+    }
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+
+    /* --- Rental cashflow card --- */
+    .rental-cashflow{
+      padding:12px 14px;
+      background: rgba(11,15,20,.35);
+      border:1px solid rgba(42,53,67,.55);
+      border-radius:14px;
+      margin-bottom:12px;
+      display:flex; justify-content:space-around; text-align:center;
+    }
+    .rcf-item .rcf-val{font-size:18px; font-weight:950; line-height:1.1}
+    .rcf-item .rcf-lbl{font-size:11px; color:var(--muted); margin-top:2px; font-weight:800}
+    .rcf-positive{color:var(--good)}
+    .rcf-negative{color:var(--danger)}
+
+    /* --- Bill Calendar --- */
+    .cal-nav{
+      display:flex; align-items:center; justify-content:center; gap:16px;
+      margin-bottom:12px;
+    }
+    .cal-nav-btn{
+      all:unset; cursor:pointer;
+      padding:6px 12px;
+      border-radius:10px;
+      border:1px solid rgba(42,53,67,.70);
+      background: rgba(11,15,20,.35);
+      color:var(--muted);
+      font-weight:950;
+    }
+    .cal-nav-btn:hover{border-color:rgba(76,175,80,.65); color:var(--ink)}
+    .cal-month{font-weight:950; font-size:16px; min-width:160px; text-align:center}
+    .cal-item{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      background: rgba(11,15,20,.35);
+      border:1px solid rgba(42,53,67,.55);
+      border-radius:14px;
+      margin-bottom:6px;
+    }
+    .cal-day{
+      width:36px; height:36px;
+      display:flex; align-items:center; justify-content:center;
+      border-radius:10px;
+      background:rgba(42,53,67,.45);
+      font-weight:950; font-size:14px;
+      flex-shrink:0;
+    }
+    .cal-info{flex:1; min-width:0}
+    .cal-name{font-weight:900; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+    .cal-amount{font-weight:950; font-size:14px; white-space:nowrap}
+    .cal-total-row{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:12px;
+      border-top:1px solid rgba(42,53,67,.55);
+      margin-top:8px;
+      font-weight:950;
+    }
+    .cal-total-row .cal-amount{font-size:16px}
+
+    /* --- Modal / Sheet (garden pattern) --- */
+    .popup{position:fixed; inset:0; display:none; z-index:50}
+    .popup.open{display:block}
+    .popup-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55)}
+    .sheet{
+      position:relative;
+      max-width:500px;
+      width:calc(100% - 24px);
+      max-height:90vh;
+      overflow-y:auto;
+      margin:5vh auto;
+      background:linear-gradient(180deg,#101823 0%, #0e151f 100%);
+      border:1px solid var(--ring);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 20px 60px rgba(0,0,0,.45);
+    }
+    .sheet-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px}
+    .sheet-title{font-weight:900; font-size:1rem; letter-spacing:.02em}
+    .sheet-close{
+      all:unset; cursor:pointer; padding:.35rem .55rem;
+      border-radius:10px; border:1px solid var(--ring); color:var(--muted);
+    }
+    .sheet-close:hover{background:#142033}
+    .form-row{display:flex; flex-direction:column; gap:4px; margin-bottom:10px}
+    .form-row label{font-weight:900; font-size:.78rem; color:var(--muted)}
+    .form-row input,
+    .form-row select,
+    .form-row textarea{
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid var(--ring);
+      background:rgba(255,255,255,.06);
+      color:var(--ink);
+      font-family:inherit;
+      font-size:.9rem;
+    }
+    .form-row input:focus,
+    .form-row select:focus{outline:none; border-color:rgba(76,175,80,.75)}
+    .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .btn-primary{
+      all:unset; cursor:pointer;
+      display:block; width:100%; text-align:center;
+      padding:12px;
+      background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
+      color:#0b0f14;
+      border-radius:12px;
+      font-weight:950;
+      margin-top:12px;
+    }
+    .btn-danger{
+      all:unset; cursor:pointer;
+      display:block; width:100%; text-align:center;
+      padding:12px;
+      background: rgba(239,68,68,.15);
+      border:1px solid rgba(239,68,68,.45);
+      color:var(--danger);
+      border-radius:12px;
+      font-weight:950;
+      margin-top:8px;
+    }
+
+    /* --- Empty state --- */
+    .empty-msg{
+      text-align:center; padding:20px; color:var(--muted);
+      font-size:13px; font-weight:800;
+    }
+
+    /* --- Responsive --- */
+    @media(max-width:480px){
+      .summary-grid{grid-template-columns:repeat(2, 1fr)}
+      .summary-value{font-size:18px}
+      .form-grid{grid-template-columns:1fr}
+      .rental-cashflow{flex-direction:column; gap:10px}
+    }
+  </style>
+</head>
+<body>
+  <!-- TOPBAR (standardized) -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-group" role="navigation" aria-label="Home and Finances">
+        <a class="brand brand-home" href="https://ragnorak02.github.io/levelUp/main.html" title="Back to LevelUp Home">🏠 <span>Home</span></a>
+        <a class="brand brand-fin active" href="index.html" title="Finances dashboard">💰</a>
+      </div>
+      <div class="nav">
+        <a class="pill" href="index.html">Finances</a>
+        <a class="pill" href="food.html">Food</a>
+        <a class="pill" href="search.html">Search</a>
+        <a class="pill" href="receipts.html">Receipts</a>
+        <a class="pill active" href="financeDashboard.html">Cashflow</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <!-- A) Summary Grid -->
+    <div class="summary-grid" id="summaryGrid"></div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar" role="tablist">
+      <button class="tab-pill active" role="tab" aria-selected="true" data-tab="accounts">Accounts</button>
+      <button class="tab-pill" role="tab" aria-selected="false" data-tab="debts">Debts</button>
+      <button class="tab-pill" role="tab" aria-selected="false" data-tab="expenses">Expenses</button>
+      <button class="tab-pill" role="tab" aria-selected="false" data-tab="income">Income</button>
+      <button class="tab-pill" role="tab" aria-selected="false" data-tab="calendar">Calendar</button>
+    </div>
+
+    <!-- Tab panels -->
+    <div class="tab-panel active" role="tabpanel" id="tabAccounts">
+      <div class="card">
+        <div class="card-head">
+          <h3>🏦 ACCOUNTS</h3>
+          <button class="add-btn" onclick="openModal('add','finances:accounts')">+ Add</button>
+        </div>
+        <div id="accountsList"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" role="tabpanel" id="tabDebts">
+      <div class="card">
+        <div class="card-head">
+          <h3>💳 DEBTS</h3>
+          <button class="add-btn" onclick="openModal('add','finances:debts')">+ Add</button>
+        </div>
+        <div id="debtsList"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" role="tabpanel" id="tabExpenses">
+      <div class="card">
+        <div class="card-head">
+          <h3>📋 FIXED EXPENSES</h3>
+          <button class="add-btn" onclick="openModal('add','finances:fixedExpenses')">+ Add</button>
+        </div>
+        <div class="sub-tabs">
+          <button class="sub-tab active" onclick="switchExpenseTab('personal',this)">Personal</button>
+          <button class="sub-tab" onclick="switchExpenseTab('rental',this)">Rental (15 Brookwood)</button>
+        </div>
+        <div id="rentalCashflow" style="display:none"></div>
+        <div id="expensesList"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" role="tabpanel" id="tabIncome">
+      <div class="card">
+        <div class="card-head">
+          <h3>💵 INCOME</h3>
+          <button class="add-btn" onclick="openModal('add','finances:income')">+ Add</button>
+        </div>
+        <div id="incomeList"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" role="tabpanel" id="tabCalendar">
+      <div class="card">
+        <div class="card-head">
+          <h3>📅 BILL CALENDAR</h3>
+        </div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="navCalendar(-1)">&laquo;</button>
+          <div class="cal-month" id="calMonth"></div>
+          <button class="cal-nav-btn" onclick="navCalendar(1)">&raquo;</button>
+        </div>
+        <div id="calendarList"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- CRUD Modal -->
+  <div class="popup" id="crudModal">
+    <div class="popup-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="sheet-title" id="modalTitle">Add Item</div>
+        <button class="sheet-close" onclick="closeCrudModal()">&#x2715;</button>
+      </div>
+      <div id="modalBody"></div>
+      <button class="btn-primary" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="popup" id="deleteModal">
+    <div class="popup-backdrop"></div>
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="sheet-title">Confirm Delete</div>
+        <button class="sheet-close" onclick="closeDeleteModal()">&#x2715;</button>
+      </div>
+      <p id="deleteMsg" style="color:var(--muted); font-size:14px; margin:0 0 12px"></p>
+      <button class="btn-danger" onclick="confirmDeleteAction()">Delete</button>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    /* ===== Constants ===== */
+    var KEYS = {
+        accounts: 'finances:accounts',
+        debts: 'finances:debts',
+        expenses: 'finances:fixedExpenses',
+        income: 'finances:income',
+        payments: 'finances:payments'
+    };
+
+    var RENTAL_ID = '15_brookwood';
+
+    /* ===== State ===== */
+    var currentExpenseTab = 'personal';
+    var calYear, calMonth;
+    var modalState = { mode: null, key: null, editId: null };
+    var deleteState = { key: null, id: null };
+
+    /* ===== Data Helpers ===== */
+    function loadList(key) {
+        try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+        catch (e) { return []; }
+    }
+
+    function saveList(key, arr) {
+        localStorage.setItem(key, JSON.stringify(arr));
+    }
+
+    function genId(prefix) {
+        return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    }
+
+    function fmtMoney(n) {
+        var val = parseFloat(n) || 0;
+        var neg = val < 0;
+        var abs = Math.abs(val).toFixed(2);
+        var parts = abs.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return (neg ? '-' : '') + '$' + parts.join('.');
+    }
+
+    function seedIfEmpty(key, data) {
+        var existing = localStorage.getItem(key);
+        if (!existing || existing === '[]' || existing === 'null') {
+            saveList(key, data);
+        }
+    }
+
+    /* ===== Generic CRUD ===== */
+    function addItem(key, item) {
+        var list = loadList(key);
+        list.push(item);
+        saveList(key, list);
+    }
+
+    function updateItem(key, id, updates) {
+        var list = loadList(key);
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].id === id) {
+                Object.assign(list[i], updates);
+                break;
+            }
+        }
+        saveList(key, list);
+    }
+
+    function deleteItem(key, id) {
+        var list = loadList(key).filter(function(item) { return item.id !== id; });
+        saveList(key, list);
+    }
+
+    /* ===== Payments ===== */
+    function paymentKey(type, refId, year, month) {
+        return type + '_' + refId + '_' + year + '-' + String(month + 1).padStart(2, '0');
+    }
+
+    function isPaid(type, refId, year, month) {
+        var payments = loadList(KEYS.payments);
+        var pk = paymentKey(type, refId, year, month);
+        return payments.some(function(p) { return p.id === pk; });
+    }
+
+    function togglePaid(type, refId, year, month) {
+        var payments = loadList(KEYS.payments);
+        var pk = paymentKey(type, refId, year, month);
+        var idx = payments.findIndex(function(p) { return p.id === pk; });
+
+        if (idx >= 0) {
+            payments.splice(idx, 1);
+        } else {
+            payments.push({
+                id: pk,
+                type: type,
+                refId: refId,
+                dayKey: year + '-' + String(month + 1).padStart(2, '0'),
+                paid: true,
+                paidAt: new Date().toISOString()
+            });
+        }
+        saveList(KEYS.payments, payments);
+    }
+
+    /* ===== Calculations ===== */
+    function calcSummary() {
+        var accounts = loadList(KEYS.accounts);
+        var debts = loadList(KEYS.debts);
+        var expenses = loadList(KEYS.expenses);
+        var income = loadList(KEYS.income);
+
+        var totalCash = 0;
+        var totalInvestments = 0;
+        accounts.forEach(function(a) {
+            var bal = parseFloat(a.balance) || 0;
+            if (a.type === 'Brokerage') totalInvestments += bal;
+            else totalCash += bal;
+        });
+
+        var totalDebt = 0;
+        var monthlyDebtMin = 0;
+        debts.forEach(function(d) {
+            totalDebt += parseFloat(d.balance) || 0;
+            monthlyDebtMin += parseFloat(d.minPayment) || 0;
+        });
+
+        var monthlyExpenses = 0;
+        expenses.forEach(function(e) {
+            monthlyExpenses += parseFloat(e.amount) || 0;
+        });
+
+        var monthlyIncome = 0;
+        income.forEach(function(inc) {
+            if (inc.recurrence === 'monthly') {
+                monthlyIncome += parseFloat(inc.amount) || 0;
+            }
+        });
+
+        var netWorth = totalCash + totalInvestments - totalDebt;
+        var projectedEndOfMonth = totalCash + monthlyIncome - monthlyExpenses - monthlyDebtMin;
+
+        return {
+            totalCash: totalCash,
+            totalInvestments: totalInvestments,
+            totalDebt: totalDebt,
+            netWorth: netWorth,
+            monthlyIncome: monthlyIncome,
+            monthlyExpenses: monthlyExpenses,
+            monthlyDebtMin: monthlyDebtMin,
+            projectedEndOfMonth: projectedEndOfMonth
+        };
+    }
+
+    function calcRentalCashflow() {
+        var expenses = loadList(KEYS.expenses);
+        var income = loadList(KEYS.income);
+
+        var rentalExpense = 0;
+        expenses.forEach(function(e) {
+            if (e.rentalPropertyId === RENTAL_ID) {
+                rentalExpense += parseFloat(e.amount) || 0;
+            }
+        });
+
+        var rentalIncome = 0;
+        income.forEach(function(inc) {
+            if (inc.category === 'rental') {
+                rentalIncome += parseFloat(inc.amount) || 0;
+            }
+        });
+
+        return {
+            income: rentalIncome,
+            expenses: rentalExpense,
+            cashflow: rentalIncome - rentalExpense
+        };
+    }
+
+    /* ===== Rendering ===== */
+    function renderSummary() {
+        var s = calcSummary();
+        var grid = document.getElementById('summaryGrid');
+        var items = [
+            { label: 'Total Cash', value: s.totalCash, cls: '' },
+            { label: 'Total Investments', value: s.totalInvestments, cls: '' },
+            { label: 'Total Debt', value: s.totalDebt, cls: 'negative' },
+            { label: 'Net Worth', value: s.netWorth, cls: s.netWorth < 0 ? 'negative' : '' },
+            { label: 'Monthly Income', value: s.monthlyIncome, cls: '' },
+            { label: 'Monthly Expenses', value: s.monthlyExpenses, cls: 'warn' },
+            { label: 'Debt Minimums', value: s.monthlyDebtMin, cls: 'warn' },
+            { label: 'Projected EOM Cash', value: s.projectedEndOfMonth, cls: s.projectedEndOfMonth < 0 ? 'negative' : '' }
+        ];
+
+        grid.innerHTML = items.map(function(item) {
+            return '<div class="summary-card">' +
+                '<div class="summary-value ' + item.cls + '">' + fmtMoney(item.value) + '</div>' +
+                '<div class="summary-label">' + item.label + '</div>' +
+            '</div>';
+        }).join('');
+    }
+
+    function renderAccounts() {
+        var accounts = loadList(KEYS.accounts);
+        var container = document.getElementById('accountsList');
+
+        if (accounts.length === 0) {
+            container.innerHTML = '<div class="empty-msg">No accounts added yet</div>';
+            return;
+        }
+
+        var groups = {};
+        accounts.forEach(function(a) {
+            var type = a.type || 'Other';
+            if (!groups[type]) groups[type] = [];
+            groups[type].push(a);
+        });
+
+        var html = '';
+        Object.keys(groups).sort().forEach(function(type) {
+            html += '<div class="group-label">' + type + '</div>';
+            groups[type].forEach(function(a) {
+                html += renderItemRow(a.name, fmtMoney(a.balance), '', KEYS.accounts, a.id, false);
+            });
+        });
+
+        container.innerHTML = html;
+    }
+
+    function renderDebts() {
+        var debts = loadList(KEYS.debts);
+        var container = document.getElementById('debtsList');
+
+        if (debts.length === 0) {
+            container.innerHTML = '<div class="empty-msg">No debts tracked</div>';
+            return;
+        }
+
+        container.innerHTML = debts.map(function(d) {
+            var sub = 'Min: ' + fmtMoney(d.minPayment);
+            if (d.dueDay) sub += ' | Due: ' + ordinal(d.dueDay);
+            return renderItemRow(d.name, fmtMoney(d.balance), sub, KEYS.debts, d.id, false, 'expense');
+        }).join('');
+    }
+
+    function renderExpenses() {
+        var expenses = loadList(KEYS.expenses);
+        var container = document.getElementById('expensesList');
+        var rentalDiv = document.getElementById('rentalCashflow');
+
+        var filtered;
+        if (currentExpenseTab === 'rental') {
+            filtered = expenses.filter(function(e) { return e.rentalPropertyId === RENTAL_ID; });
+            var rcf = calcRentalCashflow();
+            rentalDiv.style.display = '';
+            rentalDiv.innerHTML = '<div class="rental-cashflow">' +
+                '<div class="rcf-item"><div class="rcf-val rcf-positive">' + fmtMoney(rcf.income) + '</div><div class="rcf-lbl">Rental Income</div></div>' +
+                '<div class="rcf-item"><div class="rcf-val rcf-negative">' + fmtMoney(rcf.expenses) + '</div><div class="rcf-lbl">Rental Expenses</div></div>' +
+                '<div class="rcf-item"><div class="rcf-val ' + (rcf.cashflow >= 0 ? 'rcf-positive' : 'rcf-negative') + '">' + fmtMoney(rcf.cashflow) + '</div><div class="rcf-lbl">Cashflow</div></div>' +
+            '</div>';
+        } else {
+            filtered = expenses.filter(function(e) { return !e.rentalPropertyId; });
+            rentalDiv.style.display = 'none';
+        }
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty-msg">No expenses in this category</div>';
+            return;
+        }
+
+        container.innerHTML = filtered.map(function(e) {
+            var sub = '';
+            if (e.dueDay) sub = 'Due: ' + ordinal(e.dueDay);
+            var paid = isPaid('expense', e.id, calYear, calMonth);
+            return renderItemRow(e.name, fmtMoney(e.amount), sub, KEYS.expenses, e.id, true, 'expense', paid);
+        }).join('');
+    }
+
+    function renderIncome() {
+        var income = loadList(KEYS.income);
+        var container = document.getElementById('incomeList');
+
+        if (income.length === 0) {
+            container.innerHTML = '<div class="empty-msg">No income sources added</div>';
+            return;
+        }
+
+        var monthly = income.filter(function(i) { return i.recurrence === 'monthly'; });
+        var oneoff = income.filter(function(i) { return i.recurrence !== 'monthly'; });
+
+        var html = '';
+        if (monthly.length > 0) {
+            html += '<div class="group-label">MONTHLY RECURRING</div>';
+            html += monthly.map(function(inc) {
+                var sub = inc.category ? inc.category : '';
+                var paid = isPaid('income', inc.id, calYear, calMonth);
+                return renderItemRow(inc.name, fmtMoney(inc.amount), sub, KEYS.income, inc.id, true, '', paid);
+            }).join('');
+        }
+        if (oneoff.length > 0) {
+            html += '<div class="group-label">ONE-OFF</div>';
+            html += oneoff.map(function(inc) {
+                var sub = inc.date || '';
+                return renderItemRow(inc.name, fmtMoney(inc.amount), sub, KEYS.income, inc.id, false);
+            }).join('');
+        }
+
+        container.innerHTML = html;
+    }
+
+    function renderBillCalendar() {
+        var container = document.getElementById('calendarList');
+        var monthLabel = document.getElementById('calMonth');
+
+        var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        monthLabel.textContent = monthNames[calMonth] + ' ' + calYear;
+
+        var items = [];
+
+        // Fixed expenses
+        loadList(KEYS.expenses).forEach(function(e) {
+            items.push({
+                day: parseInt(e.dueDay) || 1,
+                name: e.name,
+                amount: parseFloat(e.amount) || 0,
+                type: e.rentalPropertyId ? 'rental' : 'expense',
+                typeBadge: e.rentalPropertyId ? 'Rental' : 'Expense',
+                paidType: 'expense',
+                refId: e.id
+            });
+        });
+
+        // Debts
+        loadList(KEYS.debts).forEach(function(d) {
+            items.push({
+                day: parseInt(d.dueDay) || 1,
+                name: d.name,
+                amount: parseFloat(d.minPayment) || 0,
+                type: 'debt',
+                typeBadge: 'Debt',
+                paidType: 'debt',
+                refId: d.id
+            });
+        });
+
+        // Monthly income
+        loadList(KEYS.income).forEach(function(inc) {
+            if (inc.recurrence === 'monthly') {
+                items.push({
+                    day: parseInt(inc.dayOfMonth) || 1,
+                    name: inc.name,
+                    amount: parseFloat(inc.amount) || 0,
+                    type: 'income',
+                    typeBadge: 'Income',
+                    paidType: 'income',
+                    refId: inc.id
+                });
+            }
+        });
+
+        items.sort(function(a, b) { return a.day - b.day; });
+
+        if (items.length === 0) {
+            container.innerHTML = '<div class="empty-msg">No bills this month</div>';
+            return;
+        }
+
+        var totalOut = 0;
+        var totalIn = 0;
+
+        var html = items.map(function(item) {
+            var paid = isPaid(item.paidType, item.refId, calYear, calMonth);
+            var badgeClass = item.type === 'debt' ? 'debt' : item.type === 'income' ? 'income' : 'expense';
+            var amountClass = item.type === 'income' ? '' : 'expense';
+
+            if (item.type === 'income') totalIn += item.amount;
+            else totalOut += item.amount;
+
+            return '<div class="cal-item">' +
+                '<div class="cal-day">' + item.day + '</div>' +
+                '<div class="cal-info">' +
+                    '<div class="cal-name">' + item.name + '</div>' +
+                    '<span class="type-badge ' + badgeClass + '">' + item.typeBadge + '</span>' +
+                '</div>' +
+                '<div class="cal-amount ' + amountClass + '">' + fmtMoney(item.amount) + '</div>' +
+                '<label class="paid-toggle">' +
+                    '<input type="checkbox" ' + (paid ? 'checked' : '') +
+                    ' onchange="onCalPaidToggle(\'' + item.paidType + '\',\'' + item.refId + '\')">' +
+                    '<span class="paid-slider"></span>' +
+                '</label>' +
+            '</div>';
+        }).join('');
+
+        var net = totalIn - totalOut;
+        html += '<div class="cal-total-row">' +
+            '<span>Monthly Net</span>' +
+            '<span class="cal-amount ' + (net < 0 ? 'expense' : '') + '">' + fmtMoney(net) + '</span>' +
+        '</div>';
+
+        container.innerHTML = html;
+    }
+
+    /* ===== Row builder ===== */
+    function renderItemRow(name, amount, sub, key, id, showPaidToggle, amountCls, paid) {
+        var html = '<div class="item-row">' +
+            '<div class="item-info">' +
+                '<div class="item-name">' + name + '</div>' +
+                (sub ? '<div class="item-sub">' + sub + '</div>' : '') +
+            '</div>' +
+            '<div class="item-amount ' + (amountCls || '') + '">' + amount + '</div>';
+
+        if (showPaidToggle) {
+            var paidType = key === KEYS.income ? 'income' : 'expense';
+            html += '<label class="paid-toggle">' +
+                '<input type="checkbox" ' + (paid ? 'checked' : '') +
+                ' onchange="onPaidToggle(\'' + paidType + '\',\'' + id + '\')">' +
+                '<span class="paid-slider"></span>' +
+            '</label>';
+        }
+
+        html += '<div class="item-actions">' +
+            '<button class="icon-btn" onclick="openModal(\'edit\',\'' + key + '\',\'' + id + '\')" title="Edit">&#9998;</button>' +
+            '<button class="icon-btn danger" onclick="confirmDelete(\'' + key + '\',\'' + id + '\',\'' + escapeHtml(name) + '\')" title="Delete">&#128465;</button>' +
+        '</div></div>';
+
+        return html;
+    }
+
+    function escapeHtml(str) {
+        return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    function ordinal(day) {
+        var d = parseInt(day) || 0;
+        if (d === 0) return '';
+        var s = ['th','st','nd','rd'];
+        var v = d % 100;
+        return d + (s[(v - 20) % 10] || s[v] || s[0]);
+    }
+
+    /* ===== Event Handlers ===== */
+    function switchExpenseTab(tab, btn) {
+        currentExpenseTab = tab;
+        document.querySelectorAll('.sub-tab').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        renderExpenses();
+    }
+
+    function navCalendar(delta) {
+        calMonth += delta;
+        if (calMonth > 11) { calMonth = 0; calYear++; }
+        if (calMonth < 0) { calMonth = 11; calYear--; }
+        renderBillCalendar();
+    }
+
+    function onPaidToggle(type, refId) {
+        togglePaid(type, refId, calYear, calMonth);
+        renderAll();
+    }
+
+    function onCalPaidToggle(type, refId) {
+        togglePaid(type, refId, calYear, calMonth);
+        renderBillCalendar();
+        renderExpenses();
+        renderIncome();
+    }
+
+    /* ===== Tab System ===== */
+    var TAB_MAP = {
+        accounts: 'tabAccounts',
+        debts: 'tabDebts',
+        expenses: 'tabExpenses',
+        income: 'tabIncome',
+        calendar: 'tabCalendar'
+    };
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-pill').forEach(function(btn) {
+            var active = btn.getAttribute('data-tab') === tabName;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        Object.keys(TAB_MAP).forEach(function(key) {
+            var panel = document.getElementById(TAB_MAP[key]);
+            if (panel) panel.classList.toggle('active', key === tabName);
+        });
+    }
+
+    document.querySelectorAll('.tab-pill').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            switchTab(btn.getAttribute('data-tab'));
+        });
+    });
+
+    /* ===== Modal System ===== */
+    function openModal(mode, key, editId) {
+        modalState = { mode: mode, key: key, editId: editId || null };
+
+        var title = (mode === 'edit' ? 'Edit' : 'Add') + ' ';
+        if (key === KEYS.accounts) title += 'Account';
+        else if (key === KEYS.debts) title += 'Debt';
+        else if (key === KEYS.expenses) title += 'Expense';
+        else if (key === KEYS.income) title += 'Income';
+
+        document.getElementById('modalTitle').textContent = title;
+
+        var body = document.getElementById('modalBody');
+        var existing = null;
+
+        if (mode === 'edit' && editId) {
+            var list = loadList(key);
+            existing = list.find(function(item) { return item.id === editId; });
+        }
+
+        body.innerHTML = buildForm(key, existing);
+        document.getElementById('crudModal').classList.add('open');
+    }
+
+    function closeCrudModal() {
+        document.getElementById('crudModal').classList.remove('open');
+    }
+
+    function buildForm(key, data) {
+        var d = data || {};
+
+        if (key === KEYS.accounts) {
+            return '<div class="form-row"><label>Account Name</label><input id="fName" value="' + (d.name || '') + '"></div>' +
+                '<div class="form-grid">' +
+                    '<div class="form-row"><label>Type</label><select id="fType">' +
+                        buildOptions(['Checking','Savings','Brokerage'], d.type) +
+                    '</select></div>' +
+                    '<div class="form-row"><label>Balance</label><input id="fBalance" type="number" step="0.01" value="' + (d.balance || '') + '"></div>' +
+                '</div>';
+        }
+
+        if (key === KEYS.debts) {
+            return '<div class="form-row"><label>Debt Name</label><input id="fName" value="' + (d.name || '') + '"></div>' +
+                '<div class="form-grid">' +
+                    '<div class="form-row"><label>Balance</label><input id="fBalance" type="number" step="0.01" value="' + (d.balance || '') + '"></div>' +
+                    '<div class="form-row"><label>Min Payment</label><input id="fMinPayment" type="number" step="0.01" value="' + (d.minPayment || '') + '"></div>' +
+                '</div>' +
+                '<div class="form-row"><label>Due Day of Month</label><input id="fDueDay" type="number" min="1" max="31" value="' + (d.dueDay || '') + '"></div>';
+        }
+
+        if (key === KEYS.expenses) {
+            return '<div class="form-row"><label>Expense Name</label><input id="fName" value="' + (d.name || '') + '"></div>' +
+                '<div class="form-grid">' +
+                    '<div class="form-row"><label>Amount</label><input id="fAmount" type="number" step="0.01" value="' + (d.amount || '') + '"></div>' +
+                    '<div class="form-row"><label>Due Day of Month</label><input id="fDueDay" type="number" min="1" max="31" value="' + (d.dueDay || '') + '"></div>' +
+                '</div>' +
+                '<div class="form-row"><label>Category</label><select id="fCategory">' +
+                    buildOptions(['Housing','Transportation','Insurance','Subscription','Fitness','Education','Utility','Other'], d.category) +
+                '</select></div>' +
+                '<div class="form-row"><label>Rental Property</label><select id="fRental">' +
+                    '<option value=""' + (!d.rentalPropertyId ? ' selected' : '') + '>None (Personal)</option>' +
+                    '<option value="' + RENTAL_ID + '"' + (d.rentalPropertyId === RENTAL_ID ? ' selected' : '') + '>15 Brookwood</option>' +
+                '</select></div>';
+        }
+
+        if (key === KEYS.income) {
+            return '<div class="form-row"><label>Income Name</label><input id="fName" value="' + (d.name || '') + '"></div>' +
+                '<div class="form-grid">' +
+                    '<div class="form-row"><label>Amount</label><input id="fAmount" type="number" step="0.01" value="' + (d.amount || '') + '"></div>' +
+                    '<div class="form-row"><label>Recurrence</label><select id="fRecurrence">' +
+                        buildOptions(['monthly','one-off'], d.recurrence) +
+                    '</select></div>' +
+                '</div>' +
+                '<div class="form-row"><label>Day of Month (if monthly)</label><input id="fDayOfMonth" type="number" min="1" max="31" value="' + (d.dayOfMonth || '') + '"></div>' +
+                '<div class="form-row"><label>Category</label><select id="fIncCategory">' +
+                    buildOptions(['household','rental','side-income','other'], d.category) +
+                '</select></div>';
+        }
+
+        return '';
+    }
+
+    function buildOptions(options, selected) {
+        return options.map(function(opt) {
+            return '<option value="' + opt + '"' + (opt === selected ? ' selected' : '') + '>' + opt + '</option>';
+        }).join('');
+    }
+
+    function saveModal() {
+        var key = modalState.key;
+        var mode = modalState.mode;
+        var id = modalState.editId;
+        var nameEl = document.getElementById('fName');
+
+        if (nameEl && !nameEl.value.trim()) {
+            nameEl.style.borderColor = 'var(--danger)';
+            nameEl.focus();
+            return;
+        }
+
+        var item = {};
+
+        if (key === KEYS.accounts) {
+            item = {
+                name: document.getElementById('fName').value.trim(),
+                type: document.getElementById('fType').value,
+                balance: parseFloat(document.getElementById('fBalance').value) || 0
+            };
+        } else if (key === KEYS.debts) {
+            item = {
+                name: document.getElementById('fName').value.trim(),
+                balance: parseFloat(document.getElementById('fBalance').value) || 0,
+                minPayment: parseFloat(document.getElementById('fMinPayment').value) || 0,
+                dueDay: parseInt(document.getElementById('fDueDay').value) || null
+            };
+        } else if (key === KEYS.expenses) {
+            item = {
+                name: document.getElementById('fName').value.trim(),
+                amount: parseFloat(document.getElementById('fAmount').value) || 0,
+                dueDay: parseInt(document.getElementById('fDueDay').value) || null,
+                category: document.getElementById('fCategory').value,
+                rentalPropertyId: document.getElementById('fRental').value || null
+            };
+        } else if (key === KEYS.income) {
+            item = {
+                name: document.getElementById('fName').value.trim(),
+                amount: parseFloat(document.getElementById('fAmount').value) || 0,
+                recurrence: document.getElementById('fRecurrence').value,
+                dayOfMonth: parseInt(document.getElementById('fDayOfMonth').value) || null,
+                category: document.getElementById('fIncCategory').value
+            };
+        }
+
+        if (mode === 'edit' && id) {
+            updateItem(key, id, item);
+        } else {
+            item.id = genId(key.split(':')[1]);
+            addItem(key, item);
+        }
+
+        closeCrudModal();
+        renderAll();
+    }
+
+    /* ===== Delete System ===== */
+    function confirmDelete(key, id, name) {
+        deleteState = { key: key, id: id };
+        document.getElementById('deleteMsg').textContent = 'Are you sure you want to delete "' + name + '"? This cannot be undone.';
+        document.getElementById('deleteModal').classList.add('open');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('open');
+    }
+
+    function confirmDeleteAction() {
+        deleteItem(deleteState.key, deleteState.id);
+        closeDeleteModal();
+        renderAll();
+    }
+
+    /* ===== Render All ===== */
+    function renderAll() {
+        renderSummary();
+        renderAccounts();
+        renderDebts();
+        renderExpenses();
+        renderIncome();
+        renderBillCalendar();
+    }
+
+    /* ===== Seed Data ===== */
+    function seedData() {
+        seedIfEmpty(KEYS.accounts, []);
+        seedIfEmpty(KEYS.debts, []);
+        seedIfEmpty(KEYS.payments, []);
+
+        seedIfEmpty(KEYS.income, [
+            { id: 'inc_nick_nys', name: 'Nick NYS DTF', amount: 0, recurrence: 'monthly', dayOfMonth: 1, category: 'household' },
+            { id: 'inc_sh_stpeters', name: 'Seung Hee St Peters', amount: 0, recurrence: 'monthly', dayOfMonth: 1, category: 'household' }
+        ]);
+
+        seedIfEmpty(KEYS.expenses, [
+            { id: 'exp_latham_mortgage', name: 'Latham Mortgage', amount: 2267.61, dueDay: 1, category: 'Housing', rentalPropertyId: null },
+            { id: 'exp_latham_garbage', name: 'Latham Garbage', amount: 27.98, dueDay: 1, category: 'Utility', rentalPropertyId: null },
+            { id: 'exp_car_insurance', name: 'Car Insurance', amount: 142.17, dueDay: 1, category: 'Insurance', rentalPropertyId: null },
+            { id: 'exp_sonata_loan', name: 'Sonata Loan Payment', amount: 558.44, dueDay: 1, category: 'Transportation', rentalPropertyId: null },
+            { id: 'exp_deferred_comp', name: 'Deferred Comp Loan Payment', amount: 276.72, dueDay: 1, category: 'Other', rentalPropertyId: null },
+            { id: 'exp_student_loan', name: 'Student Loan Payment', amount: 129.20, dueDay: 1, category: 'Other', rentalPropertyId: null },
+            { id: 'exp_internet', name: 'Internet', amount: 89.99, dueDay: 1, category: 'Utility', rentalPropertyId: null },
+            { id: 'exp_netflix', name: 'Netflix', amount: 26.99, dueDay: 1, category: 'Subscription', rentalPropertyId: null },
+            { id: 'exp_youtube', name: 'Youtube Premium', amount: 22.99, dueDay: 1, category: 'Subscription', rentalPropertyId: null },
+            { id: 'exp_disney', name: 'Disney+', amount: 0.00, dueDay: 1, category: 'Subscription', rentalPropertyId: null },
+            { id: 'exp_chatgpt', name: 'Chat GPT', amount: 20.00, dueDay: 1, category: 'Subscription', rentalPropertyId: null },
+            { id: 'exp_claude', name: 'Claude Max', amount: 100.00, dueDay: 1, category: 'Subscription', rentalPropertyId: null },
+            { id: 'exp_walmart_plus', name: 'Walmart+', amount: 0.00, dueDay: 1, category: 'Subscription', rentalPropertyId: null },
+            { id: 'exp_planet_fitness', name: 'Planet Fitness', amount: 15.00, dueDay: 1, category: 'Fitness', rentalPropertyId: null },
+            { id: 'exp_dance', name: "Barbara's School of The Dance", amount: 45.00, dueDay: 1, category: 'Education', rentalPropertyId: null },
+            { id: 'exp_orangetheory', name: 'Orange Theory', amount: 104.00, dueDay: 1, category: 'Fitness', rentalPropertyId: null },
+            { id: 'exp_glenmont_mortgage', name: 'Glenmont Mortgage', amount: 4147.29, dueDay: 1, category: 'Housing', rentalPropertyId: RENTAL_ID },
+            { id: 'exp_glenmont_electric', name: 'Glenmont Electric', amount: 143.38, dueDay: 1, category: 'Utility', rentalPropertyId: RENTAL_ID },
+            { id: 'exp_glenmont_garbage', name: 'Glenmont Garbage', amount: 27.98, dueDay: 1, category: 'Utility', rentalPropertyId: RENTAL_ID }
+        ]);
+    }
+
+    /* ===== Modal backdrop close ===== */
+    function setupModalBackdropClose(modalId) {
+        var modal = document.getElementById(modalId);
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target.classList.contains('popup-backdrop')) {
+                    modal.classList.remove('open');
+                }
+            });
+        }
+    }
+
+    /* ===== Init ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+        var now = new Date();
+        calYear = now.getFullYear();
+        calMonth = now.getMonth();
+
+        seedData();
+        setupModalBackdropClose('crudModal');
+        setupModalBackdropClose('deleteModal');
+        renderAll();
+    });
+  </script>
+</body>
+</html>

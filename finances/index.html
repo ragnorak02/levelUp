@@ -8,7 +8,8 @@
     :root{
       --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7;
       --accent:#4CAF50; --accent2:#2dd4bf;
-      --ring:#2a3543; --good:#22c55e; --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --ring:#2a3543; --good:#22c55e; --danger:#ef4444; --warn:#f59e0b;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius:18px;
     }
     *{box-sizing:border-box}
@@ -341,7 +342,31 @@
       color:#0b0f14;
       background: linear-gradient(135deg, rgba(76,175,80,1), rgba(45,212,191,1));
       border-color: transparent;
-    
+
+    }
+
+    /* --- Summary Grid --- */
+    .summary-grid{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .summary-card{
+      padding:12px 14px;
+      background: rgba(11,15,20,.35);
+      border:1px solid rgba(42,53,67,.55);
+      border-radius:14px;
+      text-align:center;
+    }
+    .summary-value{font-size:22px; font-weight:950; color:var(--good); line-height:1.1}
+    .summary-value.negative{color:var(--danger)}
+    .summary-value.warn{color:var(--warn)}
+    .summary-label{font-size:11px; color:var(--muted); margin-top:4px; font-weight:800}
+
+    @media(max-width:480px){
+      .summary-grid{grid-template-columns:repeat(2, 1fr)}
+      .summary-value{font-size:18px}
     }
 </style>
 </head>
@@ -358,11 +383,14 @@
         <a class="pill" href="food.html">Food</a>
         <a class="pill" href="search.html">Search</a>
         <a class="pill" href="receipts.html" id="receiptsLink">Receipts</a>
+        <a class="pill" href="financeDashboard.html">Cashflow</a>
       </div>
     </div>
   </div>
 
   <div class="wrap">
+    <div class="summary-grid" id="summaryGrid"></div>
+
     <div class="card" style="margin-top:8px;">
       <div class="month-strip" id="monthStrip"></div>
 
@@ -1344,6 +1372,75 @@
       }
       await refreshAll();
       renderRecent();
+
+      // ---- summary grid (cashflow stats) ----
+      (function renderSummaryGrid(){
+        const KEYS_CF = {
+          accounts: 'finances:accounts',
+          debts: 'finances:debts',
+          expenses: 'finances:fixedExpenses',
+          income: 'finances:income'
+        };
+        function loadCF(key){ try{ return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){ return []; } }
+        function fmtCF(n){
+          const val = parseFloat(n) || 0;
+          const neg = val < 0;
+          const abs = Math.abs(val).toFixed(2);
+          const parts = abs.split('.');
+          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          return (neg ? '-' : '') + '$' + parts.join('.');
+        }
+
+        const accounts = loadCF(KEYS_CF.accounts);
+        const debts = loadCF(KEYS_CF.debts);
+        const expenses = loadCF(KEYS_CF.expenses);
+        const income = loadCF(KEYS_CF.income);
+
+        let totalCash = 0, totalInvestments = 0;
+        accounts.forEach(a => {
+          const bal = parseFloat(a.balance) || 0;
+          if (a.type === 'Brokerage') totalInvestments += bal;
+          else totalCash += bal;
+        });
+
+        let totalDebt = 0, monthlyDebtMin = 0;
+        debts.forEach(d => {
+          totalDebt += parseFloat(d.balance) || 0;
+          monthlyDebtMin += parseFloat(d.minPayment) || 0;
+        });
+
+        let monthlyExpenses = 0;
+        expenses.forEach(e => { monthlyExpenses += parseFloat(e.amount) || 0; });
+
+        let monthlyIncome = 0;
+        income.forEach(inc => {
+          if (inc.recurrence === 'monthly') monthlyIncome += parseFloat(inc.amount) || 0;
+        });
+
+        const netWorth = totalCash + totalInvestments - totalDebt;
+        const projectedEOM = totalCash + monthlyIncome - monthlyExpenses - monthlyDebtMin;
+
+        const items = [
+          { label: 'Total Cash', value: totalCash, cls: '' },
+          { label: 'Total Investments', value: totalInvestments, cls: '' },
+          { label: 'Total Debt', value: totalDebt, cls: 'negative' },
+          { label: 'Net Worth', value: netWorth, cls: netWorth < 0 ? 'negative' : '' },
+          { label: 'Monthly Income', value: monthlyIncome, cls: '' },
+          { label: 'Monthly Expenses', value: monthlyExpenses, cls: 'warn' },
+          { label: 'Debt Minimums', value: monthlyDebtMin, cls: 'warn' },
+          { label: 'Projected EOM Cash', value: projectedEOM, cls: projectedEOM < 0 ? 'negative' : '' }
+        ];
+
+        const grid = document.getElementById('summaryGrid');
+        if (grid) {
+          grid.innerHTML = items.map(item =>
+            '<div class="summary-card">' +
+              '<div class="summary-value ' + item.cls + '">' + fmtCF(item.value) + '</div>' +
+              '<div class="summary-label">' + item.label + '</div>' +
+            '</div>'
+          ).join('');
+        }
+      })();
     }
 
     main().catch(console.error);
