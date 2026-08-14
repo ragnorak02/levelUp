@@ -3778,6 +3778,40 @@
   "tax": 0.0,
   "total": 31.66,
   "notes": "CVS Pharmacy — 02/20/2026 10:16 AM"
+},
+
+{
+  "date": "2026-02-23",
+  "store": "The Fresh Market",
+  "category": "Groceries",
+  "items": [
+    {
+      "name": "Roasted Lemon Rosemary Chicken",
+      "price": 8.99
+    }
+  ],
+  "subtotal": 8.99,
+  "tax": 0.72,
+  "total": 9.71,
+  "payment": "American Express"
+},
+
+{
+  "date": "2026-02-23",
+  "store": "Walmart",
+  "category": "Groceries",
+  "items": [
+    { "name": "Cucumber", "price": 0.63 },
+    { "name": "Grape Tomato", "price": 2.27 },
+    { "name": "Fajita Tortilla", "price": 2.26 },
+    { "name": "Taco Shells", "price": 2.50 },
+    { "name": "Avocado (5)", "price": 3.40 },
+    { "name": "Apple Cosmic", "price": 5.03 }
+  ],
+  "subtotal": 16.09,
+  "tax": 0.00,
+  "total": 16.09,
+  "payment": "Split (Gift Card + American Express)"
 }
 
 ],

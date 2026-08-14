@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git -C \"Z:\\\\Development\\\\LevelUp\" diff --stat)",
+      "Bash(git -C \"Z:\\\\Development\\\\LevelUp\" status --short)",
+      "Bash(dir:*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(start \"\" \"Z:\\\\Development\\\\LevelUp\\\\tests\\\\runner.html\")",
+      "Bash(node:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(gh api:*)",
+      "WebFetch(domain:ragnorak02.github.io)",
+      "Bash(start:*)",
+      "Bash(curl:*)",
+      "WebFetch(domain:localhost)"
+    ]
+  }
+}

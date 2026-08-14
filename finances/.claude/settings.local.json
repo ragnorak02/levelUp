@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m json.tool:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nadd 13 receipts from Feb 4-13: Walmart, Trader Joe''s, Starbucks\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git -C Z:/Development/LevelUp log --oneline -10)",
+      "Bash(python:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

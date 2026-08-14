@@ -1,0 +1,6493 @@
+[
+  {
+    "date": "2025-08-18",
+    "totalWeight": 0,
+    "totalSets": 0,
+    "exercises": [
+      {
+        "id": "xliaaev",
+        "bodyPart": "Chest",
+        "name": "Dumbbell Press",
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "12",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": 30,
+            "reps": "12",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "30",
+            "reps": "10",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "15",
+            "reps": "21",
+            "rpe": "",
+            "done": true,
+            "superset": true
+          }
+        ],
+        "finished": true
+      },
+      {
+        "id": "nouize8",
+        "bodyPart": "Triceps",
+        "name": "Skull Crushers",
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "12",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "30",
+            "reps": "10",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "30",
+            "reps": "12",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "rpe": "",
+            "done": true,
+            "superset": true
+          }
+        ],
+        "finished": true
+      },
+      {
+        "id": "w0is03e",
+        "bodyPart": "Chest",
+        "name": "Incline Bench Press",
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "10",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "rpe": "",
+            "done": true,
+            "superset": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "rpe": "",
+            "done": true,
+            "superset": true
+          }
+        ],
+        "finished": true
+      },
+      {
+        "id": "igj2x37",
+        "bodyPart": "Triceps",
+        "name": "Cable Pushdown",
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "8",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "10",
+            "reps": "12",
+            "rpe": "",
+            "done": true,
+            "superset": true
+          }
+        ],
+        "finished": true
+      },
+      {
+        "id": "varldii",
+        "bodyPart": "Triceps",
+        "name": "Overhead Extension",
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "6",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "rpe": "",
+            "done": true,
+            "superset": true
+          }
+        ],
+        "finished": true
+      },
+      {
+        "id": "vdi5j3p",
+        "bodyPart": "Chest",
+        "name": "Bench Press",
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "10",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "30",
+            "reps": "5",
+            "rpe": "",
+            "done": true
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "rpe": "",
+            "done": true,
+            "superset": true
+          }
+        ],
+        "finished": true
+      }
+    ],
+    "bodyWeight": 132
+  },
+  {
+    "date": "2025-08-19",
+    "exercises": [
+      {
+        "id": "0yqse26",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shoulder Press",
+        "finished": true,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": false,
+            "done": false
+          },
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": false,
+            "done": false
+          },
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": false,
+            "done": false
+          },
+          {
+            "weight": "10",
+            "reps": "21",
+            "superset": true,
+            "done": false
+          }
+        ],
+        "completed": true
+      },
+      {
+        "id": "mhuooex",
+        "bodyPart": "Shoulders",
+        "name": "Arnold Press",
+        "finished": true,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "10",
+            "reps": "6",
+            "superset": true,
+            "done": true
+          }
+        ],
+        "completed": true
+      },
+      {
+        "id": "w6j95tk",
+        "bodyPart": "Shoulders",
+        "name": "One-arm cable side raise",
+        "finished": true,
+        "sets": [
+          {
+            "weight": "5",
+            "reps": "6",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "5",
+            "reps": "6",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "5",
+            "reps": "6",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "5",
+            "reps": "6",
+            "superset": false,
+            "done": true
+          }
+        ],
+        "completed": true
+      },
+      {
+        "id": "0z3ymb1",
+        "bodyPart": "Shoulders",
+        "name": "One-arm cable front raise",
+        "finished": true,
+        "sets": [
+          {
+            "weight": "5",
+            "reps": "12",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "5",
+            "reps": "12",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true
+          }
+        ],
+        "completed": true
+      }
+    ]
+  },
+  {
+    "date": "2025-08-20",
+    "exercises": [
+      {
+        "id": "g3z9zx5",
+        "bodyPart": "Biceps",
+        "name": "Hammer Curl",
+        "finished": true,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "21",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "20",
+            "reps": "6",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "10",
+            "reps": "8",
+            "superset": true,
+            "done": true
+          }
+        ]
+      },
+      {
+        "id": "z3ocr1w",
+        "bodyPart": "Biceps",
+        "name": "Barbell Curl",
+        "finished": true,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true
+          }
+        ]
+      },
+      {
+        "id": "5nftwft",
+        "bodyPart": "Biceps",
+        "name": "Cable Curl",
+        "finished": true,
+        "sets": [
+          {
+            "weight": "5.",
+            "reps": "12",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "10",
+            "reps": "7",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "10",
+            "reps": "6",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "10",
+            "reps": "7",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "5",
+            "reps": "12",
+            "superset": false,
+            "done": true
+          }
+        ]
+      },
+      {
+        "id": "1tchhpy",
+        "bodyPart": "Back",
+        "name": "Lat Pulldown",
+        "finished": true,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "10",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "35",
+            "reps": "10",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "20",
+            "reps": "21",
+            "superset": true,
+            "done": true
+          }
+        ]
+      },
+      {
+        "id": "gdzs0o6",
+        "bodyPart": "Back",
+        "name": "Seated Cable Row",
+        "finished": true,
+        "sets": [
+          {
+            "weight": 20,
+            "reps": "12",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "35",
+            "reps": "15",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "42.5",
+            "reps": "8",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "42.5",
+            "reps": "8",
+            "superset": false,
+            "done": true
+          },
+          {
+            "weight": "20",
+            "reps": "21",
+            "superset": true,
+            "done": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2025-08-26",
+    "exercises": [
+      {
+        "id": "vz6l291",
+        "bodyPart": "Chest",
+        "name": "Dumbbell Press",
+        "finished": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": 30,
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "b3zuj0n",
+        "bodyPart": "Triceps",
+        "name": "Skull Crushers",
+        "finished": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "blbnkqj",
+        "bodyPart": "Triceps",
+        "name": "Cable Pushdown",
+        "finished": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "bjtkzdo",
+        "bodyPart": "Triceps",
+        "name": "Overhead Extension",
+        "finished": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "720artb",
+        "bodyPart": "Chest",
+        "name": "Cable Fly",
+        "finished": true,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "tb3an1k",
+        "bodyPart": "Chest",
+        "name": "Bench Press Machine",
+        "finished": true,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "cnltznn",
+        "bodyPart": "Chest",
+        "name": "Incline Bench Press",
+        "finished": false,
+        "sets": [
+          {
+            "weight": "",
+            "reps": "",
+            "superset": false,
+            "done": false
+          },
+          {
+            "weight": "",
+            "reps": "",
+            "superset": false,
+            "done": false,
+            "copied": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2025-08-29",
+    "exercises": [
+      {
+        "id": "3r4shvl",
+        "bodyPart": "Biceps",
+        "name": "Hammer Curl",
+        "finished": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "16",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "completed": true
+      },
+      {
+        "id": "8u0iug5",
+        "bodyPart": "Biceps",
+        "name": "Barbell Curl",
+        "finished": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "completed": true
+      },
+      {
+        "id": "89n8wfz",
+        "bodyPart": "Biceps",
+        "name": "Cable Curl",
+        "finished": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "completed": true
+      },
+      {
+        "id": "j1j2k72",
+        "bodyPart": "Back",
+        "name": "Lat Pulldown",
+        "finished": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "70",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "70",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "70",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "70",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "30",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "completed": true
+      },
+      {
+        "id": "n0ybxfh",
+        "bodyPart": "Back",
+        "name": "Seated Cable Row",
+        "finished": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "42.5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "42.5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "42.5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "42.5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "17",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "completed": true
+      },
+      {
+        "id": "3nkwds3",
+        "bodyPart": "Back",
+        "name": "One-arm DB Row",
+        "finished": true,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false,
+        "completed": true
+      }
+    ]
+  },
+  {
+    "date": "2025-09-08",
+    "exercises": [
+      {
+        "id": "vk978r8",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shoulder Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "q7x25l7",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Lying Rear Delt Fly",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "lnkslpl",
+        "bodyPart": "Shoulders",
+        "name": "One-arm cable side raise",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "h5djzo2",
+        "bodyPart": "Shoulders",
+        "name": "One-arm cable front raise",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "r1wc779",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shrugs",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "l78dtoa",
+        "bodyPart": "Shoulders",
+        "name": "Cable Face Pull",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2025-09-11",
+    "exercises": [
+      {
+        "id": "lydb8m4",
+        "bodyPart": "Chest",
+        "name": "Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "hev45le",
+        "bodyPart": "Triceps",
+        "name": "Skull Crushers",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "n185cug",
+        "bodyPart": "Triceps",
+        "name": "Cable Pushdown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "iu1qlg7",
+        "bodyPart": "Triceps",
+        "name": "Overhead Extension",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "15",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "g4bocbz",
+        "bodyPart": "Chest",
+        "name": "Cable Fly",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "cf6bywn",
+        "bodyPart": "Chest",
+        "name": "Incline Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2025-09-15",
+    "exercises": [
+      {
+        "id": "twmr5e6",
+        "bodyPart": "Biceps",
+        "name": "Hammer Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "8py6575",
+        "bodyPart": "Biceps",
+        "name": "Cable Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "wyybezp",
+        "bodyPart": "Back",
+        "name": "Lat Pulldown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "85",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "85",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "85",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "85",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "25bweo5",
+        "bodyPart": "Back",
+        "name": "Seated Cable Row",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "42.5",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "18",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "x1m13o3",
+        "bodyPart": "Back",
+        "name": "One-arm DB Row",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "6bxmxk0",
+        "bodyPart": "Biceps",
+        "name": "Bicep Curl (machine)",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "50",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "25",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2025-09-16",
+    "bodyWeight": 141.3,
+    "exercises": []
+  },
+  {
+    "date": "2025-09-19",
+    "exercises": [
+      {
+        "id": "1voabaw",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shoulder Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "19e0kzw",
+        "bodyPart": "Shoulders",
+        "name": "One-arm cable side raise",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "ey79kki",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shrugs",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "9nvniw4",
+        "bodyPart": "Shoulders",
+        "name": "Cable Face Pull",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "kjcsvul",
+        "bodyPart": "Shoulders",
+        "name": "Upright Row",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "pfp6i52",
+        "bodyPart": "Forearms",
+        "name": "Dumbbell Wrist Curl",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2025-10-06",
+    "exercises": [
+      {
+        "id": "jdqknr3",
+        "bodyPart": "Chest",
+        "name": "Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "80alngb",
+        "bodyPart": "Triceps",
+        "name": "Skull Crushers",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "oy5q9je",
+        "bodyPart": "Triceps",
+        "name": "Cable Pushdown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "z6mzz06",
+        "bodyPart": "Triceps",
+        "name": "Overhead Extension",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "r9e9vfr",
+        "bodyPart": "Chest",
+        "name": "Incline Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "xgy2msu",
+        "bodyPart": "Chest",
+        "name": "Cable flyes rising",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "18",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "k5zsj5q",
+        "bodyPart": "Chest",
+        "name": "Chest Press Machine",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "110",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "110",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "110",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "110",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "80",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2025-10-16",
+    "exercises": [
+      {
+        "id": "2bsqwli",
+        "bodyPart": "Biceps",
+        "name": "Hammer Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "4",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "0jee8go",
+        "bodyPart": "Biceps",
+        "name": "Cable Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "9",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "9",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "dkcaig9",
+        "bodyPart": "Back",
+        "name": "Lat Pulldown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "85",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "90",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "85",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "85",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "j9l7fwq",
+        "bodyPart": "Back",
+        "name": "One-arm DB Row",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "5",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "8ztd0sy",
+        "bodyPart": "Biceps",
+        "name": "Barbell Curl",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "17",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "cbivptj",
+        "bodyPart": "Back",
+        "name": "Seated Cable Row",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "15",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2025-10-21",
+    "exercises": []
+  },
+  {
+    "date": "2025-10-29",
+    "exercises": [
+      {
+        "id": "mvhc363",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shoulder Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "nvt89sh",
+        "bodyPart": "Shoulders",
+        "name": "One-arm cable side raise",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "9wsazg9",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shrugs",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "tcislii",
+        "bodyPart": "Shoulders",
+        "name": "Cable Face Pull",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "od0bsnk",
+        "bodyPart": "Shoulders",
+        "name": "Upright Row",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "gfgw24p",
+        "bodyPart": "Forearms",
+        "name": "Barbell Wrist Curl",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2025-11-14",
+    "exercises": [
+      {
+        "id": "f9fo3aw",
+        "bodyPart": "Chest",
+        "name": "Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "vewpdm1",
+        "bodyPart": "Triceps",
+        "name": "Skull Crushers",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "zhn5tvk",
+        "bodyPart": "Triceps",
+        "name": "Cable Pushdown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "j4cfpau",
+        "bodyPart": "Triceps",
+        "name": "Overhead Extension",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "9ly9jcn",
+        "bodyPart": "Chest",
+        "name": "Incline Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "hocus8y",
+        "bodyPart": "Chest",
+        "name": "Chest Press Machine",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "110",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "90",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "80",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "80",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "60",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "m7psqpc",
+        "bodyPart": "Chest",
+        "name": "Cable Fly",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2025-12-18",
+    "exercises": [
+      {
+        "id": "kutn13c",
+        "bodyPart": "Chest",
+        "name": "Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "w5ahz8o",
+        "bodyPart": "Triceps",
+        "name": "Skull Crushers",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "p72tgdx",
+        "bodyPart": "Triceps",
+        "name": "Cable Pushdown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "utpa8mo",
+        "bodyPart": "Chest",
+        "name": "Incline Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "u1iyu20",
+        "bodyPart": "Chest",
+        "name": "Chest Press Machine",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "85",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "85",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "85",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "80",
+            "reps": "4",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "55",
+            "reps": "8",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "31pedpq",
+        "bodyPart": "Chest",
+        "name": "Cable Fly",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "40",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2025-12-22",
+    "exercises": [
+      {
+        "id": "bgka9o0",
+        "bodyPart": "Biceps",
+        "name": "Hammer Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "93hp6vx",
+        "bodyPart": "Biceps",
+        "name": "Cable Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "dx2wj7u",
+        "bodyPart": "Back",
+        "name": "Lat Pulldown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "85",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "90",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "90",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "90",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "zks1iwc",
+        "bodyPart": "Back",
+        "name": "One-arm DB Row",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "kp08091",
+        "bodyPart": "Biceps",
+        "name": "Barbell Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "c3meluf",
+        "bodyPart": "Back",
+        "name": "Seated Cable Row",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "70",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "70",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "70",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "70",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-01-01",
+    "exercises": []
+  },
+  {
+    "date": "2026-01-02",
+    "exercises": [
+      {
+        "id": "7ob71vq",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shoulder Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "bkbjsok",
+        "bodyPart": "Shoulders",
+        "name": "One-arm cable side raise",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "gm44w98",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shrugs",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "qyxnd4g",
+        "bodyPart": "Shoulders",
+        "name": "Upright Row",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "3p3bb5h",
+        "bodyPart": "Forearms",
+        "name": "Barbell Wrist Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "25",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "25",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "18",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-01-03",
+    "exercises": [
+      {
+        "id": "uqihhm8",
+        "bodyPart": "Chest",
+        "name": "Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "cuyh4vr",
+        "bodyPart": "Triceps",
+        "name": "Skull Crushers",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "5",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "j1hwb2o",
+        "bodyPart": "Chest",
+        "name": "Incline Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "ymglh9m",
+        "bodyPart": "Chest",
+        "name": "Cable Fly",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "30",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "cvutlnx",
+        "bodyPart": "Triceps",
+        "name": "Overhead Extension",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2026-01-05",
+    "exercises": [
+      {
+        "id": "49lfeap",
+        "bodyPart": "Biceps",
+        "name": "Hammer Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "6o7o9xj",
+        "bodyPart": "Biceps",
+        "name": "Cable Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "6we6a8i",
+        "bodyPart": "Back",
+        "name": "Lat Pulldown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "100",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "100",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "100",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "90",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "ms2wsti",
+        "bodyPart": "Back",
+        "name": "Seated Cable Row",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "85",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "100",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "100",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "90",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "55",
+            "reps": "15",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "5egki49",
+        "bodyPart": "Biceps",
+        "name": "Cable barbell curl",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "n8jk0xs",
+        "bodyPart": "Biceps",
+        "name": "Bicep Curl (machine)",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "50",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "55",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "55",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2026-01-08",
+    "exercises": [
+      {
+        "id": "a30e64b",
+        "bodyPart": "Shoulders",
+        "name": "One-arm cable side raise",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "iy7qwy9",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shrugs",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "45",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "45",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "45",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "6jinept",
+        "bodyPart": "Forearms",
+        "name": "Barbell Wrist Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "30",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "25",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "23",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "5hux8k5",
+        "bodyPart": "Shoulders",
+        "name": "Arnold Press",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "0x947vr",
+        "bodyPart": "Shoulders",
+        "name": "Cable Face Pull",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2026-01-12",
+    "exercises": [
+      {
+        "id": "hr2898q",
+        "bodyPart": "Chest",
+        "name": "Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "10",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "9bp1630",
+        "bodyPart": "Triceps",
+        "name": "Skull Crushers",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "n05v2o0",
+        "bodyPart": "Chest",
+        "name": "Incline Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "m861bsp",
+        "bodyPart": "Chest",
+        "name": "Cable Fly",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "30",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "0s59k73",
+        "bodyPart": "Triceps",
+        "name": "Cable Pushdown",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "13",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "25",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ],
+    "bodyWeight": 139.6
+  },
+  {
+    "date": "2026-01-16",
+    "exercises": [
+      {
+        "id": "qh1n66e",
+        "bodyPart": "Biceps",
+        "name": "Hammer Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "r1i9brj",
+        "bodyPart": "Biceps",
+        "name": "Cable Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "q8pqh1k",
+        "bodyPart": "Back",
+        "name": "Lat Pulldown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "120",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "110",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "110",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "110",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "65",
+            "reps": "15",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "2cvigfg",
+        "bodyPart": "Back",
+        "name": "Seated Cable Row",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "100",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "85",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "85",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "85",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "55",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "tml47bf",
+        "bodyPart": "Biceps",
+        "name": "Barbell Curl",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "uo7209n",
+        "bodyPart": "Back",
+        "name": "Straight-arm pull-down",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ],
+    "bodyWeight": 139.1
+  },
+  {
+    "date": "2026-01-19",
+    "exercises": [
+      {
+        "id": "k1a3a6c",
+        "bodyPart": "Shoulders",
+        "name": "One-arm cable side raise",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "u4x13yf",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shrugs",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "acy459e",
+        "bodyPart": "Forearms",
+        "name": "Barbell Wrist Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "25",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "25",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "n4161us",
+        "bodyPart": "Shoulders",
+        "name": "Arnold Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "d6du0w6",
+        "bodyPart": "Shoulders",
+        "name": "Cable Face Pull",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "10",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "5cq16ad",
+        "bodyPart": "Shoulders",
+        "name": "Upright Row",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "42.5",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ],
+    "bodyWeight": 142.3
+  },
+  {
+    "date": "2026-01-22",
+    "exercises": [
+      {
+        "id": "2j0whkq",
+        "bodyPart": "Chest",
+        "name": "Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "50",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "4",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "9",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "rqzfsul",
+        "bodyPart": "Chest",
+        "name": "Incline Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "9hzobi9",
+        "bodyPart": "Chest",
+        "name": "Cable Fly",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "30",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "cd9twc0",
+        "bodyPart": "Triceps",
+        "name": "Cable Pushdown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "cu4k26w",
+        "bodyPart": "Triceps",
+        "name": "Overhead Extension",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "4",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "30",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2026-01-26",
+    "exercises": [
+      {
+        "id": "022qbk8",
+        "bodyPart": "Biceps",
+        "name": "Hammer Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "k32pxyy",
+        "bodyPart": "Biceps",
+        "name": "Cable Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "21",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "rn53l18",
+        "bodyPart": "Back",
+        "name": "Lat Pulldown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "120",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "100",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "100",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "100",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "100",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "wfugk62",
+        "bodyPart": "Back",
+        "name": "Single arm pull down",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2026-01-29",
+    "exercises": [
+      {
+        "id": "vmkj1rz",
+        "bodyPart": "Shoulders",
+        "name": "One-arm cable side raise",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "5",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "97n2087",
+        "bodyPart": "Forearms",
+        "name": "Barbell Wrist Curl",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "25",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "25",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "21",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "40",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "30",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "xztk6ub",
+        "bodyPart": "Shoulders",
+        "name": "Cable Face Pull",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "nk91u89",
+        "bodyPart": "Shoulders",
+        "name": "Dumbell Shoulder Press",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "f1um476",
+        "bodyPart": "Shoulders",
+        "name": "Machine shrugs",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "180",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "180",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "180",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "180",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "160",
+            "reps": "15",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      },
+      {
+        "id": "x81b2zg",
+        "bodyPart": "Shoulders",
+        "name": "Cable upright rows",
+        "finished": true,
+        "completed": true,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "15",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "20",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ],
+        "copied": false
+      }
+    ]
+  },
+  {
+    "date": "2026-01-30",
+    "exercises": [
+      {
+        "id": "q3gipny",
+        "bodyPart": "Chest",
+        "name": "Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "45",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "45",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "45",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "50",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "h47zjd2",
+        "bodyPart": "Chest",
+        "name": "Incline Dumbbell Press",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "40",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "35",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "fglv9p9",
+        "bodyPart": "Chest",
+        "name": "Cable Fly",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "6",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "15",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "15",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "l3cfh69",
+        "bodyPart": "Triceps",
+        "name": "Cable Pushdown",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "30",
+            "reps": "5",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "10",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "10",
+            "reps": "24",
+            "superset": true,
+            "done": true,
+            "copied": false
+          }
+        ]
+      },
+      {
+        "id": "i5hpy28",
+        "bodyPart": "Triceps",
+        "name": "Overhead Extension",
+        "finished": true,
+        "completed": true,
+        "copied": false,
+        "sets": [
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "30",
+            "reps": "7",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "25",
+            "reps": "8",
+            "superset": false,
+            "done": true,
+            "copied": false
+          },
+          {
+            "weight": "20",
+            "reps": "12",
+            "superset": false,
+            "done": true,
+            "copied": false
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(cd \"Z:/Development/LevelUp\" && node tests/nodeRunner.js 2>&1)",
+      "Bash(cd \"Z:/Development/LevelUp\" && python -m http.server 8080 2>&1)",
+      "Bash(cd:*)",
+      "Bash(cd Z:\\\\Development\\\\LevelUp:*)"
+    ]
+  }
+}
