@@ -24,18 +24,48 @@
     display:flex; flex-direction:column;
   }
 
+  /* Header scrolls away with the page — it is not sticky. Only the compact
+     totals strip stays pinned, so nothing can overlap the action buttons. */
   header{
     background: linear-gradient(180deg, rgba(11,15,20,.95), rgba(11,15,20,.75));
-    backdrop-filter: blur(10px);
-    border-bottom:1px solid var(--ring); color:var(--ink); padding:10px;
-    position:sticky; top:0; z-index:20;
+    border-bottom:1px solid var(--ring); color:var(--ink); padding:8px 10px;
   }
-  .bar{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
-  .home{all:unset; cursor:pointer; border:1px solid var(--ring); padding:.35rem .6rem; border-radius:.6rem}
-  h1{margin:0; font-size:1rem}
-  .date-nav{display:flex; align-items:center; justify-content:center; gap:10px; width:100%}
-  .date-nav button{all:unset; cursor:pointer; padding:.3rem .5rem; border:1px solid var(--ring); border-radius:.5rem}
-  .date-str{flex:1; text-align:center; font-weight:900; letter-spacing:.02em}
+  .bar{display:flex; align-items:center; gap:7px}
+  .icon-btn{
+    all:unset; cursor:pointer; flex:0 0 auto;
+    width:38px; height:38px; border:1px solid var(--ring); border-radius:10px;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:1.05rem; line-height:1;
+  }
+  .icon-btn:active{background:#16202b}
+  .brand{flex:0 0 auto; font-size:1.15rem; line-height:1}
+
+  .date-nav{display:flex; align-items:center; gap:4px; flex:1 1 auto; min-width:0}
+  .date-nav button{
+    all:unset; cursor:pointer; flex:0 0 auto;
+    width:32px; height:34px; border:1px solid var(--ring); border-radius:9px;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .date-nav button:active{background:#16202b}
+  .date-str{
+    flex:1 1 auto; min-width:0; text-align:center; font-weight:900;
+    font-size:.92rem; letter-spacing:.02em;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  header .actions{margin-top:8px}
+
+  /* Section heading + expand/collapse-all controls */
+  .sg-head{display:flex; align-items:center; gap:8px; margin:.2rem 0 .5rem}
+  .sg-head h2{margin:0; font-size:1rem; color:#c7d2fe; flex:1 1 auto; min-width:0}
+  .sg-actions{display:flex; gap:6px; flex:0 0 auto}
+  .mini-btn{
+    all:unset; cursor:pointer; white-space:nowrap;
+    font-size:.72rem; font-weight:800; color:var(--muted);
+    border:1px solid var(--ring); background:#0e141b;
+    padding:.34rem .6rem; border-radius:999px;
+    min-height:30px; display:inline-flex; align-items:center;
+  }
+  .mini-btn:active{background:#16202b; color:var(--ink)}
 
   .wrap{width:min(900px,100%); margin-inline:auto; padding:10px; display:flex; flex-direction:column; gap:10px; flex:1}
 
@@ -313,20 +343,18 @@
 <body>
 <header>
   <div class="bar">
-    <button class="home" onclick="location.href='index.html'">⟵ Home</button>
-    <h1>Power Up! — Today's Workout</h1>
-    <div class="bar"><button class="home" id="openCalendar">📅</button></div>
-  </div>
-  <div class="bar" style="margin-top:6px">
+    <button class="icon-btn" onclick="location.href='index.html'" aria-label="Home" title="Home">🏠</button>
+    <span class="brand" title="Power Up!" aria-label="Power Up">⚡</span>
     <div class="date-nav">
-      <button id="prevDay">←</button>
+      <button id="prevDay" aria-label="Previous day">←</button>
       <div class="date-str" id="dateStr">—</div>
-      <button id="nextDay">→</button>
+      <button id="nextDay" aria-label="Next day">→</button>
     </div>
-    <div class="actions">
-      <button class="btn-purple btn-workout-template" id="addWorkout"><span class="btn-stack"><span>Workout</span><span class="btn-sub">Template</span></span></button>
-      <button class="btn" id="addExercise">Add Exercise</button>
-    </div>
+    <button class="icon-btn" id="openCalendar" aria-label="Calendar" title="Calendar">📅</button>
+  </div>
+  <div class="actions">
+    <button class="btn-purple btn-workout-template" id="addWorkout"><span class="btn-stack"><span>Workout</span><span class="btn-sub">Template</span></span></button>
+    <button class="btn" id="addExercise">Add Exercise</button>
   </div>
 </header>
 
@@ -360,12 +388,24 @@
     <span class="chip">Exercises: <b id="tEx">0</b></span>  </section>
 
   <section id="sg-inprogress" class="supergroup">
-    <h2>In Progress</h2>
+    <div class="sg-head">
+      <h2>In Progress</h2>
+      <div class="sg-actions">
+        <button class="mini-btn" data-act="expandAll" data-scope="inprogress">Expand all</button>
+        <button class="mini-btn" data-act="collapseAll" data-scope="inprogress">Collapse all</button>
+      </div>
+    </div>
     <div id="log-inprogress"></div>
   </section>
 
   <section id="sg-completed" class="supergroup">
-    <h2>Completed</h2>
+    <div class="sg-head">
+      <h2>Completed</h2>
+      <div class="sg-actions">
+        <button class="mini-btn" data-act="expandAll" data-scope="completed">Expand all</button>
+        <button class="mini-btn" data-act="collapseAll" data-scope="completed">Collapse all</button>
+      </div>
+    </div>
     <div id="log-completed"></div>
   </section>
 
@@ -480,9 +520,15 @@ function getCollapseMap(){
   try{ return JSON.parse(localStorage.getItem(UI_COLLAPSE_KEY)) || {}; }catch{ return {}; }
 }
 function isCollapsed(id){ return !!getCollapseMap()[id]; }
-function setCollapsedState(id, collapsed){
+function setCollapsedState(id, collapsed){ setCollapsedBulk([[id, collapsed]]); }
+
+/* One write for many toggles — used by the expand/collapse-all buttons. */
+function setCollapsedBulk(pairs){
   const m = getCollapseMap();
-  if(collapsed) m[id] = 1; else delete m[id];
+  pairs.forEach(([id, collapsed])=>{
+    if(!id) return;
+    if(collapsed) m[id] = 1; else delete m[id];
+  });
   try{ localStorage.setItem(UI_COLLAPSE_KEY, JSON.stringify(m)); }catch{}
 }
 
@@ -917,9 +963,9 @@ function applyPowerTheme(vol){
 function render(){
   (function(){
   const isToday = (new Date().toISOString().slice(0,10) === current.toISOString().slice(0,10));
-  const weekday = new Intl.DateTimeFormat(undefined,{weekday:'long'}).format(current);
-  const md = new Intl.DateTimeFormat(undefined,{month:'short',day:'numeric'}).format(current);
-  $('#dateStr').textContent = isToday ? `Today · ${weekday}, ${md}` : `${weekday}, ${md}`;
+  const weekday = new Intl.DateTimeFormat(undefined,{weekday:'short'}).format(current);
+  const num = `${current.getMonth()+1}/${current.getDate()}/${String(current.getFullYear()).slice(2)}`;
+  $('#dateStr').textContent = isToday ? `Today · ${num}` : `${weekday} · ${num}`;
 })();
   const day = loadDay(current);
   renderPowerCard(day);
@@ -1346,6 +1392,30 @@ document.addEventListener('click', (e)=>{
   if(act==='toggleCExercise'){
     const ex = host.closest('.ex');
     if(ex){ ex.classList.toggle('ex-collapsed'); setCollapsedState(ex.dataset.key, ex.classList.contains('ex-collapsed')); }
+    return;
+  }
+
+  // Expand/collapse every section at once.
+  // Completed "Collapse all" folds the exercise cards but leaves the body-part
+  // sections open — that's the compact one-screen view worth screenshotting.
+  if(act==='expandAll' || act==='collapseAll'){
+    const collapse = (act === 'collapseAll');
+
+    if(host.dataset.scope === 'completed'){
+      const writes = [];
+      document.querySelectorAll('#log-completed .cgroup').forEach(g=>{
+        g.classList.remove('collapsed');
+        writes.push([g.dataset.key, false]);
+      });
+      document.querySelectorAll('#log-completed .ex').forEach(ex=>{
+        ex.classList.toggle('ex-collapsed', collapse);
+        writes.push([ex.dataset.key, collapse]);
+      });
+      setCollapsedBulk(writes);
+    }else{
+      document.querySelectorAll('#log-inprogress .group')
+        .forEach(g=> g.classList.toggle('collapsed', collapse));
+    }
     return;
   }
 
