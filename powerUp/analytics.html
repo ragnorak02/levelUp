@@ -110,10 +110,13 @@
     display:flex; flex-direction:column; gap:4px;
   }
   .db-track{flex:1 1 auto; display:flex; align-items:flex-end; min-height:0}
+  /* stacked segments, one per muscle group worked that day, biggest at the base */
   .db-fill{
-    display:block; width:100%; border-radius:4px 4px 0 0;
+    display:flex; flex-direction:column-reverse; width:100%;
+    border-radius:4px 4px 0 0; overflow:hidden;
     background:var(--accent); min-height:2px;
   }
+  .db-fill > b{display:block; width:100%; min-height:1px}
   .daybar.rest .db-fill{background:#1b2733; min-height:3px}
   .daybar.sel .db-fill{outline:2px solid var(--gold); outline-offset:1px}
   .daybar.today .db-fill{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
@@ -123,15 +126,60 @@
   }
   .daybar.sel .db-lbl{color:var(--gold)}
 
-  .readout{
-    margin-top:12px; padding:9px 10px; border-radius:10px; background:var(--panel);
-    border:1px solid var(--ring); font-size:.82rem; font-weight:700;
-    color:var(--muted); min-height:38px; display:flex; align-items:center;
-  }
-  .readout b{color:var(--ink)}
   .part-legend{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; font-size:.7rem; font-weight:800; color:var(--muted)}
   .part-legend span{display:inline-flex; align-items:center; gap:5px}
   .part-legend i{width:9px; height:9px; border-radius:3px; display:block}
+
+  /* ===== Selected day: the workout, laid out like the Completed section ===== */
+  .day-panel{margin-top:12px}
+  .day-head{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+  .day-sum{flex:1 1 auto; min-width:0; font-size:.86rem; font-weight:700; color:var(--muted)}
+  .day-sum b{color:var(--ink); font-weight:900; font-size:.95rem}
+  .sg-actions{display:flex; gap:6px; flex:0 0 auto}
+  .mini-btn{
+    all:unset; cursor:pointer; white-space:nowrap;
+    font-size:.7rem; font-weight:800; color:var(--muted);
+    border:1px solid var(--ring); background:#0e141b;
+    padding:.32rem .58rem; border-radius:999px;
+    min-height:30px; display:inline-flex; align-items:center;
+  }
+  .mini-btn:active{background:#16202b; color:var(--ink)}
+
+  .cgroup{background:#0b1118; border:1px solid var(--ring); border-radius:14px; overflow:hidden}
+  .cgroup + .cgroup{margin-top:8px}
+  .cgroup-head{
+    display:flex; align-items:center; gap:9px; padding:11px 11px; cursor:pointer;
+    background:linear-gradient(90deg,#111c27,#0b1118); border-bottom:1px solid var(--ring);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .cgroup.collapsed .cgroup-head{border-bottom-color:transparent}
+  .cgroup-chev{color:var(--muted); font-size:.72rem; flex:0 0 auto; transition:transform .18s ease}
+  .cgroup.collapsed .cgroup-chev{transform:rotate(-90deg)}
+  .cgroup-name{font-weight:900; font-size:.98rem; flex:1 1 auto; min-width:0}
+  .cgroup-meta{color:var(--muted); font-size:.74rem; font-weight:800; white-space:nowrap}
+  .cgroup-body{padding:6px 9px 9px}
+  .cgroup.collapsed .cgroup-body{display:none}
+
+  .exrow{border:1px dashed var(--ring); border-radius:12px; background:#0e141b; padding:9px; margin-top:7px}
+  .exrow-head{display:flex; align-items:center; gap:9px; cursor:pointer; -webkit-tap-highlight-color:transparent}
+  .ex-chev{color:var(--muted); font-size:.68rem; flex:0 0 auto; transition:transform .18s ease}
+  .exrow.collapsed .ex-chev{transform:rotate(-90deg)}
+  .exrow.collapsed .exrow-body{display:none}
+  .exrow-name{font-weight:800; font-size:.9rem}
+  .exrow-tag{color:var(--muted); font-size:.76rem; font-weight:700; margin-top:1px}
+  .exrow-body{display:grid; grid-template-columns:1fr; gap:5px; margin-top:8px}
+
+  .set-item{
+    display:grid; grid-template-columns:3.1rem auto auto auto auto 1fr;
+    align-items:center; gap:6px; padding:8px 9px; border-radius:10px;
+    background:rgba(10,16,22,.55); border:1px solid rgba(42,53,67,.75); font-weight:900;
+  }
+  .set-item .si-n{color:var(--muted); font-weight:800; font-size:.68rem; letter-spacing:.5px}
+  .set-item .si-unit, .set-item .si-x{color:var(--muted); font-weight:800; font-size:.8rem}
+  .set-item .si-w, .set-item .si-r{font-size:1rem}
+  .set-item .si-vol{color:var(--muted); font-weight:800; font-size:.72rem; justify-self:end; white-space:nowrap}
+  .set-item.set-top{border-color:rgba(255,213,74,.55); background:linear-gradient(90deg, rgba(58,42,0,.55), rgba(10,16,22,.55))}
+  .set-item.set-top .si-n{color:var(--gold)}
 
   /* ===== Recency rows ===== */
   .rec-row{display:grid; grid-template-columns:5.5rem 1fr auto; align-items:center; gap:8px; font-size:.82rem}
@@ -217,10 +265,18 @@
         <button class="chip sm" data-range="month">This month</button>
       </div>
 
-      <div class="tiles" id="rangeTiles" style="margin-top:10px"></div>
+      <div class="day-panel">
+        <div class="day-head">
+          <div class="day-sum" id="daySum">Tap a bar to see that day.</div>
+          <div class="sg-actions" id="dayActions">
+            <button class="mini-btn" data-day-act="expandAll">Expand all</button>
+            <button class="mini-btn" data-day-act="collapseAll">Collapse all</button>
+          </div>
+        </div>
+        <div id="dayGroups"></div>
+      </div>
 
       <div class="daybars" id="dayBars"></div>
-      <div class="readout" id="dayReadout">Tap a bar to see that day.</div>
       <div class="part-legend" id="partLegend"></div>
     </section>
 
@@ -687,31 +743,20 @@ function renderTraining(){
 
   const trained = rows.filter(r=> r.vol > 0);
   const max     = Math.max(0, ...rows.map(r=>r.vol));
-  const volume  = trained.reduce((s,r)=> s + r.vol, 0);
-  const sets    = trained.reduce((s,r)=> s + r.sets, 0);
 
   document.getElementById('rangeMax').textContent =
     max > 0 ? `peak ${compact(max)} lb` : '';
 
-  // ---- tiles reflect the selected range ----
-  document.getElementById('rangeTiles').innerHTML = `
-    <div class="tile"><div class="tv">${trained.length}<span style="font-size:.8rem;color:var(--muted)"> / ${rows.length}</span></div><div class="tl">Days trained</div></div>
-    <div class="tile"><div class="tv">${compact(volume)} lb</div><div class="tl">Volume</div></div>
-    <div class="tile"><div class="tv">${nf(sets)}</div><div class="tl">Sets</div></div>
-    <div class="tile"><div class="tv">${trained.length ? compact(volume/trained.length) : 0} lb</div><div class="tl">Avg / workout</div></div>
-  `;
-
   // keep the selection inside the range; otherwise pick the newest trained day
   if(!rows.some(r=> r.iso === selectedDayIso)){
-    selectedDayIso = trained.length ? trained[trained.length-1].iso : null;
+    selectDay(trained.length ? trained[trained.length-1].iso : null, false);
   }
 
-  // ---- bars, one per day, coloured by that day's biggest muscle group ----
+  // ---- one bar per day, split into a segment per muscle group worked ----
   const step = rows.length <= 7 ? 1 : rows.length <= 14 ? 2 : rows.length <= 21 ? 3 : 4;
 
   document.getElementById('dayBars').innerHTML = rows.map((r,i)=>{
     const h       = max > 0 ? Math.round((r.vol / max) * 100) : 0;
-    const colour  = r.parts.length ? partColor(r.parts[0][0]) : '';
     const showLbl = (i % step === 0) || i === rows.length-1 || r.iso === selectedDayIso;
     const cls     = [
       'daybar',
@@ -720,8 +765,13 @@ function renderTraining(){
       r.iso === TODAY_ISO ? 'today' : ''
     ].filter(Boolean).join(' ');
 
+    // segments are % of the day's own volume, so they always fill the bar
+    const segments = r.parts.map(([part, vol])=>
+      `<b style="height:${(vol / r.vol) * 100}%; background:${partColor(part)}"></b>`
+    ).join('');
+
     return `<button class="${cls}" data-iso="${r.iso}" aria-label="${r.iso}">
-      <span class="db-track"><i class="db-fill" style="height:${h}%${colour?`; background:${colour}`:''}"></i></span>
+      <span class="db-track"><i class="db-fill" style="height:${h}%">${segments}</i></span>
       <span class="db-lbl">${showLbl ? dateOf(r.iso).getDate() : ''}</span>
     </button>`;
   }).join('');
@@ -732,20 +782,103 @@ function renderTraining(){
     `<span><i style="background:${partColor(p)}"></i>${esc(p)}</span>`
   ).join('');
 
-  renderDayReadout();
+  renderDayPanel();
 }
 
-/* One line: muscle groups, then volume / sets / exercises. No date — the
-   selected bar and its axis label already say which day it is. */
-function renderDayReadout(){
-  const el  = document.getElementById('dayReadout');
-  const day = selectedDayIso ? TRAINED.get(selectedDayIso) : null;
+/* ---- selected day: the workout itself, same layout as Completed ---- */
+let collapsedGroups    = new Set();   // group keys the user folded shut
+let expandedExercises  = new Set();   // exercise keys the user opened
 
-  if(!selectedDayIso){ el.innerHTML = 'No workouts in this range.'; return; }
-  if(!day){ el.innerHTML = 'Rest day'; return; }
+function selectDay(iso, rerender = true){
+  if(iso !== selectedDayIso){
+    // a different day starts compact: sections open, exercises closed
+    collapsedGroups = new Set();
+    expandedExercises = new Set();
+  }
+  selectedDayIso = iso;
+  if(rerender) renderTraining();
+}
 
-  const parts = dayParts(day).map(p=>p[0]).join(', ') || '—';
-  el.innerHTML = `<span><b>${esc(parts)}</b> · ${nf(dayVolume(day))} lb · ${daySets(day)} sets · ${day.exercises.length} ex</span>`;
+/* Exercises with at least one real set, grouped by body part. */
+function dayWorkout(day){
+  const groups = {};
+  day.exercises.forEach(ex=>{
+    const sets = ex.sets.filter(s=> s.weight > 0 && s.reps > 0);
+    if(!sets.length) return;
+    const vol  = sets.reduce((a,s)=> a + s.weight*s.reps, 0);
+    const reps = sets.reduce((a,s)=> a + s.reps, 0);
+    (groups[ex.bodyPart] ??= []).push({
+      name: ex.name, sets, vol, avg: reps ? Math.round(vol/reps) : 0
+    });
+  });
+  return groups;
+}
+
+function renderDayPanel(){
+  const sumEl  = document.getElementById('daySum');
+  const wrapEl = document.getElementById('dayGroups');
+  const actEl  = document.getElementById('dayActions');
+  const day    = selectedDayIso ? TRAINED.get(selectedDayIso) : null;
+
+  if(!day){
+    sumEl.textContent = selectedDayIso ? 'Rest day' : 'No workouts in this range.';
+    wrapEl.innerHTML  = '';
+    actEl.style.visibility = 'hidden';
+    return;
+  }
+  actEl.style.visibility = '';
+
+  const groups   = dayWorkout(day);
+  const bps      = Object.keys(groups).sort();
+  const allEx    = bps.flatMap(bp=> groups[bp]);
+  const totalVol = allEx.reduce((s,e)=> s + e.vol, 0);
+  const totalSet = allEx.reduce((s,e)=> s + e.sets.length, 0);
+
+  sumEl.innerHTML = `<b>${nf(totalVol)} lb</b> · ${totalSet} sets · ${allEx.length} ex`;
+
+  wrapEl.innerHTML = bps.map(bp=>{
+    const list  = groups[bp];
+    const gVol  = list.reduce((s,e)=> s + e.vol, 0);
+    const gSets = list.reduce((s,e)=> s + e.sets.length, 0);
+    const gKey  = `g:${bp}`;
+
+    const body = list.map((ex,i)=>{
+      const eKey = `e:${bp}:${i}`;
+      const open = expandedExercises.has(eKey);
+      const top  = ex.sets.reduce((b,s)=>
+        (s.weight > b.weight || (s.weight === b.weight && s.reps > b.reps)) ? s : b, {weight:0, reps:0});
+
+      const setRows = ex.sets.map((s,j)=>{
+        const isTop = s.weight === top.weight && s.reps === top.reps;
+        return `<div class="set-item${isTop ? ' set-top' : ''}">
+          <span class="si-n">SET ${j+1}</span>
+          <span class="si-w">${s.weight}</span><span class="si-unit">lb</span>
+          <span class="si-x">×</span><span class="si-r">${s.reps}</span>
+          <span class="si-vol">${nf(s.weight*s.reps)} lb</span>
+        </div>`;
+      }).join('');
+
+      return `<div class="exrow${open ? '' : ' collapsed'}">
+        <div class="exrow-head" data-ekey="${esc(eKey)}">
+          <span class="ex-chev">▼</span>
+          <div style="flex:1 1 auto; min-width:0">
+            <div class="exrow-name">${esc(ex.name)}</div>
+            <div class="exrow-tag">${ex.sets.length} set(s) · ${nf(ex.vol)} lb · avg ${ex.avg} lb/rep</div>
+          </div>
+        </div>
+        <div class="exrow-body">${setRows}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="cgroup${collapsedGroups.has(gKey) ? ' collapsed' : ''}">
+      <div class="cgroup-head" data-gkey="${esc(gKey)}">
+        <span class="cgroup-chev">▼</span>
+        <span class="cgroup-name">${esc(bp)}</span>
+        <span class="cgroup-meta">${list.length} ex · ${gSets} sets · ${nf(gVol)} lb</span>
+      </div>
+      <div class="cgroup-body">${body}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderStreakTiles(){
@@ -974,8 +1107,40 @@ document.getElementById('rangeChips').addEventListener('click', e=>{
 
 document.getElementById('dayBars').addEventListener('click', e=>{
   const bar = e.target.closest('.daybar[data-iso]'); if(!bar) return;
-  selectedDayIso = bar.dataset.iso;
-  renderTraining();
+  selectDay(bar.dataset.iso);
+});
+
+// fold/unfold a body-part section or an exercise inside the selected day
+document.getElementById('dayGroups').addEventListener('click', e=>{
+  const g = e.target.closest('[data-gkey]');
+  if(g){
+    const k = g.dataset.gkey;
+    collapsedGroups.has(k) ? collapsedGroups.delete(k) : collapsedGroups.add(k);
+    renderDayPanel();
+    return;
+  }
+  const x = e.target.closest('[data-ekey]');
+  if(x){
+    const k = x.dataset.ekey;
+    expandedExercises.has(k) ? expandedExercises.delete(k) : expandedExercises.add(k);
+    renderDayPanel();
+  }
+});
+
+document.getElementById('dayActions').addEventListener('click', e=>{
+  const b = e.target.closest('[data-day-act]'); if(!b) return;
+  const day = selectedDayIso ? TRAINED.get(selectedDayIso) : null;
+  if(!day) return;
+
+  collapsedGroups = new Set();          // sections always open, as in Completed
+  expandedExercises = new Set();
+  if(b.dataset.dayAct === 'expandAll'){
+    const groups = dayWorkout(day);
+    Object.keys(groups).forEach(bp=>
+      groups[bp].forEach((_,i)=> expandedExercises.add(`e:${bp}:${i}`))
+    );
+  }
+  renderDayPanel();
 });
 
 document.getElementById('recordSort').addEventListener('click', e=>{
