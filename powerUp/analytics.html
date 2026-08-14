@@ -103,29 +103,35 @@
   .tbl .dim{color:var(--muted); font-weight:700}
   .scroll-x{overflow-x:auto; -webkit-overflow-scrolling:touch}
 
-  /* ===== Heatmap ===== */
-  .heat-scroll{overflow-x:auto; padding-bottom:6px; -webkit-overflow-scrolling:touch}
-  .heat{display:grid; grid-auto-flow:column; grid-template-rows:repeat(7, 12px); gap:3px; width:max-content}
-  .heat i{width:12px; height:12px; border-radius:3px; background:#131c25; display:block; cursor:pointer}
-  .heat i.l1{background:#14532d} .heat i.l2{background:#166534}
-  .heat i.l3{background:#22c55e} .heat i.l4{background:#86efac}
-  .heat i.today{box-shadow:0 0 0 1.5px var(--accent-2)}
-  .heat i.sel{box-shadow:0 0 0 1.5px var(--gold)}
-  .heat-legend{display:flex; align-items:center; gap:6px; margin-top:8px; color:var(--muted); font-size:.7rem; font-weight:800}
-  .heat-legend i{width:11px; height:11px; border-radius:3px; display:block}
-  /* grid-auto-columns pins each label to its week column — without it the
-     columns size to the text and the months drift out of alignment. */
-  .heat-months{
-    display:grid; grid-auto-flow:column; grid-auto-columns:12px; gap:3px;
-    width:max-content; color:var(--muted); font-size:.62rem; font-weight:800;
-    margin-bottom:4px; height:12px;
+  /* ===== Per-day bar chart ===== */
+  .daybars{display:flex; align-items:stretch; gap:3px; height:158px; margin-top:14px}
+  .daybar{
+    all:unset; cursor:pointer; flex:1 1 0; min-width:0;
+    display:flex; flex-direction:column; gap:4px;
   }
-  .heat-months span{overflow:visible; white-space:nowrap}
-  .heat-readout{
-    margin-top:10px; padding:9px 10px; border-radius:10px; background:var(--panel);
-    border:1px solid var(--ring); font-size:.82rem; font-weight:700; color:var(--muted); min-height:38px;
+  .db-track{flex:1 1 auto; display:flex; align-items:flex-end; min-height:0}
+  .db-fill{
+    display:block; width:100%; border-radius:4px 4px 0 0;
+    background:var(--accent); min-height:2px;
   }
-  .heat-readout b{color:var(--ink)}
+  .daybar.rest .db-fill{background:#1b2733; min-height:3px}
+  .daybar.sel .db-fill{outline:2px solid var(--gold); outline-offset:1px}
+  .daybar.today .db-fill{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
+  .db-lbl{
+    height:11px; line-height:11px; text-align:center; white-space:nowrap;
+    font-size:.55rem; font-weight:800; color:var(--muted);
+  }
+  .daybar.sel .db-lbl{color:var(--gold)}
+
+  .readout{
+    margin-top:12px; padding:9px 10px; border-radius:10px; background:var(--panel);
+    border:1px solid var(--ring); font-size:.82rem; font-weight:700;
+    color:var(--muted); min-height:38px; display:flex; align-items:center;
+  }
+  .readout b{color:var(--ink)}
+  .part-legend{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; font-size:.7rem; font-weight:800; color:var(--muted)}
+  .part-legend span{display:inline-flex; align-items:center; gap:5px}
+  .part-legend i{width:9px; height:9px; border-radius:3px; display:block}
 
   /* ===== Recency rows ===== */
   .rec-row{display:grid; grid-template-columns:5.5rem 1fr auto; align-items:center; gap:8px; font-size:.82rem}
@@ -176,11 +182,6 @@
   <!-- ================= PROGRESS ================= -->
   <div class="tab-panel" id="panel-progress">
     <section class="card">
-      <h3>Lifetime<span class="sp" id="rangeNote"></span></h3>
-      <div class="tiles" id="lifetimeTiles"></div>
-    </section>
-
-    <section class="card">
       <h3>Exercise progression</h3>
       <div class="chips" id="partFilters" style="margin-bottom:8px"></div>
       <select class="picker" id="exercisePicker"></select>
@@ -208,28 +209,24 @@
   <!-- ================= CONSISTENCY ================= -->
   <div class="tab-panel" id="panel-consistency" hidden>
     <section class="card">
-      <h3>Consistency</h3>
-      <div class="tiles" id="consistencyTiles"></div>
+      <h3>Training<span class="sp" id="rangeMax"></span></h3>
+      <div class="chips" id="rangeChips">
+        <button class="chip sm active" data-range="7">7 days</button>
+        <button class="chip sm" data-range="14">14 days</button>
+        <button class="chip sm" data-range="21">21 days</button>
+        <button class="chip sm" data-range="month">This month</button>
+      </div>
+
+      <div class="tiles" id="rangeTiles" style="margin-top:10px"></div>
+
+      <div class="daybars" id="dayBars"></div>
+      <div class="readout" id="dayReadout">Tap a bar to see that day.</div>
+      <div class="part-legend" id="partLegend"></div>
     </section>
 
     <section class="card">
-      <h3>Training calendar<span class="sp" id="heatRange"></span></h3>
-      <div class="heat-scroll">
-        <div class="heat-months" id="heatMonths"></div>
-        <div class="heat" id="heatmap"></div>
-      </div>
-      <div class="heat-legend">
-        <span>Less</span>
-        <i style="background:#131c25"></i><i style="background:#14532d"></i>
-        <i style="background:#166534"></i><i style="background:#22c55e"></i><i style="background:#86efac"></i>
-        <span>More</span>
-      </div>
-      <div class="heat-readout" id="heatReadout">Tap a square to see that day.</div>
-    </section>
-
-    <section class="card">
-      <h3>Weekly volume<span class="sp">last 12 weeks</span></h3>
-      <div class="chart-box"><canvas id="weeklyChart"></canvas></div>
+      <h3>Streaks</h3>
+      <div class="tiles" id="streakTiles"></div>
     </section>
 
     <section class="card">
@@ -499,43 +496,16 @@ function drawChart(canvas, series, opts = {}){
 /* =========================================================
    Tab 1 — Progress
    ========================================================= */
-const UI_KEYS = { tab:'powerUp:analyticsTab', ex:'powerUp:analyticsExercise', metric:'powerUp:analyticsMetric' };
+const UI_KEYS = {
+  tab:'powerUp:analyticsTab', ex:'powerUp:analyticsExercise',
+  metric:'powerUp:analyticsMetric', range:'powerUp:analyticsRange'
+};
 const readUI  = k => { try{ return localStorage.getItem(k); }catch{ return null; } };
 const writeUI = (k,v) => { try{ localStorage.setItem(k,v); }catch{} };
 
 let selectedPart   = 'all';
 let selectedExKey  = readUI(UI_KEYS.ex) || null;
 let selectedMetric = readUI(UI_KEYS.metric) || 'topW';
-
-function renderLifetime(){
-  const trained = DAYS.filter(d=> dayVolume(d) > 0);
-  const volume  = trained.reduce((s,d)=> s + dayVolume(d), 0);
-  const sets    = trained.reduce((s,d)=> s + daySets(d), 0);
-
-  const cutoff  = isoOf(addDays(TODAY,-27));
-  const prev    = isoOf(addDays(TODAY,-55));
-  const last28  = trained.filter(d=> d.date >  cutoff);
-  const prev28  = trained.filter(d=> d.date >  prev && d.date <= cutoff);
-  const v28     = last28.reduce((s,d)=> s + dayVolume(d), 0);
-  const p28     = prev28.reduce((s,d)=> s + dayVolume(d), 0);
-
-  let delta = '<span class="ts flat">no earlier period</span>';
-  if(p28 > 0){
-    const pct = Math.round(((v28 - p28) / p28) * 100);
-    const cls = pct > 0 ? 'up' : (pct < 0 ? 'down' : 'flat');
-    delta = `<span class="ts ${cls}">${pct > 0 ? '↗ +' : (pct < 0 ? '↘ ' : '→ ')}${pct}% vs prior 28d</span>`;
-  }
-
-  document.getElementById('rangeNote').textContent =
-    trained.length ? `${longDate(trained[0].date)} → today` : '';
-
-  document.getElementById('lifetimeTiles').innerHTML = `
-    <div class="tile"><div class="tv">${compact(volume)} lb</div><div class="tl">Total volume</div></div>
-    <div class="tile"><div class="tv">${nf(trained.length)}</div><div class="tl">Workouts</div></div>
-    <div class="tile"><div class="tv">${nf(sets)}</div><div class="tl">Sets logged</div></div>
-    <div class="tile"><div class="tv">${compact(v28)} lb</div><div class="tl">Last 28 days</div>${delta}</div>
-  `;
-}
 
 function renderPartFilters(){
   const parts = [...new Set(EX_LIST.map(e=>e.bodyPart))].sort();
@@ -659,7 +629,6 @@ function renderExerciseDetail(){
 }
 
 function renderProgress(){
-  renderLifetime();
   renderPartFilters();
   renderExercisePicker();
   renderExerciseDetail();
@@ -670,9 +639,118 @@ function renderProgress(){
    ========================================================= */
 const TRAINED = new Map(DAYS.filter(d=> dayVolume(d) > 0).map(d=>[d.date, d]));
 
-function renderConsistencyTiles(){
+const PART_COLORS = {
+  Chest:'#f87171', Back:'#60a5fa', Biceps:'#a78bfa', Triceps:'#f472b6',
+  Shoulders:'#fbbf24', Legs:'#34d399', Lats:'#22d3ee', Forearms:'#fb923c',
+  Cardio:'#94a3b8'
+};
+const partColor = p => PART_COLORS[p] || '#64748b';
+
+/* [part, volume] for one day, biggest first. */
+function dayParts(day){
+  const m = {};
+  day.exercises.forEach(ex=>{
+    const v = ex.sets.reduce((s,st)=> (st.weight>0 && st.reps>0) ? s + st.weight*st.reps : s, 0);
+    if(v <= 0) return;
+    m[ex.bodyPart] = (m[ex.bodyPart] || 0) + v;
+  });
+  return Object.entries(m).sort((a,b)=> b[1]-a[1]);
+}
+
+let selectedRange  = readUI(UI_KEYS.range) || '7';
+let selectedDayIso = null;
+
+/* Every date in the active range, oldest → newest. */
+function rangeDates(){
+  const out = [];
+  if(selectedRange === 'month'){
+    const start = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
+    for(let d = new Date(start); d <= TODAY; d = addDays(d,1)) out.push(isoOf(d));
+  }else{
+    const n = Number(selectedRange) || 7;
+    for(let i=n-1; i>=0; i--) out.push(isoOf(addDays(TODAY,-i)));
+  }
+  return out;
+}
+
+function renderTraining(){
+  const dates = rangeDates();
+  const rows = dates.map(iso=>{
+    const day = TRAINED.get(iso);
+    return {
+      iso, day,
+      vol:   day ? dayVolume(day) : 0,
+      sets:  day ? daySets(day)   : 0,
+      parts: day ? dayParts(day)  : []
+    };
+  });
+
+  const trained = rows.filter(r=> r.vol > 0);
+  const max     = Math.max(0, ...rows.map(r=>r.vol));
+  const volume  = trained.reduce((s,r)=> s + r.vol, 0);
+  const sets    = trained.reduce((s,r)=> s + r.sets, 0);
+
+  document.getElementById('rangeMax').textContent =
+    max > 0 ? `peak ${compact(max)} lb` : '';
+
+  // ---- tiles reflect the selected range ----
+  document.getElementById('rangeTiles').innerHTML = `
+    <div class="tile"><div class="tv">${trained.length}<span style="font-size:.8rem;color:var(--muted)"> / ${rows.length}</span></div><div class="tl">Days trained</div></div>
+    <div class="tile"><div class="tv">${compact(volume)} lb</div><div class="tl">Volume</div></div>
+    <div class="tile"><div class="tv">${nf(sets)}</div><div class="tl">Sets</div></div>
+    <div class="tile"><div class="tv">${trained.length ? compact(volume/trained.length) : 0} lb</div><div class="tl">Avg / workout</div></div>
+  `;
+
+  // keep the selection inside the range; otherwise pick the newest trained day
+  if(!rows.some(r=> r.iso === selectedDayIso)){
+    selectedDayIso = trained.length ? trained[trained.length-1].iso : null;
+  }
+
+  // ---- bars, one per day, coloured by that day's biggest muscle group ----
+  const step = rows.length <= 7 ? 1 : rows.length <= 14 ? 2 : rows.length <= 21 ? 3 : 4;
+
+  document.getElementById('dayBars').innerHTML = rows.map((r,i)=>{
+    const h       = max > 0 ? Math.round((r.vol / max) * 100) : 0;
+    const colour  = r.parts.length ? partColor(r.parts[0][0]) : '';
+    const showLbl = (i % step === 0) || i === rows.length-1 || r.iso === selectedDayIso;
+    const cls     = [
+      'daybar',
+      r.vol > 0 ? '' : 'rest',
+      r.iso === selectedDayIso ? 'sel' : '',
+      r.iso === TODAY_ISO ? 'today' : ''
+    ].filter(Boolean).join(' ');
+
+    return `<button class="${cls}" data-iso="${r.iso}" aria-label="${r.iso}">
+      <span class="db-track"><i class="db-fill" style="height:${h}%${colour?`; background:${colour}`:''}"></i></span>
+      <span class="db-lbl">${showLbl ? dateOf(r.iso).getDate() : ''}</span>
+    </button>`;
+  }).join('');
+
+  // ---- legend for the muscle groups actually present ----
+  const parts = [...new Set(trained.flatMap(r=> r.parts.map(p=>p[0])))].sort();
+  document.getElementById('partLegend').innerHTML = parts.map(p=>
+    `<span><i style="background:${partColor(p)}"></i>${esc(p)}</span>`
+  ).join('');
+
+  renderDayReadout();
+}
+
+/* One line: muscle groups, then volume / sets / exercises. No date — the
+   selected bar and its axis label already say which day it is. */
+function renderDayReadout(){
+  const el  = document.getElementById('dayReadout');
+  const day = selectedDayIso ? TRAINED.get(selectedDayIso) : null;
+
+  if(!selectedDayIso){ el.innerHTML = 'No workouts in this range.'; return; }
+  if(!day){ el.innerHTML = 'Rest day'; return; }
+
+  const parts = dayParts(day).map(p=>p[0]).join(', ') || '—';
+  el.innerHTML = `<span><b>${esc(parts)}</b> · ${nf(dayVolume(day))} lb · ${daySets(day)} sets · ${day.exercises.length} ex</span>`;
+}
+
+function renderStreakTiles(){
   const dates = [...TRAINED.keys()].sort();
-  const el = document.getElementById('consistencyTiles');
+  const el = document.getElementById('streakTiles');
 
   if(!dates.length){
     el.innerHTML = '<div class="tile"><div class="tv">—</div><div class="tl">No workouts logged</div></div>';
@@ -680,7 +758,6 @@ function renderConsistencyTiles(){
   }
 
   const last     = dates[dates.length-1];
-  const last30   = dates.filter(d=> daysBetween(d, TODAY_ISO) < 30).length;
   const spanWks  = Math.max(1, (daysBetween(dates[0], TODAY_ISO) + 1) / 7);
   const perWeek  = (dates.length / spanWks).toFixed(1);
 
@@ -702,78 +779,11 @@ function renderConsistencyTiles(){
   });
 
   el.innerHTML = `
-    <div class="tile"><div class="tv">${last30}</div><div class="tl">Last 30 days</div><div class="ts">workouts</div></div>
-    <div class="tile"><div class="tv">${perWeek}</div><div class="tl">Per week</div><div class="ts">lifetime average</div></div>
     <div class="tile ${streak>=2?'gold':''}"><div class="tv">${streak}</div><div class="tl">Week streak</div><div class="ts">best: ${best}</div></div>
     <div class="tile"><div class="tv">${agoLabel(last)}</div><div class="tl">Last workout</div><div class="ts">${mdOf(last)}</div></div>
+    <div class="tile"><div class="tv">${perWeek}</div><div class="tl">Per week</div><div class="ts">lifetime average</div></div>
+    <div class="tile"><div class="tv">${nf(dates.length)}</div><div class="tl">Workouts</div><div class="ts">all time</div></div>
   `;
-}
-
-function renderHeatmap(){
-  const grid   = document.getElementById('heatmap');
-  const months = document.getElementById('heatMonths');
-  const WEEKS  = 26;
-
-  const end   = startOfWeek(TODAY);
-  const start = addDays(end, -7 * (WEEKS - 1));
-
-  const vols = [...TRAINED.values()].map(dayVolume).filter(v=>v>0).sort((a,b)=>a-b);
-  const q = p => vols.length ? vols[Math.min(vols.length-1, Math.floor(vols.length * p))] : 0;
-  const q1 = q(0.25), q2 = q(0.5), q3 = q(0.75);
-
-  let cells = '', monthCells = '';
-  for(let wk=0; wk<WEEKS; wk++){
-    const wkStart = addDays(start, wk*7);
-    const showMonth = wk === 0 || wkStart.getDate() <= 7;
-    monthCells += `<span style="width:12px">${showMonth ? wkStart.toLocaleDateString(undefined,{month:'short'}).slice(0,3) : ''}</span>`;
-
-    for(let dow=0; dow<7; dow++){
-      const d   = addDays(wkStart, dow);
-      const iso = isoOf(d);
-      if(d > TODAY){ cells += `<i style="visibility:hidden"></i>`; continue; }
-      const day = TRAINED.get(iso);
-      const v   = day ? dayVolume(day) : 0;
-      let lvl = '';
-      if(v > 0) lvl = v <= q1 ? 'l1' : v <= q2 ? 'l2' : v <= q3 ? 'l3' : 'l4';
-      cells += `<i class="${lvl}${iso===TODAY_ISO?' today':''}" data-iso="${iso}" title="${iso}"></i>`;
-    }
-  }
-
-  months.innerHTML = monthCells;
-  grid.innerHTML   = cells;
-
-  document.getElementById('heatRange').textContent = `${mdOf(isoOf(start))} → today`;
-}
-
-function showHeatDay(iso){
-  const out = document.getElementById('heatReadout');
-  document.querySelectorAll('.heat i.sel').forEach(n=>n.classList.remove('sel'));
-  const cell = document.querySelector(`.heat i[data-iso="${iso}"]`);
-  if(cell) cell.classList.add('sel');
-
-  const day = TRAINED.get(iso);
-  if(!day){ out.innerHTML = `<b>${longDate(iso)}</b> — rest day`; return; }
-
-  const parts = [...new Set(day.exercises.map(e=>e.bodyPart))].join(', ');
-  out.innerHTML =
-    `<b>${longDate(iso)}</b> — ${nf(dayVolume(day))} lb · ${daySets(day)} sets · ` +
-    `${day.exercises.length} exercise${day.exercises.length===1?'':'s'}<br>${esc(parts)}`;
-}
-
-function renderWeeklyChart(){
-  const WEEKS = 12;
-  const end   = startOfWeek(TODAY);
-  const series = [];
-  for(let i=WEEKS-1; i>=0; i--){
-    const ws = addDays(end, -7*i), we = addDays(ws, 6);
-    const vol = [...TRAINED.values()]
-      .filter(d=>{ const dd = dateOf(d.date); return dd >= ws && dd <= we; })
-      .reduce((s,d)=> s + dayVolume(d), 0);
-    series.push({ label: mdOf(isoOf(ws)), value: vol });
-  }
-  const max = Math.max(...series.map(s=>s.value));
-  series.forEach(s=> s.highlight = (s.value === max && max > 0));
-  drawChart(document.getElementById('weeklyChart'), series, { type:'bar', color:'#2dd4bf' });
 }
 
 function renderRecency(){
@@ -808,12 +818,9 @@ function renderRecency(){
 }
 
 function renderConsistency(){
-  renderConsistencyTiles();
-  renderHeatmap();
-  renderWeeklyChart();
+  renderTraining();
+  renderStreakTiles();
   renderRecency();
-  const dates = [...TRAINED.keys()].sort();
-  if(dates.length) showHeatDay(dates[dates.length-1]);
 }
 
 /* =========================================================
@@ -927,9 +934,8 @@ function showTab(view){
   });
   writeUI(UI_KEYS.tab, view);
 
-  // canvases must be laid out before they can be sized
-  if(view === 'progress')    renderExerciseDetail();
-  if(view === 'consistency') { renderWeeklyChart(); }
+  // the progression canvas must be laid out before it can be sized
+  if(view === 'progress') renderExerciseDetail();
 }
 
 document.querySelectorAll('.tab').forEach(t=>
@@ -958,9 +964,18 @@ document.getElementById('metricChips').addEventListener('click', e=>{
   renderExerciseDetail();
 });
 
-document.getElementById('heatmap').addEventListener('click', e=>{
-  const cell = e.target.closest('i[data-iso]'); if(!cell) return;
-  showHeatDay(cell.dataset.iso);
+document.getElementById('rangeChips').addEventListener('click', e=>{
+  const b = e.target.closest('[data-range]'); if(!b) return;
+  selectedRange = b.dataset.range;
+  writeUI(UI_KEYS.range, selectedRange);
+  document.querySelectorAll('#rangeChips .chip').forEach(c=> c.classList.toggle('active', c === b));
+  renderTraining();
+});
+
+document.getElementById('dayBars').addEventListener('click', e=>{
+  const bar = e.target.closest('.daybar[data-iso]'); if(!bar) return;
+  selectedDayIso = bar.dataset.iso;
+  renderTraining();
 });
 
 document.getElementById('recordSort').addEventListener('click', e=>{
@@ -1000,21 +1015,28 @@ let resizeTimer = null;
 window.addEventListener('resize', ()=>{
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(()=>{
-    if(!document.getElementById('panel-progress').hidden)    renderExerciseDetail();
-    if(!document.getElementById('panel-consistency').hidden) renderWeeklyChart();
+    // the debounce can outlive the document (navigation mid-timer), so don't
+    // assume the panel is still there
+    const panel = document.getElementById('panel-progress');
+    if(panel && !panel.hidden) renderExerciseDetail();
   }, 150);
 });
 
 /* ---- boot ---- */
+// restore the remembered chip selections before the first render
+function restoreChip(containerSel, attr, value){
+  const btn = document.querySelector(`${containerSel} [data-${attr}="${value}"]`);
+  if(!btn) return false;
+  document.querySelectorAll(`${containerSel} .chip`).forEach(c=> c.classList.remove('active'));
+  btn.classList.add('active');
+  return true;
+}
+if(!restoreChip('#metricChips', 'metric', selectedMetric)) selectedMetric = 'topW';
+if(!restoreChip('#rangeChips',  'range',  selectedRange))  selectedRange  = '7';
+
 renderProgress();
 renderConsistency();
 renderRecords();
-
-const savedMetricBtn = document.querySelector(`#metricChips [data-metric="${selectedMetric}"]`);
-if(savedMetricBtn){
-  document.querySelectorAll('#metricChips .chip').forEach(c=> c.classList.remove('active'));
-  savedMetricBtn.classList.add('active');
-}
 
 showTab(readUI(UI_KEYS.tab) || 'progress');
 </script>
