@@ -255,8 +255,34 @@
   .workout-exercises{font-size:.85rem; color:var(--muted); margin-top:4px;}
   .workout-stats{display:flex; gap:12px; margin-top:6px; font-size:.8rem; color:var(--muted);}
   
-  /* FIX #3: Exercise history chart styles */
-  .history-chart{width:100%; height:200px; margin:10px 0; border:1px solid var(--ring); border-radius:8px; background:#0a1016}
+  /* ===== Exercise history modal ===== */
+  .hist-pr{
+    display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+    background:#0f141b; border:1px solid var(--ring); border-radius:12px; padding:10px;
+  }
+  .hist-pr .k{
+    color:var(--muted); font-weight:800; text-transform:uppercase;
+    letter-spacing:.5px; font-size:.68rem;
+  }
+  .hist-pr .v{color:#ffd54a; font-weight:900; font-size:1.05rem; text-shadow:0 0 12px rgba(255,213,74,.35)}
+  .hist-pr .sep{color:#2a3949; font-weight:900}
+  .hist-pr .note{color:var(--muted); font-weight:700; font-size:.82rem}
+
+  .hist-session{border-top:1px solid rgba(42,53,67,.55); margin-top:12px; padding-top:10px}
+  .hist-head{display:flex; align-items:baseline; gap:8px; margin-bottom:7px}
+  .hist-date{font-weight:900; font-size:.92rem; color:#c7d2fe}
+  .hist-meta{color:var(--muted); font-weight:700; font-size:.76rem}
+  .hist-sets{display:grid; grid-template-columns:1fr; gap:5px}
+  .hist-set{
+    display:grid; grid-template-columns:3.1rem auto auto auto 1fr;
+    align-items:center; gap:6px; padding:8px 9px; border-radius:10px;
+    background:rgba(10,16,22,.55); border:1px solid rgba(42,53,67,.75); font-weight:900;
+  }
+  .hist-set .si-n{color:var(--muted); font-weight:800; font-size:.7rem; letter-spacing:.5px}
+  .hist-set .si-unit, .hist-set .si-x{color:var(--muted); font-weight:800; font-size:.82rem}
+  .hist-set .si-w, .hist-set .si-r{font-size:1.02rem}
+  .hist-set.set-top{border-color:rgba(255,213,74,.5); background:linear-gradient(90deg, rgba(58,42,0,.5), rgba(10,16,22,.55))}
+  .hist-set.set-top .si-n{color:#ffd54a}
 
   /* ===== Sets list (single column, in the order performed) ===== */
   .set-grid{display:grid; grid-template-columns:1fr; gap:6px; margin-top:10px}
@@ -318,6 +344,7 @@
   }
   .trend-head b{color:var(--ink); font-size:.8rem}
   .trend-plot{position:relative; height:54px; margin-top:6px}
+  .trend-lg .trend-plot{height:120px}
   .trend-plot svg{position:absolute; inset:0; width:100%; height:100%; display:block}
   .trend-area{fill:rgba(255,197,49,.13); stroke:none}
   .trend-line{fill:none; stroke:#ffc531; stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
@@ -326,6 +353,7 @@
     background:#ffc531; transform:translate(-50%,-50%);
     box-shadow:0 0 0 2px rgba(15,20,27,.9);
   }
+  .trend-dot.sm{width:6px; height:6px; background:#e0a316}
   .trend-dot.gold{background:#fff7a8; box-shadow:0 0 0 2px rgba(15,20,27,.9), 0 0 12px rgba(255,213,74,.8)}
   .trend-foot{
     display:flex; justify-content:space-between; margin-top:4px;
@@ -463,8 +491,7 @@
   <div class="sheet">
     <button class="x" data-close="#historyPopup">✕</button>
     <h2 id="historyTitle" style="margin:6px 0 10px; font-size:1rem; color:#9fb0c7">Exercise History</h2>
-    <canvas id="historyChart" class="history-chart"></canvas>
-    <div id="historyStats" style="margin-top:10px; color:var(--muted); font-size:.9rem"></div>
+    <div id="historyBody"></div>
   </div>
 </div>
 
@@ -558,110 +585,6 @@ function getPreviousExerciseData(exerciseName, bodyPart) {
     }
   }
   return null;
-}
-
-/* FIX #3: Get full exercise history for chart */
-function getExerciseHistory(exerciseName, bodyPart, maxWorkouts = 10) {
-  const history = [];
-  const allDates = [];
-  
-  for(let i=0; i<localStorage.length; i++){
-    const k = localStorage.key(i);
-    if(!/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
-    try{
-      const day = JSON.parse(localStorage.getItem(k));
-      if(!day?.date || !day?.exercises) continue;
-      
-      const exercise = day.exercises.find(ex => 
-        ex.name.toLowerCase().trim() === exerciseName.toLowerCase().trim() &&
-        ex.bodyPart === bodyPart
-      );
-      
-      if(exercise && exercise.sets && exercise.sets.length > 0) {
-        const maxWeight = Math.max(...exercise.sets
-          .map(s => Number(s.weight) || 0)
-          .filter(w => w > 0));
-        
-        if(maxWeight > 0) {
-          allDates.push({
-            date: day.date,
-            weight: maxWeight,
-            sets: exercise.sets.length,
-            totalVolume: exercise.sets.reduce((sum, s) => 
-              sum + (Number(s.weight) || 0) * (Number(s.reps) || 0), 0)
-          });
-        }
-      }
-    }catch(e){}
-  }
-  
-  allDates.sort((a,b) => new Date(a.date) - new Date(b.date));
-  return allDates.slice(-maxWorkouts);
-}
-
-/* FIX #3: Draw exercise history chart */
-function drawExerciseHistoryChart(canvasId, history) {
-  const canvas = document.getElementById(canvasId);
-  if(!canvas || history.length === 0) return;
-  
-  const ctx = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  ctx.scale(dpr, dpr);
-  
-  const width = rect.width;
-  const height = rect.height;
-  const padding = 40;
-  const barWidth = Math.max(20, (width - 2 * padding) / history.length - 10);
-  
-  const weights = history.map(h => h.weight);
-  const maxWeight = Math.max(...weights);
-  
-  ctx.clearRect(0, 0, width, height);
-  
-  // Grid lines
-  ctx.strokeStyle = '#233446';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([2, 3]);
-  for(let i = 0; i <= 4; i++) {
-    const y = padding + (i / 4) * (height - 2 * padding);
-    ctx.beginPath();
-    ctx.moveTo(padding, y);
-    ctx.lineTo(width - padding, y);
-    ctx.stroke();
-  }
-  ctx.setLineDash([]);
-  
-  // Draw bars
-  history.forEach((item, i) => {
-    const x = padding + i * (barWidth + 10);
-    const barHeight = (item.weight / maxWeight) * (height - 2 * padding);
-    const y = height - padding - barHeight;
-    
-    const gradient = ctx.createLinearGradient(x, y, x, height - padding);
-    gradient.addColorStop(0, '#4CAF50');
-    gradient.addColorStop(1, '#22c55e');
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(x, y, barWidth, barHeight);
-    
-    // Weight label
-    ctx.fillStyle = '#e8eef6';
-    ctx.font = 'bold 10px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(item.weight + 'lb', x + barWidth/2, y - 5);
-    
-    // Date label (if space)
-    if(history.length <= 10) {
-      ctx.fillStyle = '#9fb0c7';
-      ctx.font = '9px sans-serif';
-      const dateLabel = new Date(item.date).toLocaleDateString('en', {month:'short', day:'numeric'});
-      ctx.fillText(dateLabel, x + barWidth/2, height - padding + 15);
-    }
-  });
 }
 
 function getPreviousWorkouts(limit=5){
@@ -823,9 +746,9 @@ function trendPoints(exName, bodyPart, n = 8){
 /* Mini line chart of top weight per session. Responsive: the SVG stretches
    (preserveAspectRatio=none) with a non-scaling stroke, and the end dot is an
    HTML element positioned in percentages so it stays circular. */
-function renderTrendSparkline(points){
+function renderTrendSparkline(points, opts = {}){
   const wrap = document.createElement('div');
-  wrap.className = 'trend';
+  wrap.className = 'trend' + (opts.large ? ' trend-lg' : '');
 
   if(points.length < 2){
     wrap.innerHTML = `<div class="trend-head"><span>Trend</span><b>First session</b></div>`;
@@ -844,9 +767,15 @@ function renderTrendSparkline(points){
   const line = coords.map(([x,y],i)=> `${i ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`).join(' ');
   const area = `${line} L100 30 L0 30 Z`;
 
-  const [lastX, lastY] = coords[coords.length - 1];
-  const latest = points[points.length - 1].weight;
-  const isPeak = latest >= vMax;
+  // one dot per session, so you can see how many sessions the line covers
+  const dots = coords.map(([x,y],i)=>{
+    const isLast = i === coords.length - 1;
+    const cls = isLast
+      ? (points[i].weight >= vMax ? 'trend-dot gold' : 'trend-dot')
+      : 'trend-dot sm';
+    return `<span class="${cls}" title="${mdFromISO(points[i].date)} · ${points[i].weight} lb"
+      style="left:${x.toFixed(2)}%; top:${((y/30)*100).toFixed(2)}%"></span>`;
+  }).join('');
 
   wrap.innerHTML = `
     <div class="trend-head">
@@ -858,7 +787,7 @@ function renderTrendSparkline(points){
         <path class="trend-area" d="${area}"/>
         <path class="trend-line" d="${line}" vector-effect="non-scaling-stroke"/>
       </svg>
-      <span class="trend-dot${isPeak ? ' gold' : ''}" style="left:${lastX.toFixed(2)}%; top:${((lastY/30)*100).toFixed(2)}%"></span>
+      ${dots}
     </div>
     <div class="trend-foot">
       <span>${mdFromISO(points[0].date)}</span>
@@ -866,6 +795,71 @@ function renderTrendSparkline(points){
     </div>
   `;
   return wrap;
+}
+
+/* History modal: the PR to beat, the weight trend, and every set of the recent
+   sessions — the numbers you need to pick today's opening weight. */
+function openExerciseHistory(ex){
+  const sessions = scanExerciseSessions(ex.name, ex.bodyPart, null)
+    .map(s=>({ date: s.date, sets: (s.sets||[]).filter(x=> (Number(x.weight)||0) > 0 || (Number(x.reps)||0) > 0) }))
+    .filter(s=> s.sets.length);
+
+  if(!sessions.length){
+    alert('No previous workout data found for this exercise');
+    return;
+  }
+
+  $('#historyTitle').textContent = `${ex.name} — History`;
+  const body = $('#historyBody');
+  body.innerHTML = '';
+
+  // heaviest set ever logged for this exercise
+  const { topSet } = bestsFromSessions(sessions);
+  const pr = document.createElement('div');
+  pr.className = 'hist-pr';
+  pr.innerHTML = `
+    <span class="k">PR</span>
+    <span class="v">${topSet.weight} lb × ${topSet.reps}</span>
+    <span class="sep">·</span>
+    <span class="note">${mdFromISO(topSet.date)}</span>
+    <span class="sep">·</span>
+    <span class="note">${sessions.length} session${sessions.length===1?'':'s'}</span>
+  `;
+  body.appendChild(pr);
+
+  body.appendChild(renderTrendSparkline(trendPoints(ex.name, ex.bodyPart, 10), { large:true }));
+
+  // recent sessions, newest first, with every set spelled out
+  sessions.slice(-8).reverse().forEach(s=>{
+    // index, not value — otherwise two identical top sets both get marked
+    let topIdx = -1, best = {w:0, r:0};
+    s.sets.forEach((x,i)=>{
+      const w = Number(x.weight)||0, r = Number(x.reps)||0;
+      if(w > best.w || (w === best.w && r > best.r)){ best = {w, r}; topIdx = i; }
+    });
+
+    const block = document.createElement('div');
+    block.className = 'hist-session';
+    block.innerHTML = `
+      <div class="hist-head">
+        <span class="hist-date">${mdFromISO(s.date)}</span>
+        <span class="hist-meta">${s.sets.length} set${s.sets.length===1?'':'s'}</span>
+      </div>
+      <div class="hist-sets">
+        ${s.sets.map((st,i)=>{
+          const isTop = best.w > 0 && i === topIdx;
+          return `<div class="hist-set${isTop ? ' set-top' : ''}">
+            <span class="si-n">SET ${i+1}</span>
+            <span class="si-w">${esc(st.weight ?? '—')}</span><span class="si-unit">lb</span>
+            <span class="si-x">×</span><span class="si-r">${esc(st.reps ?? '—')}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+    body.appendChild(block);
+  });
+
+  openPopup('#historyPopup');
 }
 
 function renderExerciseComparisonSummary(ex){
@@ -1455,29 +1449,10 @@ document.addEventListener('click', (e)=>{
     saveDay(day); render(); return;
   }
 
-  // FIX #3: View exercise history
   if(act==='viewHistory'){
-    const exId = e.target.closest('.ex').dataset.id;
+    const exId = host.closest('.ex').dataset.id;
     const ex = day.exercises.find(x=>x.id===exId);
-    const history = getExerciseHistory(ex.name, ex.bodyPart);
-    
-    if(history.length === 0) {
-      alert('No previous workout data found for this exercise');
-      return;
-    }
-    
-    $('#historyTitle').textContent = `${ex.name} - History`;
-    const stats = history.length > 1 
-      ? `${history.length} workouts • Max: ${Math.max(...history.map(h=>h.weight))}lb • Latest: ${history[history.length-1].weight}lb`
-      : `First workout with this exercise`;
-    $('#historyStats').textContent = stats;
-    
-    openPopup('#historyPopup');
-    
-    setTimeout(() => {
-      drawExerciseHistoryChart('historyChart', history);
-    }, 100);
-    
+    openExerciseHistory(ex);
     return;
   }
 });
