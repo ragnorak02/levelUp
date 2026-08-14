@@ -110,13 +110,13 @@
     display:flex; flex-direction:column; gap:4px;
   }
   .db-track{flex:1 1 auto; display:flex; align-items:flex-end; min-height:0}
-  /* stacked segments, one per muscle group worked that day, biggest at the base */
+  /* one bar per day; multi-group days get diagonal stripes, set inline as a
+     repeating-linear-gradient (see stripeBackground) */
   .db-fill{
-    display:flex; flex-direction:column-reverse; width:100%;
+    display:block; width:100%;
     border-radius:4px 4px 0 0; overflow:hidden;
     background:var(--accent); min-height:2px;
   }
-  .db-fill > b{display:block; width:100%; min-height:1px}
   .daybar.rest .db-fill{background:#1b2733; min-height:3px}
   .daybar.sel .db-fill{outline:2px solid var(--gold); outline-offset:1px}
   .daybar.today .db-fill{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
@@ -131,7 +131,7 @@
   .part-legend i{width:9px; height:9px; border-radius:3px; display:block}
 
   /* ===== Selected day: the workout, laid out like the Completed section ===== */
-  .day-panel{margin-top:12px}
+  .day-panel{margin-top:14px; padding-top:14px; border-top:1px solid rgba(42,53,67,.6)}
   .day-head{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px}
   .day-sum{flex:1 1 auto; min-width:0; font-size:.86rem; font-weight:700; color:var(--muted)}
   .day-sum b{color:var(--ink); font-weight:900; font-size:.95rem}
@@ -265,6 +265,9 @@
         <button class="chip sm" data-range="month">This month</button>
       </div>
 
+      <div class="daybars" id="dayBars"></div>
+      <div class="part-legend" id="partLegend"></div>
+
       <div class="day-panel">
         <div class="day-head">
           <div class="day-sum" id="daySum">Tap a bar to see that day.</div>
@@ -275,9 +278,6 @@
         </div>
         <div id="dayGroups"></div>
       </div>
-
-      <div class="daybars" id="dayBars"></div>
-      <div class="part-legend" id="partLegend"></div>
     </section>
 
     <section class="card">
@@ -702,6 +702,31 @@ const PART_COLORS = {
 };
 const partColor = p => PART_COLORS[p] || '#64748b';
 
+/* Fill for one day's bar. A single muscle group is flat colour; two or more
+   become alternating 45° stripes. Stripe widths stay proportional to each
+   group's share of the day (with a floor, so a small group is still visible),
+   so the pattern reads as "which groups" and roughly "how much of each". */
+function stripeBackground(parts, total){
+  if(!parts.length) return '';
+  if(parts.length === 1) return partColor(parts[0][0]);
+
+  const CYCLE = Math.max(18, parts.length * 10);   // px for one full repeat
+  const MIN   = 4;                                 // px, keeps thin slices visible
+
+  let widths = parts.map(([, vol])=> Math.max(MIN, (vol / total) * CYCLE));
+  const sum  = widths.reduce((a,b)=> a+b, 0);
+  widths = widths.map(w=> (w * CYCLE) / sum);      // renormalise back to CYCLE
+
+  let pos = 0;
+  const stops = parts.map(([part], i)=>{
+    const start = pos, end = pos + widths[i];
+    pos = end;
+    return `${partColor(part)} ${start.toFixed(2)}px ${end.toFixed(2)}px`;
+  });
+
+  return `repeating-linear-gradient(45deg, ${stops.join(', ')})`;
+}
+
 /* [part, volume] for one day, biggest first. */
 function dayParts(day){
   const m = {};
@@ -752,7 +777,7 @@ function renderTraining(){
     selectDay(trained.length ? trained[trained.length-1].iso : null, false);
   }
 
-  // ---- one bar per day, split into a segment per muscle group worked ----
+  // ---- one bar per day, striped by the muscle groups worked ----
   const step = rows.length <= 7 ? 1 : rows.length <= 14 ? 2 : rows.length <= 21 ? 3 : 4;
 
   document.getElementById('dayBars').innerHTML = rows.map((r,i)=>{
@@ -765,13 +790,10 @@ function renderTraining(){
       r.iso === TODAY_ISO ? 'today' : ''
     ].filter(Boolean).join(' ');
 
-    // segments are % of the day's own volume, so they always fill the bar
-    const segments = r.parts.map(([part, vol])=>
-      `<b style="height:${(vol / r.vol) * 100}%; background:${partColor(part)}"></b>`
-    ).join('');
+    const fill = r.vol > 0 ? `; background:${stripeBackground(r.parts, r.vol)}` : '';
 
     return `<button class="${cls}" data-iso="${r.iso}" aria-label="${r.iso}">
-      <span class="db-track"><i class="db-fill" style="height:${h}%">${segments}</i></span>
+      <span class="db-track"><i class="db-fill" style="height:${h}%${fill}"></i></span>
       <span class="db-lbl">${showLbl ? dateOf(r.iso).getDate() : ''}</span>
     </button>`;
   }).join('');
