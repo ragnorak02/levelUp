@@ -61,7 +61,7 @@
   .tile .ts{font-size:.72rem; color:var(--muted); font-weight:700; margin-top:2px}
   .tile.gold{border-color:rgba(255,213,74,.45); background:linear-gradient(160deg, rgba(58,42,0,.5), var(--panel))}
   .tile.gold .tv{color:var(--gold)}
-  .up{color:var(--good)} .down{color:var(--bad)} .flat{color:var(--muted)}
+  .up{color:var(--good)} .down{color:var(--bad)} .flat{color:var(--muted)} .dim{color:var(--muted)}
 
   /* ===== Buttons / chips ===== */
   .chips{display:flex; gap:6px; flex-wrap:wrap}
@@ -209,6 +209,102 @@
   }
   .badge.stale{background:rgba(159,176,199,.1); color:var(--muted); border-color:var(--ring)}
 
+  /* ===== Progress: mode switch, multi-select pickers, legend ===== */
+  .seg{display:flex; gap:3px; background:#0a1016; padding:3px; border-radius:11px; border:1px solid var(--ring)}
+  .seg button{
+    all:unset; cursor:pointer; flex:1 1 0; text-align:center; padding:.45rem .4rem; border-radius:9px;
+    font-size:.8rem; font-weight:800; color:var(--muted); min-height:36px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .seg button.active{background:var(--accent); color:#04130a}
+
+  .field-lbl{
+    font-size:.62rem; color:var(--muted); font-weight:800; text-transform:uppercase;
+    letter-spacing:.5px; margin:12px 0 5px;
+  }
+
+  .picker-btn{
+    all:unset; box-sizing:border-box; cursor:pointer; width:100%;
+    padding:.7rem .8rem; border-radius:12px; border:1px solid var(--ring);
+    background:#0e141b; color:var(--ink); font-size:.9rem; font-weight:800; min-height:46px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .picker-btn .pb-count{margin-left:auto; color:var(--muted); font-size:.78rem; font-weight:800}
+  .picker-btn .pb-chev{color:var(--muted); font-size:.7rem}
+  .picker-btn[disabled]{opacity:.45; cursor:default}
+
+  /* bottom sheet used to tick off several exercises at once */
+  .sheet-back{
+    position:fixed; inset:0; z-index:60; background:rgba(4,8,12,.72); backdrop-filter:blur(3px);
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .sheet-back[hidden]{display:none}
+  .sheet{
+    width:min(560px,100%); max-height:84vh; display:flex; flex-direction:column;
+    background:var(--card); border:1px solid var(--ring); border-radius:18px 18px 0 0; padding:12px;
+  }
+  @media(min-width:700px){ .sheet-back{align-items:center} .sheet{border-radius:18px} }
+  .sheet-head{display:flex; align-items:center; gap:8px; padding-bottom:10px; border-bottom:1px solid var(--ring)}
+  .sheet-head b{font-size:.95rem}
+  .sheet-head .mini-btn{margin-left:auto}
+  .sheet-body{flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:4px 0}
+  .sheet-foot{display:flex; align-items:center; gap:8px; padding-top:10px; border-top:1px solid var(--ring)}
+  .sheet-foot .sf-count{font-size:.76rem; color:var(--muted); font-weight:800}
+  .sheet-foot .btn-line{margin-left:auto}
+  .sheet-part{
+    font-size:.62rem; color:var(--muted); font-weight:800; text-transform:uppercase;
+    letter-spacing:.5px; margin:10px 2px 4px;
+  }
+  .opt{
+    display:flex; align-items:center; gap:10px; width:100%; padding:.6rem .55rem;
+    border-radius:10px; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  }
+  .opt:active{background:#16202b}
+  .opt .box{
+    width:20px; height:20px; border-radius:6px; border:1.5px solid var(--ring); background:#0b1118;
+    flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+    font-size:.72rem; color:#04130a; font-weight:900;
+  }
+  .opt.on .box{background:var(--accent); border-color:var(--accent)}
+  .opt .o-name{font-weight:800; font-size:.9rem; flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .opt .o-meta{font-size:.72rem; color:var(--muted); font-weight:800; white-space:nowrap}
+
+  /* pick a past workout instead of a muscle group */
+  .sess-list{display:flex; flex-direction:column; gap:6px; max-height:236px; overflow-y:auto; -webkit-overflow-scrolling:touch}
+  .sess-row{
+    all:unset; cursor:pointer; display:flex; align-items:center; gap:9px; padding:.55rem .7rem;
+    border:1px solid var(--ring); border-radius:12px; background:#0e141b; min-height:44px;
+  }
+  .sess-row.sel{border-color:var(--accent); background:linear-gradient(90deg, rgba(30,66,42,.55), #0e141b)}
+  .sess-when{font-weight:900; font-size:.85rem; flex:0 0 auto}
+  .sess-parts{
+    font-size:.74rem; color:var(--muted); font-weight:800; flex:1 1 auto; min-width:0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .sess-meta{font-size:.72rem; color:var(--muted); font-weight:800; white-space:nowrap}
+
+  /* one row per plotted exercise — tap to hide or show its line */
+  .lg-list{display:flex; flex-direction:column; gap:6px; margin-top:10px}
+  .lg-row{
+    all:unset; cursor:pointer; display:flex; align-items:center; gap:9px; padding:.45rem .6rem;
+    border:1px solid var(--ring); border-radius:11px; background:#0e141b; min-height:44px;
+  }
+  .lg-row.off{opacity:.42}
+  .lg-dot{width:11px; height:11px; border-radius:50%; flex:0 0 auto}
+  .lg-row.off .lg-dot{background:#3a4655 !important}
+  .lg-name{flex:1 1 auto; min-width:0; font-weight:800; font-size:.86rem; overflow:hidden}
+  .lg-name span{
+    display:block; font-size:.68rem; color:var(--muted); font-weight:700;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .lg-val{font-weight:900; font-size:.9rem; font-variant-numeric:tabular-nums; white-space:nowrap}
+  .lg-chg{font-size:.74rem; font-weight:800; white-space:nowrap; min-width:3.1rem; max-width:7.5rem; overflow:hidden; text-overflow:ellipsis; text-align:right}
+
+  .th-dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; vertical-align:middle}
+  .tbl th{white-space:nowrap}
+  .tbl th.num{text-align:right}
+  .tbl tr.sel-day td{background:rgba(45,212,191,.1)}
+
   .note{color:var(--muted); font-size:.78rem; font-weight:700; margin-top:8px}
 </style>
 </head>
@@ -231,23 +327,52 @@
   <div class="tab-panel" id="panel-progress">
     <section class="card">
       <h3>Exercise progression</h3>
-      <div class="chips" id="partFilters" style="margin-bottom:8px"></div>
-      <select class="picker" id="exercisePicker"></select>
 
-      <div class="tiles three" id="exTiles" style="margin-top:10px"></div>
-
-      <div class="chips" id="metricChips" style="margin-top:12px">
-        <button class="chip sm active" data-metric="topW">Top weight</button>
-        <button class="chip sm" data-metric="e1rm">Est. 1RM</button>
-        <button class="chip sm" data-metric="vol">Session volume</button>
-        <button class="chip sm" data-metric="reps">Total reps</button>
+      <div class="seg" id="progModeTabs">
+        <button type="button" data-pmode="muscle" class="active">By muscle</button>
+        <button type="button" data-pmode="session">By session</button>
       </div>
+
+      <div id="muscleMode">
+        <div class="field-lbl">Muscle groups<span style="text-transform:none; letter-spacing:0"> — tap to combine</span></div>
+        <div class="chips" id="partFilters"></div>
+        <button class="picker-btn" id="openExPicker" type="button" style="margin-top:8px">
+          <span>Select exercises</span>
+          <span class="pb-count" id="exPickCount">none</span>
+          <span class="pb-chev">▾</span>
+        </button>
+      </div>
+
+      <div id="sessionMode" hidden>
+        <div class="field-lbl">Recent workouts<span style="text-transform:none; letter-spacing:0"> — plots every exercise from that day</span></div>
+        <div class="sess-list" id="sessionList"></div>
+      </div>
+
+      <div class="field-lbl">Date range</div>
+      <div class="chips" id="progRangeChips">
+        <button class="chip sm" data-prange="7">1 week</button>
+        <button class="chip sm" data-prange="14">2 weeks</button>
+        <button class="chip sm" data-prange="30">1 month</button>
+        <button class="chip sm active" data-prange="90">3 months</button>
+        <button class="chip sm" data-prange="month">This month</button>
+        <button class="chip sm" data-prange="all">All time</button>
+      </div>
+
+      <div class="field-lbl">Metric</div>
+      <div class="chips" id="metricChips">
+        <button class="chip sm active" data-metric="workW">Working weight</button>
+        <button class="chip sm" data-metric="best">Best set</button>
+        <button class="chip sm" data-metric="topW">Top weight</button>
+        <button class="chip sm" data-metric="vol">Session volume</button>
+      </div>
+
       <div class="chart-box"><canvas id="progressionChart"></canvas></div>
+      <div class="lg-list" id="progressionLegend"></div>
       <div class="note" id="progressionNote"></div>
     </section>
 
     <section class="card">
-      <h3>Session history<span class="sp" id="historyCount"></span></h3>
+      <h3>Session comparison<span class="sp" id="historyCount"></span></h3>
       <div class="scroll-x">
         <table class="tbl" id="sessionTable"></table>
       </div>
@@ -316,6 +441,20 @@
     <div class="note">Download writes every logged workout to a JSON file. Import only adds dates you don't already have — it never overwrites or deletes an existing day.</div>
   </section>
 </main>
+
+<div class="sheet-back" id="exSheet" hidden>
+  <div class="sheet">
+    <div class="sheet-head">
+      <b>Select exercises</b>
+      <button class="mini-btn" id="exSheetClear" type="button">Clear all</button>
+    </div>
+    <div class="sheet-body" id="exSheetList"></div>
+    <div class="sheet-foot">
+      <span class="sf-count" id="exSheetCount">0 selected</span>
+      <button class="btn-line" id="exSheetDone" type="button">Done</button>
+    </div>
+  </div>
+</div>
 
 <script>
 'use strict';
@@ -395,6 +534,38 @@ function daySets(day){
 }
 
 /* ---------- per-exercise index ---------- */
+
+// The working weight of a session: the load you actually did your work sets at,
+// so a warm-up ramp or a single heavy triple doesn't own the number. The most
+// repeated weight wins, ties go to the heavier load, and a session with no
+// repeated weight at all (a straight ramp) falls back to the mean of its two
+// heaviest sets.
+function workingWeight(sets){
+  const byWeight = new Map();
+  sets.forEach(s=>{
+    const agg = byWeight.get(s.weight) || { count:0, reps:0 };
+    agg.count += 1; agg.reps += s.reps;
+    byWeight.set(s.weight, agg);
+  });
+
+  let best = null;
+  [...byWeight.entries()].sort((a,b)=> b[0] - a[0]).forEach(([w,agg])=>{
+    if(!best || agg.count > best.count){
+      best = { weight:w, count:agg.count, reps:Math.round(agg.reps/agg.count) };
+    }
+  });
+  if(best && best.count >= 2) return best;
+
+
+  const top = sets.slice().sort((a,b)=> b.weight - a.weight).slice(0,2);
+  return {
+    weight: Math.round(top.reduce((s,x)=> s + x.weight, 0) / top.length),
+    count:  top.length,
+    reps:   Math.round(top.reduce((s,x)=> s + x.reps, 0) / top.length),
+    estimated: true
+  };
+}
+
 function buildExerciseIndex(){
   const m = new Map();
   DAYS.forEach(day=>{
@@ -406,16 +577,23 @@ function buildExerciseIndex(){
       if(!m.has(key)) m.set(key, { key, name: ex.name, bodyPart: ex.bodyPart, sessions: [] });
 
       let topW = 0, topR = 0, vol = 0, reps = 0, e1rm = 0;
+      let bestSet = 0, bestSetW = 0, bestSetR = 0;
       sets.forEach(s=>{
         vol  += s.weight * s.reps;
         reps += s.reps;
         if(s.weight > topW || (s.weight === topW && s.reps > topR)){ topW = s.weight; topR = s.reps; }
         e1rm = Math.max(e1rm, epley(s.weight, s.reps));
+        const setVol = s.weight * s.reps;
+        if(setVol > bestSet){ bestSet = setVol; bestSetW = s.weight; bestSetR = s.reps; }
       });
+
+      const work = workingWeight(sets);
 
       m.get(key).sessions.push({
         date: day.date, topW, topR, vol, reps,
-        e1rm: Math.round(e1rm), setCount: sets.length
+        e1rm: Math.round(e1rm), setCount: sets.length,
+        workW: work.weight, workSets: work.count, workReps: work.reps, workEst: !!work.estimated,
+        bestSet, bestSetW, bestSetR
       });
     });
   });
@@ -447,13 +625,13 @@ function recordsFor(entry){
 }
 
 /* =========================================================
-   Canvas chart — line or bar, DPR-aware, with axis labels
+   Canvas chart — several lines on one true calendar x-axis.
+   Points sit at their real date, so the oldest session is always
+   on the left and gaps between workouts are honest.
    ========================================================= */
-function drawChart(canvas, series, opts = {}){
-  if(!canvas) return;
-  const type   = opts.type || 'line';
-  const color  = opts.color || '#2dd4bf';
-  const fmt    = opts.format || compact;
+function drawMultiChart(canvas, seriesList, opts = {}){
+  if(!canvas) return null;
+  const fmt = opts.format || compact;
 
   const cssW = canvas.clientWidth || canvas.parentElement.clientWidth;
   const cssH = canvas.clientHeight || 220;
@@ -466,23 +644,28 @@ function drawChart(canvas, series, opts = {}){
   ctx.clearRect(0,0,cssW,cssH);
   ctx.font = '10px system-ui, sans-serif';
 
-  if(!series.length){
+  const vis = seriesList.filter(s=> !s.hidden && s.points.length);
+  if(!vis.length){
     ctx.fillStyle = '#9fb0c7'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(opts.emptyText || 'No data yet', cssW/2, cssH/2);
-    return;
+    return null;
   }
 
   const padL = 42, padR = 12, padT = 12, padB = 24;
   const w = Math.max(10, cssW - padL - padR);
   const h = Math.max(10, cssH - padT - padB);
 
-  const vals = series.map(p=>p.value);
-  let lo = Math.min(...vals), hi = Math.max(...vals);
-  if(type === 'bar') lo = 0;
-  if(lo === hi){ hi = lo + (lo === 0 ? 1 : lo * 0.1); }
-  else { const pad = (hi - lo) * 0.12; hi += pad; if(type !== 'bar') lo = Math.max(0, lo - pad); }
+  const times = [], vals = [];
+  vis.forEach(s=> s.points.forEach(p=>{ times.push(dateOf(p.iso).getTime()); vals.push(p.value); }));
 
+  const t0 = Math.min(...times), t1 = Math.max(...times);
+  let   lo = Math.min(...vals),  hi = Math.max(...vals);
+  if(lo === hi){ hi = lo + (lo === 0 ? 1 : lo * 0.1); lo = Math.max(0, lo - lo * 0.1); }
+  else { const pad = (hi - lo) * 0.12; hi += pad; lo = Math.max(0, lo - pad); }
+
+  const X = t => t1 === t0 ? padL + w/2 : padL + ((t - t0) / (t1 - t0)) * w;
   const Y = v => padT + h - ((v - lo) / (hi - lo)) * h;
+  const xOfIso = iso => X(dateOf(iso).getTime());
 
   // gridlines + y labels
   ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
@@ -495,199 +678,411 @@ function drawChart(canvas, series, opts = {}){
     ctx.fillText(fmt(v), padL - 6, y);
   }
 
-  // x labels: first / middle / last only, so they never collide
-  const xLabelAt = new Set([0, Math.floor((series.length-1)/2), series.length-1]);
-  ctx.textBaseline = 'top';
+  // the tapped day gets a guide so every line can be read off one date
+  if(opts.focusIso){
+    const ft = dateOf(opts.focusIso).getTime();
+    if(ft >= t0 && ft <= t1){
+      const x = Math.round(X(ft)) + 0.5;
+      ctx.strokeStyle = 'rgba(232,238,246,.3)'; ctx.lineWidth = 1;
+      ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + h); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
 
-  if(type === 'bar'){
-    const slot = w / series.length;
-    const bw   = Math.max(3, Math.min(26, slot * 0.62));
-    series.forEach((p,i)=>{
-      const cx = padL + slot*i + slot/2;
-      const y  = Y(p.value);
-      ctx.fillStyle = p.highlight ? '#ffd54a' : color;
-      ctx.fillRect(cx - bw/2, y, bw, padT + h - y);
-      if(xLabelAt.has(i)){
-        ctx.fillStyle = '#9fb0c7';
-        ctx.textAlign = i === 0 ? 'left' : (i === series.length-1 ? 'right' : 'center');
-        ctx.fillText(p.label, i === 0 ? padL : (i === series.length-1 ? padL+w : cx), padT + h + 7);
-      }
-    });
-  }else{
-    const X = i => series.length === 1 ? padL + w/2 : padL + (i/(series.length-1)) * w;
-
-    // area under the line
+  // a lone line keeps the filled area; overlaid lines would just muddy each other
+  if(vis.length === 1 && vis[0].points.length > 1){
+    const pts = vis[0].points;
     ctx.beginPath();
-    ctx.moveTo(X(0), padT + h);
-    series.forEach((p,i)=> ctx.lineTo(X(i), Y(p.value)));
-    ctx.lineTo(X(series.length-1), padT + h);
+    ctx.moveTo(xOfIso(pts[0].iso), padT + h);
+    pts.forEach(p=> ctx.lineTo(xOfIso(p.iso), Y(p.value)));
+    ctx.lineTo(xOfIso(pts[pts.length-1].iso), padT + h);
     ctx.closePath();
-    ctx.fillStyle = opts.fill || 'rgba(45,212,191,.12)';
+    ctx.fillStyle = vis[0].color + '22';
     ctx.fill();
+  }
 
+  vis.forEach(s=>{
+    ctx.strokeStyle = s.color; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     ctx.beginPath();
-    series.forEach((p,i)=> i ? ctx.lineTo(X(i), Y(p.value)) : ctx.moveTo(X(i), Y(p.value)));
-    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    s.points.forEach((p,i)=>{
+      const x = xOfIso(p.iso), y = Y(p.value);
+      i ? ctx.lineTo(x,y) : ctx.moveTo(x,y);
+    });
     ctx.stroke();
 
-    series.forEach((p,i)=>{
-      const x = X(i), y = Y(p.value);
-      ctx.beginPath();
-      ctx.arc(x, y, p.highlight ? 4.5 : 3, 0, Math.PI*2);
-      ctx.fillStyle = p.highlight ? '#ffd54a' : color;
-      ctx.fill();
-      if(p.highlight){
-        ctx.strokeStyle = 'rgba(255,213,74,.35)'; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI*2); ctx.stroke();
-      }
-      if(xLabelAt.has(i)){
-        ctx.fillStyle = '#9fb0c7';
-        ctx.textAlign = i === 0 ? 'left' : (i === series.length-1 ? 'right' : 'center');
-        ctx.fillText(p.label, x, padT + h + 7);
-      }
+    s.points.forEach(p=>{
+      const x = xOfIso(p.iso), y = Y(p.value);
+      const on = opts.focusIso === p.iso;
+      ctx.beginPath(); ctx.arc(x, y, on ? 5 : 3, 0, Math.PI*2);
+      ctx.fillStyle = s.color; ctx.fill();
+      if(on){ ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.lineWidth = 1.5; ctx.stroke(); }
     });
-  }
+  });
+
+  // x labels: evenly spaced along the calendar span, year shown when it crosses one
+  ctx.textBaseline = 'top';
+  const crossesYear = new Date(t0).getFullYear() !== new Date(t1).getFullYear();
+  const ticks = t1 === t0 ? [t0] : [t0, t0 + (t1-t0)/3, t0 + (t1-t0)*2/3, t1];
+  ticks.forEach((t,i)=>{
+    const d = new Date(t);
+    const lbl = `${d.getMonth()+1}/${d.getDate()}` + (crossesYear ? `/${String(d.getFullYear()).slice(-2)}` : '');
+    ctx.fillStyle = '#9fb0c7';
+    ctx.textAlign = i === 0 ? 'left' : (i === ticks.length-1 ? 'right' : 'center');
+    ctx.fillText(lbl, X(t), padT + h + 7);
+  });
+
+  return { padL, w, t0, t1 };
 }
 
 /* =========================================================
    Tab 1 — Progress
    ========================================================= */
 const UI_KEYS = {
-  tab:'powerUp:analyticsTab', ex:'powerUp:analyticsExercise',
-  metric:'powerUp:analyticsMetric', range:'powerUp:analyticsRange'
+  tab:'powerUp:analyticsTab', range:'powerUp:analyticsRange',
+  mode:'powerUp:progMode', parts:'powerUp:progParts', exs:'powerUp:progExercises',
+  metric:'powerUp:progMetric', prange:'powerUp:progRange', sess:'powerUp:progSession'
 };
-const readUI  = k => { try{ return localStorage.getItem(k); }catch{ return null; } };
-const writeUI = (k,v) => { try{ localStorage.setItem(k,v); }catch{} };
+const readUI   = k => { try{ return localStorage.getItem(k); }catch{ return null; } };
+const writeUI  = (k,v) => { try{ localStorage.setItem(k,v); }catch{} };
+const readList = k => { try{ const v = JSON.parse(localStorage.getItem(k)); return Array.isArray(v) ? v : []; }catch{ return []; } };
 
-let selectedPart   = 'all';
-let selectedExKey  = readUI(UI_KEYS.ex) || null;
-let selectedMetric = readUI(UI_KEYS.metric) || 'topW';
+// line colours, handed out in selection order
+const SERIES_COLORS = ['#2dd4bf','#ffc531','#60a5fa','#f472b6','#a78bfa','#34d399','#fb923c','#f87171'];
 
-function renderPartFilters(){
-  const parts = [...new Set(EX_LIST.map(e=>e.bodyPart))].sort();
-  document.getElementById('partFilters').innerHTML =
-    [`<button class="chip sm ${selectedPart==='all'?'active':''}" data-part="all">All</button>`]
-    .concat(parts.map(p=>
-      `<button class="chip sm ${selectedPart===p?'active':''}" data-part="${esc(p)}">${esc(p)}</button>`
-    )).join('');
+const ALL_PARTS    = [...new Set(EX_LIST.map(e=>e.bodyPart))].sort();
+const SESSION_DAYS = DAYS.filter(d=> dayVolume(d) > 0).slice().reverse();   // newest first
+
+function dayExKeys(day){
+  const keys = [];
+  day.exercises.forEach(ex=>{
+    if(!ex.sets.some(s=> s.weight > 0 && s.reps > 0)) return;
+    const k = ex.name.toLowerCase().trim() + '|' + ex.bodyPart;
+    if(EX_INDEX.has(k) && !keys.includes(k)) keys.push(k);
+  });
+  return keys;
 }
-
-function visibleExercises(){
-  return selectedPart === 'all' ? EX_LIST : EX_LIST.filter(e=> e.bodyPart === selectedPart);
-}
-
-function renderExercisePicker(){
-  const list = visibleExercises();
-  const sel  = document.getElementById('exercisePicker');
-
-  if(!list.length){
-    sel.innerHTML = '<option>No exercises logged</option>';
-    sel.disabled = true;
-    return;
-  }
-  sel.disabled = false;
-
-  if(!list.some(e=>e.key === selectedExKey)) selectedExKey = list[0].key;
-
-  sel.innerHTML = list.map(e=>
-    `<option value="${esc(e.key)}" ${e.key===selectedExKey?'selected':''}>${esc(e.name)} — ${esc(e.bodyPart)} (${e.sessions.length})</option>`
-  ).join('');
+function dayParts(day){
+  return [...new Set(day.exercises
+    .filter(ex=> ex.sets.some(s=> s.weight > 0 && s.reps > 0))
+    .map(ex=> ex.bodyPart))];
 }
 
 const METRIC_DEFS = {
-  topW: { label:'Top weight',     unit:'lb',   color:'#ffc531', fill:'rgba(255,197,49,.12)', pick:s=>s.topW },
-  e1rm: { label:'Est. 1RM',       unit:'lb',   color:'#a78bfa', fill:'rgba(167,139,250,.12)', pick:s=>s.e1rm },
-  vol:  { label:'Session volume', unit:'lb',   color:'#2dd4bf', fill:'rgba(45,212,191,.12)', pick:s=>s.vol },
-  reps: { label:'Total reps',     unit:'reps', color:'#60a5fa', fill:'rgba(96,165,250,.12)', pick:s=>s.reps }
+  workW: {
+    label:'Working weight', unit:'lb', pick:s=> s.workW,
+    detail:s=> s.workEst ? 'avg of top 2 sets' : `${s.workSets}×${s.workReps} reps`,
+    blurb:'the load you did most of your work sets at'
+  },
+  best: {
+    label:'Best set', unit:'lb', pick:s=> s.bestSet,
+    detail:s=> `${s.bestSetW} × ${s.bestSetR}`,
+    blurb:'the hardest single set, scored weight × reps'
+  },
+  topW: {
+    label:'Top weight', unit:'lb', pick:s=> s.topW,
+    detail:s=> `× ${s.topR}`,
+    blurb:'the heaviest weight touched'
+  },
+  vol: {
+    label:'Session volume', unit:'lb', pick:s=> s.vol,
+    detail:s=> `${s.setCount} sets`,
+    blurb:'every set added up'
+  }
 };
 
-function renderExerciseDetail(){
-  const entry = EX_INDEX.get(selectedExKey);
-  const tiles = document.getElementById('exTiles');
-  const table = document.getElementById('sessionTable');
-  const note  = document.getElementById('progressionNote');
-  const count = document.getElementById('historyCount');
+let progMode           = readUI(UI_KEYS.mode) === 'session' ? 'session' : 'muscle';
+let selectedParts      = new Set(readList(UI_KEYS.parts).filter(p=> ALL_PARTS.includes(p)));
+let selectedExKeys     = readList(UI_KEYS.exs).filter(k=> EX_INDEX.has(k));
+let hiddenExKeys       = new Set();
+let selectedSessionIso = readUI(UI_KEYS.sess);
+let selectedMetric     = METRIC_DEFS[readUI(UI_KEYS.metric)] ? readUI(UI_KEYS.metric) : 'workW';
+let progRange          = readUI(UI_KEYS.prange) || '90';
+let focusIso           = null;
+let chartGeo           = null;
+let plottedDates       = [];
+let sheetPick          = null;
 
-  if(!entry){
-    tiles.innerHTML = '';
-    table.innerHTML = '<tr><td class="dim">No exercises logged yet.</td></tr>';
-    note.textContent = '';
-    count.textContent = '';
-    drawChart(document.getElementById('progressionChart'), []);
+function persistProg(){
+  writeUI(UI_KEYS.mode, progMode);
+  writeUI(UI_KEYS.parts, JSON.stringify([...selectedParts]));
+  writeUI(UI_KEYS.exs, JSON.stringify(selectedExKeys));
+  writeUI(UI_KEYS.metric, selectedMetric);
+  writeUI(UI_KEYS.prange, progRange);
+  if(selectedSessionIso) writeUI(UI_KEYS.sess, selectedSessionIso);
+}
+
+// first run: open on the most recent workout so there's something to look at
+function seedProgDefaults(){
+  if(selectedExKeys.length){
+    if(!selectedParts.size) selectedParts = new Set(selectedExKeys.map(k=> EX_INDEX.get(k).bodyPart));
+    return;
+  }
+  const last = SESSION_DAYS[0];
+  if(!last) return;
+  selectedExKeys = dayExKeys(last).slice(0,6);
+  selectedParts  = new Set(selectedExKeys.map(k=> EX_INDEX.get(k).bodyPart));
+  if(!selectedSessionIso) selectedSessionIso = last.date;
+}
+seedProgDefaults();
+
+function rangeCutoffIso(){
+  if(progRange === 'all') return null;
+  if(progRange === 'month'){ const d = new Date(TODAY); d.setDate(1); return isoOf(d); }
+  const n = parseInt(progRange, 10);
+  return Number.isFinite(n) ? isoOf(addDays(TODAY, -(n-1))) : null;
+}
+
+function buildSeries(){
+  const cutoff = rangeCutoffIso();
+  const def    = METRIC_DEFS[selectedMetric];
+  return selectedExKeys.filter(k=> EX_INDEX.has(k)).map((k,i)=>{
+    const entry = EX_INDEX.get(k);
+    const ss    = entry.sessions.filter(s=> !cutoff || s.date >= cutoff);
+    return {
+      key:k, name:entry.name, part:entry.bodyPart,
+      color: SERIES_COLORS[i % SERIES_COLORS.length],
+      hidden: hiddenExKeys.has(k),
+      points: ss.map(s=>({ iso:s.date, value:def.pick(s), s }))
+    };
+  });
+}
+
+/* ---------- muscle mode ---------- */
+function renderPartFilters(){
+  const box = document.getElementById('partFilters');
+  if(!ALL_PARTS.length){ box.innerHTML = '<div class="note">No workouts logged yet.</div>'; return; }
+  box.innerHTML = ALL_PARTS.map(p=>
+    `<button class="chip sm ${selectedParts.has(p)?'active':''}" data-part="${esc(p)}">${esc(p)}</button>`
+  ).join('');
+}
+
+function togglePart(part){
+  if(selectedParts.has(part)){
+    selectedParts.delete(part);
+    selectedExKeys = selectedExKeys.filter(k=> EX_INDEX.get(k).bodyPart !== part);
+  }else{
+    selectedParts.add(part);
+    // give a newly picked group something on the chart straight away — its three
+    // most-trained lifts — and let the picker refine it from there
+    const add = EX_LIST.filter(e=> e.bodyPart === part)
+      .sort((a,b)=> b.sessions.length - a.sessions.length)
+      .slice(0,3).map(e=> e.key);
+    const wanted = new Set([...selectedExKeys, ...add]);
+    selectedExKeys = EX_LIST.filter(e=> wanted.has(e.key)).map(e=> e.key);
+  }
+  hiddenExKeys.clear();
+}
+
+function updatePickerBtn(){
+  const btn  = document.getElementById('openExPicker');
+  const cnt  = document.getElementById('exPickCount');
+  const pool = EX_LIST.filter(e=> selectedParts.has(e.bodyPart));
+  btn.disabled = !pool.length;
+  cnt.textContent = !selectedParts.size
+    ? 'pick a muscle group first'
+    : `${selectedExKeys.length} of ${pool.length}`;
+}
+
+/* ---------- session mode ---------- */
+function renderSessionList(){
+  const el = document.getElementById('sessionList');
+  if(!SESSION_DAYS.length){ el.innerHTML = '<div class="note">No workouts logged yet.</div>'; return; }
+  el.innerHTML = SESSION_DAYS.slice(0,14).map(d=>{
+    const wd = dateOf(d.date).toLocaleDateString(undefined, { weekday:'short' });
+    return `<button class="sess-row ${d.date === selectedSessionIso ? 'sel' : ''}" data-sessiso="${d.date}">
+      <span class="sess-when">${wd} ${mdOf(d.date)}</span>
+      <span class="sess-parts">${esc(dayParts(d).join(', ')) || '—'}</span>
+      <span class="sess-meta">${dayExKeys(d).length} ex</span>
+    </button>`;
+  }).join('');
+}
+
+function selectSession(iso){
+  const day = SESSION_DAYS.find(d=> d.date === iso);
+  if(!day) return;
+  selectedSessionIso = iso;
+  selectedExKeys = dayExKeys(day);
+  selectedParts  = new Set(dayParts(day));
+  hiddenExKeys.clear();
+  focusIso = iso;
+}
+
+/* ---------- exercise picker sheet ---------- */
+function openExSheet(){
+  sheetPick = new Set(selectedExKeys);
+  renderExSheet();
+  document.getElementById('exSheet').hidden = false;
+}
+function closeExSheet(){
+  document.getElementById('exSheet').hidden = true;
+  sheetPick = null;
+}
+function renderExSheet(){
+  const body = document.getElementById('exSheetList');
+  const pool = EX_LIST.filter(e=> selectedParts.has(e.bodyPart));
+
+  if(!pool.length){
+    body.innerHTML = '<div class="note">Nothing logged for those muscle groups yet.</div>';
+  }else{
+    const groups = {};
+    pool.forEach(e=>{ (groups[e.bodyPart] = groups[e.bodyPart] || []).push(e); });
+    body.innerHTML = Object.keys(groups).sort().map(bp=>
+      `<div class="sheet-part">${esc(bp)}</div>` +
+      groups[bp].map(e=>{
+        const on = sheetPick.has(e.key);
+        return `<div class="opt ${on?'on':''}" data-optkey="${esc(e.key)}">
+          <span class="box">${on ? '✓' : ''}</span>
+          <span class="o-name">${esc(e.name)}</span>
+          <span class="o-meta">${e.sessions.length} session${e.sessions.length===1?'':'s'}</span>
+        </div>`;
+      }).join('')
+    ).join('');
+  }
+  document.getElementById('exSheetCount').textContent = `${sheetPick.size} selected`;
+}
+
+/* ---------- rendering ---------- */
+function renderLegend(series){
+  const el  = document.getElementById('progressionLegend');
+  const def = METRIC_DEFS[selectedMetric];
+  if(!series.length){ el.innerHTML = ''; return; }
+
+  el.innerHTML = series.map(s=>{
+    const pts   = s.points;
+    const focus = focusIso ? pts.find(p=> p.iso === focusIso) : null;
+    const shown = focus || pts[pts.length-1];
+    const first = pts[0];
+
+    const val = shown ? `<span class="lg-val">${nf(shown.value)}</span>`
+                      : '<span class="lg-val dim">—</span>';
+
+    let chg = '<span class="lg-chg flat"></span>';
+    if(focus){
+      chg = `<span class="lg-chg flat">${esc(def.detail(focus.s))}</span>`;
+    }else if(pts.length > 1 && first.value > 0){
+      const d = Math.round(((shown.value - first.value) / first.value) * 100);
+      chg = `<span class="lg-chg ${d>0?'up':(d<0?'down':'flat')}">${d>0?'+':''}${d}%</span>`;
+    }
+
+    const sub = focus ? `${mdOf(focus.iso)} · ${s.part}`
+      : (pts.length
+          ? `${s.part} · ${pts.length} session${pts.length===1?'':'s'} · ${agoLabel(pts[pts.length-1].iso)}`
+          : `${s.part} · nothing in range`);
+
+    return `<button class="lg-row ${s.hidden?'off':''}" data-exkey="${esc(s.key)}">
+      <i class="lg-dot" style="background:${s.color}"></i>
+      <span class="lg-name">${esc(s.name)}<span>${esc(sub)}</span></span>
+      ${val}${chg}
+    </button>`;
+  }).join('');
+}
+
+function renderProgNote(series){
+  const note = document.getElementById('progressionNote');
+  const def  = METRIC_DEFS[selectedMetric];
+  const vis  = series.filter(s=> !s.hidden && s.points.length);
+
+  if(!selectedExKeys.length){
+    note.textContent = progMode === 'muscle'
+      ? 'Pick one or more muscle groups, then choose the exercises to overlay.'
+      : 'Pick a workout to plot everything you did that day.';
+    return;
+  }
+  if(!vis.length){
+    note.textContent = 'Nothing logged in this date range — widen it above.';
+    return;
+  }
+  if(focusIso){
+    note.innerHTML = `<b>${longDate(focusIso)}</b> — every line read off that day. Tap the chart again to clear.`;
     return;
   }
 
-  const r  = recordsFor(entry);
-  const ss = entry.sessions;
+  const span = plottedDates.length > 1
+    ? `${mdOf(plottedDates[0])} → ${mdOf(plottedDates[plottedDates.length-1])}`
+    : mdOf(plottedDates[0]);
+  note.innerHTML = `<b>${esc(def.label)}</b> — ${esc(def.blurb)}. ${vis.length} exercise${vis.length===1?'':'s'} across ${plottedDates.length} session${plottedDates.length===1?'':'s'} (${span}). Tap a point to read one day.`;
+}
 
-  tiles.innerHTML = `
-    <div class="tile gold">
-      <div class="tv">${r.bestW.w} lb</div><div class="tl">Best set</div>
-      <div class="ts">× ${r.bestW.r} · ${agoLabel(r.bestW.date)}</div>
-    </div>
-    <div class="tile">
-      <div class="tv">${nf(r.best1RM.v)} lb</div><div class="tl">Best est. 1RM</div>
-      <div class="ts">${agoLabel(r.best1RM.date)}</div>
-    </div>
-    <div class="tile">
-      <div class="tv">${compact(r.bestVol.v)} lb</div><div class="tl">Best session</div>
-      <div class="ts">${agoLabel(r.bestVol.date)}</div>
-    </div>
-  `;
+function renderComparisonTable(series){
+  const table = document.getElementById('sessionTable');
+  const count = document.getElementById('historyCount');
+  const def   = METRIC_DEFS[selectedMetric];
+  const vis   = series.filter(s=> !s.hidden && s.points.length);
 
-  // ---- chart ----
-  const def    = METRIC_DEFS[selectedMetric] || METRIC_DEFS.topW;
-  const shown  = ss.slice(-20);
-  const series = shown.map(s=>({
-    label: mdOf(s.date),
-    value: def.pick(s),
-    highlight: selectedMetric === 'topW' && s.isPR
-  }));
+  if(!vis.length){
+    table.innerHTML = '<tr><td class="dim">Nothing selected.</td></tr>';
+    count.textContent = '';
+    return;
+  }
 
-  drawChart(document.getElementById('progressionChart'), series, {
-    type: shown.length > 10 ? 'bar' : 'line',
-    color: def.color,
-    fill: def.fill,
-    format: v => compact(v)
-  });
-
-  const first = def.pick(ss[0]), latest = def.pick(ss[ss.length-1]);
-  const change = first > 0 ? Math.round(((latest - first) / first) * 100) : 0;
-  note.innerHTML = ss.length > 1
-    ? `${esc(def.label)}: <b>${nf(first)}</b> → <b>${nf(latest)}</b> ${def.unit} over ${ss.length} sessions (<span class="${change>=0?'up':'down'}">${change>=0?'+':''}${change}%</span>). Last trained ${agoLabel(ss[ss.length-1].date)}.`
-    : `Only one session logged — ${longDate(ss[0].date)}.`;
-
-  // ---- session table ----
-  count.textContent = `${ss.length} session${ss.length===1?'':'s'}`;
-  const rows = ss.slice(-30).reverse();
+  const dates  = plottedDates.slice().reverse();      // newest first reads better in a table
+  const lookup = new Map(vis.map(s=> [s.key, new Map(s.points.map(p=> [p.iso, p]))]));
+  count.textContent = `${def.label} · ${dates.length} session${dates.length===1?'':'s'}`;
 
   table.innerHTML = `
     <thead><tr>
-      <th>Date</th><th>Top set</th><th class="num">Sets</th><th class="num">Volume</th><th class="num">Δ vol</th>
+      <th>Date</th>
+      ${vis.map(s=> `<th class="num"><span class="th-dot" style="background:${s.color}"></span>${esc(s.name)}</th>`).join('')}
     </tr></thead>
     <tbody>
-      ${rows.map(s=>{
-        const i    = ss.indexOf(s);
-        const prev = i > 0 ? ss[i-1].vol : null;
-        const d    = prev === null ? null : s.vol - prev;
-        const dTxt = d === null ? '—'
-          : `<span class="${d>0?'up':(d<0?'down':'flat')}">${d>0?'+':''}${compact(d)}</span>`;
-        return `<tr class="${s.isPR?'is-pr':''}">
-          <td>${mdOf(s.date)}<div class="dim" style="font-size:.7rem">${dateOf(s.date).getFullYear()}</div></td>
-          <td>${s.topW} lb × ${s.topR}${s.isPR?' <span class="badge">PR</span>':''}</td>
-          <td class="num">${s.setCount}</td>
-          <td class="num">${nf(s.vol)}</td>
-          <td class="num">${dTxt}</td>
-        </tr>`;
-      }).join('')}
+      ${dates.slice(0,40).map(iso=> `
+        <tr class="${iso === focusIso ? 'sel-day' : ''}" data-rowiso="${iso}">
+          <td>${mdOf(iso)}<div class="dim" style="font-size:.7rem">${dateOf(iso).getFullYear()}</div></td>
+          ${vis.map(s=>{
+            const p = lookup.get(s.key).get(iso);
+            return `<td class="num">${p
+              ? `${nf(p.value)}<div class="dim" style="font-size:.7rem">${esc(def.detail(p.s))}</div>`
+              : '<span class="dim">—</span>'}</td>`;
+          }).join('')}
+        </tr>`).join('')}
     </tbody>
   `;
 }
 
+function renderProgressChart(){
+  const series = buildSeries();
+
+  plottedDates = [...new Set(series.filter(s=> !s.hidden).flatMap(s=> s.points.map(p=> p.iso)))].sort();
+  if(focusIso && !plottedDates.includes(focusIso)) focusIso = null;
+
+  chartGeo = drawMultiChart(document.getElementById('progressionChart'), series, {
+    format: compact,
+    focusIso,
+    emptyText: selectedExKeys.length ? 'No sessions in this range' : 'Nothing selected yet'
+  });
+
+  renderLegend(series);
+  renderProgNote(series);
+  renderComparisonTable(series);
+}
+
 function renderProgress(){
-  renderPartFilters();
-  renderExercisePicker();
-  renderExerciseDetail();
+  document.querySelectorAll('#progModeTabs button').forEach(b=>
+    b.classList.toggle('active', b.dataset.pmode === progMode));
+  document.getElementById('muscleMode').hidden  = progMode !== 'muscle';
+  document.getElementById('sessionMode').hidden = progMode !== 'session';
+
+  if(progMode === 'muscle'){ renderPartFilters(); updatePickerBtn(); }
+  else renderSessionList();
+
+  renderProgressChart();
+}
+
+// map a tap anywhere on the plot to the nearest logged session
+function nearestPlottedIso(clientX, canvas){
+  if(!chartGeo || !plottedDates.length) return null;
+  const rect = canvas.getBoundingClientRect();
+  const t = chartGeo.t1 === chartGeo.t0
+    ? chartGeo.t0
+    : chartGeo.t0 + ((clientX - rect.left - chartGeo.padL) / chartGeo.w) * (chartGeo.t1 - chartGeo.t0);
+
+  let best = null, bestGap = Infinity;
+  plottedDates.forEach(iso=>{
+    const gap = Math.abs(dateOf(iso).getTime() - t);
+    if(gap < bestGap){ bestGap = gap; best = iso; }
+  });
+  return best;
 }
 
 /* =========================================================
@@ -1090,25 +1485,75 @@ function showTab(view){
   writeUI(UI_KEYS.tab, view);
 
   // the progression canvas must be laid out before it can be sized
-  if(view === 'progress') renderExerciseDetail();
+  if(view === 'progress') renderProgressChart();
 }
 
 document.querySelectorAll('.tab').forEach(t=>
   t.addEventListener('click', ()=> showTab(t.dataset.view))
 );
 
-document.getElementById('partFilters').addEventListener('click', e=>{
-  const b = e.target.closest('[data-part]'); if(!b) return;
-  selectedPart = b.dataset.part;
-  renderPartFilters();
-  renderExercisePicker();
-  renderExerciseDetail();
+document.getElementById('progModeTabs').addEventListener('click', e=>{
+  const b = e.target.closest('[data-pmode]'); if(!b) return;
+  progMode = b.dataset.pmode;
+  if(progMode === 'session' && selectedSessionIso) selectSession(selectedSessionIso);
+  persistProg();
+  renderProgress();
 });
 
-document.getElementById('exercisePicker').addEventListener('change', e=>{
-  selectedExKey = e.target.value;
-  writeUI(UI_KEYS.ex, selectedExKey);
-  renderExerciseDetail();
+document.getElementById('partFilters').addEventListener('click', e=>{
+  const b = e.target.closest('[data-part]'); if(!b) return;
+  togglePart(b.dataset.part);
+  persistProg();
+  renderProgress();
+});
+
+document.getElementById('openExPicker').addEventListener('click', ()=>{
+  if(!selectedParts.size) return;
+  openExSheet();
+});
+
+document.getElementById('exSheetList').addEventListener('click', e=>{
+  const row = e.target.closest('[data-optkey]'); if(!row || !sheetPick) return;
+  const k = row.dataset.optkey;
+  sheetPick.has(k) ? sheetPick.delete(k) : sheetPick.add(k);
+  renderExSheet();
+});
+
+document.getElementById('exSheetClear').addEventListener('click', ()=>{
+  if(!sheetPick) return;
+  sheetPick.clear();
+  renderExSheet();
+});
+
+document.getElementById('exSheetDone').addEventListener('click', ()=>{
+  if(sheetPick){
+    // keep EX_LIST order so a given exercise keeps its colour between edits
+    selectedExKeys = EX_LIST.filter(e=> sheetPick.has(e.key)).map(e=> e.key);
+    hiddenExKeys.clear();
+    persistProg();
+  }
+  closeExSheet();
+  renderProgress();
+});
+
+// tapping the dimmed backdrop closes without applying
+document.getElementById('exSheet').addEventListener('click', e=>{
+  if(e.target.id === 'exSheet') closeExSheet();
+});
+
+document.getElementById('sessionList').addEventListener('click', e=>{
+  const b = e.target.closest('[data-sessiso]'); if(!b) return;
+  selectSession(b.dataset.sessiso);
+  persistProg();
+  renderProgress();
+});
+
+document.getElementById('progRangeChips').addEventListener('click', e=>{
+  const b = e.target.closest('[data-prange]'); if(!b) return;
+  progRange = b.dataset.prange;
+  writeUI(UI_KEYS.prange, progRange);
+  document.querySelectorAll('#progRangeChips .chip').forEach(c=> c.classList.toggle('active', c === b));
+  renderProgressChart();
 });
 
 document.getElementById('metricChips').addEventListener('click', e=>{
@@ -1116,7 +1561,28 @@ document.getElementById('metricChips').addEventListener('click', e=>{
   selectedMetric = b.dataset.metric;
   writeUI(UI_KEYS.metric, selectedMetric);
   document.querySelectorAll('#metricChips .chip').forEach(c=> c.classList.toggle('active', c === b));
-  renderExerciseDetail();
+  renderProgressChart();
+});
+
+// a legend row is the show/hide switch for its line
+document.getElementById('progressionLegend').addEventListener('click', e=>{
+  const b = e.target.closest('[data-exkey]'); if(!b) return;
+  const k = b.dataset.exkey;
+  hiddenExKeys.has(k) ? hiddenExKeys.delete(k) : hiddenExKeys.add(k);
+  renderProgressChart();
+});
+
+document.getElementById('progressionChart').addEventListener('click', e=>{
+  const iso = nearestPlottedIso(e.clientX, e.currentTarget);
+  if(!iso) return;
+  focusIso = (focusIso === iso) ? null : iso;
+  renderProgressChart();
+});
+
+document.getElementById('sessionTable').addEventListener('click', e=>{
+  const row = e.target.closest('[data-rowiso]'); if(!row) return;
+  focusIso = (focusIso === row.dataset.rowiso) ? null : row.dataset.rowiso;
+  renderProgressChart();
 });
 
 document.getElementById('rangeChips').addEventListener('click', e=>{
@@ -1205,7 +1671,7 @@ window.addEventListener('resize', ()=>{
     // the debounce can outlive the document (navigation mid-timer), so don't
     // assume the panel is still there
     const panel = document.getElementById('panel-progress');
-    if(panel && !panel.hidden) renderExerciseDetail();
+    if(panel && !panel.hidden) renderProgressChart();
   }, 150);
 });
 
@@ -1218,7 +1684,8 @@ function restoreChip(containerSel, attr, value){
   btn.classList.add('active');
   return true;
 }
-if(!restoreChip('#metricChips', 'metric', selectedMetric)) selectedMetric = 'topW';
+if(!restoreChip('#metricChips',    'metric', selectedMetric)) selectedMetric = 'workW';
+if(!restoreChip('#progRangeChips', 'prange', progRange))      progRange      = '90';
 if(!restoreChip('#rangeChips',  'range',  selectedRange))  selectedRange  = '7';
 
 renderProgress();
