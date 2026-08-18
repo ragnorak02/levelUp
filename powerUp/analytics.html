@@ -220,7 +220,7 @@
   .ctl-row{display:flex; gap:6px; align-items:center; margin-bottom:6px}
   .ctl-row[hidden]{display:none}
   .ctl-row:last-of-type{margin-bottom:8px}
-  .ctl-row > .seg, .ctl-row > .sess-list{flex:1 1 auto; min-width:0}
+  .ctl-row > .seg{flex:1 1 auto; min-width:0}
 
   .seg{display:flex; gap:3px; background:#0a1016; padding:2px; border-radius:9px; border:1px solid var(--ring)}
   .seg button{
@@ -277,19 +277,29 @@
   .opt .o-name{font-weight:800; font-size:.9rem; flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .opt .o-meta{font-size:.72rem; color:var(--muted); font-weight:800; white-space:nowrap}
 
-  /* pick a past workout instead of a muscle group */
-  .sess-list{display:flex; flex-direction:column; gap:4px; max-height:132px; overflow-y:auto; -webkit-overflow-scrolling:touch}
-  .sess-row{
-    all:unset; cursor:pointer; display:flex; align-items:center; gap:8px; padding:.3rem .6rem;
-    border:1px solid var(--ring); border-radius:9px; background:#0e141b; min-height:30px;
+  /* one calendar week, arrows either side — pick a day to plot it */
+  .wk-arrow{
+    all:unset; cursor:pointer; flex:0 0 auto;
+    display:inline-flex; align-items:center; justify-content:center;
+    width:22px; height:30px; border:1px solid var(--ring); border-radius:8px;
+    color:var(--muted); font-size:.8rem;
   }
-  .sess-row.sel{border-color:var(--accent); background:linear-gradient(90deg, rgba(30,66,42,.55), #0e141b)}
-  .sess-when{font-weight:900; font-size:.78rem; flex:0 0 auto}
-  .sess-parts{
-    font-size:.7rem; color:var(--muted); font-weight:800; flex:1 1 auto; min-width:0;
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  .wk-arrow[disabled]{opacity:.3; cursor:default}
+  .wk-strip{flex:1 1 auto; min-width:0; display:grid; grid-template-columns:repeat(7,1fr); gap:3px}
+  .wk-day{
+    all:unset; cursor:pointer; height:30px; border-radius:7px; overflow:hidden;
+    border:1px solid var(--ring); background:#0e141b;
+    display:flex; align-items:center; justify-content:center;
+    font-size:.72rem; font-weight:900; color:var(--muted);
   }
-  .sess-meta{font-size:.68rem; color:var(--muted); font-weight:800; white-space:nowrap}
+  .wk-day.has{color:#0b1118}
+  .wk-day.rest{cursor:default}
+  .wk-day.future{opacity:.32}
+  .wk-day.today{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.5)}
+  .wk-day.sel{outline:2px solid var(--gold); outline-offset:1px}
+  .wk-legend{flex-wrap:wrap; gap:3px 9px; font-size:.62rem; font-weight:800; color:var(--muted)}
+  .wk-legend i{width:8px; height:8px; border-radius:3px; display:inline-block; margin-right:4px; vertical-align:middle}
+  .wk-when{font-weight:900; color:var(--ink)}
 
   /* one row per plotted exercise — tap to hide or show its line */
   .lg-list{display:flex; flex-direction:column; gap:6px; margin-top:10px}
@@ -355,8 +365,11 @@
       </div>
 
       <div class="ctl-row" id="sessionMode" hidden>
-        <div class="sess-list" id="sessionList"></div>
+        <button class="wk-arrow" id="weekPrev" type="button">←</button>
+        <div class="wk-strip" id="weekStrip"></div>
+        <button class="wk-arrow" id="weekNext" type="button">→</button>
       </div>
+      <div class="ctl-row wk-legend" id="weekLegend" hidden></div>
 
       <div class="ctl-row">
         <select class="mini-sel" id="rangeNum" aria-label="Range amount"></select>
@@ -941,18 +954,43 @@ function closePartSheet(){
   document.getElementById('partSheet').hidden = true;
 }
 
-/* ---------- session mode ---------- */
-function renderSessionList(){
-  const el = document.getElementById('sessionList');
-  if(!SESSION_DAYS.length){ el.innerHTML = '<div class="note">No workouts logged yet.</div>'; return; }
-  el.innerHTML = SESSION_DAYS.slice(0,14).map(d=>{
-    const wd = dateOf(d.date).toLocaleDateString(undefined, { weekday:'short' });
-    return `<button class="sess-row ${d.date === selectedSessionIso ? 'sel' : ''}" data-sessiso="${d.date}">
-      <span class="sess-when">${wd} ${mdOf(d.date)}</span>
-      <span class="sess-parts">${esc(dayPartNames(d).join(', ')) || '—'}</span>
-      <span class="sess-meta">${dayExKeys(d).length} ex</span>
-    </button>`;
+/* ---------- session mode: a single calendar week ---------- */
+const PART_SHORT = { Shoulders:'Shldr', Forearms:'Fore', Triceps:'Tri', Biceps:'Bi' };
+const shortPart  = p => PART_SHORT[p] || p;
+let weekStart = null;
+
+function focusWeekOn(iso){
+  weekStart = startOfWeek(dateOf(iso || TODAY_ISO));
+}
+
+function renderWeekStrip(){
+  if(!weekStart) focusWeekOn(selectedSessionIso || SESSION_DAYS[0]?.date);
+
+  const strip  = document.getElementById('weekStrip');
+  const legend = document.getElementById('weekLegend');
+  const seen   = new Map();                       // part -> colour, for the key below
+
+  strip.innerHTML = [...Array(7)].map((_,i)=>{
+    const iso   = isoOf(addDays(weekStart, i));
+    const day   = TRAINED.get(iso);
+    const parts = day ? dayParts(day) : [];       // [part, volume], biggest first
+    parts.forEach(([p])=> seen.set(p, partColor(p)));
+
+    const bg  = parts.length ? stripeBackground(parts, dayVolume(day)) : '';
+    const cls = ['wk-day', parts.length ? 'has' : 'rest',
+      iso > TODAY_ISO ? 'future' : '',
+      iso === TODAY_ISO ? 'today' : '',
+      iso === selectedSessionIso ? 'sel' : ''].filter(Boolean).join(' ');
+
+    return `<button class="${cls}" data-wkiso="${iso}"${bg ? ` style="background:${bg}"` : ''}>${dateOf(iso).getDate()}</button>`;
   }).join('');
+
+  const span = `${mdOf(isoOf(weekStart))}–${mdOf(isoOf(addDays(weekStart, 6)))}`;
+  const keys = [...seen.entries()].map(([p,c])=>
+    `<span><i style="background:${c}"></i>${esc(shortPart(p))}</span>`).join('');
+  legend.innerHTML = `<span class="wk-when">${span}</span>` + (keys || '<span>no workouts this week</span>');
+
+  document.getElementById('weekNext').disabled = isoOf(addDays(weekStart, 7)) > TODAY_ISO;
 }
 
 function selectSession(iso){
@@ -1120,8 +1158,9 @@ function renderProgress(){
   document.getElementById('muscleMode').hidden  = progMode !== 'muscle';
   document.getElementById('sessionMode').hidden = progMode !== 'session';
 
+  document.getElementById('weekLegend').hidden = progMode !== 'session';
   if(progMode === 'muscle'){ updatePartBtn(); updatePickerBtn(); }
-  else renderSessionList();
+  else renderWeekStrip();
 
   renderRangeControls();
   renderProgressChart();
@@ -1553,7 +1592,10 @@ document.querySelectorAll('.tab').forEach(t=>
 document.getElementById('progModeTabs').addEventListener('click', e=>{
   const b = e.target.closest('[data-pmode]'); if(!b) return;
   progMode = b.dataset.pmode;
-  if(progMode === 'session' && selectedSessionIso) selectSession(selectedSessionIso);
+  if(progMode === 'session'){
+    if(selectedSessionIso) selectSession(selectedSessionIso);
+    focusWeekOn(selectedSessionIso);
+  }
   persistProg();
   renderProgress();
 });
@@ -1609,11 +1651,22 @@ document.getElementById('exSheet').addEventListener('click', e=>{
   if(e.target.id === 'exSheet') closeExSheet();
 });
 
-document.getElementById('sessionList').addEventListener('click', e=>{
-  const b = e.target.closest('[data-sessiso]'); if(!b) return;
-  selectSession(b.dataset.sessiso);
+document.getElementById('weekPrev').addEventListener('click', ()=>{
+  weekStart = addDays(weekStart, -7);
+  renderWeekStrip();
+});
+document.getElementById('weekNext').addEventListener('click', ()=>{
+  weekStart = addDays(weekStart, 7);
+  renderWeekStrip();
+});
+
+document.getElementById('weekStrip').addEventListener('click', e=>{
+  const b = e.target.closest('[data-wkiso]');
+  if(!b || b.classList.contains('rest')) return;      // rest days have nothing to plot
+  selectSession(b.dataset.wkiso);
   persistProg();
-  renderProgress();
+  renderWeekStrip();
+  renderProgressChart();
 });
 
 ['rangeNum','rangeUnit'].forEach(id=>
