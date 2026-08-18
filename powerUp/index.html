@@ -62,7 +62,9 @@
 .workout-stats{display:flex; gap:14px; margin-top:4px}
 .wstat{display:flex; align-items:baseline; gap:5px; font-size:.82rem; color:var(--muted)}
 .wstat b{color:var(--ink); font-size:.95rem}
-  .ex-list{display:flex; flex-direction:column; gap:4px}
+  .ex-list{display:flex; flex-wrap:wrap; align-items:center; gap:5px 14px; padding:2px}
+  .mg-chip{display:inline-flex; align-items:center; gap:6px; font-size:.9rem; font-weight:700; color:var(--ink)}
+  .mg-chip i{width:9px; height:9px; border-radius:3px; display:inline-block}
   .cta-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px}
   .cta{
     all:unset; cursor:pointer; background:linear-gradient(90deg, var(--accent), #22c55e);
@@ -168,29 +170,8 @@
   .count{ position:absolute; bottom:6px; right:7px; font-size:var(--cal-count); color:var(--muted) }
 
 
-  /* Calendar muscle labels */
   .day.hasWorkout{ background:#0f141b; }
-  .muscles{
-    position:absolute;
-    left:7px;
-    right:7px;
-    bottom:6px;
-    display:flex;
-    flex-direction:column;
-    gap:2px;
-    font-size:.72rem;
-    line-height:1.05;
-    color:#e8eef6;
-    opacity:.95;
-    pointer-events:none;
-    text-shadow:0 1px 2px rgba(0,0,0,.55);
-  }
-  .muscle-line{
-    display:block;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
+  .day.hasWorkout .num{ text-shadow:0 1px 2px rgba(0,0,0,.6) }
   .legend.legend-muscle{flex-wrap:wrap; gap:8px 10px}
   .legend.legend-muscle .swatch{border-radius:4px}
 
@@ -212,34 +193,6 @@
   }
 
   /* Exercise list: 2-column rows */
-  .ex-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:7px 10px;
-    border:1px dashed #223143;
-    border-radius:8px;
-    background:#0f141b;
-  }
-  .ex-bp{
-    font-size:.88rem;
-    font-weight:650;
-    color:var(--muted);
-    display:flex;
-    align-items:center;
-    gap:5px;
-  }
-  .ex-bp .bp-dot{
-    width:8px; height:8px;
-    border-radius:3px;
-    display:inline-block;
-  }
-  .ex-name{
-    font-size:.88rem;
-    color:var(--ink);
-    text-align:right;
-  }
-
   #lastWorkoutCard { overflow-x: hidden; }
 
 
@@ -493,28 +446,41 @@ function renderWorkoutPanel(){
   title.textContent = isToday ? 'Today\'s Workout' : shortDate(selectedWorkoutDate);
   document.getElementById('lastVolume').textContent = totalVolume(workout).toLocaleString()+' lb';
   document.getElementById('lastMoves').textContent = workout.exercises.length;
-  // 2-column exercise rows
-  const exList = document.getElementById('exList');
-  exList.innerHTML = '';
-  const seen = new Set();
+  // one line of muscle groups, heaviest first — the exercise names are a tap
+  // away on the workout page and were costing six rows here
+  const vols = new Map();
   workout.exercises.forEach(ex=>{
-    const bp = ex.bodyPart || 'Other';
-    const name = ex.name || 'Exercise';
-    const key = bp + '|' + name;
-    if(seen.has(key)) return;
-    seen.add(key);
-    const row = document.createElement('div');
-    row.className = 'ex-row';
-    const bpLower = bp.toLowerCase();
-    const dotColor = bpLower.includes('chest') || bpLower.includes('pec') ? 'var(--mg-chest)' :
-                     bpLower.includes('back') || bpLower.includes('lat') ? 'var(--mg-back)' :
-                     bpLower.includes('leg') || bpLower.includes('quad') || bpLower.includes('ham') || bpLower.includes('glute') || bpLower.includes('calf') ? 'var(--mg-legs)' :
-                     bpLower.includes('shoulder') || bpLower.includes('delt') ? 'var(--mg-shoulders)' :
-                     'var(--muted)';
-    row.innerHTML = `<div class="ex-bp"><span class="bp-dot" style="background:${dotColor}"></span>${bp}</div><div class="ex-name">${name}</div>`;
-    exList.appendChild(row);
+    const group = muscleName(ex.bodyPart);
+    const vol = (ex.sets || []).reduce((sum,st)=>{
+      const reps = Number(st.reps) || 0, weight = Number(st.weight) || 0;
+      return sum + (reps > 0 && weight > 0 ? reps * weight : 0);
+    }, 0);
+    vols.set(group, (vols.get(group) || 0) + vol);
   });
+
+  document.getElementById('exList').innerHTML = [...vols.entries()]
+    .sort((a,b)=> b[1] - a[1])
+    .map(([group])=> `<span class="mg-chip"><i style="background:${muscleDot(group)}"></i>${group}</span>`)
+    .join('');
 }
+
+const MUSCLE_COLORS = {
+  Chest:'var(--mg-chest)', Back:'var(--mg-back)', Legs:'var(--mg-legs)',
+  Shoulders:'var(--mg-shoulders)', Triceps:'var(--mg-triceps)',
+  Biceps:'var(--mg-biceps)', Forearms:'var(--mg-forearms)'
+};
+function muscleName(raw){
+  const s = String(raw || '').toLowerCase();
+  if(s.includes('tricep')) return 'Triceps';
+  if(s.includes('bicep')) return 'Biceps';
+  if(s.includes('forearm') || s.includes('grip')) return 'Forearms';
+  if(s.includes('chest') || s.includes('pec')) return 'Chest';
+  if(s.includes('back') || s.includes('lat') || s.includes('row')) return 'Back';
+  if(s.includes('leg') || s.includes('quad') || s.includes('ham') || s.includes('glute') || s.includes('calf')) return 'Legs';
+  if(s.includes('shoulder') || s.includes('delt')) return 'Shoulders';
+  return String(raw || 'Other');
+}
+const muscleDot = n => MUSCLE_COLORS[n] || 'var(--muted)';
 
 /* FIX #1: Calendar - muscle-group view + properly highlight selected date */
 function renderCalendar(){
@@ -680,20 +646,6 @@ if(info.hasWorkout && ranked.length){
     num.className='num';
     num.textContent = day;
     cell.appendChild(num);
-
-    // Muscle labels (max 2 lines)
-    if(info.hasWorkout && top.length){
-      const wrap = document.createElement('div');
-      wrap.className = 'muscles';
-      const SHORT = { Shoulders:'Shldr', Forearms:'Fore', Triceps:'Tri', Biceps:'Bi' };
-      top.slice(0,2).forEach(k=>{
-        const line = document.createElement('div');
-        line.className = 'muscle-line';
-        line.textContent = SHORT[k] || k;
-        wrap.appendChild(line);
-      });
-      cell.appendChild(wrap);
-    }
 
     calGrid.appendChild(cell);
   }
