@@ -297,7 +297,7 @@
   .wk-day.future{opacity:.32}
   .wk-day.today{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.5)}
   .wk-day.sel{outline:2px solid var(--gold); outline-offset:1px}
-  .wk-legend{flex-wrap:wrap; gap:3px 9px; font-size:.62rem; font-weight:800; color:var(--muted)}
+  .wk-legend{flex-wrap:wrap; gap:3px 10px; font-size:.66rem; font-weight:800; color:var(--muted)}
   .wk-legend i{width:8px; height:8px; border-radius:3px; display:inline-block; margin-right:4px; vertical-align:middle}
   .wk-when{font-weight:900; color:var(--ink)}
 
@@ -351,6 +351,16 @@
         </div>
       </div>
 
+      <div class="ctl-row">
+        <select class="mini-sel" id="rangeNum" aria-label="Range amount"></select>
+        <select class="mini-sel" id="rangeUnit" aria-label="Range unit">
+          <option value="d">days</option>
+          <option value="w" selected>weeks</option>
+          <option value="m">months</option>
+        </select>
+        <button class="chip sm" id="rangeAll" type="button">All time</button>
+      </div>
+
       <div class="ctl-row" id="muscleMode">
         <button class="picker-btn" id="openPartPicker" type="button">
           <span>Muscles</span>
@@ -370,16 +380,6 @@
         <button class="wk-arrow" id="weekNext" type="button">→</button>
       </div>
       <div class="ctl-row wk-legend" id="weekLegend" hidden></div>
-
-      <div class="ctl-row">
-        <select class="mini-sel" id="rangeNum" aria-label="Range amount"></select>
-        <select class="mini-sel" id="rangeUnit" aria-label="Range unit">
-          <option value="d">days</option>
-          <option value="w" selected>weeks</option>
-          <option value="m">months</option>
-        </select>
-        <button class="chip sm" id="rangeAll" type="button">All time</button>
-      </div>
 
       <div class="chips ctl-row" id="metricChips">
         <button class="chip sm active" data-metric="workW">Working weight</button>
@@ -772,7 +772,8 @@ function drawMultiChart(canvas, seriesList, opts = {}){
 const UI_KEYS = {
   tab:'powerUp:analyticsTab', range:'powerUp:analyticsRange',
   mode:'powerUp:progMode', parts:'powerUp:progParts', exs:'powerUp:progExercises',
-  metric:'powerUp:progMetric', prange:'powerUp:progRange', sess:'powerUp:progSession'
+  metric:'powerUp:progMetric', prange:'powerUp:progRange',
+  prangeSess:'powerUp:progRangeSession', sess:'powerUp:progSession'
 };
 const readUI   = k => { try{ return localStorage.getItem(k); }catch{ return null; } };
 const writeUI  = (k,v) => { try{ localStorage.setItem(k,v); }catch{} };
@@ -823,7 +824,8 @@ let selectedExKeys     = readList(UI_KEYS.exs).filter(k=> EX_INDEX.has(k));
 let hiddenExKeys       = new Set();
 let selectedSessionIso = readUI(UI_KEYS.sess);
 let selectedMetric     = METRIC_DEFS[readUI(UI_KEYS.metric)] ? readUI(UI_KEYS.metric) : 'workW';
-let progRange          = readUI(UI_KEYS.prange) || '3m';
+const rangeKeyFor      = mode => mode === 'session' ? UI_KEYS.prangeSess : UI_KEYS.prange;
+let progRange          = readUI(rangeKeyFor(progMode)) || '3m';
 let focusIso           = null;
 let chartGeo           = null;
 let plottedDates       = [];
@@ -834,7 +836,7 @@ function persistProg(){
   writeUI(UI_KEYS.parts, JSON.stringify([...selectedParts]));
   writeUI(UI_KEYS.exs, JSON.stringify(selectedExKeys));
   writeUI(UI_KEYS.metric, selectedMetric);
-  writeUI(UI_KEYS.prange, progRange);
+  writeUI(rangeKeyFor(progMode), progRange);
   if(selectedSessionIso) writeUI(UI_KEYS.sess, selectedSessionIso);
 }
 
@@ -985,7 +987,11 @@ function renderWeekStrip(){
     return `<button class="${cls}" data-wkiso="${iso}"${bg ? ` style="background:${bg}"` : ''}>${dateOf(iso).getDate()}</button>`;
   }).join('');
 
-  const span = `${mdOf(isoOf(weekStart))}–${mdOf(isoOf(addDays(weekStart, 6)))}`;
+  const weekEnd = addDays(weekStart, 6);
+  const mon = d => d.toLocaleDateString(undefined, { month:'short' });
+  const span = weekStart.getMonth() === weekEnd.getMonth()
+    ? `${mon(weekStart)} ${weekStart.getDate()} – ${weekEnd.getDate()}`
+    : `${mon(weekStart)} ${weekStart.getDate()} – ${mon(weekEnd)} ${weekEnd.getDate()}`;
   const keys = [...seen.entries()].map(([p,c])=>
     `<span><i style="background:${c}"></i>${esc(shortPart(p))}</span>`).join('');
   legend.innerHTML = `<span class="wk-when">${span}</span>` + (keys || '<span>no workouts this week</span>');
@@ -1592,6 +1598,7 @@ document.querySelectorAll('.tab').forEach(t=>
 document.getElementById('progModeTabs').addEventListener('click', e=>{
   const b = e.target.closest('[data-pmode]'); if(!b) return;
   progMode = b.dataset.pmode;
+  progRange = readUI(rangeKeyFor(progMode)) || '3m';
   if(progMode === 'session'){
     if(selectedSessionIso) selectSession(selectedSessionIso);
     focusWeekOn(selectedSessionIso);
@@ -1672,7 +1679,7 @@ document.getElementById('weekStrip').addEventListener('click', e=>{
 ['rangeNum','rangeUnit'].forEach(id=>
   document.getElementById(id).addEventListener('change', ()=>{
     progRange = rangeFromControls();
-    writeUI(UI_KEYS.prange, progRange);
+    writeUI(rangeKeyFor(progMode), progRange);
     renderRangeControls();
     renderProgressChart();
   })
@@ -1680,7 +1687,7 @@ document.getElementById('weekStrip').addEventListener('click', e=>{
 
 document.getElementById('rangeAll').addEventListener('click', ()=>{
   progRange = parseRange(progRange) ? 'all' : rangeFromControls();
-  writeUI(UI_KEYS.prange, progRange);
+  writeUI(rangeKeyFor(progMode), progRange);
   renderRangeControls();
   renderProgressChart();
 });
