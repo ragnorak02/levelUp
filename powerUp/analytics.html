@@ -21,7 +21,7 @@
 
   /* ===== Header ===== */
   header{
-    padding:.6rem .8rem; border-bottom:1px solid var(--ring);
+    padding:.4rem .7rem; border-bottom:1px solid var(--ring);
     background:linear-gradient(180deg, rgba(11,15,20,.97), rgba(11,15,20,.82));
     backdrop-filter:blur(10px); position:sticky; top:0; z-index:30;
   }
@@ -29,21 +29,21 @@
   header h1{margin:0; font-size:1rem; letter-spacing:.2px; flex:1 1 auto; min-width:0}
   .home{all:unset; cursor:pointer; padding:.35rem .6rem; border-radius:.6rem; border:1px solid var(--ring); flex:0 0 auto}
 
-  .nav-tabs{display:flex; gap:3px; background:#0a1016; padding:4px; border-radius:12px; border:1px solid var(--ring); margin-top:8px}
+  .nav-tabs{display:flex; gap:3px; background:#0a1016; padding:3px; border-radius:12px; border:1px solid var(--ring); margin-top:5px}
   .tab{
     all:unset; cursor:pointer; flex:1 1 0; text-align:center;
-    padding:.55rem .4rem; border-radius:9px; font-size:.85rem; font-weight:700;
-    color:var(--muted); min-height:40px; display:flex; align-items:center; justify-content:center;
+    padding:.3rem .4rem; border-radius:8px; font-size:.8rem; font-weight:700;
+    color:var(--muted); min-height:30px; display:flex; align-items:center; justify-content:center;
   }
   .tab.active{background:var(--gradient-primary); color:#04130a}
 
-  .wrap{width:min(1100px,100%); margin-inline:auto; padding:12px; flex:1; display:flex; flex-direction:column; gap:12px}
+  .wrap{width:min(1100px,100%); margin-inline:auto; padding:10px; flex:1; display:flex; flex-direction:column; gap:10px}
   .tab-panel{display:flex; flex-direction:column; gap:12px}
   .tab-panel[hidden]{display:none}
 
   .card{
     background:var(--card); border:1px solid rgba(42,53,67,.7); border-radius:16px;
-    padding:14px; box-shadow:0 4px 20px rgba(0,0,0,.2);
+    padding:12px; box-shadow:0 4px 20px rgba(0,0,0,.2);
   }
   .card > h3{
     margin:0 0 .7rem; font-size:.72rem; color:var(--muted); font-weight:800;
@@ -71,7 +71,13 @@
     font-size:.8rem; font-weight:800; min-height:34px; display:inline-flex; align-items:center;
   }
   .chip.active{background:var(--accent); color:#04130a; border-color:var(--accent)}
-  .chip.sm{font-size:.75rem; padding:.3rem .6rem; min-height:30px}
+  .chip.sm{font-size:.72rem; padding:.2rem .55rem; min-height:26px}
+  .mini-sel{
+    flex:0 0 auto; padding:.2rem .3rem; border-radius:8px; border:1px solid var(--ring);
+    background:#0e141b; color:var(--ink); font-size:.75rem; font-weight:800; min-height:26px;
+  }
+  #rangeNum{width:4.2rem}
+  #rangeUnit{width:5.4rem}
 
   .picker{
     width:100%; padding:.7rem .8rem; border-radius:12px; border:1px solid var(--ring);
@@ -210,26 +216,27 @@
   .badge.stale{background:rgba(159,176,199,.1); color:var(--muted); border-color:var(--ring)}
 
   /* ===== Progress: mode switch, multi-select pickers, legend ===== */
-  .seg{display:flex; gap:3px; background:#0a1016; padding:3px; border-radius:11px; border:1px solid var(--ring)}
+  .card.tight{padding:10px}
+  .ctl-row{display:flex; gap:6px; align-items:center; margin-bottom:6px}
+  .ctl-row[hidden]{display:none}
+  .ctl-row:last-of-type{margin-bottom:8px}
+  .ctl-row > .seg, .ctl-row > .sess-list{flex:1 1 auto; min-width:0}
+
+  .seg{display:flex; gap:3px; background:#0a1016; padding:2px; border-radius:9px; border:1px solid var(--ring)}
   .seg button{
-    all:unset; cursor:pointer; flex:1 1 0; text-align:center; padding:.45rem .4rem; border-radius:9px;
-    font-size:.8rem; font-weight:800; color:var(--muted); min-height:36px;
+    all:unset; cursor:pointer; flex:1 1 0; text-align:center; padding:.24rem .4rem; border-radius:7px;
+    font-size:.76rem; font-weight:800; color:var(--muted); min-height:26px;
     display:flex; align-items:center; justify-content:center;
   }
   .seg button.active{background:var(--accent); color:#04130a}
 
-  .field-lbl{
-    font-size:.62rem; color:var(--muted); font-weight:800; text-transform:uppercase;
-    letter-spacing:.5px; margin:12px 0 5px;
-  }
-
   .picker-btn{
     all:unset; box-sizing:border-box; cursor:pointer; width:100%;
-    padding:.7rem .8rem; border-radius:12px; border:1px solid var(--ring);
-    background:#0e141b; color:var(--ink); font-size:.9rem; font-weight:800; min-height:46px;
-    display:flex; align-items:center; gap:8px;
+    padding:.3rem .55rem; border-radius:9px; border:1px solid var(--ring);
+    background:#0e141b; color:var(--ink); font-size:.78rem; font-weight:800; min-height:30px;
+    display:flex; align-items:center; gap:6px; flex:1 1 0; min-width:0;
   }
-  .picker-btn .pb-count{margin-left:auto; color:var(--muted); font-size:.78rem; font-weight:800}
+  .picker-btn .pb-count{margin-left:auto; color:var(--muted); font-size:.72rem; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .picker-btn .pb-chev{color:var(--muted); font-size:.7rem}
   .picker-btn[disabled]{opacity:.45; cursor:default}
 
@@ -251,6 +258,7 @@
   .sheet-foot{display:flex; align-items:center; gap:8px; padding-top:10px; border-top:1px solid var(--ring)}
   .sheet-foot .sf-count{font-size:.76rem; color:var(--muted); font-weight:800}
   .sheet-foot .btn-line{margin-left:auto}
+  #partFilters .chip{font-size:.82rem; padding:.4rem .8rem; min-height:38px}
   .sheet-part{
     font-size:.62rem; color:var(--muted); font-weight:800; text-transform:uppercase;
     letter-spacing:.5px; margin:10px 2px 4px;
@@ -270,18 +278,18 @@
   .opt .o-meta{font-size:.72rem; color:var(--muted); font-weight:800; white-space:nowrap}
 
   /* pick a past workout instead of a muscle group */
-  .sess-list{display:flex; flex-direction:column; gap:6px; max-height:236px; overflow-y:auto; -webkit-overflow-scrolling:touch}
+  .sess-list{display:flex; flex-direction:column; gap:4px; max-height:132px; overflow-y:auto; -webkit-overflow-scrolling:touch}
   .sess-row{
-    all:unset; cursor:pointer; display:flex; align-items:center; gap:9px; padding:.55rem .7rem;
-    border:1px solid var(--ring); border-radius:12px; background:#0e141b; min-height:44px;
+    all:unset; cursor:pointer; display:flex; align-items:center; gap:8px; padding:.3rem .6rem;
+    border:1px solid var(--ring); border-radius:9px; background:#0e141b; min-height:30px;
   }
   .sess-row.sel{border-color:var(--accent); background:linear-gradient(90deg, rgba(30,66,42,.55), #0e141b)}
-  .sess-when{font-weight:900; font-size:.85rem; flex:0 0 auto}
+  .sess-when{font-weight:900; font-size:.78rem; flex:0 0 auto}
   .sess-parts{
-    font-size:.74rem; color:var(--muted); font-weight:800; flex:1 1 auto; min-width:0;
+    font-size:.7rem; color:var(--muted); font-weight:800; flex:1 1 auto; min-width:0;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
-  .sess-meta{font-size:.72rem; color:var(--muted); font-weight:800; white-space:nowrap}
+  .sess-meta{font-size:.68rem; color:var(--muted); font-weight:800; white-space:nowrap}
 
   /* one row per plotted exercise — tap to hide or show its line */
   .lg-list{display:flex; flex-direction:column; gap:6px; margin-top:10px}
@@ -325,45 +333,45 @@
 
   <!-- ================= PROGRESS ================= -->
   <div class="tab-panel" id="panel-progress">
-    <section class="card">
-      <h3>Exercise progression</h3>
-
-      <div class="seg" id="progModeTabs">
-        <button type="button" data-pmode="muscle" class="active">By muscle</button>
-        <button type="button" data-pmode="session">By session</button>
+    <section class="card tight">
+      <div class="ctl-row">
+        <div class="seg" id="progModeTabs">
+          <button type="button" data-pmode="muscle" class="active">By muscle</button>
+          <button type="button" data-pmode="session">By session</button>
+        </div>
       </div>
 
-      <div id="muscleMode">
-        <div class="field-lbl">Muscle groups<span style="text-transform:none; letter-spacing:0"> — tap to combine</span></div>
-        <div class="chips" id="partFilters"></div>
-        <button class="picker-btn" id="openExPicker" type="button" style="margin-top:8px">
-          <span>Select exercises</span>
+      <div class="ctl-row" id="muscleMode">
+        <button class="picker-btn" id="openPartPicker" type="button">
+          <span>Muscles</span>
+          <span class="pb-count" id="partPickCount">none</span>
+          <span class="pb-chev">▾</span>
+        </button>
+        <button class="picker-btn" id="openExPicker" type="button">
+          <span>Exercises</span>
           <span class="pb-count" id="exPickCount">none</span>
           <span class="pb-chev">▾</span>
         </button>
       </div>
 
-      <div id="sessionMode" hidden>
-        <div class="field-lbl">Recent workouts<span style="text-transform:none; letter-spacing:0"> — plots every exercise from that day</span></div>
+      <div class="ctl-row" id="sessionMode" hidden>
         <div class="sess-list" id="sessionList"></div>
       </div>
 
-      <div class="field-lbl">Date range</div>
-      <div class="chips" id="progRangeChips">
-        <button class="chip sm" data-prange="7">1 week</button>
-        <button class="chip sm" data-prange="14">2 weeks</button>
-        <button class="chip sm" data-prange="30">1 month</button>
-        <button class="chip sm active" data-prange="90">3 months</button>
-        <button class="chip sm" data-prange="month">This month</button>
-        <button class="chip sm" data-prange="all">All time</button>
+      <div class="ctl-row">
+        <select class="mini-sel" id="rangeNum" aria-label="Range amount"></select>
+        <select class="mini-sel" id="rangeUnit" aria-label="Range unit">
+          <option value="d">days</option>
+          <option value="w" selected>weeks</option>
+          <option value="m">months</option>
+        </select>
+        <button class="chip sm" id="rangeAll" type="button">All time</button>
       </div>
 
-      <div class="field-lbl">Metric</div>
-      <div class="chips" id="metricChips">
+      <div class="chips ctl-row" id="metricChips">
         <button class="chip sm active" data-metric="workW">Working weight</button>
         <button class="chip sm" data-metric="best">Best set</button>
         <button class="chip sm" data-metric="topW">Top weight</button>
-        <button class="chip sm" data-metric="vol">Session volume</button>
       </div>
 
       <div class="chart-box"><canvas id="progressionChart"></canvas></div>
@@ -441,6 +449,16 @@
     <div class="note">Download writes every logged workout to a JSON file. Import only adds dates you don't already have — it never overwrites or deletes an existing day.</div>
   </section>
 </main>
+
+<div class="sheet-back" id="partSheet" hidden>
+  <div class="sheet">
+    <div class="sheet-head">
+      <b>Muscle groups</b>
+      <button class="mini-btn" id="partSheetDone" type="button">Done</button>
+    </div>
+    <div class="sheet-body"><div class="chips" id="partFilters"></div></div>
+  </div>
+</div>
 
 <div class="sheet-back" id="exSheet" hidden>
   <div class="sheet">
@@ -762,7 +780,7 @@ function dayExKeys(day){
   });
   return keys;
 }
-function dayParts(day){
+function dayPartNames(day){
   return [...new Set(day.exercises
     .filter(ex=> ex.sets.some(s=> s.weight > 0 && s.reps > 0))
     .map(ex=> ex.bodyPart))];
@@ -783,11 +801,6 @@ const METRIC_DEFS = {
     label:'Top weight', unit:'lb', pick:s=> s.topW,
     detail:s=> `× ${s.topR}`,
     blurb:'the heaviest weight touched'
-  },
-  vol: {
-    label:'Session volume', unit:'lb', pick:s=> s.vol,
-    detail:s=> `${s.setCount} sets`,
-    blurb:'every set added up'
   }
 };
 
@@ -797,7 +810,7 @@ let selectedExKeys     = readList(UI_KEYS.exs).filter(k=> EX_INDEX.has(k));
 let hiddenExKeys       = new Set();
 let selectedSessionIso = readUI(UI_KEYS.sess);
 let selectedMetric     = METRIC_DEFS[readUI(UI_KEYS.metric)] ? readUI(UI_KEYS.metric) : 'workW';
-let progRange          = readUI(UI_KEYS.prange) || '90';
+let progRange          = readUI(UI_KEYS.prange) || '3m';
 let focusIso           = null;
 let chartGeo           = null;
 let plottedDates       = [];
@@ -826,11 +839,43 @@ function seedProgDefaults(){
 }
 seedProgDefaults();
 
+const RANGE_NUMS = [1,2,3,4,5,6,8,10,12];
+const UNIT_DAYS  = { d:1, w:7, m:30 };
+
+// '2w' / '30d' / '3m' / 'all', with a migration for the old chip values
+function parseRange(v){
+  if(!v || v === 'all') return null;
+  const m = /^([0-9]+)([dwm])$/.exec(v);
+  if(m) return { n:+m[1], unit:m[2] };
+  if(v === 'month') return { n:1, unit:'m' };
+  const n = parseInt(v, 10);
+  if(!Number.isFinite(n)) return null;
+  if(n % 30 === 0) return { n:n/30, unit:'m' };
+  if(n % 7 === 0)  return { n:n/7,  unit:'w' };
+  return { n, unit:'d' };
+}
+
 function rangeCutoffIso(){
-  if(progRange === 'all') return null;
-  if(progRange === 'month'){ const d = new Date(TODAY); d.setDate(1); return isoOf(d); }
-  const n = parseInt(progRange, 10);
-  return Number.isFinite(n) ? isoOf(addDays(TODAY, -(n-1))) : null;
+  const r = parseRange(progRange);
+  if(!r) return null;
+  return isoOf(addDays(TODAY, -(r.n * UNIT_DAYS[r.unit] - 1)));
+}
+
+function renderRangeControls(){
+  const numSel  = document.getElementById('rangeNum');
+  const unitSel = document.getElementById('rangeUnit');
+  const allBtn  = document.getElementById('rangeAll');
+  const r = parseRange(progRange);
+
+  if(!numSel.options.length){
+    numSel.innerHTML = RANGE_NUMS.map(n=> `<option value="${n}">${n}</option>`).join('');
+  }
+  if(r){ numSel.value = String(r.n); unitSel.value = r.unit; }
+  allBtn.classList.toggle('active', !r);
+}
+
+function rangeFromControls(){
+  return document.getElementById('rangeNum').value + document.getElementById('rangeUnit').value;
 }
 
 function buildSeries(){
@@ -879,9 +924,21 @@ function updatePickerBtn(){
   const cnt  = document.getElementById('exPickCount');
   const pool = EX_LIST.filter(e=> selectedParts.has(e.bodyPart));
   btn.disabled = !pool.length;
-  cnt.textContent = !selectedParts.size
-    ? 'pick a muscle group first'
-    : `${selectedExKeys.length} of ${pool.length}`;
+  cnt.textContent = pool.length ? `${selectedExKeys.length}/${pool.length}` : 'none';
+}
+
+function updatePartBtn(){
+  const names = [...selectedParts].sort();
+  document.getElementById('partPickCount').textContent =
+    !names.length ? 'none' : (names.length <= 2 ? names.join(', ') : names.length + ' groups');
+}
+
+function openPartSheet(){
+  renderPartFilters();
+  document.getElementById('partSheet').hidden = false;
+}
+function closePartSheet(){
+  document.getElementById('partSheet').hidden = true;
 }
 
 /* ---------- session mode ---------- */
@@ -892,7 +949,7 @@ function renderSessionList(){
     const wd = dateOf(d.date).toLocaleDateString(undefined, { weekday:'short' });
     return `<button class="sess-row ${d.date === selectedSessionIso ? 'sel' : ''}" data-sessiso="${d.date}">
       <span class="sess-when">${wd} ${mdOf(d.date)}</span>
-      <span class="sess-parts">${esc(dayParts(d).join(', ')) || '—'}</span>
+      <span class="sess-parts">${esc(dayPartNames(d).join(', ')) || '—'}</span>
       <span class="sess-meta">${dayExKeys(d).length} ex</span>
     </button>`;
   }).join('');
@@ -903,7 +960,7 @@ function selectSession(iso){
   if(!day) return;
   selectedSessionIso = iso;
   selectedExKeys = dayExKeys(day);
-  selectedParts  = new Set(dayParts(day));
+  selectedParts  = new Set(dayPartNames(day));
   hiddenExKeys.clear();
   focusIso = iso;
 }
@@ -1063,9 +1120,10 @@ function renderProgress(){
   document.getElementById('muscleMode').hidden  = progMode !== 'muscle';
   document.getElementById('sessionMode').hidden = progMode !== 'session';
 
-  if(progMode === 'muscle'){ renderPartFilters(); updatePickerBtn(); }
+  if(progMode === 'muscle'){ updatePartBtn(); updatePickerBtn(); }
   else renderSessionList();
 
+  renderRangeControls();
   renderProgressChart();
 }
 
@@ -1500,11 +1558,21 @@ document.getElementById('progModeTabs').addEventListener('click', e=>{
   renderProgress();
 });
 
+document.getElementById('openPartPicker').addEventListener('click', openPartSheet);
+document.getElementById('partSheetDone').addEventListener('click', closePartSheet);
+document.getElementById('partSheet').addEventListener('click', e=>{
+  if(e.target.id === 'partSheet') closePartSheet();       // tapping off closes it
+});
+
+// muscle groups apply as you tap, with the chart updating behind the sheet
 document.getElementById('partFilters').addEventListener('click', e=>{
   const b = e.target.closest('[data-part]'); if(!b) return;
   togglePart(b.dataset.part);
   persistProg();
-  renderProgress();
+  renderPartFilters();
+  updatePartBtn();
+  updatePickerBtn();
+  renderProgressChart();
 });
 
 document.getElementById('openExPicker').addEventListener('click', ()=>{
@@ -1548,11 +1616,19 @@ document.getElementById('sessionList').addEventListener('click', e=>{
   renderProgress();
 });
 
-document.getElementById('progRangeChips').addEventListener('click', e=>{
-  const b = e.target.closest('[data-prange]'); if(!b) return;
-  progRange = b.dataset.prange;
+['rangeNum','rangeUnit'].forEach(id=>
+  document.getElementById(id).addEventListener('change', ()=>{
+    progRange = rangeFromControls();
+    writeUI(UI_KEYS.prange, progRange);
+    renderRangeControls();
+    renderProgressChart();
+  })
+);
+
+document.getElementById('rangeAll').addEventListener('click', ()=>{
+  progRange = parseRange(progRange) ? 'all' : rangeFromControls();
   writeUI(UI_KEYS.prange, progRange);
-  document.querySelectorAll('#progRangeChips .chip').forEach(c=> c.classList.toggle('active', c === b));
+  renderRangeControls();
   renderProgressChart();
 });
 
@@ -1685,7 +1761,6 @@ function restoreChip(containerSel, attr, value){
   return true;
 }
 if(!restoreChip('#metricChips',    'metric', selectedMetric)) selectedMetric = 'workW';
-if(!restoreChip('#progRangeChips', 'prange', progRange))      progRange      = '90';
 if(!restoreChip('#rangeChips',  'range',  selectedRange))  selectedRange  = '7';
 
 renderProgress();
