@@ -112,6 +112,25 @@
     margin:0 0 .3rem; color:var(--muted); font-size:.68rem;
     font-weight:800; text-transform:uppercase; letter-spacing:.6px;
   }
+  .sess-head{display:flex; align-items:flex-start; gap:8px; justify-content:space-between}
+  .sess-head .sess-label{flex:1 1 auto; min-width:0}
+  .copy-btn{
+    all:unset; cursor:pointer; white-space:nowrap; flex:0 0 auto;
+    font-size:.68rem; font-weight:900; letter-spacing:.4px; text-transform:uppercase;
+    color:#c7d2fe; border:1px solid var(--ring); background:#0e141b;
+    padding:.34rem .6rem; border-radius:999px;
+    min-height:30px; display:inline-flex; align-items:center; gap:5px;
+  }
+  .copy-btn:active{background:#16202b}
+  .copy-btn.ok{color:#4ade80; border-color:rgba(34,197,94,.45); background:#0d1a12}
+  .json-hint{color:var(--muted); font-size:.75rem; font-weight:700; margin:0 0 8px}
+  .json-box{
+    width:100%; box-sizing:border-box; height:46vh; resize:vertical;
+    background:#080d13; color:#cbd5e1; border:1px solid var(--ring); border-radius:10px;
+    padding:10px; white-space:pre; overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.72rem; line-height:1.45;
+  }
+
   .sess-block{margin-top:12px}
   .sess-block + .sess-block{border-top:1px solid rgba(42,53,67,.55); padding-top:10px}
 
@@ -413,7 +432,10 @@
 
 <main class="wrap">
   <section class="card" id="powerCard">
-    <h3 class="sess-label">Today's Volume</h3>
+    <div class="sess-head">
+      <h3 class="sess-label">Today's Volume</h3>
+      <button class="copy-btn" id="copyWorkout" title="Copy this workout as JSON">📋 Copy Workout</button>
+    </div>
     <div class="top">
       <div id="powerVal">0 lb</div>
       <div id="powerTrend">—</div>
@@ -517,6 +539,18 @@
     <button class="x" data-close="#historyPopup">✕</button>
     <h2 id="historyTitle" style="margin:6px 0 10px; font-size:1rem; color:#9fb0c7">Exercise History</h2>
     <div id="historyBody"></div>
+  </div>
+</div>
+
+<div class="popup" id="copyPopup">
+  <div class="sheet">
+    <button class="x" data-close="#copyPopup">✕</button>
+    <h2 style="margin:6px 0 6px; font-size:1rem; color:#9fb0c7">Workout JSON</h2>
+    <p class="json-hint">Tap the box to select it all, then copy and paste it into ChatGPT.</p>
+    <textarea class="json-box" id="copyJsonBox" readonly spellcheck="false"></textarea>
+    <div style="display:flex; gap:8px; margin-top:10px">
+      <button class="mini-btn" id="copyJsonAgain">Copy to clipboard</button>
+    </div>
   </div>
 </div>
 
@@ -1198,6 +1232,155 @@ function renderPowerCard(day){
   applyPowerTheme(vol);
 }
 
+/* =========================
+   Copy workout as JSON
+   A self-describing snapshot of one day: totals, muscle split, every set, and
+   the history each exercise is measured against — sized to paste straight into
+   a chat assistant. Read-only; never writes to the stored day.
+   ========================= */
+
+const COPY_BTN_LABEL = '📋 Copy Workout';
+
+const round1 = (n)=> Math.round((Number(n)||0) * 10) / 10;
+
+function sumSets(sets){
+  let reps = 0, vol = 0;
+  (sets||[]).forEach(s=>{
+    const w = Number(s.weight)||0, r = Number(s.reps)||0;
+    reps += r; vol += w * r;
+  });
+  return { reps, volume: Math.round(vol) };
+}
+
+function exportExercise(ex, iso){
+  const cs      = countedSets(ex);
+  const sum     = sumSets(cs);
+  const top     = topSetOf(ex);
+  const prior   = priorBests(ex.name, ex.bodyPart, iso);
+  const past    = scanExerciseSessions(ex.name, ex.bodyPart, iso);
+  const last    = past.length ? past[past.length-1] : null;
+  const lastSum = last ? sumSets(last.sets) : null;
+  const st      = prStatus(ex, iso);
+
+  return {
+    name: ex.name,
+    muscleGroup: ex.bodyPart || null,
+    completed: !!ex.finished,
+    sets: (ex.sets||[]).map((s, i)=>({
+      set: i + 1,
+      weightLb: Number(s.weight)||0,
+      reps: Number(s.reps)||0,
+      volumeLb: Math.round((Number(s.weight)||0) * (Number(s.reps)||0)),
+      completed: !!(ex.finished || s.done),
+      superset: !!s.superset
+    })),
+    totals: {
+      countedSets: cs.length,
+      reps: sum.reps,
+      volumeLb: sum.volume,
+      avgWeightPerRepLb: sum.reps ? round1(sum.volume / sum.reps) : 0,
+      topSet: { weightLb: top.weight, reps: top.reps }
+    },
+    personalRecordToday: st.any ? (st.weightPR ? 'weight' : (st.repPR ? 'reps' : 'volume')) : null,
+    history: {
+      priorSessionsLogged: prior.sessions,
+      priorBestSet: prior.topSet.weight
+        ? { weightLb: prior.topSet.weight, reps: prior.topSet.reps, date: prior.topSet.date }
+        : null,
+      priorBestSessionVolume: prior.bestVol.vol
+        ? { volumeLb: Math.round(prior.bestVol.vol), date: prior.bestVol.date }
+        : null,
+      previousSession: last
+        ? { date: last.date, sets: (last.sets||[]).length, reps: lastSum.reps, volumeLb: lastSum.volume }
+        : null
+    }
+  };
+}
+
+function buildWorkoutExport(day, iso){
+  const totals = totalsFiltered(day);
+
+  const byPart = {};
+  let totalReps = 0;
+  day.exercises.forEach(ex=>{
+    const p   = ex.bodyPart || 'Other';
+    const cs  = countedSets(ex);
+    const sum = sumSets(cs);
+    totalReps += sum.reps;
+    const b = byPart[p] || (byPart[p] = { muscleGroup:p, exercises:0, sets:0, reps:0, volumeLb:0 });
+    b.exercises++; b.sets += cs.length; b.reps += sum.reps; b.volumeLb += sum.volume;
+  });
+  const muscleGroups = Object.values(byPart)
+    .sort((a,b)=> b.volumeLb - a.volumeLb)
+    .map(b=> Object.assign(b, {
+      pctOfSessionVolume: totals.vol ? round1((b.volumeLb / totals.vol) * 100) : 0
+    }));
+
+  const similar = findLastSimilarWorkout(day, iso);
+
+  return {
+    source: 'LevelUp · Power Up workout log',
+    exportedAt: new Date().toISOString(),
+    units: { weight:'lb', volume:'lb — weight × reps, summed over sets' },
+    note: 'Only completed sets count toward volume totals; every logged set is listed with its own completed flag.',
+    workout: {
+      date: iso,
+      weekday: new Intl.DateTimeFormat('en-US', { weekday:'long' }).format(new Date(iso + 'T00:00:00')),
+      totals: {
+        exercises: totals.exCount,
+        loggedSets: day.exercises.reduce((n, ex)=> n + (ex.sets||[]).length, 0),
+        completedSets: totals.sets,
+        reps: totalReps,
+        volumeLb: Math.round(totals.vol),
+        avgWeightPerRepLb: totalReps ? round1(totals.vol / totalReps) : 0
+      },
+      muscleGroups,
+      comparedToLastSimilarSession: similar ? {
+        date: similar.date,
+        volumeLb: Math.round(similar.vol),
+        deltaVolumeLb: Math.round(totals.vol - similar.vol),
+        deltaPct: similar.vol ? round1(((totals.vol - similar.vol) / similar.vol) * 100) : null
+      } : null,
+      exercises: day.exercises.map(ex=> exportExercise(ex, iso))
+    }
+  };
+}
+
+/* Clipboard write, with the old execCommand path for browsers that refuse the
+   async API outside a secure context. */
+async function copyText(text){
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  }catch{}
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed; top:-1000px; left:0; opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  }catch{ return false; }
+}
+
+let copyFlashTimer = null;
+function flashCopyBtn(msg, ok){
+  const b = $('#copyWorkout'); if(!b) return;
+  clearTimeout(copyFlashTimer);
+  b.textContent = msg;
+  b.classList.toggle('ok', !!ok);
+  copyFlashTimer = setTimeout(()=>{
+    b.textContent = COPY_BTN_LABEL;
+    b.classList.remove('ok');
+  }, 1800);
+}
+
 function renderExercise(ex){
   const node = document.createElement('div');
   node.className = 'ex' + (ex.finished ? ' finished' : '') + (ex.copied ? ' copied' : '');
@@ -1342,7 +1525,7 @@ function refreshRowPR(row, ex, s){
 }
 
 function uid(){ return Math.random().toString(36).slice(2,9); }
-function openPopup(id){ $(id).style.display='flex'; if (id === '#bpPopup' || id === '#exPopup' || id === '#workoutPopup' || id === '#historyPopup') $('#totalsBar').classList.add('hidden'); }
+function openPopup(id){ $(id).style.display='flex'; if (id === '#bpPopup' || id === '#exPopup' || id === '#workoutPopup' || id === '#historyPopup' || id === '#copyPopup') $('#totalsBar').classList.add('hidden'); }
 function closePopup(id){ $(id).style.display='none'; $('#totalsBar').classList.remove('hidden'); }
 Array.from(document.querySelectorAll('.x')).forEach(btn=> btn.addEventListener('click', e=> closePopup(e.target.dataset.close)));
 
@@ -1381,6 +1564,28 @@ $('#addExercise').addEventListener('click', ()=>{
   });
   openPopup('#bpPopup');
 });
+$('#copyWorkout').addEventListener('click', async ()=>{
+  const day = loadDay(current);
+  if(!day.exercises.length){ flashCopyBtn('Nothing logged', false); return; }
+
+  const iso  = current.toISOString().slice(0,10);
+  const text = JSON.stringify(buildWorkoutExport(day, iso), null, 2);
+
+  if(await copyText(text)){
+    flashCopyBtn('✓ Copied', true);
+  }else{
+    $('#copyJsonBox').value = text;   // clipboard blocked — let them select it by hand
+    openPopup('#copyPopup');
+  }
+});
+
+$('#copyJsonBox').addEventListener('focus', (e)=> e.target.select());
+$('#copyJsonAgain').addEventListener('click', async (e)=>{
+  const ok = await copyText($('#copyJsonBox').value);
+  e.target.textContent = ok ? '✓ Copied' : 'Select the text above to copy';
+  setTimeout(()=>{ e.target.textContent = 'Copy to clipboard'; }, 1800);
+});
+
 $('#backToBP').addEventListener('click', ()=>{ closePopup('#exPopup'); openPopup('#bpPopup'); });
 $('#bpGrid').addEventListener('click', (e)=>{
   const bp=e.target.closest('.opt')?.dataset.bp; if(!bp) return;
