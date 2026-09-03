@@ -223,11 +223,32 @@
   .ex.dragging{opacity:.6; transform:scale(.995)}
   .ex.drop-over{outline:2px solid #2dd4bf}
 
-  .ex-header{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
+  .ex-header{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:nowrap}
   .ex-name{font-weight:700}
   .tag{font-size:.9rem; color:var(--muted)}
   .sets{display:grid; gap:6px}
   .ex-actions-bottom{display:flex; gap:8px; margin-top:4px; justify-content:space-between; align-items:center}
+
+  /* Complete / History ride on the exercise name line - that row had the
+     vertical space to spare, and the buttons stay reachable when collapsed. */
+  .ex-title{flex:1 1 auto; min-width:0}
+  .ex-title .tag{font-size:.82rem}
+  .ex-head-actions{display:flex; align-items:center; gap:6px; flex:0 0 auto}
+  /* Narrow enough to share the name row, still a 40px tap target. */
+  .btn-complete,.btn-undo,.btn-icon{
+    all:unset; cursor:pointer; box-sizing:border-box;
+    display:inline-flex; align-items:center; justify-content:center;
+    min-height:40px; padding:0 .7rem; border-radius:10px;
+    font-weight:800; font-size:.82rem; white-space:nowrap;
+  }
+  .btn-complete{background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a}
+  .btn-undo{color:#fbbf24; border:1px solid rgba(251,191,36,.5); background:rgba(251,191,36,.08)}
+  .btn-icon{min-width:40px; padding:0 .4rem; font-size:.95rem; border:1px solid var(--ring); color:#9fb0c7}
+  .btn-complete:active,.btn-undo:active,.btn-icon:active{opacity:.75}
+
+  /* Started but not finished - floated to the top of In Progress with a rail
+     down the side so you can spot where you left off. */
+  .ex.started{border-style:solid; border-color:#2b4a63; box-shadow:inset 3px 0 0 var(--accent)}
 
   /* transparent border/padding on every row so the PR state doesn't shift layout */
   .set-row{
@@ -617,7 +638,15 @@ function setCollapsedBulk(pairs){
 }
 
 function blankDay(date){ return { date: date.toISOString().slice(0,10), exercises:[] }; }
-function loadDay(date){ const raw = localStorage.getItem(keyFor(date)); return raw ? JSON.parse(raw) : blankDay(date); }
+/* `finished` locks a card read-only, `completed` decides which section it sits
+   in - they move together. Data written before Undo cleared `finished` can be
+   locked while still listed under In Progress; unstick it on read. */
+function loadDay(date){
+  const raw = localStorage.getItem(keyFor(date));
+  const day = raw ? JSON.parse(raw) : blankDay(date);
+  (day.exercises||[]).forEach(ex=>{ if(ex.finished && !ex.completed) ex.finished = false; });
+  return day;
+}
 function saveDay(day){
   localStorage.setItem(`powerUp:${day.date}`, JSON.stringify(day));
   historyScanCache.clear();   // stored history changed — drop memoised scans
@@ -1088,15 +1117,24 @@ function renderCompletedGroups(list){
 }
 
 
+/* Any set ticked Done means this is the exercise being worked right now. */
+function isStarted(ex){ return (ex.sets||[]).some(s=> !!s.done); }
+
 function renderSuperGroup(containerSel, superSel, list){
   const container = $(containerSel);
   container.innerHTML = '';
 
   const groups = list.reduce((m,o)=>((m[o.bodyPart]??=[]).push(o),m),{});
-  const bodyPartsSorted = Object.keys(groups).sort();
+  // Started work rises to the top: the body part you're mid-way through leads
+  // the list, and inside it the started exercises come before the untouched
+  // ones. Six exercises queued at the start of a session stay findable.
+  const startRank = bp => groups[bp].some(isStarted) ? 0 : 1;
+  const bodyPartsSorted = Object.keys(groups)
+    .sort((a,b)=> startRank(a) - startRank(b) || a.localeCompare(b));
 
   bodyPartsSorted.forEach(bp=>{
-    const exList = groups[bp];
+    const exList = groups[bp].slice()
+      .sort((a,b)=> (isStarted(a)?0:1) - (isStarted(b)?0:1));
     if(!exList.length) return;
 
     const g = document.createElement('div');
@@ -1381,7 +1419,8 @@ function flashCopyBtn(msg, ok){
 
 function renderExercise(ex){
   const node = document.createElement('div');
-  node.className = 'ex' + (ex.finished ? ' finished' : '') + (ex.copied ? ' copied' : '');
+  node.className = 'ex' + (ex.finished ? ' finished' : '') + (ex.copied ? ' copied' : '')
+    + (!ex.finished && isStarted(ex) ? ' started' : '');
   node.dataset.id = ex.id;
   node.setAttribute('tabindex','0');
 
@@ -1397,23 +1436,18 @@ function renderExercise(ex){
     node.innerHTML = `
       <div class="ex-header" data-act="toggleCExercise">
         <span class="ex-chev">▼</span>
-        <div style="flex:1 1 auto; min-width:0">
+        <div class="ex-title">
           <div class="ex-name">${esc(ex.name)}${copiedText}</div>
-          <div class="tag">${ex.sets.length} set(s) • ${Math.round(vol).toLocaleString()} lb • avg ${Math.round(avg)} lb/rep</div>
+          <div class="tag">${ex.sets.length} set${ex.sets.length===1?"":"s"} • ${Math.round(vol).toLocaleString()} lb • ${Math.round(avg)} lb/rep</div>
+        </div>
+        <div class="ex-head-actions">
+          <button class="btn-undo" data-act="markComplete" title="Reopen for editing">↩ Undo</button>
+          <button class="btn-icon" data-act="viewHistory" title="History" aria-label="History">📊</button>
         </div>
       </div>
 
       <div class="ex-body">
         <div class="sets"></div>
-
-        <div class="ex-actions-bottom">
-          <div style="display:flex; gap:8px; flex-wrap:wrap">
-            <button class="btn" style="padding:.6rem 1.2rem; background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a" data-act="markComplete">
-              ${ex.completed ? 'Completed ✓' : 'Complete'}
-            </button>
-            <button class="btn-ghost btn-small" data-act="viewHistory">📊 History</button>
-          </div>
-        </div>
       </div>
     `;
 
@@ -1439,9 +1473,13 @@ function renderExercise(ex){
   // ---------- In-progress exercise ----------
   node.innerHTML = `
     <div class="ex-header" data-act="toggleExercise">
-      <div>
+      <div class="ex-title">
         <div class="ex-name">${ex.name}${copiedText}</div>
-        <div class="tag">${ex.sets.length} set(s) • ${Math.round(vol).toLocaleString()} lb • avg ${Math.round(avg)} lb/rep</div>
+        <div class="tag">${ex.sets.length} set${ex.sets.length===1?"":"s"} • ${Math.round(vol).toLocaleString()} lb • ${Math.round(avg)} lb/rep</div>
+      </div>
+      <div class="ex-head-actions">
+        <button class="btn-complete" data-act="markComplete">Complete</button>
+        <button class="btn-icon" data-act="viewHistory" title="History" aria-label="History">📊</button>
       </div>
     </div>
 
@@ -1450,12 +1488,6 @@ function renderExercise(ex){
     <div class="ex-actions-bottom">
       <div>
         <button class="btn-ghost btn-small" data-act="addSet">+ Set</button>
-
-        <button class="btn" style="padding:.6rem 1.2rem; background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a" data-act="markComplete">
-          ${ex.completed ? 'Completed ✓' : 'Complete'}
-        </button>
-
-        <button class="btn-ghost btn-small" data-act="viewHistory">📊 History</button>
       </div>
 
       <div style="display:flex; gap:8px">
@@ -1702,6 +1734,10 @@ document.addEventListener('click', (e)=>{
       ex.finished = true;
       ex.sets.forEach(s=>{ s.done=true; s.copied=false; });
       ex.copied=false;
+    }else{
+      // Undo hands the card back editable - a mistyped weight is the whole
+      // reason to reopen one. The sets stay ticked Done; they were performed.
+      ex.finished = false;
     }
     saveDay(day); render(); return;
   }
