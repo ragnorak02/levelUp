@@ -741,6 +741,9 @@ body{
 .xp-up small{color:var(--muted); font-size:10px; font-weight:800}
 
 /* Bowling: live scorer */
+.bs-season{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 0 8px}
+.bs-season > span{color:var(--muted); font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.5px; margin-right:2px}
+.bs-season .chip{padding:4px 8px; font-size:11px}
 .bs-tiles{display:flex; gap:6px}
 .bs-tile{
   all:unset; cursor:pointer; flex:1; min-width:0; text-align:center;
@@ -749,10 +752,11 @@ body{
   display:flex; flex-direction:column; gap:1px;
 }
 .bs-tile small{color:var(--muted); font-size:10px; font-weight:900}
-.bs-tile b{font-size:18px; font-weight:1000}
+.bs-tile b{font-size:15px; font-weight:1000}
 .bs-tile.on{border-color: rgba(59,130,246,.6); background: rgba(59,130,246,.14)}
 .bs-tile.live small{color:#86efac}
 .bs-tile.add{border-style:dashed; color:var(--muted)}
+.bs-tile.series{cursor:default; border-color: rgba(168,85,247,.4); background: rgba(168,85,247,.10)}
 
 .bs-sheet{display:grid; grid-template-columns:repeat(9, 1fr) 1.4fr; gap:2px; margin-top:8px}
 .bs-frame{
@@ -760,6 +764,9 @@ body{
   border-radius:6px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
   padding:1px 2px 2px;
 }
+.bs-frame.tap{all:unset; box-sizing:border-box; cursor:pointer; display:flex; flex-direction:column; align-items:stretch; min-width:0;
+  border-radius:6px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); padding:1px 2px 2px}
+.bs-frame.tap:active{background: rgba(255,255,255,.10)}
 .bs-frame.cur{border-color: rgba(59,130,246,.7); background: rgba(59,130,246,.12)}
 .bs-fn{font-size:8px; color:var(--muted); font-weight:900; line-height:1.2}
 .bs-marks{display:flex; justify-content:flex-end; gap:1px; min-height:13px}
@@ -789,10 +796,19 @@ body{
 .bs-btn.hit{background: linear-gradient(90deg, #f59e0b, #fbbf24); color:#1a1205}
 .bs-btn.ghost{background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); color:var(--ink); font-size:12px; padding:7px 6px}
 .bs-btn[disabled]{opacity:.35; cursor:default}
-.bs-btn-row{display:flex; gap:6px}
-.bs-btn-row .bs-btn{flex:1}
-.bs-hint{font-size:10px; color:var(--muted); font-weight:800}
-.bs-done{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; font-weight:900; color:var(--muted)}
+.bs-pair{display:flex; gap:6px}
+.bs-pair .bs-btn{flex:1; min-width:0; padding:8px 4px}
+.bs-btn.spare{background: linear-gradient(90deg, #0ea5e9, #38bdf8); color:#04121c}
+.bs-pad{display:grid; grid-template-columns:repeat(5, 1fr); gap:4px}
+.bs-num{
+  all:unset; box-sizing:border-box; cursor:pointer; text-align:center;
+  padding:6px 0; border-radius:8px; font-weight:1000; font-size:14px;
+  background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+}
+.bs-num:active{background: rgba(255,255,255,.14)}
+.bs-num[disabled]{opacity:.25; cursor:default}
+.bs-done{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:10px; font-weight:900; color:var(--muted)}
+.bs-done span{font-size:11px}
 .bs-done b{font-size:24px; color:var(--ink)}
 
 /* Bowling summary card */
@@ -800,7 +816,7 @@ body{
 .bowl-label span{text-transform:none; letter-spacing:0; font-weight:800}
 .bowl-games-row{display:flex; gap:8px; flex-wrap:wrap}
 .bowl-game-box{
-  min-width:62px; padding:8px 10px; border-radius:12px; text-align:center;
+  flex:1; min-width:0; padding:8px 10px; border-radius:12px; text-align:center;
   background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10);
   display:flex; flex-direction:column; gap:2px;
 }

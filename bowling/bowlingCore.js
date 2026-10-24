@@ -237,6 +237,23 @@
     return game;
   }
 
+  /* Replace one frame's balls (re-entering a frame after the fact) and
+     re-score the game. Returns the game. */
+  function setFrameShots(week, gameIndex, frameIndex, shots){
+    const game = week.games[gameIndex];
+    if(!game || !game.frames[frameIndex]) return game;
+    game.frames[frameIndex].shots = shots.map(s => Object.assign({}, s, { pinsLeft: [...(s.pinsLeft || [])] }));
+    if(isGameComplete(game)){
+      game.score = getFinalScore(game);
+      game.completedDate = game.completedDate || new Date().toISOString().slice(0, 10);
+    }else if(!game.imported){
+      game.score = null;
+      game.completedDate = null;
+    }
+    saveWeek(week);
+    return game;
+  }
+
   /* Take back the last ball recorded in a game. */
   function undoShot(week, gameIndex){
     const game = week.games[gameIndex];
@@ -315,7 +332,7 @@
     standingBefore, pinsKnocked, isFrameComplete, calculateGameScore,
     isGameComplete, isGameDone, getFinalScore, getRunningScore, shotDisplay,
     getAllPins, getAvailablePins, currentPosition,
-    recordShot, undoShot, startGame,
+    recordShot, undoShot, startGame, setFrameShots,
     listAllWeekKeys, getAllCompletedGames,
     archiveSeason, listArchivedWeeks
   };
