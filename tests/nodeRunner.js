@@ -31,6 +31,8 @@ require('./testSuiteAggregation.js');
 require('./testSuiteUI.js');
 require('../powerUp/sessionSummary.js');
 require('./testSuiteSessionSummary.js');
+require('../powerUp/workoutXP.js');
+require('./testSuiteWorkoutXP.js');
 
 // Run
 const result = window.TestFramework.runAllSuites();

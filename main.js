@@ -8,7 +8,11 @@ const KEY_TRANSFORMS = 'levelUp:transformCount';
 const KEY_EX_RESET_AT = 'levelUp:exerciseResetAt';
 const todayISO = new Date().toISOString().slice(0,10);
 
-/* ===== Exercise Threshold ===== */
+/* ===== Exercise Threshold =====
+   Level progress is a percentage: workouts earn their share via
+   powerUp/workoutXP.js (~25% for a typical session). Bowling and garden
+   still produce raw volume, converted at EX_MAX volume = one level. */
+const LEVEL_PCT = 100;
 const EX_MAX = 50000;
 
 /* ===== Finance Threshold (for Fin vertical bar only) ===== */
@@ -170,19 +174,12 @@ function getExerciseResetAt(){
   return (v && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? v : '1900-01-01';
 }
 
-function volumeSince(isoDate){
-  const all = getAllWorkouts();
-  let total = 0;
-  all.forEach(day => {
-    if(day.date > isoDate){
-      total += dayTotals(day).volume;
-    }
-  });
-  // Include bowling scores as exercise volume
-  total += bowlingVolumeSince(isoDate);
-  // Include garden XP as exercise volume
-  total += gardenVolumeSince(isoDate);
-  return Math.round(total);
+/* Level-% earned after `isoDate`: scored workouts, plus bowling and garden
+   volume converted at EX_MAX per level. */
+function powerSince(isoDate){
+  const workouts = window.WorkoutXP ? WorkoutXP.pctSince(isoDate) : 0;
+  const otherVolume = bowlingVolumeSince(isoDate) + gardenVolumeSince(isoDate);
+  return workouts + (otherVolume / EX_MAX) * LEVEL_PCT;
 }
 
 function flashTransform(){
@@ -198,8 +195,8 @@ function flashTransform(){
 }
 
 function doExerciseTransform(){
-  const exPower = volumeSince(getExerciseResetAt());
-  if(exPower < EX_MAX) return;
+  const exPower = powerSince(getExerciseResetAt());
+  if(exPower < LEVEL_PCT) return;
 
   setLevel(getLevel() + 1);
   setTransformCount(getTransformCount() + 1);
@@ -1872,20 +1869,20 @@ function renderTop(){
 }
 
 function renderModulesAndCharacter(){
-  const exPower = volumeSince(getExerciseResetAt());
+  const exPower = powerSince(getExerciseResetAt());
 
   // Thin level bar (replaces old power strip)
-  setWidth('levelFill', pct(exPower, EX_MAX));
+  setWidth('levelFill', pct(exPower, LEVEL_PCT));
 
   // Stacked: everything before today, with today's gain glowing on top
   const yesterday = new Date(todayISO + 'T00:00:00Z');
   yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-  const exToday = Math.min(exPower, volumeSince(yesterday.toISOString().slice(0,10)));
-  const exBase = pct(exPower - exToday, EX_MAX);
+  const exToday = Math.min(exPower, powerSince(yesterday.toISOString().slice(0,10)));
+  const exBase = pct(exPower - exToday, LEVEL_PCT);
   setHeight('modExFill', exBase);
   const todayFill = $('modExToday');
   if(todayFill){
-    const h = pct(exPower, EX_MAX) - exBase;
+    const h = pct(exPower, LEVEL_PCT) - exBase;
     todayFill.style.bottom = exBase.toFixed(1) + '%';
     todayFill.style.height = h.toFixed(1) + '%';
     todayFill.classList.toggle('on', h > 0);
@@ -1899,7 +1896,7 @@ function renderModulesAndCharacter(){
   const nutTargets = loadNutritionTargets();
   setHeight('modNutFill', pct(lastNutritionCal, nutTargets.dailyCalories));
 
-  const ready = exPower >= EX_MAX && EX_MAX > 0;
+  const ready = exPower >= LEVEL_PCT;
   const btn = $('exTransform');
 
   if(btn){
@@ -2004,8 +2001,8 @@ function bindButtons(){
   const exTransform = $('exTransform');
   if(exTransform){
     exTransform.addEventListener('click', () => {
-      const exPower = volumeSince(getExerciseResetAt());
-      if(exPower >= EX_MAX){
+      const exPower = powerSince(getExerciseResetAt());
+      if(exPower >= LEVEL_PCT){
         doExerciseTransform();
       } else {
         // Play power-up animation preview, then reset to idle
