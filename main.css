@@ -45,9 +45,24 @@ body{
 }
 .dash-top{
   display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+/* Portrait | bars. The portrait sets the height; the bars stretch to it. */
+.dash-hero{
+  display:flex;
   gap:8px;
   align-items:stretch;
 }
+/* Level | calendar | carousel, full width under the portrait and bars */
+.dash-strip{
+  display:flex;
+  gap:8px;
+  align-items:stretch;
+}
+.dash-strip .level-block{flex:1 1 0; min-width:0; justify-content:center;}
+.dash-strip .qicon{flex:0 0 auto; height:auto; min-height:44px;}
+.dash-strip .mini-carousel{flex:1.25 1 0; min-width:0;}
 .card{
   background: var(--card);
   border: 1px solid var(--ring);
@@ -175,6 +190,10 @@ body{
   font-size:14px;
   color:var(--muted);
   margin-left:2px;
+  min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .level-row-bar{
   display:flex;
@@ -372,11 +391,11 @@ body{
 .travel-c-title{font-weight:950; font-size:12px;}
 .travel-c-sub{color:var(--muted); font-size:10px; font-weight:800;}
 
-/* Quick icon row (calendar, recipes, medicine) */
+/* Quick icon row (recipes, medicine) */
 .quick-icons{
   display:flex;
   gap:8px;
-  justify-content:center;
+  justify-content:flex-start;
 }
 .qicon{
   all:unset;
@@ -451,7 +470,7 @@ body{
   background: rgba(255,255,255,.04);
   position:relative;
   overflow:hidden;
-  min-height: 160px;
+  min-height:0;   /* never taller than the portrait beside it */
 }
 .vfill{
   position:absolute;
@@ -503,15 +522,6 @@ body{
   .vfill-today.ex, .vfill-today.ex::before{ animation:none }
 }
 
-.abbr{
-  text-align:center;
-  font-weight:1000;
-  letter-spacing:.6px;
-  font-size:13px;
-  color: var(--ink);
-  padding-top:2px;
-  user-select:none;
-}
 
 /* Finance card */
 .finance-card{
@@ -1543,8 +1553,6 @@ body{
   .modules-grid{gap:6px;}
   .modv{padding:8px 4px; gap:6px;}
   .micon{width:30px; height:30px; font-size:14px; border-radius:10px;}
-  .vbar{min-height:120px;}
-  .abbr{font-size:11px;}
   .nbar-val{width:70px;}
   .cal-cell{min-height:34px;}
   .cal-num{font-size:11px;}
@@ -1559,5 +1567,4 @@ body{
 }
 @media (max-width: 360px){
   .modules-grid{gap:4px}
-  .vbar{min-height:100px}
 }

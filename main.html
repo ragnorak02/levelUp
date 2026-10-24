@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Level Up — Dashboard</title>
 
-  <link rel="stylesheet" href="./main.css?v=20261024c" />
+  <link rel="stylesheet" href="./main.css?v=20261024e" />
   <link rel="stylesheet" href="./powerUp/sessionSummary.css?v=20261024d" />
 
   <!-- Chart.js (CDN) for donut chart -->
@@ -23,110 +23,110 @@
   <main class="wrap">
     <!-- TOP DASHBOARD ROW -->
     <section class="dash-top">
-      <!-- LEFT: Character -->
-      <div class="card character-card">
-        <div class="card-inner">
-          <div class="character-frame" id="characterFrame">
-            <div class="avatar-badge" title="Character icon">⚡</div>
-            <div class="aura" aria-hidden="true"></div>
-            <img
-              class="character-gif"
-              src="https://giffiles.alphacoders.com/220/220162.gif"
-              alt="Character GIF"
-            />
-          </div>
-
-          <div class="level-block">
-            <div class="level-row-title">
-              <button class="level-bolt-btn" id="exTransform" title="Power Up!">⚡</button>
-              <span class="level-label">Lv</span>
-              <span class="level-num" id="levelNum">1</span>
-              <span class="level-name" id="levelName">Novice</span>
-            </div>
-            <div class="level-row-bar">
-              <div class="level-bar"><div class="level-fill" id="levelFill"></div></div>
-              <span class="level-bar-badge" id="levelBadge">🛡️</span>
+      <div class="dash-hero">
+        <!-- LEFT: Character -->
+        <div class="card character-card">
+          <div class="card-inner">
+            <div class="character-frame" id="characterFrame">
+              <div class="avatar-badge" title="Character icon">⚡</div>
+              <div class="aura" aria-hidden="true"></div>
+              <img
+                class="character-gif"
+                src="https://giffiles.alphacoders.com/220/220162.gif"
+                alt="Character GIF"
+              />
             </div>
           </div>
+        </div>
 
-          <div class="mini-carousel" id="miniCarousel">
-            <button class="carousel-arrow carousel-arrow-left" id="carouselPrev" type="button" aria-label="Previous">&#9664;</button>
-            <div class="carousel-track" id="carouselTrack">
-              <div class="carousel-slide">
-                <a class="bowl-compact" href="./bowling/index.html">
-                  <span class="bowl-icon">🎳</span>
-                  <span class="bowl-info">
-                    <span class="bowl-title">Bowl</span>
-                    <span class="bowl-avg" id="bowlAvg"></span>
-                  </span>
-                  <div class="bowl-scores" id="bowlRecent" style="display:none;"></div>
-                </a>
+        <!-- RIGHT: Modules (tap a bar to show its card, again to open it) -->
+        <div class="card modules-card">
+          <div class="card-inner">
+            <div class="modules-grid" aria-label="Modules">
+              <div class="modv" id="modExercise" data-module="exercise">
+                <div class="vbar"><div class="vfill ex" id="modExFill"></div><div class="vfill-today ex" id="modExToday"></div></div>
+                <div class="modv-top"><a class="micon ex" href="./powerUp/index.html" title="Open Exercise module">💪</a></div>
               </div>
-              <div class="carousel-slide">
-                <a class="garden-compact" href="./garden/index.html">
-                  <span class="garden-icon">🌱</span>
-                  <span class="garden-info">
-                    <span class="garden-title">Garden</span>
-                    <span class="garden-sub" id="gardenSub"></span>
-                  </span>
-                  <div class="garden-status" id="gardenStatus"></div>
-                </a>
+
+              <div class="modv" id="modStudy" data-module="study">
+                <div class="vbar"><div class="vfill study" id="modStudyFill"></div></div>
+                <div class="modv-top"><a class="micon study" href="./study/studyHome.html" title="Open Study module">📘</a></div>
               </div>
-              <div class="carousel-slide">
-                <a class="travel-compact" href="./travel/index.html">
-                  <span class="travel-c-icon">✈️</span>
-                  <span class="travel-c-info">
-                    <span class="travel-c-title">Travel</span>
-                    <span class="travel-c-sub" id="travelCompactSub"></span>
-                  </span>
-                </a>
+
+              <div class="modv" id="modFin" data-module="finance">
+                <div class="vbar"><div class="vfill fin" id="modFinFill"></div></div>
+                <div class="modv-top"><a class="micon fin" href="./finances/index.html" title="Open Finances module">💰</a></div>
+              </div>
+
+              <div class="modv" id="modNutrition" data-module="nutrition">
+                <div class="vbar"><div class="vfill nut" id="modNutFill"></div></div>
+                <div class="modv-top"><a class="micon nut" href="./nutrition/index.html" title="Open Nutrition module">🍎</a></div>
               </div>
             </div>
-            <button class="carousel-arrow carousel-arrow-right" id="carouselNext" type="button" aria-label="Next">&#9654;</button>
-            <div class="carousel-dots" id="carouselDots">
-              <span class="carousel-dot active" data-slide="0"></span>
-              <span class="carousel-dot" data-slide="1"></span>
-              <span class="carousel-dot" data-slide="2"></span>
-            </div>
-          </div>
-
-          <div class="quick-icons">
-            <button class="qicon" id="calToggleBtn" title="Toggle Calendar">📅</button>
-            <button class="qicon" id="recipesToggleBtn" title="Recipes">🍳</button>
-            <button class="qicon" id="medToggleBtn" title="Medicine">💊</button>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT: Modules (tap to navigate) -->
-      <div class="card modules-card">
-        <div class="card-inner">
-          <div class="modules-grid" aria-label="Modules">
-            <div class="modv" id="modExercise" data-module="exercise">
-              <div class="modv-top"><a class="micon ex" href="./powerUp/index.html" title="Open Exercise module">💪</a></div>
-              <div class="vbar"><div class="vfill ex" id="modExFill"></div><div class="vfill-today ex" id="modExToday"></div></div>
-              <div class="abbr">Str</div>
-            </div>
-
-            <div class="modv" id="modStudy" data-module="study">
-              <div class="modv-top"><a class="micon study" href="./study/studyHome.html" title="Open Study module">📘</a></div>
-              <div class="vbar"><div class="vfill study" id="modStudyFill"></div></div>
-              <div class="abbr">Wis</div>
-            </div>
-
-            <div class="modv" id="modFin" data-module="finance">
-              <div class="modv-top"><a class="micon fin" href="./finances/index.html" title="Open Finances module">💰</a></div>
-              <div class="vbar"><div class="vfill fin" id="modFinFill"></div></div>
-              <div class="abbr">Fin</div>
-            </div>
-
-            <div class="modv" id="modNutrition" data-module="nutrition">
-              <div class="modv-top"><a class="micon nut" href="./nutrition/index.html" title="Open Nutrition module">🍎</a></div>
-              <div class="vbar"><div class="vfill nut" id="modNutFill"></div></div>
-              <div class="abbr">Nut</div>
-            </div>
+      <!-- Level | calendar | bowling/garden/travel carousel -->
+      <div class="dash-strip">
+        <div class="level-block">
+          <div class="level-row-title">
+            <button class="level-bolt-btn" id="exTransform" title="Power Up!">⚡</button>
+            <span class="level-label">Lv</span>
+            <span class="level-num" id="levelNum">1</span>
+            <span class="level-name" id="levelName">Novice</span>
+          </div>
+          <div class="level-row-bar">
+            <div class="level-bar"><div class="level-fill" id="levelFill"></div></div>
+            <span class="level-bar-badge" id="levelBadge">🛡️</span>
           </div>
         </div>
+        <button class="qicon" id="calToggleBtn" title="Toggle Calendar">📅</button>
+        <div class="mini-carousel" id="miniCarousel">
+          <button class="carousel-arrow carousel-arrow-left" id="carouselPrev" type="button" aria-label="Previous">&#9664;</button>
+          <div class="carousel-track" id="carouselTrack">
+            <div class="carousel-slide">
+              <a class="bowl-compact" href="./bowling/index.html">
+                <span class="bowl-icon">🎳</span>
+                <span class="bowl-info">
+                  <span class="bowl-title">Bowl</span>
+                  <span class="bowl-avg" id="bowlAvg"></span>
+                </span>
+                <div class="bowl-scores" id="bowlRecent" style="display:none;"></div>
+              </a>
+            </div>
+            <div class="carousel-slide">
+              <a class="garden-compact" href="./garden/index.html">
+                <span class="garden-icon">🌱</span>
+                <span class="garden-info">
+                  <span class="garden-title">Garden</span>
+                  <span class="garden-sub" id="gardenSub"></span>
+                </span>
+                <div class="garden-status" id="gardenStatus"></div>
+              </a>
+            </div>
+            <div class="carousel-slide">
+              <a class="travel-compact" href="./travel/index.html">
+                <span class="travel-c-icon">✈️</span>
+                <span class="travel-c-info">
+                  <span class="travel-c-title">Travel</span>
+                  <span class="travel-c-sub" id="travelCompactSub"></span>
+                </span>
+              </a>
+            </div>
+          </div>
+          <button class="carousel-arrow carousel-arrow-right" id="carouselNext" type="button" aria-label="Next">&#9654;</button>
+          <div class="carousel-dots" id="carouselDots">
+            <span class="carousel-dot active" data-slide="0"></span>
+            <span class="carousel-dot" data-slide="1"></span>
+            <span class="carousel-dot" data-slide="2"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-icons">
+        <button class="qicon" id="recipesToggleBtn" title="Recipes">🍳</button>
+        <button class="qicon" id="medToggleBtn" title="Medicine">💊</button>
       </div>
     </section>
 
