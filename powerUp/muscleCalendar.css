@@ -1,0 +1,56 @@
+/* MuscleCalendar styles — shared by powerUp/index.html and workout.html.
+   Scoped under .mcal so either page's own .day / .legend rules can't clash. */
+
+.mcal{
+  --ink:#e8eef6; --muted:#9fb0c7; --ring:#2a3543; --accent-2:#2dd4bf;
+  --cal-gap:4px; --cal-radius:10px; --cal-font:.9rem;
+  --mg-chest: rgba(255, 59, 48, .72);      /* bright red */
+  --mg-back: rgba(0, 122, 255, .72);       /* strong blue */
+  --mg-legs: rgba(52, 199, 89, .72);       /* vibrant green */
+  --mg-shoulders: rgba(175, 82, 222, .72); /* rich purple */
+  --mg-triceps: rgba(255, 149, 0, .72);    /* orange */
+  --mg-biceps: rgba(88, 86, 214, .72);     /* indigo */
+  --mg-forearms: rgba(0, 199, 190, .72);   /* teal */
+  color:var(--ink);
+}
+
+.mcal .cal-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px}
+.mcal .cal-header h3{margin:0; font-size:1rem; color:var(--muted)}
+.mcal .cal-nav{display:flex; align-items:center; gap:8px}
+.mcal .cal-nav button{
+  all:unset;
+  cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center;
+  width:2.2rem; height:2rem; padding:0;
+  border:1px solid var(--ring);
+  border-radius:8px;
+  font-size:.9rem;
+  color:var(--muted);
+}
+.mcal .cal-nav button:hover{background:rgba(255,255,255,0.05)}
+
+.mcal .legend{display:flex; flex-wrap:wrap; gap:8px 10px; color:var(--muted); font-size:.85rem}
+.mcal .legend .swatch{width:10px; height:10px; border-radius:4px; display:inline-block; border:1px solid #233446}
+
+.mcal .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:var(--cal-gap); margin-top:6px}
+.mcal .dow{font-size:.78rem; color:var(--muted); text-align:center; padding:3px 0}
+.mcal .day{
+  aspect-ratio:1/1; border:1px solid var(--ring); border-radius:var(--cal-radius);
+  position:relative; background:#0f141b; cursor:pointer;
+  min-height:44px;
+}
+.mcal .day:hover{background:#1a1f26}
+.mcal .day.muted{opacity:.45; cursor:default}
+.mcal .day.muted:hover{background:#0f141b}
+.mcal .day.future{opacity:.5}
+.mcal .day.future .num{color:var(--muted)}
+.mcal .day.today{outline:2px solid var(--accent-2)}
+.mcal .day.selected{outline:2px solid #3b82f6; outline-offset:-2px; background:#1a2f4a}
+.mcal .day.hasWorkout .num{text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.mcal .num{position:absolute; top:6px; left:7px; font-size:var(--cal-font); line-height:1; color:var(--ink)}
+
+@media (max-width: 480px){
+  .mcal{--cal-font:.85rem}
+  .mcal .legend{font-size:.8rem}
+  .mcal .day{border-radius:8px}
+}

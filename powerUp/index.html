@@ -4,11 +4,11 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Power Up!</title>
+<link rel="stylesheet" href="muscleCalendar.css" />
 <style>
   :root{
     --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7; --accent:#4CAF50; --accent-2:#2dd4bf;
     --ring:#2a3543; --warn:#f59e0b; --good:#22c55e; --bad:#ef4444;
-    --cal-gap:4px; --cal-radius:10px; --cal-font:.9rem; --cal-count:.8rem;
     --mg-chest: rgba(255, 59, 48, .72); /* bright red */
     --mg-back: rgba(0, 122, 255, .72); /* strong blue */
     --mg-legs: rgba(52, 199, 89, .72); /* vibrant green */
@@ -130,7 +130,7 @@
     align-items:center;
     gap:8px;
   }
-  .nav-btn, .cal-nav button{
+  .nav-btn{
     all:unset;
     cursor:pointer;
     display:inline-flex; align-items:center; justify-content:center;
@@ -145,36 +145,6 @@
 
   /* calendar (compact + half width on desktop) */
   .calendar{grid-column: span 6}
-  .calendar h3{margin:0; font-size:1rem; color:var(--muted)}
-  .legend{display:flex; gap:10px; color:var(--muted); font-size:.85rem}
-  .legend .swatch{width:10px; height:10px; border-radius:4px; display:inline-block; border:1px solid #233446}
-  .cal-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px}
-  .cal-nav{display:flex; align-items:center; gap:8px}
-  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:var(--cal-gap); margin-top:6px}
-  .dow{font-size:.78rem; color:var(--muted); text-align:center; padding:3px 0}
-  .day{
-    aspect-ratio:1/1; border:1px solid var(--ring); border-radius:var(--cal-radius);
-    position:relative; background:#0f141b; cursor:pointer;
-    min-height:44px;
-  }
-  .day:hover{background:#1a1f26}
-  .day.muted{opacity:.45; cursor:default}
-  .day.future{opacity:.5}
-  .day.future .num{color:var(--muted)}
-  .day.muted:hover{background:#0f141b}
-  .day.done{ background:#16a34a }
-  .day.today{outline:2px solid var(--accent-2)}
-  /* FIX #1: Change .selected to use blue highlight instead of today */
-  .day.selected{outline:2px solid #3b82f6; outline-offset:-2px; background:#1a2f4a}
-  .num{ position:absolute; top:6px; left:7px; font-size:var(--cal-font); line-height:1; color:var(--ink) }
-  .count{ position:absolute; bottom:6px; right:7px; font-size:var(--cal-count); color:var(--muted) }
-
-
-  .day.hasWorkout{ background:#0f141b; }
-  .day.hasWorkout .num{ text-shadow:0 1px 2px rgba(0,0,0,.6) }
-  .legend.legend-muscle{flex-wrap:wrap; gap:8px 10px}
-  .legend.legend-muscle .swatch{border-radius:4px}
-
 
   /* responsive (fit on one mobile screen) */
   @media (max-width: 980px){
@@ -186,10 +156,7 @@
     .wrap{gap:8px; padding:8px 8px 12px}
     .card{padding:10px; border-radius:12px}
     .val{font-size:1.4rem}
-    .legend{font-size:.8rem}
     .calendar .card{padding:8px}
-    .day{border-radius:8px}
-    :root{ --cal-font:.85rem; --cal-count:.7rem }
   }
 
   /* Exercise list: 2-column rows */
@@ -270,30 +237,12 @@
       </article>
 
       <!-- Calendar -->
-      <section class="card calendar" id="calendar">
-        <div class="cal-header">
-          <h3 id="calTitle">—</h3>
-          <div class="cal-nav">
-            <button id="calPrev">←</button>
-            <button id="calNext">→</button>
-          </div>
-        </div>
-
-        <div class="legend legend-muscle">
-          <span><i class="swatch" style="background:var(--mg-chest)"></i> Chest</span>
-          <span><i class="swatch" style="background:var(--mg-back)"></i> Back</span>
-          <span><i class="swatch" style="background:var(--mg-legs)"></i> Legs</span>
-          <span><i class="swatch" style="background:var(--mg-shoulders)"></i> Shldr</span>
-          <span><i class="swatch" style="background:var(--mg-triceps)"></i> Tri</span>
-          <span><i class="swatch" style="background:var(--mg-biceps)"></i> Bi</span>
-          <span><i class="swatch" style="background:var(--mg-forearms)"></i> Fore</span>
-</div>
-        <div class="cal-grid" id="calDOW"></div>
-        <div class="cal-grid" id="calGrid"></div>
-      </section>
+      <!-- powerUp/muscleCalendar.js -->
+      <section class="card calendar" id="calendar"></section>
     </section>
   </div>
 
+<script src="muscleCalendar.js"></script>
 <script>
 /* ========= Load data ========= */
 const today = new Date();
@@ -303,9 +252,6 @@ const isoLocal = d =>
   `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const todayISO = isoLocal(today);
 const fmt = (d)=>new Date(d+'T00:00:00');
-
-// Calendar navigation state
-let currentCalendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
 // Selected workout date (defaults to today)
 let selectedWorkoutDate = todayISO;
@@ -482,174 +428,16 @@ function muscleName(raw){
 }
 const muscleDot = n => MUSCLE_COLORS[n] || 'var(--muted)';
 
-/* FIX #1: Calendar - muscle-group view + properly highlight selected date */
-function renderCalendar(){
-  const calTitle = document.getElementById('calTitle');
-  const calGrid  = document.getElementById('calGrid');
-  const calDOW   = document.getElementById('calDOW');
-
-  // DOW header
-  calDOW.innerHTML = '';
-  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{
-    const e = document.createElement('div');
-    e.className='dow'; e.textContent = d; calDOW.appendChild(e);
-  });
-
-  const year = currentCalendarMonth.getFullYear();
-  const month = currentCalendarMonth.getMonth();
-  const monthStart = new Date(year, month, 1);
-  const monthEnd   = new Date(year, month+1, 0);
-  calTitle.textContent = monthStart.toLocaleDateString(undefined, {month:'long', year:'numeric'});
-
-  // --- Muscle mapping ---
-  const muscleKey = (raw)=>{
-  const s = String(raw||'').toLowerCase();
-  if(s.includes('chest') || s.includes('pec')) return 'Chest';
-  if(s.includes('back') || s.includes('lat') || s.includes('row')) return 'Back';
-  if(s.includes('leg') || s.includes('quad') || s.includes('ham') || s.includes('glute') || s.includes('calf')) return 'Legs';
-  if(s.includes('shoulder') || s.includes('delt')) return 'Shoulders';
-  if(s.includes('tricep')) return 'Triceps';
-  if(s.includes('bicep')) return 'Biceps';
-  if(s.includes('forearm') || s.includes('grip')) return 'Forearms';
-  return null;
-};
-
-
-  const muscleBg = (key)=>{
-  switch(key){
-    case 'Chest': return 'var(--mg-chest)';
-    case 'Back': return 'var(--mg-back)';
-    case 'Legs': return 'var(--mg-legs)';
-    case 'Shoulders': return 'var(--mg-shoulders)';
-    case 'Triceps': return 'var(--mg-triceps)';
-    case 'Biceps': return 'var(--mg-biceps)';
-    case 'Forearms': return 'var(--mg-forearms)';
-    default: return '';
+/* Muscle-group calendar — shared with the workout page (muscleCalendar.js) */
+const calendar = MuscleCalendar.create(document.getElementById('calendar'), {
+  selected: ()=> selectedWorkoutDate,
+  onSelect: (iso)=>{
+    selectedWorkoutDate = iso;
+    renderWorkoutPanel();
+    renderCalendar();
   }
-};
-
-
-  // A day that trained more than one group shows every colour as diagonal
-  // stripes, each slice sized by that group's share of the day's volume.
-  const muscleStripes = (entries)=>{
-    if(!entries.length) return '';
-    if(entries.length === 1) return muscleBg(entries[0][0]);
-
-    const CYCLE = Math.max(18, entries.length * 10);
-    const total = entries.reduce((sum,[,v])=> sum + v, 0) || 1;
-
-    let widths = entries.map(([,v])=> Math.max(4, (v/total) * CYCLE));
-    const sum  = widths.reduce((a,b)=> a+b, 0);
-    widths = widths.map(w=> (w * CYCLE) / sum);
-
-    let pos = 0;
-    const stops = entries.map(([k],i)=>{
-      const start = pos, end = pos + widths[i];
-      pos = end;
-      return `${muscleBg(k)} ${start.toFixed(2)}px ${end.toFixed(2)}px`;
-    });
-    return `repeating-linear-gradient(45deg, ${stops.join(', ')})`;
-  };
-
-  // day -> { hasWorkout:boolean, vols: Map(muscle->volume) }
-  const byDay = new Map();
-
-  workouts.forEach(w=>{
-    const d = fmt(w.date);
-    if(d.getFullYear()!==year || d.getMonth()!==month) return;
-
-    const dayNum = d.getDate();
-    if(!byDay.has(dayNum)){
-      byDay.set(dayNum, { hasWorkout:false, vols:new Map() });
-    }
-    const info = byDay.get(dayNum);
-
-    // Completion: at least one set with any meaningful values OR any exercises exist
-    let anyLogged = false;
-
-    (w.exercises||[]).forEach(ex=>{
-      const mk = muscleKey(ex.bodyPart);
-      if(!mk) return;
-      (ex.sets||[]).forEach(st=>{
-        const reps = Number(st.reps)||0;
-        const weight = Number(st.weight)||0;
-        if(reps>0 || weight>0) anyLogged = true;
-
-        const vol = reps>0 && weight>0 ? (reps*weight) : 0;
-        if(vol>0){
-          info.vols.set(mk, (info.vols.get(mk)||0) + vol);
-        }
-      });
-    });
-
-    if((w.exercises||[]).length>0) anyLogged = true;
-    if(anyLogged) info.hasWorkout = true;
-  });
-
-  // Build grid
-  calGrid.innerHTML = '';
-  const leadingBlanks = monthStart.getDay();
-
-  // Previous month dates (muted)
-  for(let i = leadingBlanks - 1; i >= 0; i--){
-    const prevDate = new Date(year, month, -i);
-    const cell = document.createElement('div');
-    cell.className = 'day muted';
-    const num = document.createElement('div');
-    num.className = 'num';
-    num.textContent = prevDate.getDate();
-    cell.appendChild(num);
-    calGrid.appendChild(cell);
-  }
-
-  // Current month dates
-  for(let day=1; day<=monthEnd.getDate(); day++){
-    const cell = document.createElement('div');
-
-    const cellDate = new Date(year, month, day);
-    const cellDateStr = isoLocal(cellDate);
-
-    const info = byDay.get(day) || { hasWorkout:false, vols:new Map() };
-
-    // every group trained that day, biggest share first
-    const ranked = [...info.vols.entries()]
-      .sort((a,b)=> (b[1]||0) - (a[1]||0))
-      .filter(([,v])=> (v||0) > 0)
-      .slice(0,3);
-    const top = ranked.map(([k])=> k);
-
-    // Classes (selected/today)
-    let state = info.hasWorkout ? 'hasWorkout' : '';
-    if(cellDateStr === selectedWorkoutDate) state += ' selected';
-    if(day===today.getDate() && month===today.getMonth() && year===today.getFullYear() && cellDateStr !== selectedWorkoutDate) state += ' today';
-    if(cellDateStr > todayISO) state += ' future';
-
-    cell.className = `day ${state}`.trim();
-
-    // Background tint based on PRIMARY muscle group (solid color)
-if(info.hasWorkout && ranked.length){
-  cell.style.background = muscleStripes(ranked);
-} else {
-  cell.style.background = '';
-}
-
-
-    // Click behavior (same as before)
-    cell.addEventListener('click', () => {
-      selectedWorkoutDate = cellDateStr;
-      renderWorkoutPanel();
-      renderCalendar();
-    });
-
-    // Day number
-    const num = document.createElement('div');
-    num.className='num';
-    num.textContent = day;
-    cell.appendChild(num);
-
-    calGrid.appendChild(cell);
-  }
-}
+});
+function renderCalendar(){ calendar.render(); }
 
 
 /* In-progress detection */
@@ -700,17 +488,6 @@ document.getElementById('nextWorkout').addEventListener('click', () => {
     renderWorkoutPanel();
     renderCalendar();
   }
-});
-
-// Calendar navigation
-document.getElementById('calPrev').addEventListener('click', () => {
-  currentCalendarMonth = new Date(currentCalendarMonth.getFullYear(), currentCalendarMonth.getMonth() - 1, 1);
-  renderCalendar();
-});
-
-document.getElementById('calNext').addEventListener('click', () => {
-  currentCalendarMonth = new Date(currentCalendarMonth.getFullYear(), currentCalendarMonth.getMonth() + 1, 1);
-  renderCalendar();
 });
 
 /* Init */

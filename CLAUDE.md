@@ -11,6 +11,8 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 │   ├── workout.html          ← Log workout (query: ?date=YYYY-MM-DD)
 │   ├── sessionSummary.js/.css← Day summary (volume card, totals, In Progress/Completed,
 │   │                            history + copy-JSON popups) — shared with the dashboard
+│   ├── muscleCalendar.js/.css← Muscle-group colour-coded month calendar — shared by
+│   │                            index.html and workout.html's calendar popup
 │   └── analytics.html        ← Workout history & stats
 ├── study/                    ← Flashcards with spaced repetition
 │   ├── studyHome.html        ← Module entry point
@@ -63,6 +65,7 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 - **Finance dataLoader**: IIFE with `'use strict'`
 - **Garden module**: IIFE with `'use strict'` — `GardenDataManager` class for data layer, `GardenApp` for UI; exposed via `window.GardenDataManager` and `window.GardenConstants`
 - **Workout summary** (`powerUp/sessionSummary.js`): IIFE exposing `window.SessionSummary`. Both `workout.html` and the dashboard's Exercise card render through `SessionSummary.create(root, opts).render(day, iso)` — edit the summary there, never in either page. Dashboard uses `readOnly: true` + `memoryCollapse()` (always opens folded); styles are scoped under `.session-summary` / `.ss-popup`
+- **Workout calendar** (`powerUp/muscleCalendar.js`): IIFE exposing `window.MuscleCalendar.create(root, { selected, onSelect })`; reads `powerUp:YYYY-MM-DD` records itself. Used by `powerUp/index.html` and the workout page's 📅 popup — change it there, not per page. Styles scoped under `.mcal`
 - **No ES module imports** — all scripts use global scope or window attachment
 
 ### CSS
