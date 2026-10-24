@@ -722,8 +722,10 @@ function listBowlingWeekKeys(){
 
 function bowlingVolumeSince(isoDate){
   let total = 0;
-  listBowlingWeekKeys().forEach(k => {
-    const week = safeParse(k);
+  // archived seasons still count toward the level — a new season shouldn't lower it
+  const weeks = listBowlingWeekKeys().map(k => safeParse(k))
+    .concat(window.BowlingCore ? BowlingCore.listArchivedWeeks() : []);
+  weeks.forEach(week => {
     if(!week || !Array.isArray(week.games)) return;
     week.games.forEach(g => {
       if(g.score != null && g.completedDate && g.completedDate > isoDate){
@@ -744,21 +746,6 @@ function getBowlingAverage(){
     });
   });
   return count > 0 ? Math.round(total / count) : null;
-}
-
-function getLastNBowlingGames(n){
-  const games = [];
-  listBowlingWeekKeys().forEach(k => {
-    const week = safeParse(k);
-    if(!week || !Array.isArray(week.games)) return;
-    week.games.forEach(g => {
-      if(g.score != null){
-        games.push({ score: g.score, date: g.completedDate || week.weekId });
-      }
-    });
-  });
-  games.sort((a, b) => (a.date > b.date ? -1 : a.date < b.date ? 1 : 0));
-  return games.slice(0, n);
 }
 
 /* Every scored game, newest first, with its week for grouping series. */
@@ -977,7 +964,7 @@ function renderBowlStats(){
   `).join('');
 
   body.innerHTML = `
-    <div class="bowl-label">Career · ${games.length} game${games.length === 1 ? '' : 's'}</div>
+    <div class="bowl-label">Season · ${games.length} game${games.length === 1 ? '' : 's'}</div>
     <div class="summary">${chips}</div>
     <div class="bowl-label">Latest series</div>
     <div class="bowl-games-row">${latestHtml}</div>
@@ -998,11 +985,13 @@ function renderBowlDashboard(){
 
   const recentEl = $('bowlRecent');
   if(recentEl){
-    const games = getLastNBowlingGames(3);
+    // the latest night's games, labelled by the order they were bowled
+    const all = getAllBowlingGames();
+    const games = all.length ? all.filter(g => g.weekId === all[0].weekId).sort((a, b) => a.order - b.order).slice(-3) : [];
     if(games.length){
       recentEl.style.display = 'flex';
-      recentEl.innerHTML = games.map((g, i) =>
-        `<div class="bowl-game"><div class="bg-score">${g.score}</div><div class="bg-label">G${games.length - i}</div></div>`
+      recentEl.innerHTML = games.map(g =>
+        `<div class="bowl-game"><div class="bg-score">${g.score}</div><div class="bg-label">G${g.order + 1}</div></div>`
       ).join('');
     } else {
       recentEl.style.display = 'none';

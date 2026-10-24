@@ -12,6 +12,7 @@
   'use strict';
 
   const STORAGE_PREFIX = 'bowling:week:';
+  const ARCHIVE_PREFIX = 'bowling:archive:';   // one key per archived season
   const ALL_PINS = [1,2,3,4,5,6,7,8,9,10];
   const MAX_GAMES_PER_WEEK = 3;
 
@@ -282,14 +283,40 @@
     return games;
   }
 
+  /* ---------- Seasons ----------
+     Starting a new season moves every week into one archive record instead
+     of deleting it, so an old season can always be brought back. */
+
+  function archiveSeason(){
+    const keys = listAllWeekKeys();
+    if(!keys.length) return 0;
+    const weeks = keys.map(k => safeParse(k)).filter(Boolean)
+      .sort((a, b) => (a.weekId < b.weekId ? -1 : 1));
+    const archivedAt = new Date().toISOString();
+    localStorage.setItem(ARCHIVE_PREFIX + archivedAt, JSON.stringify({ archivedAt, weeks }));
+    keys.forEach(k => localStorage.removeItem(k));
+    return weeks.length;
+  }
+
+  /* Weeks from every archived season, oldest season first. */
+  function listArchivedWeeks(){
+    const keys = [];
+    for(let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(k && k.startsWith(ARCHIVE_PREFIX)) keys.push(k);
+    }
+    return keys.sort().flatMap(k => (safeParse(k) || {}).weeks || []);
+  }
+
   window.BowlingCore = {
-    STORAGE_PREFIX, MAX_GAMES_PER_WEEK,
+    STORAGE_PREFIX, ARCHIVE_PREFIX, MAX_GAMES_PER_WEEK,
     getISOWeek, weekIdToLabel, offsetWeek,
     storageKey, loadWeek, saveWeek, ensureWeek, createEmptyGame,
     standingBefore, pinsKnocked, isFrameComplete, calculateGameScore,
     isGameComplete, isGameDone, getFinalScore, getRunningScore, shotDisplay,
     getAllPins, getAvailablePins, currentPosition,
     recordShot, undoShot, startGame,
-    listAllWeekKeys, getAllCompletedGames
+    listAllWeekKeys, getAllCompletedGames,
+    archiveSeason, listArchivedWeeks
   };
 })();

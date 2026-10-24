@@ -108,6 +108,8 @@ Namespaced with colon prefix:
 - `levelUp:exerciseSpentPct` — number, level-% used up by transforms
 - `levelUp:workoutScores` — JSON scoring report (see WorkoutXP.buildReport)
 - `levelUp:levelHistory` — JSON array `[{ level, date }]`, one entry per transform (from Oct 2026 on)
+- `bowling:week:YYYY-Www` — JSON bowling week `{ weekId, games: [...] }` (current season)
+- `bowling:archive:<ISO timestamp>` — JSON `{ archivedAt, weeks: [...] }`, one per season ended with New Season; still counts toward level XP
 - `powerUp:YYYY-MM-DD` — JSON workout object (date-keyed)
 - `finances:receipts` — JSON array of receipt objects
 - `finances:dataLoaded` — "true"/"false" string

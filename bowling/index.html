@@ -628,6 +628,7 @@
     margin-bottom:10px;
   }
   .history-toolbar .stats-title{margin-bottom:0;}
+  .history-actions{display:flex; gap:8px}
   .import-btn{
     padding:8px 14px;
     border-radius:12px;
@@ -854,7 +855,10 @@
     <div id="historyView" class="hidden">
       <div class="history-toolbar">
         <div class="stats-title">Game History</div>
-        <button class="import-btn" id="importBtn" type="button">Import Standings</button>
+        <div class="history-actions">
+          <button class="import-btn" id="newSeasonBtn" type="button">New Season</button>
+          <button class="import-btn" id="importBtn" type="button">Import Standings</button>
+        </div>
       </div>
       <div class="card">
         <div class="card-inner">
@@ -1821,6 +1825,14 @@ function parseStandings(text){
             cols.splice(1, 1, dateStr, dateGm1[2]);
         }
 
+        // Lanes column ("17 - 18") between Date and Gm1 — keep it, but not as a score
+        let lanes = null;
+        if(/^\d+\s*-\s*\d+$/.test((cols[2] || '').trim())){
+            lanes = cols.splice(2, 1)[0].trim();
+        }else if(cols[3] === '-' && /^\d+$/.test(cols[2]) && /^\d+$/.test(cols[4] || '')){
+            lanes = cols.splice(2, 3).join(' ');
+        }
+
         if(cols.length < 6) return;
 
         const gm1 = parseInt(cols[2]);
@@ -1851,6 +1863,7 @@ function parseStandings(text){
             weekId,
             scores: [gm1, gm2, gm3],
             seriesScore: ss,
+            lanes,
         });
     });
 
@@ -1858,11 +1871,7 @@ function parseStandings(text){
 }
 
 function importStandings(parsed, fullOverwrite){
-    if(fullOverwrite){
-        // Remove all bowling week keys
-        const keys = listAllWeekKeys();
-        keys.forEach(k => localStorage.removeItem(k));
-    }
+    if(fullOverwrite) BowlingCore.archiveSeason();   // old weeks are kept, not deleted
 
     parsed.forEach(entry => {
         const games = entry.scores.map((score, i) => {
@@ -1884,6 +1893,7 @@ function importStandings(parsed, fullOverwrite){
             weekId: entry.weekId,
             weekLabel: weekIdToLabel(entry.weekId),
             leagueDate: entry.leagueDate,
+            lanes: entry.lanes || null,
             games,
             created: new Date().toISOString(),
         };
@@ -1939,6 +1949,18 @@ function onImportTextChange(){
     preview.style.display = 'block';
 }
 
+/* Archive every week and start the season from zero. Nothing is deleted:
+   the old weeks go into one bowling:archive:* record. */
+function startNewSeason(){
+    const count = listAllWeekKeys().length;
+    if(!count){ alert('No bowling weeks to archive — this season is already empty.'); return; }
+    if(!confirm('Start a new season? Your ' + count + ' current week' + (count === 1 ? '' : 's') + ' will be archived (kept, not deleted) and the tracker will start from zero.')) return;
+    BowlingCore.archiveSeason();
+    state.currentGame = null;
+    renderHistory();
+    renderAll();
+}
+
 function executeImport(){
     const text = $('importText').value;
     const parsed = parseStandings(text);
@@ -1946,7 +1968,7 @@ function executeImport(){
 
     const fullOverwrite = $('importOverwrite').checked;
     if(fullOverwrite){
-        if(!confirm('This will DELETE all existing bowling data and replace it with the imported standings. Continue?')) return;
+        if(!confirm('This will archive all existing bowling weeks (they are kept, not deleted) and replace them with the imported standings. Continue?')) return;
     }
 
     importStandings(parsed, fullOverwrite);
@@ -1996,6 +2018,7 @@ function bindEvents(){
 
     // Import modal
     $('importBtn').onclick = openImportModal;
+    $('newSeasonBtn').onclick = startNewSeason;
     $('importClose').onclick = closeImportModal;
     $('importCancelBtn').onclick = closeImportModal;
     $('importModal').onclick = function(e){
