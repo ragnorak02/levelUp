@@ -5,7 +5,8 @@
 /* ===== Storage Keys (existing) ===== */
 const KEY_LEVEL = 'levelUp:characterLevel';
 const KEY_TRANSFORMS = 'levelUp:transformCount';
-const KEY_EX_RESET_AT = 'levelUp:exerciseResetAt';
+const KEY_EX_RESET_AT = 'levelUp:exerciseResetAt';   // pre-carry-over meter reset; read once to migrate
+const KEY_EX_SPENT = 'levelUp:exerciseSpentPct';    // level-% used up by transforms
 const todayISO = new Date().toISOString().slice(0,10);
 
 /* ===== Exercise Threshold =====
@@ -176,10 +177,28 @@ function getExerciseResetAt(){
 
 /* Level-% earned after `isoDate`: scored workouts, plus bowling and garden
    volume converted at EX_MAX per level. */
-function powerSince(isoDate){
-  const workouts = window.WorkoutXP ? WorkoutXP.pctSince(isoDate) : 0;
+function powerSince(isoDate, scores){
+  const workouts = window.WorkoutXP ? WorkoutXP.pctSince(isoDate, scores || WorkoutXP.scoreAll()) : 0;
   const otherVolume = bowlingVolumeSince(isoDate) + gardenVolumeSince(isoDate);
   return workouts + (otherVolume / EX_MAX) * LEVEL_PCT;
+}
+
+/* Level-% used up by transforms. First run after the switch to carry-over:
+   everything earned before the old reset date counts as already spent, so
+   the meter shows exactly what it did before. */
+function getExerciseSpent(scores){
+  const raw = localStorage.getItem(KEY_EX_SPENT);
+  if(raw !== null && raw !== '' && isFinite(Number(raw))) return Number(raw);
+  const spent = powerSince('0000-00-00', scores) - powerSince(getExerciseResetAt(), scores);
+  localStorage.setItem(KEY_EX_SPENT, String(spent));
+  return spent;
+}
+
+/* Progress toward the next level: everything ever earned minus what
+   transforms spent, so whatever ran past 100% carries into the next level. */
+function getExerciseProgress(scores){
+  scores = scores || (window.WorkoutXP ? WorkoutXP.scoreAll() : new Map());
+  return Math.max(0, powerSince('0000-00-00', scores) - getExerciseSpent(scores));
 }
 
 function flashTransform(){
@@ -195,14 +214,13 @@ function flashTransform(){
 }
 
 function doExerciseTransform(){
-  const exPower = powerSince(getExerciseResetAt());
-  if(exPower < LEVEL_PCT) return;
+  if(getExerciseProgress() < LEVEL_PCT) return;
 
   setLevel(getLevel() + 1);
   setTransformCount(getTransformCount() + 1);
 
-  // reset dashboard meter only
-  localStorage.setItem(KEY_EX_RESET_AT, todayISO);
+  // spend one level's worth; anything over it stays on the meter
+  localStorage.setItem(KEY_EX_SPENT, String(getExerciseSpent() + LEVEL_PCT));
 
   flashTransform();
   renderAll();
@@ -1869,7 +1887,9 @@ function renderTop(){
 }
 
 function renderModulesAndCharacter(){
-  const exPower = powerSince(getExerciseResetAt());
+  const scores = window.WorkoutXP ? WorkoutXP.scoreAll() : new Map();
+  const exPower = getExerciseProgress(scores);
+  if(window.WorkoutXP) WorkoutXP.save(scores);   // keep the saved scores current
 
   // Thin level bar (replaces old power strip)
   setWidth('levelFill', pct(exPower, LEVEL_PCT));
@@ -1877,7 +1897,7 @@ function renderModulesAndCharacter(){
   // Stacked: everything before today, with today's gain glowing on top
   const yesterday = new Date(todayISO + 'T00:00:00Z');
   yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-  const exToday = Math.min(exPower, powerSince(yesterday.toISOString().slice(0,10)));
+  const exToday = Math.min(exPower, powerSince(yesterday.toISOString().slice(0,10), scores));
   const exBase = pct(exPower - exToday, LEVEL_PCT);
   setHeight('modExFill', exBase);
   const todayFill = $('modExToday');
@@ -2001,8 +2021,7 @@ function bindButtons(){
   const exTransform = $('exTransform');
   if(exTransform){
     exTransform.addEventListener('click', () => {
-      const exPower = powerSince(getExerciseResetAt());
-      if(exPower >= LEVEL_PCT){
+      if(getExerciseProgress() >= LEVEL_PCT){
         doExerciseTransform();
       } else {
         // Play power-up animation preview, then reset to idle
@@ -2019,6 +2038,9 @@ function bindButtons(){
   };
   const openExercise = $('openExercise');
   if(openExercise) openExercise.addEventListener('click', openShownWorkout);
+  const downloadScores = $('downloadScores');
+  if(downloadScores && window.WorkoutXP) downloadScores.addEventListener('click', ()=> WorkoutXP.download());
+
   const exDate = $('exDate');
   if(exDate) exDate.addEventListener('click', openShownWorkout);
 

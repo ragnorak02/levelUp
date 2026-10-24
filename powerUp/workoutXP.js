@@ -71,7 +71,8 @@
 
   /* Score every workout in date order. Each one is judged only against the
      sessions before it, so past scores never shift when you log new ones.
-     Returns Map(date -> { pct, work, strength, bonus, prs: [{name, kind}] }). */
+     Returns Map(date -> { pct, work, strength, bonus, prs: [{name, kind}],
+                           parts: {bodyPart: volume} }). */
   function scoreAll(days = readDays()){
     const exHist = new Map();     // exercise -> [{ e1, topW, topR, vol }]
     const partHist = new Map();   // body part -> [volume per session]
@@ -126,7 +127,9 @@
       bonus = Math.min(bonus, BONUS_CAP);
 
       const pct = BASE_PCT * work * Math.pow(strength, STRENGTH_POWER) + bonus;
-      out.set(day.date, { pct, work, strength, bonus, prs });
+      const parts = {};
+      partVol.forEach((v, part)=>{ parts[part] = Math.round(v); });
+      out.set(day.date, { pct, work, strength, bonus, prs, parts });
     });
     return out;
   }
@@ -138,8 +141,88 @@
     return total;
   }
 
+  /* ---------- Saved scores + JSON export ----------
+     The scores are always recomputed from the workouts, so this copy is a
+     snapshot for looking at (and downloading), never the source of truth. */
+
+  const SCORES_KEY = 'levelUp:workoutScores';
+  const round1 = n => Math.round(n * 10) / 10;
+  const round2 = n => Math.round(n * 100) / 100;
+
+  function buildReport(scores = scoreAll()){
+    const rows = [...scores].map(([date, s])=>({
+      date,
+      pct: round1(s.pct),
+      work: round2(s.work),
+      strength: round2(s.strength),
+      bonus: round1(s.bonus),
+      parts: s.parts,
+      prs: s.prs
+    }));
+    const avg = list => list.length ? round1(mean(list.map(r=> r.pct))) : null;
+
+    // what it has learned about each body part
+    const byBodyPart = {};
+    rows.forEach(r=> Object.keys(r.parts).forEach(part=>{
+      (byBodyPart[part] = byBodyPart[part] || []).push(r);
+    }));
+    Object.keys(byBodyPart).forEach(part=>{
+      const list = byBodyPart[part];
+      byBodyPart[part] = {
+        sessions: list.length,
+        usualVolumeLb: Math.round(median(list.map(r=> r.parts[part]))),
+        avgPctPerWorkout: avg(list),
+        last4AvgPct: avg(list.slice(-4))
+      };
+    });
+
+    return {
+      source: 'LevelUp · workout level scoring',
+      generatedAt: new Date().toISOString(),
+      howItWorks: 'pct of one level = basePct × work × strength^strengthPower + prBonus. ' +
+        "work: each body part's volume vs its own usual volume. " +
+        "strength: each exercise's estimated 1RM vs its first sessions. 100 pct = level up.",
+      settings: {
+        basePct: BASE_PCT, strengthPower: STRENGTH_POWER,
+        workRange: [WORK_MIN, WORK_MAX], strengthRange: [STRENGTH_MIN, STRENGTH_MAX],
+        anchorSessions: ANCHOR_SESSIONS, prBonus: PR_BONUS, bonusCap: BONUS_CAP
+      },
+      summary: {
+        workouts: rows.length,
+        avgPctPerWorkout: avg(rows),
+        last10AvgPct: avg(rows.slice(-10)),
+        workoutsPerLevelRecently: rows.length ? round1(100 / avg(rows.slice(-10))) : null,
+        byBodyPart
+      },
+      workouts: rows
+    };
+  }
+
+  function save(scores = scoreAll()){
+    const report = buildReport(scores);
+    try{ localStorage.setItem(SCORES_KEY, JSON.stringify(report)); }catch{}
+    return report;
+  }
+
+  function loadSaved(){
+    try{ return JSON.parse(localStorage.getItem(SCORES_KEY)); }catch{ return null; }
+  }
+
+  /* Save a fresh report to a .json file on this device. */
+  function download(scores = scoreAll()){
+    const report = save(scores);
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `levelup-workout-scores-${report.generatedAt.slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
+  }
+
   window.WorkoutXP = {
-    scoreAll, pctSince, readDays,
-    BASE_PCT, STRENGTH_POWER, PR_BONUS, BONUS_CAP
+    scoreAll, pctSince, readDays, buildReport, save, loadSaved, download,
+    BASE_PCT, STRENGTH_POWER, PR_BONUS, BONUS_CAP, SCORES_KEY
   };
 })();

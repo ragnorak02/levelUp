@@ -59,6 +59,20 @@
             assert.equal(s.get('2026-04-08').bonus, XP.BONUS_CAP);
         });
 
+        it('report summarises each body part it has learned', function() {
+            var s = XP.scoreAll([
+                day('2026-06-01', [bench(100)]),
+                day('2026-06-08', [bench(110)]),
+                day('2026-06-15', [ex('Squat', 'Legs', [set(200, 5)])])
+            ]);
+            var r = XP.buildReport(s);
+            assert.equal(r.summary.workouts, 3);
+            assert.equal(r.summary.byBodyPart.Chest.sessions, 2);
+            assert.equal(r.summary.byBodyPart.Legs.usualVolumeLb, 1000);
+            assert.equal(r.workouts[1].prs[0].kind, 'weight');
+            assert.equal(r.settings.basePct, XP.BASE_PCT);
+        });
+
         it('pctSince sums only workouts after the given date', function() {
             var s = XP.scoreAll([day('2026-05-01', [bench(100)]), day('2026-05-08', [bench(100)])]);
             assert.closeTo(XP.pctSince('2026-05-01', s), s.get('2026-05-08').pct, 0.001);

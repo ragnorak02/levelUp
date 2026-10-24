@@ -100,7 +100,9 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 Namespaced with colon prefix:
 - `levelUp:characterLevel` — integer (character level)
 - `levelUp:transformCount` — integer
-- `levelUp:exerciseResetAt` — ISO date string (YYYY-MM-DD)
+- `levelUp:exerciseResetAt` — ISO date string (YYYY-MM-DD); legacy, read once to migrate to `exerciseSpentPct`
+- `levelUp:exerciseSpentPct` — number, level-% used up by transforms
+- `levelUp:workoutScores` — JSON scoring report (see WorkoutXP.buildReport)
 - `powerUp:YYYY-MM-DD` — JSON workout object (date-keyed)
 - `finances:receipts` — JSON array of receipt objects
 - `finances:dataLoaded` — "true"/"false" string
@@ -140,7 +142,8 @@ Namespaced with colon prefix:
 - **Level progress** is a percentage (`LEVEL_PCT` = 100). Each workout earns its share via `powerUp/workoutXP.js`: `BASE_PCT × work × strength^1.5 + PR bonus` — work = each body part's volume vs its own usual volume; strength = each exercise's estimated 1RM vs where you started on it; PR bonus capped at 6. Tuned on real data: ~25% for a typical workout (a level every ~4), heavy PR days ~35–40%. Tune the constants at the top of that file
 - **EX_MAX**: 50,000 — now only converts bowling/garden *volume* into level-% (EX_MAX volume = one level)
 - **FIN_MAX**: 2,000 (monthly finance threshold)
-- **Transform**: Unlocks when level-% since last reset >= 100; increments character level, resets exercise meter
+- **Transform**: Unlocks when level progress >= 100; increments character level and spends 100 (`levelUp:exerciseSpentPct`) — anything past 100 carries over. Progress = all level-% ever earned − spent
+- **Saved scores**: every dashboard render writes the per-workout scoring report to `levelUp:workoutScores`; the Exercise card's ⬇ Scores button downloads it as JSON. Always recomputed from the workouts — a snapshot, not the source of truth
 - **Character**: Visual GIF + aura effect, level displayed on dashboard
 - **Module meters**: Vertical progress bars on dashboard cards (study meter currently placeholder at 0%)
 - **Garden XP**: Contributes to character progression at 50:1 volume ratio (`GARDEN_VOLUME_MULTIPLIER`); tracked on dashboard calendar with `--garden: #22c55e` dot color
@@ -170,14 +173,14 @@ tests/
 ├── testSuiteAggregation.js ← Computation tests (10 tests)
 ├── testSuiteUI.js       ← Data round-trip & append mode tests (10 tests)
 ├── testSuiteSessionSummary.js ← Shared workout summary (7 tests)
-├── testSuiteWorkoutXP.js ← Level-% scoring per workout (6 tests)
+├── testSuiteWorkoutXP.js ← Level-% scoring per workout (7 tests)
 ├── runner.html          ← Browser test runner UI (dark themed, click-to-run)
 └── nodeRunner.js        ← Terminal runner (node tests/nodeRunner.js)
 ```
 
 ### Running Tests
 - **Browser**: Open `tests/runner.html`, click "Run Tests" — safe, read-only, won't change data
-- **Terminal**: `node tests/nodeRunner.js` — mocks localStorage, runs all 75 tests, exits 0/1
+- **Terminal**: `node tests/nodeRunner.js` — mocks localStorage, runs all 76 tests, exits 0/1
 - **Seed Data**: Click "Seed Data" in runner.html (confirms before wiping) or call `SeedGenerator.generateFullDataset(42)` in console
 
 ### Test Framework API
