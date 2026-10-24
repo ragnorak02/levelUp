@@ -788,12 +788,23 @@ function bowlingRates(games){
    stance / target board).
 ----------------------------------*/
 // edit: { frame, shots } while re-entering an earlier frame ball by ball
-const bowlScorer = { gameIndex: null, standing: [], edit: null };
+// weekId: the week shown (‹ › step through weeks; defaults to this week)
+const bowlScorer = { weekId: null, gameIndex: null, standing: [], edit: null };
 
-/* This week's record — not saved until a game is started. */
+/* The shown week's record — not saved until a game is started. */
 function bowlWeek(){
-  const id = BowlingCore.getISOWeek(new Date());
+  const id = bowlScorer.weekId || (bowlScorer.weekId = BowlingCore.getISOWeek(new Date()));
   return BowlingCore.loadWeek(id) || { weekId: id, weekLabel: BowlingCore.weekIdToLabel(id), games: [], created: new Date().toISOString() };
+}
+
+/* "‹ This week · Tue, Oct 20 ›" in the card header. */
+function bowlWeekNav(week){
+  const B = BowlingCore;
+  const now = B.getISOWeek(new Date());
+  const rel = { [B.offsetWeek(now, -1)]: 'Last week', [now]: 'This week', [B.offsetWeek(now, 1)]: 'Next week' }[week.weekId];
+  const label = (rel ? rel + ' · ' : '') + (week.weekLabel || B.weekIdToLabel(week.weekId));
+  return `<span class="bs-weeknav"><button class="bs-wk" data-bs="week" data-step="-1" aria-label="Previous week">‹</button>`
+    + `<span>${label}</span><button class="bs-wk" data-bs="week" data-step="1" aria-label="Next week">›</button></span>`;
 }
 
 function renderBowlCard(){
@@ -807,7 +818,8 @@ function renderBowlScorer(){
   if(!root) return;
   const B = BowlingCore;
   const week = bowlWeek();
-  setText('bowlCardSub', `This week · ${week.weekLabel || B.weekIdToLabel(week.weekId)}`);
+  const sub = $('bowlCardSub');
+  if(sub) sub.innerHTML = bowlWeekNav(week);
 
   // default to the game in progress, else the last one bowled
   if(bowlScorer.gameIndex == null || !week.games[bowlScorer.gameIndex]){
@@ -816,19 +828,21 @@ function renderBowlScorer(){
     bowlScorer.edit = null;
   }
 
+  const started = g => g.score != null || g.frames.some(f => f.shots.length);
   const gameValue = g => B.isGameDone(g) ? (g.score != null ? g.score : B.getFinalScore(g)) : B.getRunningScore(g);
   const series = week.games.reduce((sum, g) => sum + (gameValue(g) || 0), 0);
   const tiles = week.games.map((g, i) => {
     const done = B.isGameDone(g);
     return `<button class="bs-tile${i === bowlScorer.gameIndex ? ' on' : ''}${done ? '' : ' live'}" data-bs="game" data-i="${i}">
-      <small>G${i + 1}${done ? '' : ' ▶'}</small><b>${gameValue(g)}</b></button>`;
+      <small>G${i + 1}${done ? '' : ' ▶'}</small><b>${started(g) ? gameValue(g) : '–'}</b></button>`;
   }).join('') + (week.games.length < B.MAX_GAMES_PER_WEEK
     ? `<button class="bs-tile add" data-bs="new"><small>G${week.games.length + 1}</small><b>＋</b></button>` : '')
     + `<div class="bs-tile series"><small>Series</small><b>${series}</b></div>`;
 
   const game = bowlScorer.gameIndex != null ? week.games[bowlScorer.gameIndex] : null;
   if(!game){
-    root.innerHTML = `<div class="bs-tiles">${tiles}</div>`;
+    // nothing bowled this week yet: one tap sets up all three games
+    root.innerHTML = `<button class="bs-start" data-bs="start">▶ Start bowling night<small>${week.weekLabel || B.weekIdToLabel(week.weekId)} · G1, G2, G3</small></button>`;
     return;
   }
 
@@ -888,7 +902,9 @@ function renderBowlScorer(){
   }else if(!hasFrames){
     entry = `<div class="bs-done">Final <b>${game.score}</b><span>Imported score — frames weren't recorded</span></div>`;
   }else{
+    const next = week.games.findIndex((g, i) => i !== bowlScorer.gameIndex && !B.isGameDone(g));
     entry = `<div class="bs-done">Final <b>${game.score != null ? game.score : B.getFinalScore(game)}</b>
+      ${next >= 0 ? `<button class="bs-btn hit" data-bs="game" data-i="${next}">Next: G${next + 1} ▶</button>` : ''}
       <span>Tap a frame to fix it</span>
       <button class="bs-btn ghost" data-bs="undo">↩ Undo last ball</button></div>`;
   }
@@ -928,6 +944,17 @@ function handleBowlScorer(e){
   const game = gi != null ? week.games[gi] : null;
   const wasDone = !!game && B.isGameDone(game);
 
+  if(act === 'week'){
+    bowlScorer.weekId = B.offsetWeek(week.weekId, Number(el.dataset.step));
+    bowlScorer.gameIndex = null; bowlScorer.standing = []; bowlScorer.edit = null;
+    renderBowlScorer();
+    return;
+  }
+  if(act === 'start'){
+    // a fresh night: create G1–G3 empty and start on G1
+    while(B.startGame(week) >= 0){}
+    bowlScorer.gameIndex = 0; bowlScorer.standing = []; bowlScorer.edit = null;
+  }
   if(act === 'game'){ bowlScorer.gameIndex = Number(el.dataset.i); bowlScorer.standing = []; bowlScorer.edit = null; }
   if(act === 'new'){
     const idx = B.startGame(week);
@@ -1726,8 +1753,8 @@ function bindButtons(){
   const openBowling = $('openBowling');
   if(openBowling) openBowling.addEventListener('click', ()=> location.href = './bowling/index.html');
 
-  const bowlScorerEl = $('bowlScorer');
-  if(bowlScorerEl) bowlScorerEl.addEventListener('click', handleBowlScorer);
+  const bowlCard = document.querySelector('.detail-panel[data-focus="bowling"]');
+  if(bowlCard) bowlCard.addEventListener('click', handleBowlScorer);
 
   const openNutrition = $('openNutrition');
   if(openNutrition){

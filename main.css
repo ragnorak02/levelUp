@@ -741,6 +741,20 @@ body{
 .xp-up small{color:var(--muted); font-size:10px; font-weight:800}
 
 /* Bowling: live scorer */
+.bs-weeknav{display:inline-flex; align-items:center; gap:6px}
+.bs-wk{
+  all:unset; cursor:pointer; width:24px; height:22px; border-radius:7px;
+  display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid var(--ring); color:var(--ink); font-size:14px; font-weight:900;
+}
+.bs-wk:active{background: rgba(255,255,255,.10)}
+.bs-start{
+  all:unset; box-sizing:border-box; cursor:pointer; width:100%; text-align:center;
+  padding:16px 10px; border-radius:12px; font-weight:1000; font-size:17px; color:#fff;
+  background: linear-gradient(90deg, #7c3aed, #a855f7); box-shadow: 0 6px 20px rgba(168,85,247,.25);
+  display:flex; flex-direction:column; gap:3px;
+}
+.bs-start small{font-size:11px; font-weight:800; opacity:.85}
 .bs-season{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 0 8px}
 .bs-season > span{color:var(--muted); font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.5px; margin-right:2px}
 .bs-season .chip{padding:4px 8px; font-size:11px}
@@ -809,6 +823,7 @@ body{
 .bs-num[disabled]{opacity:.25; cursor:default}
 .bs-done{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:10px; font-weight:900; color:var(--muted)}
 .bs-done span{font-size:11px}
+.bs-done .bs-btn{padding:8px 12px}
 .bs-done b{font-size:24px; color:var(--ink)}
 
 /* Bowling summary card */
