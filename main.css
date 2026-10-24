@@ -288,6 +288,9 @@ body{
   border-radius:0;
   background:transparent;
 }
+.mini-slot[data-module]{cursor:pointer; transition: border-color .25s, box-shadow .25s;}
+.mini-slot.selected{border-color: rgba(59,130,246,.5); border-style:solid; box-shadow: 0 0 12px rgba(59,130,246,.15);}
+
 /* Unused: a light grey, greyed-out slot - still tappable */
 .mini-slot.slot-idle{
   background: rgba(203,213,225,.10);
@@ -717,6 +720,36 @@ body{
 }
 .mini:hover{background: rgba(19,26,34,.90)}
 .mini:active{transform: translateY(1px)}
+
+/* Bowling summary card */
+.bowl-label{margin:12px 0 6px; color:var(--muted); font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.5px}
+.bowl-label span{text-transform:none; letter-spacing:0; font-weight:800}
+.bowl-games-row{display:flex; gap:8px; flex-wrap:wrap}
+.bowl-game-box{
+  min-width:62px; padding:8px 10px; border-radius:12px; text-align:center;
+  background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10);
+  display:flex; flex-direction:column; gap:2px;
+}
+.bowl-game-box b{font-size:20px; font-weight:1000}
+.bowl-game-box small{color:var(--muted); font-size:10px; font-weight:900}
+.bowl-game-box.best{border-color: rgba(255,213,74,.5); background: linear-gradient(180deg, rgba(58,42,0,.55), rgba(255,255,255,.04))}
+.bowl-game-box.best b{color:#ffd54a}
+.bowl-game-box.total{border-color: rgba(168,85,247,.4); background: rgba(168,85,247,.10)}
+.bowl-trend{
+  height:110px; padding:16px 6px 0; border-radius:12px;
+  background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+}
+.bowl-trend-plot{position:relative; height:100%; display:flex; align-items:flex-end; gap:6px}
+.bowl-bar{
+  position:relative; flex:1; min-width:0; border-radius:6px 6px 0 0;
+  background: rgba(168,85,247,.45);
+}
+.bowl-bar.up{background: linear-gradient(180deg, #c084fc, #7c3aed)}
+.bowl-bar span{
+  position:absolute; top:-15px; left:50%; transform:translateX(-50%);
+  font-size:9px; font-weight:900; color:var(--muted); white-space:nowrap;
+}
+.bowl-avg-line{position:absolute; left:0; right:0; border-top:1px dashed rgba(255,255,255,.35); pointer-events:none}
 
 /* Exercise: step between logged workouts (summary renders below) */
 .ss-nav{display:flex; align-items:center; gap:6px; margin:4px 0 10px}

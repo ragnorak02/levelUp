@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Level Up — Dashboard</title>
 
-  <link rel="stylesheet" href="./main.css?v=20261024f" />
+  <link rel="stylesheet" href="./main.css?v=20261024g" />
   <link rel="stylesheet" href="./powerUp/sessionSummary.css?v=20261024d" />
 
   <!-- Chart.js (CDN) for donut chart -->
@@ -83,15 +83,15 @@
         </div>
         <button class="qicon" id="calToggleBtn" title="Toggle Calendar">📅</button>
         <!-- open slot: bowling for now, muted while unused -->
-        <div class="mini-slot slot-idle">
-          <a class="bowl-compact" href="./bowling/index.html">
+        <div class="mini-slot slot-idle" data-module="bowling" data-href="./bowling/index.html" role="button" tabindex="0" title="Bowling: tap for summary, again to open">
+          <div class="bowl-compact">
             <span class="bowl-icon">🎳</span>
             <span class="bowl-info">
               <span class="bowl-title">Bowl</span>
               <span class="bowl-avg" id="bowlAvg"></span>
             </span>
             <div class="bowl-scores" id="bowlRecent" style="display:none;"></div>
-          </a>
+          </div>
         </div>
       </div>
     </section>
@@ -225,6 +225,22 @@
       </div>
     </section>
 
+    <!-- BOWLING: summary (tap the bowling slot) -->
+    <section class="card bowl-card detail-panel" data-focus="bowling" style="display:none;">
+      <div class="card-inner">
+        <div class="history-head">
+          <div class="history-title">
+            <b>Bowling</b>
+            <span id="bowlCardSub">No games yet</span>
+          </div>
+          <div class="history-cta">
+            <button class="mini" id="openBowling">Open Bowling</button>
+          </div>
+        </div>
+        <div id="bowlCardBody"></div>
+      </div>
+    </section>
+
     <!-- Exercise: one workout's summary, rendered by powerUp/sessionSummary.js -->
     <section class="card history detail-panel" data-focus="exercise" style="display:none;">
       <div class="card-inner">
@@ -257,6 +273,6 @@
 
   <script src="./powerUp/workoutXP.js?v=20261024c"></script>
   <script src="./powerUp/sessionSummary.js?v=20261024d"></script>
-  <script src="./main.js?v=20261024f"></script>
+  <script src="./main.js?v=20261024g"></script>
 </body>
 </html>

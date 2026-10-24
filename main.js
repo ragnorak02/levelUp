@@ -757,6 +757,105 @@ function getLastNBowlingGames(n){
   return games.slice(0, n);
 }
 
+/* Every scored game, newest first, with its week for grouping series. */
+function getAllBowlingGames(){
+  const games = [];
+  listBowlingWeekKeys().forEach(k => {
+    const week = safeParse(k);
+    if(!week || !Array.isArray(week.games)) return;
+    week.games.forEach((g, i) => {
+      if(g.score != null){
+        games.push({ score: g.score, date: g.completedDate || '', weekId: week.weekId || k.slice('bowling:week:'.length), order: i, frames: g.frames });
+      }
+    });
+  });
+  games.sort((a, b) => (a.date !== b.date) ? (a.date > b.date ? -1 : 1) : (b.order - a.order));
+  return games;
+}
+
+/* Strike % of first balls, spare % of the non-strike frames — same rules as bowling/index.html. */
+function bowlingRates(games){
+  let firsts = 0, strikes = 0, spares = 0;
+  games.forEach(g => (g.frames || []).forEach((f, fi) => {
+    const shots = f.shots || [];
+    if(!shots.length) return;
+    const knocked1 = 10 - (shots[0].pinsLeft ? shots[0].pinsLeft.length : 0);
+    firsts++;
+    if(knocked1 === 10){ strikes++; return; }
+    if(shots.length >= 2){
+      const knocked2 = 10 - (shots[1].pinsLeft ? shots[1].pinsLeft.length : 0);
+      if(fi < 9 ? knocked1 + knocked2 === 10 : knocked1 + knocked2 >= 10) spares++;
+    }
+  }));
+  return {
+    strikeRate: firsts ? Math.round((strikes / firsts) * 100) : null,
+    spareRate: (firsts - strikes) ? Math.round((spares / (firsts - strikes)) * 100) : null
+  };
+}
+
+/* Bowling summary card (shown when the bowling slot is tapped). */
+function renderBowlCard(){
+  const body = $('bowlCardBody');
+  if(!body) return;
+  const games = getAllBowlingGames();
+  if(!games.length){
+    setText('bowlCardSub', 'No games yet');
+    body.innerHTML = `<div class="empty">No bowling games logged yet.<br/>Log a game in <b>Bowling</b> and your stats will show up here.</div>`;
+    return;
+  }
+
+  const scores = games.map(g => g.score);
+  const avg = Math.round(scores.reduce((s, v) => s + v, 0) / scores.length);
+  const high = Math.max(...scores);
+
+  // a series = one week's games, scored when it has three
+  const byWeek = new Map();
+  games.forEach(g => { if(!byWeek.has(g.weekId)) byWeek.set(g.weekId, []); byWeek.get(g.weekId).push(g); });
+  const series = [...byWeek.values()].filter(w => w.length === 3).map(w => w.reduce((s, g) => s + g.score, 0));
+  const bestSeries = series.length ? Math.max(...series) : null;
+  const rates = bowlingRates(games);
+
+  const last = games[0];
+  const lastDate = last.date ? new Date(last.date.slice(0,10) + 'T12:00:00').toLocaleDateString(undefined, {month:'short', day:'numeric'}) : last.weekId;
+  setText('bowlCardSub', `${games.length} game${games.length === 1 ? '' : 's'} · last ${lastDate}`);
+
+  const chip = (label, val) => `<div class="chip"><small>${label}</small> <span>${val}</span></div>`;
+  const chips = [
+    chip('Avg', avg),
+    chip('High', high),
+    bestSeries != null ? chip('Best series', bestSeries) : '',
+    rates.strikeRate != null ? chip('Strike', rates.strikeRate + '%') : '',
+    rates.spareRate != null ? chip('Spare', rates.spareRate + '%') : ''
+  ].join('');
+
+  // latest week's games, in the order bowled
+  const latestWeek = byWeek.get(last.weekId).slice().sort((a, b) => a.order - b.order);
+  const latestTotal = latestWeek.reduce((s, g) => s + g.score, 0);
+  const latestHtml = latestWeek.map((g, i) => `
+    <div class="bowl-game-box${g.score === high ? ' best' : ''}"><b>${g.score}</b><small>G${i + 1}</small></div>
+  `).join('') + (latestWeek.length > 1 ? `<div class="bowl-game-box total"><b>${latestTotal}</b><small>Series</small></div>` : '');
+
+  // last 10 games, oldest → newest, bars against the average
+  const recent = games.slice(0, 10).reverse();
+  const lo = Math.min(...recent.map(g => g.score), avg) - 20;
+  const hi = Math.max(...recent.map(g => g.score), avg);
+  const h = v => Math.max(6, Math.round(((v - lo) / ((hi - lo) || 1)) * 100));
+  const trendHtml = recent.map(g => `
+    <div class="bowl-bar${g.score >= avg ? ' up' : ''}" style="height:${h(g.score)}%" title="${g.score}"><span>${g.score}</span></div>
+  `).join('');
+
+  body.innerHTML = `
+    <div class="summary">${chips}</div>
+    <div class="bowl-label">Latest series</div>
+    <div class="bowl-games-row">${latestHtml}</div>
+    <div class="bowl-label">Last ${recent.length} games <span>· avg line ${avg}</span></div>
+    <div class="bowl-trend"><div class="bowl-trend-plot">
+      <div class="bowl-avg-line" style="bottom:${h(avg)}%"></div>
+      ${trendHtml}
+    </div></div>
+  `;
+}
+
 function renderBowlDashboard(){
   const avg = getBowlingAverage();
   const avgEl = $('bowlAvg');
@@ -1334,14 +1433,15 @@ function bindNav(){
     icon.addEventListener('click', (e) => e.stopPropagation());
   });
 
-  // Module bar click → focus mode
-  document.querySelectorAll('.modv[data-module]').forEach(modv => {
-    modv.addEventListener('click', () => {
-      const mod = modv.dataset.module;
-      // second tap on the selected bar opens the module, same as its icon
+  // Module bar / bowling slot click → focus mode
+  document.querySelectorAll('.modv[data-module], .mini-slot[data-module]').forEach(el => {
+    el.addEventListener('click', () => {
+      const mod = el.dataset.module;
+      // second tap on the selected one opens its module, same as its icon
       if(focusModule === mod){
-        const link = modv.querySelector('.micon');
-        if(link) location.href = link.href;
+        const link = el.querySelector('.micon');
+        const href = el.dataset.href || (link && link.href);
+        if(href) location.href = href;
         return;
       }
       focusModule = mod;
@@ -1383,6 +1483,9 @@ function bindButtons(){
   if(exNext) exNext.addEventListener('click', ()=> stepExerciseWorkout(1));
 
   // Nutrition
+  const openBowling = $('openBowling');
+  if(openBowling) openBowling.addEventListener('click', ()=> location.href = './bowling/index.html');
+
   const openNutrition = $('openNutrition');
   if(openNutrition){
     openNutrition.addEventListener('click', ()=> location.href = './nutrition/index.html');
@@ -1509,7 +1612,7 @@ function highlightImprovedToday(){
    Focus Mode
 ----------------------------------*/
 function updateFocusMode(){
-  document.querySelectorAll('.modv[data-module]').forEach(m => {
+  document.querySelectorAll('.modv[data-module], .mini-slot[data-module]').forEach(m => {
     m.classList.toggle('selected', m.dataset.module === focusModule);
   });
 
@@ -1544,6 +1647,7 @@ function renderAll(){
   renderHistory();
   renderFinanceDonut();
   renderBowlDashboard();
+  renderBowlCard();
   if(calendarVisible) renderCalendarGrid();
 }
 
