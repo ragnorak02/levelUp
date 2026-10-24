@@ -671,6 +671,12 @@
         <div class="sess-prog"><i class="ss-prog-fill" style="width:0%"></i></div>
       </div>
 
+      <div class="sess-block ss-xp-block">
+        <div class="sess-prog-head"><span>Level earned</span><b class="ss-xp-val">—</b></div>
+        <div class="sess-prog ss-xp-track"><i class="ss-xp-fill" style="width:0%"></i></div>
+        <div class="ss-xp-why"></div>
+      </div>
+
       <div class="sess-block ss-split-block">
         <h3 class="sess-label">Volume by muscle group</h3>
         <div class="ss-split-list"></div>
@@ -770,6 +776,19 @@
       const fill = q('.ss-prog-fill');
       fill.style.width = pctDone + '%';
       fill.classList.toggle('done', complete);
+
+      // --- Share of a character level this workout earned (powerUp/workoutXP.js) ---
+      const xp = window.WorkoutXP ? WorkoutXP.scoreAll().get(iso) : null;
+      q('.ss-xp-block').style.display = xp ? '' : 'none';
+      if(xp){
+        q('.ss-xp-val').textContent = `+${xp.pct.toFixed(1)}%`;
+        q('.ss-xp-fill').style.width = Math.min(100, xp.pct) + '%';
+        q('.ss-xp-why').innerHTML = [
+          `<span>Effort <b>${xp.work.toFixed(2)}×</b></span>`,
+          `<span>Strength <b>${xp.strength.toFixed(2)}×</b></span>`,
+          xp.bonus ? `<span>PR bonus <b>+${xp.bonus.toFixed(1)}%</b></span>` : ''
+        ].join('');
+      }
 
       // --- Volume split by muscle group ---
       const byPart = {};

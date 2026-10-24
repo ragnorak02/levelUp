@@ -82,6 +82,12 @@
 .session-summary .sess-prog > i{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#22c55e,#4ade80); transition:width .25s ease}
 .session-summary .sess-prog > i.done{background:linear-gradient(90deg,#ffd54a,#fff7a8); box-shadow:0 0 12px rgba(255,213,74,.5)}
 
+/* Level earned */
+.session-summary .sess-prog-head b.ss-xp-val{color:#c4b5fd}
+.session-summary .sess-prog > i.ss-xp-fill{background:linear-gradient(90deg,#8b5cf6,#c4b5fd); box-shadow:0 0 10px rgba(167,139,250,.45)}
+.session-summary .ss-xp-why{display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:6px; color:var(--muted); font-size:.74rem; font-weight:700}
+.session-summary .ss-xp-why b{color:var(--ink); font-weight:900}
+
 /* Per-muscle-group split */
 .session-summary .split-row{display:grid; grid-template-columns:5.5rem 1fr auto; align-items:center; gap:8px; font-size:.82rem}
 .session-summary .split-row + .split-row{margin-top:6px}
