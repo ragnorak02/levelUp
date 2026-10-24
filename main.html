@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Level Up — Dashboard</title>
 
-  <link rel="stylesheet" href="./main.css?v=20261024e" />
+  <link rel="stylesheet" href="./main.css?v=20261024f" />
   <link rel="stylesheet" href="./powerUp/sessionSummary.css?v=20261024d" />
 
   <!-- Chart.js (CDN) for donut chart -->
@@ -67,7 +67,7 @@
         </div>
       </div>
 
-      <!-- Level | calendar | bowling/garden/travel carousel -->
+      <!-- Level | calendar | open slot (bowling) -->
       <div class="dash-strip">
         <div class="level-block">
           <div class="level-row-title">
@@ -82,51 +82,17 @@
           </div>
         </div>
         <button class="qicon" id="calToggleBtn" title="Toggle Calendar">📅</button>
-        <div class="mini-carousel" id="miniCarousel">
-          <button class="carousel-arrow carousel-arrow-left" id="carouselPrev" type="button" aria-label="Previous">&#9664;</button>
-          <div class="carousel-track" id="carouselTrack">
-            <div class="carousel-slide">
-              <a class="bowl-compact" href="./bowling/index.html">
-                <span class="bowl-icon">🎳</span>
-                <span class="bowl-info">
-                  <span class="bowl-title">Bowl</span>
-                  <span class="bowl-avg" id="bowlAvg"></span>
-                </span>
-                <div class="bowl-scores" id="bowlRecent" style="display:none;"></div>
-              </a>
-            </div>
-            <div class="carousel-slide">
-              <a class="garden-compact" href="./garden/index.html">
-                <span class="garden-icon">🌱</span>
-                <span class="garden-info">
-                  <span class="garden-title">Garden</span>
-                  <span class="garden-sub" id="gardenSub"></span>
-                </span>
-                <div class="garden-status" id="gardenStatus"></div>
-              </a>
-            </div>
-            <div class="carousel-slide">
-              <a class="travel-compact" href="./travel/index.html">
-                <span class="travel-c-icon">✈️</span>
-                <span class="travel-c-info">
-                  <span class="travel-c-title">Travel</span>
-                  <span class="travel-c-sub" id="travelCompactSub"></span>
-                </span>
-              </a>
-            </div>
-          </div>
-          <button class="carousel-arrow carousel-arrow-right" id="carouselNext" type="button" aria-label="Next">&#9654;</button>
-          <div class="carousel-dots" id="carouselDots">
-            <span class="carousel-dot active" data-slide="0"></span>
-            <span class="carousel-dot" data-slide="1"></span>
-            <span class="carousel-dot" data-slide="2"></span>
-          </div>
+        <!-- open slot: bowling for now, muted while unused -->
+        <div class="mini-slot slot-idle">
+          <a class="bowl-compact" href="./bowling/index.html">
+            <span class="bowl-icon">🎳</span>
+            <span class="bowl-info">
+              <span class="bowl-title">Bowl</span>
+              <span class="bowl-avg" id="bowlAvg"></span>
+            </span>
+            <div class="bowl-scores" id="bowlRecent" style="display:none;"></div>
+          </a>
         </div>
-      </div>
-
-      <div class="quick-icons">
-        <button class="qicon" id="recipesToggleBtn" title="Recipes">🍳</button>
-        <button class="qicon" id="medToggleBtn" title="Medicine">💊</button>
       </div>
     </section>
 
@@ -287,68 +253,10 @@
       </div>
     </section>
 
-    <!-- TRAVEL: Dashboard preview -->
-    <section class="card travel-card detail-panel" data-focus="travel" style="display:none;">
-      <div class="card-inner">
-        <div class="travel-head"><div><b>Travel</b><span class="travel-sub" id="travelSub">No trips</span></div></div>
-        <div id="travelBody"></div>
-      </div>
-    </section>
-
-    <!-- RECIPES: Dashboard preview -->
-    <section class="card recipes-card detail-panel" data-focus="recipes" style="display:none;">
-      <div class="card-inner">
-        <div class="recipes-head"><div><b>Recipes</b><span class="recipes-sub" id="recipesSub">No recipes</span></div></div>
-        <div class="recipes-filter-row">
-          <input type="text" class="recipes-search" id="recipesSearch" placeholder="Search recipes..." />
-        </div>
-        <div id="recipesBody"></div>
-      </div>
-    </section>
-
-    <!-- MEDICINE: Post-surgery tracker -->
-    <section class="card med-card detail-panel" data-focus="medicine" style="display:none;">
-      <div class="card-inner">
-        <div class="med-head">
-          <div><b>Medicine</b><span class="med-sub" id="medSub">Today</span></div>
-          <button class="mini med-clear-btn" id="medClearToday">Clear Today</button>
-        </div>
-        <div id="medBody"></div>
-      </div>
-    </section>
-
-    <!-- Medicine Pill Modal -->
-    <div class="med-modal-overlay" id="medModalOverlay">
-      <div class="med-modal">
-        <div class="med-modal-head">
-          <b id="medModalTitle">Take Dose</b>
-          <button class="cal-event-del" id="medModalClose" title="Close">✕</button>
-        </div>
-        <div class="med-modal-body">
-          <button class="med-action-btn med-take-btn" id="medMarkTaken">Mark Taken Now</button>
-          <button class="med-action-btn med-remind-btn" id="medSetReminder">Set Reminder</button>
-          <div class="med-reminder-row" id="medReminderRow" style="display:none;">
-            <input type="time" id="medReminderTime" />
-            <button class="mini" id="medReminderSave">Save</button>
-          </div>
-          <div class="med-edit-row" id="medEditRow" style="display:none;">
-            <button class="med-action-btn med-undo-btn" id="medUndoDose">Undo Dose</button>
-            <div class="med-edit-time-row">
-              <label class="med-edit-label">Taken at:</label>
-              <input type="time" id="medEditTime" />
-              <button class="mini" id="medEditTimeSave">Save</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Medicine Toast -->
-    <div class="med-toast" id="medToast"></div>
   </main>
 
   <script src="./powerUp/workoutXP.js?v=20261024c"></script>
   <script src="./powerUp/sessionSummary.js?v=20261024d"></script>
-  <script src="./main.js?v=20261024c"></script>
+  <script src="./main.js?v=20261024f"></script>
 </body>
 </html>
