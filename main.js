@@ -2095,14 +2095,12 @@ function bindButtons(){
     monthPrev.addEventListener('click', ()=>{
       financeState.monthOffset -= 1;
       renderFinanceDonut();
-      if(focusModule === 'finance') renderFocusHeader();
     });
   }
   if(monthNext){
     monthNext.addEventListener('click', ()=>{
       financeState.monthOffset += 1;
       renderFinanceDonut();
-      if(focusModule === 'finance') renderFocusHeader();
     });
   }
 
@@ -2159,7 +2157,6 @@ function bindButtons(){
       document.querySelectorAll('.fin-filter').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       renderFinanceDonut();
-      if(focusModule === 'finance') renderFocusHeader();
     });
   });
 }
@@ -2227,16 +2224,7 @@ function updateFocusMode(){
     p.classList.remove('visible');
   });
 
-  const focusPanel = $('focusPanel');
-
-  if(!focusModule){
-    if(focusPanel) focusPanel.style.display = 'none';
-    return;
-  }
-
-  // Show focus panel with stats
-  if(focusPanel) focusPanel.style.display = 'block';
-  renderFocusHeader();
+  if(!focusModule) return;
 
   // Show matching detail panel
   const detail = document.querySelector(`.detail-panel[data-focus="${focusModule}"]`);
@@ -2249,146 +2237,6 @@ function updateFocusMode(){
   if(focusModule === 'finance'){
     requestAnimationFrame(() => renderFinanceDonut());
   }
-}
-
-function renderFocusHeader(){
-  const header = $('focusHeader');
-  if(!header) return;
-
-  const names = { exercise: 'Strength', study: 'Wisdom', finance: 'Finance', nutrition: 'Nutrition', travel: 'Travel', recipes: 'Recipes', medicine: 'Medicine' };
-  const hrefs = {
-    exercise: './powerUp/index.html',
-    study: './study/studyHome.html',
-    finance: './finances/index.html',
-    nutrition: './nutrition/index.html',
-    travel: './travel/index.html',
-    recipes: './nutrition/recipes.html',
-    medicine: '#'
-  };
-  const name = names[focusModule] || focusModule;
-  const href = hrefs[focusModule] || '#';
-
-  let stats = [];
-
-  if(focusModule === 'exercise'){
-    const exPower = volumeSince(getExerciseResetAt());
-    const todayWork = safeParse('powerUp:' + todayISO);
-    const todayVol = todayWork ? dayTotals(normalizeDay(todayWork)).volume : 0;
-    const allW = getAllWorkouts();
-    const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
-    const weekISO = weekAgo.toISOString().slice(0,10);
-    const weekWorkouts = allW.filter(w => w.date >= weekISO).length;
-    const remaining = Math.max(0, EX_MAX - exPower);
-
-    stats.push(`<b>${todayVol.toLocaleString()}</b> vol today`);
-    stats.push(`<b>${weekWorkouts}</b> workouts this week`);
-    stats.push(`<b>${remaining.toLocaleString()}</b> vol to transform`);
-  }
-
-  if(focusModule === 'study'){
-    let total = 0, mastered = 0;
-    try{
-      const flashData = JSON.parse(localStorage.getItem('levelupFlashData') || '{}');
-      if(flashData.cards){
-        total = flashData.cards.length;
-        mastered = flashData.cards.filter(c => c.state === 'mastered').length;
-      }
-    }catch(e){}
-    stats.push(`<b>${total}</b> total cards`);
-    stats.push(`<b>${mastered}</b> mastered`);
-  }
-
-  if(focusModule === 'finance'){
-    const offset = financeState.monthOffset;
-    const receipts = loadFinanceReceipts();
-    const entries = receiptsToEntries(receipts);
-    const monthEntries = filterByMonthOffset(entries, offset);
-    const total = monthEntries.reduce((s,e) => s + (Number(e.amount) || 0), 0);
-    const monthLabel = getMonthLabel(offset);
-
-    if(offset === 0){
-      const todayEntries = entries.filter(e => e.date === todayISO);
-      const todayTotal = todayEntries.reduce((s,e) => s + (Number(e.amount) || 0), 0);
-      stats.push(`<b>${formatMoney2(todayTotal)}</b> today`);
-    }
-    stats.push(`<b>${formatMoney(total)}</b> ${monthLabel}`);
-    stats.push(`<b>${monthEntries.length}</b> items`);
-  }
-
-  if(focusModule === 'nutrition'){
-    const meals = loadNutritionMeals();
-    const todayMeals = meals.filter(m => m.date === todayISO);
-    let cal = 0, pro = 0;
-    todayMeals.forEach(m => { if(m.totals){ cal += m.totals.calories || 0; pro += m.totals.protein || 0; } });
-    const targets = loadNutritionTargets();
-    const streak = getNutritionStreak(meals);
-
-    stats.push(`<b>${Math.round(cal)}</b> / ${targets.dailyCalories} cal today`);
-    stats.push(`<b>${Math.round(pro)}g</b> protein`);
-    if(streak > 0) stats.push(`<b>${streak}</b> day streak`);
-  }
-
-  if(focusModule === 'travel'){
-    const trips = loadTravelTrips();
-    const now = todayISO;
-    const upcoming = trips.filter(t => t.startDate && t.startDate > now);
-    stats.push(`<b>${trips.length}</b> trip${trips.length !== 1 ? 's' : ''}`);
-    if(upcoming.length){
-      stats.push(`<b>${upcoming.length}</b> upcoming`);
-      const nextTrip = upcoming.sort((a, b) => a.startDate.localeCompare(b.startDate))[0];
-      const daysUntil = Math.ceil((new Date(nextTrip.startDate) - new Date(now)) / 86400000);
-      if(daysUntil > 0) stats.push(`<b>${daysUntil}</b> days to next`);
-    }
-  }
-
-  if(focusModule === 'recipes'){
-    const recipes = loadDashboardRecipes();
-    let totalCal = 0;
-    let totalCost = 0;
-    recipes.forEach(r => {
-      if(r.totals){
-        totalCal += r.totals.calories || 0;
-        if(r.totals.cost) totalCost += r.totals.cost;
-      }
-    });
-    stats.push(`<b>${recipes.length}</b> recipe${recipes.length !== 1 ? 's' : ''}`);
-    if(totalCal > 0) stats.push(`<b>${Math.round(totalCal).toLocaleString()}</b> total cal`);
-    if(totalCost > 0) stats.push(`<b>${formatMoney2(totalCost)}</b> est. cost`);
-  }
-
-  if(focusModule === 'medicine'){
-    const today = getTodayMeds();
-    let taken = 0, remaining = 0;
-    ['antibiotics', 'tylenol'].forEach(key => {
-      if(!today[key]) return;
-      today[key].doses.forEach(d => {
-        if(d.takenAt) taken++;
-        else remaining++;
-      });
-    });
-    stats.push(`<b>${taken}</b> taken`);
-    stats.push(`<b>${remaining}</b> remaining`);
-  }
-
-  header.innerHTML = `
-    <a class="focus-attr-name" href="${href}">${escapeHtml(name)}</a>
-    <div class="focus-stats">
-      ${stats.map(s => `<span class="focus-stat">${s}</span>`).join('')}
-    </div>
-  `;
-}
-
-function getNutritionStreak(meals){
-  let streak = 0;
-  const d = new Date();
-  while(true){
-    const iso = d.toISOString().slice(0,10);
-    if(meals.some(m => m.date === iso)){
-      streak++;
-      d.setDate(d.getDate() - 1);
-    } else break;
-  }
-  return streak;
 }
 
 /* --------------------------------

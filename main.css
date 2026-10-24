@@ -1084,54 +1084,9 @@ body{
 .cal-save-btn:active{transform:translateY(1px);}
 
 
-/* Focus panel */
-.focus-panel{
-  background: var(--card);
-  border: 1px solid var(--ring);
-}
-.focus-header{
-  display:flex;
-  align-items:baseline;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:8px;
-}
-.focus-attr-name{
-  font-weight:1000;
-  font-size:16px;
-}
-.focus-stats{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.focus-stat{
-  padding:4px 10px;
-  border-radius:8px;
-  background: rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.10);
-  font-weight:900;
-  font-size:11px;
-  color:var(--muted);
-  white-space:nowrap;
-}
-.focus-stat b{color:var(--ink); margin-right:4px;}
-
 /* Detail panels (hidden by default, shown by focus mode) */
 .detail-panel{display:none;}
 .detail-panel.visible{display:block;}
-
-/* Focus header link */
-a.focus-attr-name{
-  color:inherit;
-  text-decoration:none;
-  transition: color .15s;
-}
-a.focus-attr-name:hover{
-  color:#a78bfa;
-  text-decoration:underline;
-}
 
 /* Travel card */
 .travel-card .card-inner{padding:10px;}
