@@ -786,10 +786,7 @@ function bowlingRates(games){
     const knocked1 = 10 - (shots[0].pinsLeft ? shots[0].pinsLeft.length : 0);
     firsts++;
     if(knocked1 === 10){ strikes++; return; }
-    if(shots.length >= 2){
-      const knocked2 = 10 - (shots[1].pinsLeft ? shots[1].pinsLeft.length : 0);
-      if(fi < 9 ? knocked1 + knocked2 === 10 : knocked1 + knocked2 >= 10) spares++;
-    }
+    if(shots.length >= 2 && knocked1 + BowlingCore.pinsKnocked(f, 1, fi) === 10) spares++;
   }));
   return {
     strikeRate: firsts ? Math.round((strikes / firsts) * 100) : null,
@@ -797,16 +794,149 @@ function bowlingRates(games){
   };
 }
 
-/* Bowling summary card (shown when the bowling slot is tapped). */
+/* --------------------------------
+   Bowling card: score the current game live, then career stats.
+   Scoring rules and storage come from bowling/bowlingCore.js, the same
+   code the bowling page uses. Shots logged here record pins only (no
+   stance / target board).
+----------------------------------*/
+const bowlScorer = { gameIndex: null, standing: [] };
+
+/* This week's record — not saved until a game is started. */
+function bowlWeek(){
+  const id = BowlingCore.getISOWeek(new Date());
+  return BowlingCore.loadWeek(id) || { weekId: id, weekLabel: BowlingCore.weekIdToLabel(id), games: [], created: new Date().toISOString() };
+}
+
 function renderBowlCard(){
+  if(!window.BowlingCore) return;
+  renderBowlScorer();
+  renderBowlStats();
+}
+
+function renderBowlScorer(){
+  const root = $('bowlScorer');
+  if(!root) return;
+  const B = BowlingCore;
+  const week = bowlWeek();
+  setText('bowlCardSub', `This week · ${week.weekLabel || B.weekIdToLabel(week.weekId)}`);
+
+  // default to the game in progress, else the last one bowled
+  if(bowlScorer.gameIndex == null || !week.games[bowlScorer.gameIndex]){
+    const open = week.games.findIndex(g => !B.isGameDone(g));
+    bowlScorer.gameIndex = open >= 0 ? open : (week.games.length ? week.games.length - 1 : null);
+  }
+
+  const tiles = week.games.map((g, i) => {
+    const done = B.isGameDone(g);
+    const val = done ? (g.score != null ? g.score : B.getFinalScore(g)) : B.getRunningScore(g);
+    return `<button class="bs-tile${i === bowlScorer.gameIndex ? ' on' : ''}${done ? '' : ' live'}" data-bs="game" data-i="${i}">
+      <small>G${i + 1}${done ? '' : ' ▶'}</small><b>${val}</b></button>`;
+  }).join('') + (week.games.length < B.MAX_GAMES_PER_WEEK
+    ? `<button class="bs-tile add" data-bs="new"><small>Game ${week.games.length + 1}</small><b>＋</b></button>` : '');
+
+  const game = bowlScorer.gameIndex != null ? week.games[bowlScorer.gameIndex] : null;
+  if(!game){
+    root.innerHTML = `<div class="bs-tiles">${tiles}</div>`;
+    return;
+  }
+
+  // ten-frame score sheet
+  const totals = B.calculateGameScore(game.frames);
+  const pos = B.currentPosition(game);
+  const sheet = game.frames.map((f, fi) => {
+    const boxes = fi < 9 ? 2 : 3;
+    let marks = '';
+    for(let b = 0; b < boxes; b++) marks += `<i>${B.shotDisplay(f, b, fi)}</i>`;
+    return `<div class="bs-frame${pos && pos.frame === fi ? ' cur' : ''}"><span class="bs-fn">${fi + 1}</span>
+      <span class="bs-marks">${marks}</span><span class="bs-tot">${totals[fi] != null ? totals[fi] : ''}</span></div>`;
+  }).join('');
+
+  let entry = '';
+  if(pos){
+    const avail = B.getAvailablePins(game.frames[pos.frame], pos.frame);
+    bowlScorer.standing = bowlScorer.standing.filter(p => avail.includes(p));
+    const pin = n => {
+      if(!avail.includes(n)) return `<span class="bs-pin down">${n}</span>`;
+      return `<button class="bs-pin${bowlScorer.standing.includes(n) ? ' up' : ''}" data-bs="pin" data-pin="${n}">${n}</button>`;
+    };
+    const deck = [[7,8,9,10],[4,5,6],[2,3],[1]].map(r => `<div class="bs-row">${r.map(pin).join('')}</div>`).join('');
+    const fresh = avail.length === 10;
+    const left = bowlScorer.standing.length;
+    entry = `
+      <div class="bs-entry">
+        <div class="bs-deck">${deck}</div>
+        <div class="bs-side">
+          <div class="bs-where">Frame <b>${pos.frame + 1}</b> · Ball <b>${pos.ball + 1}</b> · <b>${B.getRunningScore(game)}</b></div>
+          <button class="bs-btn hit" data-bs="clear">${fresh ? 'X Strike' : '/ Spare'}</button>
+          <button class="bs-btn" data-bs="record">Record · ${left} left</button>
+          <div class="bs-btn-row">
+            <button class="bs-btn ghost" data-bs="miss">– Miss</button>
+            <button class="bs-btn ghost" data-bs="undo"${pos.frame === 0 && pos.ball === 0 ? ' disabled' : ''}>↩ Undo</button>
+          </div>
+          <div class="bs-hint">Tap the pins still standing</div>
+        </div>
+      </div>`;
+  }else{
+    entry = `<div class="bs-done">Final <b>${game.score != null ? game.score : B.getFinalScore(game)}</b>
+      ${game.imported ? '' : '<button class="bs-btn ghost" data-bs="undo">↩ Undo last ball</button>'}</div>`;
+  }
+
+  root.innerHTML = `
+    <div class="bs-tiles">${tiles}</div>
+    <div class="bs-sheet">${sheet}</div>
+    ${entry}
+  `;
+}
+
+/* Taps inside the scorer: pick a game, toggle pins, record balls. */
+function handleBowlScorer(e){
+  const el = e.target.closest('[data-bs]');
+  if(!el) return;
+  const B = BowlingCore;
+  const week = bowlWeek();
+  const act = el.dataset.bs;
+  const gi = bowlScorer.gameIndex;
+  const wasDone = gi != null && week.games[gi] && B.isGameDone(week.games[gi]);
+
+  if(act === 'game'){ bowlScorer.gameIndex = Number(el.dataset.i); bowlScorer.standing = []; }
+  if(act === 'new'){
+    const idx = B.startGame(week);
+    if(idx >= 0){ bowlScorer.gameIndex = idx; bowlScorer.standing = []; }
+  }
+  if(act === 'pin'){
+    const n = Number(el.dataset.pin);
+    bowlScorer.standing = bowlScorer.standing.includes(n)
+      ? bowlScorer.standing.filter(p => p !== n) : bowlScorer.standing.concat(n);
+  }
+  if(gi != null && (act === 'clear' || act === 'record' || act === 'miss')){
+    const game = week.games[gi];
+    const pos = B.currentPosition(game);
+    if(pos){
+      const avail = B.getAvailablePins(game.frames[pos.frame], pos.frame);
+      const leftPins = act === 'clear' ? [] : act === 'miss' ? avail : bowlScorer.standing;
+      B.recordShot(week, gi, leftPins);
+      bowlScorer.standing = [];
+    }
+  }
+  if(gi != null && act === 'undo'){ B.undoShot(week, gi); bowlScorer.standing = []; }
+
+  const nowDone = gi != null && week.games[gi] && B.isGameDone(week.games[gi]);
+  renderBowlScorer();
+  // a finished (or reopened) game changes stats, the slot and level XP
+  if(wasDone !== nowDone){
+    renderBowlStats();
+    renderBowlDashboard();
+    renderModulesAndCharacter();
+  }
+}
+
+/* Career stats under the scorer. */
+function renderBowlStats(){
   const body = $('bowlCardBody');
   if(!body) return;
   const games = getAllBowlingGames();
-  if(!games.length){
-    setText('bowlCardSub', 'No games yet');
-    body.innerHTML = `<div class="empty">No bowling games logged yet.<br/>Log a game in <b>Bowling</b> and your stats will show up here.</div>`;
-    return;
-  }
+  if(!games.length){ body.innerHTML = ''; return; }
 
   const scores = games.map(g => g.score);
   const avg = Math.round(scores.reduce((s, v) => s + v, 0) / scores.length);
@@ -820,8 +950,6 @@ function renderBowlCard(){
   const rates = bowlingRates(games);
 
   const last = games[0];
-  const lastDate = last.date ? new Date(last.date.slice(0,10) + 'T12:00:00').toLocaleDateString(undefined, {month:'short', day:'numeric'}) : last.weekId;
-  setText('bowlCardSub', `${games.length} game${games.length === 1 ? '' : 's'} · last ${lastDate}`);
 
   const chip = (label, val) => `<div class="chip"><small>${label}</small> <span>${val}</span></div>`;
   const chips = [
@@ -849,6 +977,7 @@ function renderBowlCard(){
   `).join('');
 
   body.innerHTML = `
+    <div class="bowl-label">Career · ${games.length} game${games.length === 1 ? '' : 's'}</div>
     <div class="summary">${chips}</div>
     <div class="bowl-label">Latest series</div>
     <div class="bowl-games-row">${latestHtml}</div>
@@ -1553,6 +1682,9 @@ function bindButtons(){
   // Nutrition
   const openBowling = $('openBowling');
   if(openBowling) openBowling.addEventListener('click', ()=> location.href = './bowling/index.html');
+
+  const bowlScorerEl = $('bowlScorer');
+  if(bowlScorerEl) bowlScorerEl.addEventListener('click', handleBowlScorer);
 
   const openNutrition = $('openNutrition');
   if(openNutrition){

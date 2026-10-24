@@ -740,6 +740,61 @@ body{
 .xp-up b{color:#fbbf24; font-size:13px}
 .xp-up small{color:var(--muted); font-size:10px; font-weight:800}
 
+/* Bowling: live scorer */
+.bs-tiles{display:flex; gap:6px}
+.bs-tile{
+  all:unset; cursor:pointer; flex:1; min-width:0; text-align:center;
+  padding:6px 4px; border-radius:10px;
+  background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10);
+  display:flex; flex-direction:column; gap:1px;
+}
+.bs-tile small{color:var(--muted); font-size:10px; font-weight:900}
+.bs-tile b{font-size:18px; font-weight:1000}
+.bs-tile.on{border-color: rgba(59,130,246,.6); background: rgba(59,130,246,.14)}
+.bs-tile.live small{color:#86efac}
+.bs-tile.add{border-style:dashed; color:var(--muted)}
+
+.bs-sheet{display:grid; grid-template-columns:repeat(9, 1fr) 1.4fr; gap:2px; margin-top:8px}
+.bs-frame{
+  display:flex; flex-direction:column; align-items:stretch; min-width:0;
+  border-radius:6px; background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  padding:1px 2px 2px;
+}
+.bs-frame.cur{border-color: rgba(59,130,246,.7); background: rgba(59,130,246,.12)}
+.bs-fn{font-size:8px; color:var(--muted); font-weight:900; line-height:1.2}
+.bs-marks{display:flex; justify-content:flex-end; gap:1px; min-height:13px}
+.bs-marks i{font-style:normal; font-size:10px; font-weight:1000; min-width:8px; text-align:center}
+.bs-tot{text-align:center; font-size:11px; font-weight:1000; min-height:14px}
+
+.bs-entry{display:flex; gap:10px; align-items:center; margin-top:10px}
+.bs-deck{display:flex; flex-direction:column; gap:4px; flex:0 0 auto}
+.bs-row{display:flex; justify-content:center; gap:5px}
+.bs-pin{
+  all:unset; box-sizing:border-box; cursor:pointer;
+  width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:1000; color:rgba(255,255,255,.45);
+  border:1px dashed rgba(255,255,255,.22); background:transparent;
+}
+.bs-pin.up{color:#0b0f14; background:#f8fafc; border:1px solid #f8fafc; box-shadow:0 0 8px rgba(248,250,252,.35)}
+.bs-pin.down{cursor:default; opacity:.18; border-style:solid}
+.bs-side{flex:1; min-width:0; display:flex; flex-direction:column; gap:6px}
+.bs-where{font-size:12px; color:var(--muted); font-weight:800}
+.bs-where b{color:var(--ink)}
+.bs-btn{
+  all:unset; box-sizing:border-box; cursor:pointer; text-align:center;
+  padding:9px 8px; border-radius:10px; font-weight:1000; font-size:13px;
+  background: linear-gradient(90deg, #7c3aed, #a855f7); color:#fff;
+}
+.bs-btn.hit{background: linear-gradient(90deg, #f59e0b, #fbbf24); color:#1a1205}
+.bs-btn.ghost{background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); color:var(--ink); font-size:12px; padding:7px 6px}
+.bs-btn[disabled]{opacity:.35; cursor:default}
+.bs-btn-row{display:flex; gap:6px}
+.bs-btn-row .bs-btn{flex:1}
+.bs-hint{font-size:10px; color:var(--muted); font-weight:800}
+.bs-done{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; font-weight:900; color:var(--muted)}
+.bs-done b{font-size:24px; color:var(--ink)}
+
 /* Bowling summary card */
 .bowl-label{margin:12px 0 6px; color:var(--muted); font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.5px}
 .bowl-label span{text-transform:none; letter-spacing:0; font-weight:800}

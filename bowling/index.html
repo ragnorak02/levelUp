@@ -954,6 +954,7 @@
     </div>
   </div>
 
+<script src="bowlingCore.js"></script>
 <script>
 'use strict';
 
@@ -968,46 +969,18 @@ function safeParse(key){
 }
 
 /* --------------------------------
-   ISO Week helpers
+   Scoring, weeks and storage: bowling/bowlingCore.js (shared with the dashboard)
 ----------------------------------*/
-function getISOWeek(date){
-    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-    return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
-}
-
-function weekIdToLabel(weekId){
-    const match = weekId.match(/^(\d{4})-W(\d{2})$/);
-    if(!match) return weekId;
-    const year = parseInt(match[1]);
-    const week = parseInt(match[2]);
-    const jan4 = new Date(year, 0, 4);
-    const dayOfWeek = jan4.getDay() || 7;
-    const monday = new Date(year, 0, 4 - dayOfWeek + 1 + (week - 1) * 7);
-    const tuesday = new Date(monday);
-    tuesday.setDate(monday.getDate() + 1);
-    return 'Tue, ' + tuesday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-function offsetWeek(weekId, offset){
-    const match = weekId.match(/^(\d{4})-W(\d{2})$/);
-    if(!match) return weekId;
-    const year = parseInt(match[1]);
-    const week = parseInt(match[2]);
-    const jan4 = new Date(year, 0, 4);
-    const dayOfWeek = jan4.getDay() || 7;
-    const monday = new Date(year, 0, 4 - dayOfWeek + 1 + (week - 1) * 7);
-    monday.setDate(monday.getDate() + offset * 7);
-    return getISOWeek(monday);
-}
+const {
+    STORAGE_PREFIX, getISOWeek, weekIdToLabel, offsetWeek,
+    storageKey, loadWeek, saveWeek, ensureWeek, createEmptyGame,
+    isFrameComplete, calculateGameScore, isGameComplete, getFinalScore, getRunningScore,
+    shotDisplay, getAllPins, getAvailablePins, listAllWeekKeys, getAllCompletedGames
+} = BowlingCore;
 
 /* --------------------------------
    Data Layer
 ----------------------------------*/
-const STORAGE_PREFIX = 'bowling:week:';
-
 let state = {
     weekId: getISOWeek(new Date()),
     viewMode: 'games',
@@ -1019,65 +992,6 @@ let state = {
     lastTargetBoard: null,
     copySource: null,
 };
-
-function storageKey(weekId){ return STORAGE_PREFIX + weekId; }
-function loadWeek(weekId){ return safeParse(storageKey(weekId)); }
-
-function saveWeek(weekData){
-    localStorage.setItem(storageKey(weekData.weekId), JSON.stringify(weekData));
-}
-
-function ensureWeek(weekId){
-    let week = loadWeek(weekId);
-    if(!week){
-        week = {
-            weekId,
-            weekLabel: weekIdToLabel(weekId),
-            games: [],
-            created: new Date().toISOString(),
-        };
-        saveWeek(week);
-    }
-    return week;
-}
-
-function createEmptyGame(gameNumber){
-    const frames = [];
-    for(let i = 1; i <= 10; i++){
-        frames.push({ frameNumber: i, shots: [] });
-    }
-    return {
-        id: 'game_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-        gameNumber,
-        frames,
-        score: null,
-        completedDate: null,
-    };
-}
-
-/* --------------------------------
-   All-time data access
-----------------------------------*/
-function listAllWeekKeys(){
-    const keys = [];
-    for(let i = 0; i < localStorage.length; i++){
-        const k = localStorage.key(i);
-        if(k && k.startsWith(STORAGE_PREFIX)) keys.push(k);
-    }
-    return keys;
-}
-
-function getAllCompletedGames(){
-    const games = [];
-    listAllWeekKeys().forEach(k => {
-        const week = safeParse(k);
-        if(!week || !Array.isArray(week.games)) return;
-        week.games.forEach(g => {
-            if(g.score != null) games.push({ ...g, weekId: week.weekId });
-        });
-    });
-    return games;
-}
 
 /* --------------------------------
    Stats calculation
@@ -1123,8 +1037,7 @@ function computeStats(games){
 
                 // Spare or open (check second shot)
                 if(frame.shots.length >= 2){
-                    const shot2 = frame.shots[1];
-                    const knocked2 = 10 - (shot2.pinsLeft ? shot2.pinsLeft.length : 0);
+                    const knocked2 = BowlingCore.pinsKnocked(frame, 1, fi);
                     if(fi < 9){
                         if(knocked + knocked2 === 10) spares++;
                         else opens++;
@@ -1176,202 +1089,11 @@ function computeStats(games){
     };
 }
 
-/* --------------------------------
-   Scoring
-----------------------------------*/
-function pinsKnockedInShot(shot){
-    return 10 - (shot.pinsLeft ? shot.pinsLeft.length : 0);
-}
-
-function calculateGameScore(frames){
-    const scores = new Array(10).fill(null);
-    const allShots = [];
-    frames.forEach(f => {
-        f.shots.forEach(s => allShots.push(pinsKnockedInShot(s)));
-    });
-
-    let shotIndex = 0;
-    let cumulative = 0;
-
-    for(let f = 0; f < 10; f++){
-        const frame = frames[f];
-        if(!frame.shots.length) break;
-
-        if(f < 9){
-            const shot1 = allShots[shotIndex];
-            if(shot1 === undefined) break;
-
-            if(shot1 === 10){
-                const next1 = allShots[shotIndex + 1];
-                const next2 = allShots[shotIndex + 2];
-                if(next1 === undefined || next2 === undefined){
-                    scores[f] = null;
-                    shotIndex += 1;
-                    continue;
-                }
-                cumulative += 10 + next1 + next2;
-                scores[f] = cumulative;
-                shotIndex += 1;
-            } else {
-                const shot2 = allShots[shotIndex + 1];
-                if(shot2 === undefined) break;
-
-                if(shot1 + shot2 === 10){
-                    const next1 = allShots[shotIndex + 2];
-                    if(next1 === undefined){
-                        scores[f] = null;
-                        shotIndex += 2;
-                        continue;
-                    }
-                    cumulative += 10 + next1;
-                    scores[f] = cumulative;
-                } else {
-                    cumulative += shot1 + shot2;
-                    scores[f] = cumulative;
-                }
-                shotIndex += 2;
-            }
-        } else {
-            let frameTotal = 0;
-            for(let s = 0; s < frame.shots.length; s++){
-                frameTotal += allShots[shotIndex + s] || 0;
-            }
-            if(isFrameComplete(frame, 9)){
-                cumulative += frameTotal;
-                scores[f] = cumulative;
-            }
-            shotIndex += frame.shots.length;
-        }
-    }
-    return scores;
-}
-
-function isFrameComplete(frame, frameIndex){
-    if(frameIndex < 9){
-        if(frame.shots.length === 0) return false;
-        if(pinsKnockedInShot(frame.shots[0]) === 10) return true;
-        return frame.shots.length >= 2;
-    } else {
-        if(frame.shots.length < 2) return false;
-        const s1 = pinsKnockedInShot(frame.shots[0]);
-        const s2 = pinsKnockedInShot(frame.shots[1]);
-        if(s1 === 10 || s1 + s2 === 10) return frame.shots.length >= 3;
-        return true;
-    }
-}
-
-function isGameComplete(game){
-    return isFrameComplete(game.frames[9], 9);
-}
-
-function getFinalScore(game){
-    return calculateGameScore(game.frames)[9];
-}
-
-function getRunningScore(game){
-    const scores = calculateGameScore(game.frames);
-    for(let f = 9; f >= 0; f--){
-        if(scores[f] != null) return scores[f];
-    }
-    return 0;
-}
-
-/* --------------------------------
-   Shot display helpers
-----------------------------------*/
-function shotDisplay(frame, shotIdx, frameIdx){
-    if(!frame.shots[shotIdx]) return '';
-    const knocked = pinsKnockedInShot(frame.shots[shotIdx]);
-
-    if(frameIdx < 9){
-        if(shotIdx === 0){
-            if(knocked === 10) return 'X';
-            if(knocked === 0) return '-';
-            return String(knocked);
-        }
-        if(shotIdx === 1){
-            const first = pinsKnockedInShot(frame.shots[0]);
-            if(first + knocked === 10) return '/';
-            if(knocked === 0) return '-';
-            return String(knocked);
-        }
-    } else {
-        if(shotIdx === 0){
-            if(knocked === 10) return 'X';
-            if(knocked === 0) return '-';
-            return String(knocked);
-        }
-        if(shotIdx === 1){
-            const s1 = pinsKnockedInShot(frame.shots[0]);
-            if(s1 === 10){
-                if(knocked === 10) return 'X';
-                if(knocked === 0) return '-';
-                return String(knocked);
-            }
-            if(s1 + knocked === 10) return '/';
-            if(knocked === 0) return '-';
-            return String(knocked);
-        }
-        if(shotIdx === 2){
-            const s1 = pinsKnockedInShot(frame.shots[0]);
-            const s2 = pinsKnockedInShot(frame.shots[1]);
-            if(s1 === 10 && s2 === 10){
-                if(knocked === 10) return 'X';
-            } else if(s1 === 10){
-                if(s2 + knocked === 10) return '/';
-            } else if(s1 + s2 === 10){
-                if(knocked === 10) return 'X';
-            }
-            if(knocked === 0) return '-';
-            return String(knocked);
-        }
-    }
-    return '';
-}
-
 function shotBoxClass(display){
     if(display === 'X') return 'strike';
     if(display === '/') return 'spare';
     if(display === '-') return 'gutter';
     return '';
-}
-
-/* --------------------------------
-   Pin Management
-----------------------------------*/
-function getAllPins(){ return [1,2,3,4,5,6,7,8,9,10]; }
-
-function getAvailablePins(frame, frameIndex){
-    if(frame.shots.length === 0) return getAllPins();
-
-    if(frameIndex < 9){
-        if(frame.shots.length === 1){
-            return frame.shots[0].pinsLeft ? [...frame.shots[0].pinsLeft] : [];
-        }
-        return [];
-    } else {
-        const shotCount = frame.shots.length;
-        if(shotCount === 0) return getAllPins();
-
-        const s1 = pinsKnockedInShot(frame.shots[0]);
-
-        if(shotCount === 1){
-            if(s1 === 10) return getAllPins();
-            return frame.shots[0].pinsLeft ? [...frame.shots[0].pinsLeft] : [];
-        }
-
-        if(shotCount === 2){
-            const s2 = pinsKnockedInShot(frame.shots[1]);
-            if(s1 === 10 && s2 === 10) return getAllPins();
-            if(s1 === 10){
-                if(frame.shots[1].pinsLeft && frame.shots[1].pinsLeft.length === 0) return getAllPins();
-                return frame.shots[1].pinsLeft ? [...frame.shots[1].pinsLeft] : [];
-            }
-            if(s1 + s2 === 10) return getAllPins();
-            return [];
-        }
-        return [];
-    }
 }
 
 /* --------------------------------

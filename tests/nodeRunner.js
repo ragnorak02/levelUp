@@ -33,6 +33,8 @@ require('../powerUp/sessionSummary.js');
 require('./testSuiteSessionSummary.js');
 require('../powerUp/workoutXP.js');
 require('./testSuiteWorkoutXP.js');
+require('../bowling/bowlingCore.js');
+require('./testSuiteBowling.js');
 
 // Run
 const result = window.TestFramework.runAllSuites();
