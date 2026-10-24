@@ -1877,7 +1877,20 @@ function renderModulesAndCharacter(){
   // Thin level bar (replaces old power strip)
   setWidth('levelFill', pct(exPower, EX_MAX));
 
-  setHeight('modExFill', pct(exPower, EX_MAX));
+  // Stacked: everything before today, with today's gain glowing on top
+  const yesterday = new Date(todayISO + 'T00:00:00Z');
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+  const exToday = Math.min(exPower, volumeSince(yesterday.toISOString().slice(0,10)));
+  const exBase = pct(exPower - exToday, EX_MAX);
+  setHeight('modExFill', exBase);
+  const todayFill = $('modExToday');
+  if(todayFill){
+    const h = pct(exPower, EX_MAX) - exBase;
+    todayFill.style.bottom = exBase.toFixed(1) + '%';
+    todayFill.style.height = h.toFixed(1) + '%';
+    todayFill.classList.toggle('on', h > 0);
+    $('modExFill').classList.toggle('dim', h > 0);
+  }
 
   // Study fill: (placeholder until you wire study power)
   setHeight('modStudyFill', 0);
@@ -1975,11 +1988,13 @@ function bindNav(){
   document.querySelectorAll('.modv[data-module]').forEach(modv => {
     modv.addEventListener('click', () => {
       const mod = modv.dataset.module;
+      // second tap on the selected bar opens the module, same as its icon
       if(focusModule === mod){
-        focusModule = null; // toggle off
-      } else {
-        focusModule = mod;
+        const link = modv.querySelector('.micon');
+        if(link) location.href = link.href;
+        return;
       }
+      focusModule = mod;
       updateFocusMode();
     });
   });

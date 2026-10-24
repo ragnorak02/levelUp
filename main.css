@@ -466,6 +466,43 @@ body{
 .vfill.fin{ background: linear-gradient(180deg, rgba(34,197,94,.65), rgba(34,197,94,.92)); }
 .vfill.nut{ background: linear-gradient(180deg, rgba(245,158,11,.65), rgba(245,158,11,.92)); }
 
+/* Today's gain, stacked on the earlier fill: the older part darkens and the
+   new slice burns bright with a flickering, crackling top edge. */
+.vfill.ex.dim{ background: linear-gradient(180deg, #7f1d1d, #5b1414); }
+.vfill-today{
+  position:absolute; left:0; right:0;
+  height:0; display:none;
+  transition: height .35s ease, bottom .35s ease;
+}
+.vfill-today.on{display:block}
+.vfill-today.ex{
+  background: linear-gradient(0deg, #dc2626 0%, #f97316 55%, #fde047 100%);
+  background-size: 100% 200%;
+  box-shadow: 0 0 14px 2px rgba(249,115,22,.55), inset 0 0 10px rgba(255,255,255,.25);
+  animation: todayBurn 1.6s ease-in-out infinite alternate, todayFlicker 2.3s steps(1) infinite;
+}
+.vfill-today.ex::before{
+  content:""; position:absolute; left:0; right:0; top:-2px; height:4px;
+  background: linear-gradient(90deg, transparent, #fff7ae, #fff, #fff7ae, transparent);
+  background-size: 200% 100%;
+  box-shadow: 0 0 10px 3px rgba(253,224,71,.85);
+  animation: todaySpark 1.1s linear infinite;
+}
+@keyframes todayBurn{
+  from{ background-position: 0 0%;   filter: brightness(1) }
+  to  { background-position: 0 100%; filter: brightness(1.25) }
+}
+@keyframes todayFlicker{
+  0%,100%{ opacity:1 } 37%{ opacity:.82 } 41%{ opacity:1 } 68%{ opacity:.9 } 71%{ opacity:1 }
+}
+@keyframes todaySpark{
+  from{ background-position: 200% 0 }
+  to  { background-position: -200% 0 }
+}
+@media (prefers-reduced-motion: reduce){
+  .vfill-today.ex, .vfill-today.ex::before{ animation:none }
+}
+
 .abbr{
   text-align:center;
   font-weight:1000;
