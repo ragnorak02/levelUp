@@ -1,0 +1,300 @@
+/* SessionSummary styles — shared by powerUp/workout.html and main.html.
+   Everything is scoped under .session-summary (or .ss-popup for the popups)
+   so it can't leak into, or be overridden by, either host page. */
+
+.session-summary, .ss-popup{
+  --panel:#0d131a; --ink:#e8eef6; --muted:#9fb0c7; --ring:#1c2a37;
+  --accent:#4CAF50;
+  --finished-bg:#0e141b; --finished-ring:#1c2a37;
+  --copied-bg:#1a1f2b; --copied-ring:#2a3447; --copied-text:#22c55e;
+  color:var(--ink);
+}
+.session-summary{display:flex; flex-direction:column; gap:10px}
+.session-summary .hidden{display:none}
+
+/* ===== Volume card ===== */
+.session-summary .ss-card{
+  background:var(--panel);
+  border:1px solid rgba(42,53,67,.70);
+  border-radius:16px; padding:12px;
+  box-shadow:0 4px 20px rgba(0,0,0,.20);
+}
+.session-summary .ss-power{
+  --power-glow:#1e3a8a;
+  --power-grad: linear-gradient(90deg,#0b1118, #0b1118);
+  position:relative;
+  overflow:hidden;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--power-glow), #000 60%),
+    0 0 24px color-mix(in oklab, var(--power-glow), #000 10%),
+    inset 0 0 28px color-mix(in oklab, var(--power-glow), #000 75%);
+  outline: 1px solid color-mix(in oklab, var(--power-glow), #000 60%);
+}
+.session-summary .ss-power::after{
+  content:"";
+  position:absolute; inset:-1px;
+  background: var(--power-grad);
+  background-size: 300% 100%;
+  opacity:0; pointer-events:none;
+}
+.level-up .session-summary .ss-power::after{
+  animation: ssSweep 650ms ease-out;
+}
+@keyframes ssSweep{
+  0%{opacity:.0; background-position: -200% 0}
+  20%{opacity:.25}
+  50%{opacity:.35}
+  100%{opacity:0; background-position: 200% 0}
+}
+
+.session-summary .ss-power .top{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; position:relative; padding-right:38px}
+.session-summary .ss-power-val{font-size:2rem; font-weight:900; line-height:1}
+.session-summary .ss-power-trend{font-size:.85rem; color:var(--muted); font-weight:700}
+.session-summary .ss-power-trend.up{color:#4ade80}
+.session-summary .ss-power-trend.down{color:#94a3b8}
+
+.session-summary .sess-label{
+  margin:0 0 .3rem; color:var(--muted); font-size:.68rem;
+  font-weight:800; text-transform:uppercase; letter-spacing:.6px;
+}
+/* Out of flow, centred on the volume figure — it must not grow the card. */
+.session-summary .copy-btn{
+  all:unset; cursor:pointer;
+  position:absolute; right:0; top:50%; transform:translateY(-50%);
+  width:30px; height:30px; border-radius:999px;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:.85rem; line-height:1; font-weight:900;
+  color:#c7d2fe; border:1px solid var(--ring); background:#0e141b;
+}
+.session-summary .copy-btn:active{background:#16202b}
+.session-summary .copy-btn.ok{color:#4ade80; border-color:rgba(34,197,94,.45); background:#0d1a12}
+
+.session-summary .sess-block{margin-top:12px}
+.session-summary .sess-block + .sess-block{border-top:1px solid rgba(42,53,67,.55); padding-top:10px}
+
+/* Session progress */
+.session-summary .sess-prog-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:.8rem; color:var(--muted); font-weight:700}
+.session-summary .sess-prog-head b{color:var(--ink); font-weight:900}
+.session-summary .sess-prog{
+  height:8px; border-radius:999px; background:#101a24;
+  border:1px solid rgba(42,53,67,.9); overflow:hidden; margin-top:6px;
+}
+.session-summary .sess-prog > i{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#22c55e,#4ade80); transition:width .25s ease}
+.session-summary .sess-prog > i.done{background:linear-gradient(90deg,#ffd54a,#fff7a8); box-shadow:0 0 12px rgba(255,213,74,.5)}
+
+/* Per-muscle-group split */
+.session-summary .split-row{display:grid; grid-template-columns:5.5rem 1fr auto; align-items:center; gap:8px; font-size:.82rem}
+.session-summary .split-row + .split-row{margin-top:6px}
+.session-summary .split-name{color:var(--ink); font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.session-summary .split-track{height:8px; border-radius:999px; background:#101a24; border:1px solid rgba(42,53,67,.9); overflow:hidden}
+.session-summary .split-track > i{display:block; height:100%; border-radius:999px}
+.session-summary .split-val{color:var(--muted); font-weight:800; font-size:.76rem; white-space:nowrap; justify-self:end}
+
+/* PRs hit today */
+.session-summary .pr-hits{display:flex; flex-direction:column; gap:6px}
+.session-summary .pr-hit{
+  display:flex; align-items:center; gap:8px; font-size:.84rem; font-weight:800;
+  background:linear-gradient(90deg, rgba(58,42,0,.55), rgba(11,17,24,.5));
+  border:1px solid rgba(255,213,74,.45); border-radius:10px; padding:7px 9px;
+}
+.session-summary .pr-hit .pr-name{color:#ffd54a; flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.session-summary .pr-hit .pr-val{color:var(--ink); white-space:nowrap}
+.session-summary .pr-hit .pr-kind{color:var(--muted); font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.4px; white-space:nowrap}
+
+/* ===== Totals strip ===== */
+.session-summary .ss-totals{position:sticky; top:0; z-index:20; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+  background:rgba(13,19,26,.9); backdrop-filter:saturate(1.1) blur(3px); border:1px solid var(--ring); border-radius:12px; padding:10px; font-size:.95rem}
+.ss-popup-open .session-summary .ss-totals{display:none}
+.session-summary .ss-chip{background:#0b1118; border:1px solid var(--ring); padding:.35rem .6rem; border-radius:999px; color:var(--muted)}
+.session-summary .ss-chip b{color:var(--ink)}
+
+/* ===== Sections ===== */
+.session-summary .supergroup{background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:10px}
+.session-summary .sg-head{display:flex; align-items:center; gap:8px; margin:.2rem 0 .5rem}
+.session-summary .sg-head h2{margin:0; font-size:1rem; color:#c7d2fe; flex:1 1 auto; min-width:0}
+.session-summary .sg-actions{display:flex; gap:6px; flex:0 0 auto}
+.session-summary .mini-btn, .ss-popup .mini-btn{
+  all:unset; cursor:pointer; white-space:nowrap;
+  font-size:.72rem; font-weight:800; color:var(--muted);
+  border:1px solid var(--ring); background:#0e141b;
+  padding:.34rem .6rem; border-radius:999px;
+  min-height:30px; display:inline-flex; align-items:center;
+}
+.session-summary .mini-btn:active, .ss-popup .mini-btn:active{background:#16202b; color:var(--ink)}
+
+/* Collapsible body-part sections */
+.session-summary .cgroup{
+  background:#0b1118; border:1px solid var(--ring);
+  border-radius:14px; overflow:hidden; margin-top:8px;
+}
+.session-summary .cgroup-head{
+  display:flex; align-items:center; gap:10px;
+  padding:12px 12px; cursor:pointer;
+  background:linear-gradient(90deg,#111c27,#0b1118);
+  border-bottom:1px solid var(--ring);
+  -webkit-tap-highlight-color:transparent;
+}
+.session-summary .cgroup.collapsed .cgroup-head{border-bottom-color:transparent}
+.session-summary .cgroup-head:active{background:linear-gradient(90deg,#16232f,#0d141c)}
+.session-summary .cgroup-chev{
+  color:var(--muted); font-size:.75rem; flex:0 0 auto;
+  transition:transform .18s ease; pointer-events:none;
+}
+.session-summary .cgroup.collapsed .cgroup-chev{transform:rotate(-90deg)}
+.session-summary .cgroup-name{font-weight:900; font-size:1.02rem; color:var(--ink); flex:1 1 auto; min-width:0; pointer-events:none}
+.session-summary .cgroup-meta{color:var(--muted); font-size:.8rem; font-weight:800; white-space:nowrap; pointer-events:none}
+.session-summary .cgroup-body{padding:6px 10px 10px}
+.session-summary .cgroup.collapsed .cgroup-body{display:none}
+
+/* ===== Exercise cards ===== */
+.session-summary .ex{border:1px dashed var(--ring); border-radius:12px; padding:10px; margin:8px 0; display:grid; gap:8px; background:#0e141b}
+.session-summary .ex.finished{background:var(--finished-bg); border-color:var(--finished-ring)}
+.session-summary .ex.copied{background:var(--copied-bg); border-color:var(--copied-ring)}
+
+.session-summary .ex-header{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:nowrap; cursor:pointer; position:relative}
+.session-summary .ex-name{font-weight:700}
+.session-summary .tag{font-size:.9rem; color:var(--muted)}
+.session-summary .sets{display:grid; gap:6px}
+
+/* Per-exercise collapse */
+.session-summary .ex-chev{color:var(--muted); font-size:.7rem; transition:transform .18s ease; flex:0 0 auto}
+.session-summary .ex.ex-collapsed .ex-chev{transform:rotate(-90deg)}
+.session-summary .ex.ex-collapsed .ex-body{display:none}
+
+/* Complete / History ride on the exercise name line - that row had the
+   vertical space to spare, and the buttons stay reachable when collapsed. */
+.session-summary .ex-title{flex:1 1 auto; min-width:0}
+.session-summary .ex-title .tag{font-size:.82rem}
+.session-summary .ex-head-actions{display:flex; align-items:center; gap:6px; flex:0 0 auto}
+/* Narrow enough to share the name row, still a 40px tap target. */
+.session-summary .btn-complete,.session-summary .btn-undo,.session-summary .btn-icon{
+  all:unset; cursor:pointer; box-sizing:border-box;
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:40px; padding:0 .7rem; border-radius:10px;
+  font-weight:800; font-size:.82rem; white-space:nowrap;
+}
+.session-summary .btn-complete{background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a}
+.session-summary .btn-undo{color:#fbbf24; border:1px solid rgba(251,191,36,.5); background:rgba(251,191,36,.08)}
+.session-summary .btn-icon{min-width:40px; padding:0 .4rem; font-size:.95rem; border:1px solid var(--ring); color:#9fb0c7}
+.session-summary .btn-complete:active,.session-summary .btn-undo:active,.session-summary .btn-icon:active{opacity:.75}
+
+/* Sets list (single column, in the order performed) */
+.session-summary .set-grid{display:grid; grid-template-columns:1fr; gap:6px; margin-top:10px}
+.session-summary .set-item{
+  display:grid;
+  grid-template-columns:3.1rem auto auto auto auto 1fr;
+  align-items:center;
+  gap:6px;
+  padding:9px 10px;
+  border-radius:10px;
+  background:rgba(10,16,22,.55);
+  border:1px solid rgba(42,53,67,.75);
+  font-weight:900;
+  letter-spacing:.02em;
+}
+.session-summary .set-item .si-unit, .session-summary .set-item .si-x{color:var(--muted); font-weight:800; font-size:.85rem}
+.session-summary .set-item .si-n{color:var(--muted); font-weight:800; font-size:.72rem; letter-spacing:.5px}
+.session-summary .set-item .si-w, .session-summary .set-item .si-r{font-size:1.05rem}
+.session-summary .set-item .si-vol{color:var(--muted); font-weight:800; font-size:.76rem; justify-self:end; white-space:nowrap}
+.session-summary .set-item.set-top{
+  border-color:rgba(255,213,74,.55);
+  background:linear-gradient(90deg, rgba(58,42,0,.55), rgba(10,16,22,.55));
+}
+.session-summary .set-item.set-top .si-n{color:#ffd54a}
+.session-summary .set-item.set-special{
+  background:linear-gradient(180deg,#2a2100,#3a2a00);
+  border-color:#fbbf24;
+}
+/* Read-only view of an unfinished exercise: sets not ticked Done yet */
+.session-summary .ex.ex-pending{border-style:dashed}
+.session-summary .set-item.set-pending{opacity:.45; border-style:dashed}
+
+/* PR summary + trend sparkline */
+.session-summary .prsum{
+  background:#0f141b; border:1px solid var(--ring);
+  border-radius:12px; padding:10px; margin-top:8px;
+}
+.session-summary .prsum-row{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; line-height:1.25}
+.session-summary .prsum-row + .prsum-row{margin-top:6px}
+.session-summary .prsum-row .k{
+  color:var(--muted); font-weight:800; text-transform:uppercase;
+  letter-spacing:.5px; font-size:.68rem; flex:0 0 auto; min-width:52px;
+}
+.session-summary .prsum-row .v{color:var(--ink); font-weight:900; font-size:.98rem}
+.session-summary .prsum-row .v.gold{color:#ffd54a; text-shadow:0 0 12px rgba(255,213,74,.4)}
+.session-summary .prsum-row .sep{color:#2a3949; font-weight:900}
+.session-summary .prsum-row .note{color:var(--muted); font-weight:700; font-size:.82rem}
+.session-summary .prsum-row .note.gold{color:#ffd54a}
+.session-summary .prsum-bar{
+  height:6px; border-radius:999px; background:#101a24;
+  border:1px solid rgba(42,53,67,.9); overflow:hidden; margin-top:8px;
+}
+.session-summary .prsum-bar > i{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#ff7a18,#ffc531)}
+.session-summary .prsum-bar > i.gold{background:linear-gradient(90deg,#ffd54a,#fff7a8); box-shadow:0 0 12px rgba(255,213,74,.55)}
+
+.session-summary .trend, .ss-popup .trend{margin-top:10px; border-top:1px solid rgba(42,53,67,.55); padding-top:8px}
+.session-summary .trend-head, .ss-popup .trend-head{
+  display:flex; justify-content:space-between; align-items:baseline; gap:8px;
+  color:var(--muted); font-size:.68rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.5px;
+}
+.session-summary .trend-head b, .ss-popup .trend-head b{color:var(--ink); font-size:.8rem}
+.session-summary .trend-plot, .ss-popup .trend-plot{position:relative; height:54px; margin-top:6px}
+.ss-popup .trend-lg .trend-plot{height:120px}
+.session-summary .trend-plot svg, .ss-popup .trend-plot svg{position:absolute; inset:0; width:100%; height:100%; display:block}
+.session-summary .trend-area, .ss-popup .trend-area{fill:rgba(255,197,49,.13); stroke:none}
+.session-summary .trend-line, .ss-popup .trend-line{fill:none; stroke:#ffc531; stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
+.session-summary .trend-dot, .ss-popup .trend-dot{
+  position:absolute; width:8px; height:8px; border-radius:50%;
+  background:#ffc531; transform:translate(-50%,-50%);
+  box-shadow:0 0 0 2px rgba(15,20,27,.9);
+}
+.session-summary .trend-dot.sm, .ss-popup .trend-dot.sm{width:6px; height:6px; background:#e0a316}
+.session-summary .trend-dot.gold, .ss-popup .trend-dot.gold{background:#fff7a8; box-shadow:0 0 0 2px rgba(15,20,27,.9), 0 0 12px rgba(255,213,74,.8)}
+.session-summary .trend-foot, .ss-popup .trend-foot{
+  display:flex; justify-content:space-between; margin-top:4px;
+  color:var(--muted); font-size:.68rem; font-weight:800;
+}
+
+/* ===== Popups ===== */
+.ss-popup{position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; padding:10px; z-index:100}
+.ss-sheet{width:min(650px, 96%); max-height:85vh; overflow:auto; background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:12px}
+.ss-x{all:unset; cursor:pointer; float:right; border:1px solid var(--ring); padding:.25rem .5rem; border-radius:8px; color:#9fb0c7}
+.ss-sheet-title{margin:6px 0 10px; font-size:1rem; color:#9fb0c7}
+
+.ss-popup .json-hint{color:var(--muted); font-size:.75rem; font-weight:700; margin:0 0 8px}
+.ss-popup .json-box{
+  width:100%; box-sizing:border-box; height:46vh; resize:vertical;
+  background:#080d13; color:#cbd5e1; border:1px solid var(--ring); border-radius:10px;
+  padding:10px; white-space:pre; overflow:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.72rem; line-height:1.45;
+}
+
+/* Exercise history */
+.ss-popup .hist-pr{
+  display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+  background:#0f141b; border:1px solid var(--ring); border-radius:12px; padding:10px;
+}
+.ss-popup .hist-pr .k{
+  color:var(--muted); font-weight:800; text-transform:uppercase;
+  letter-spacing:.5px; font-size:.68rem;
+}
+.ss-popup .hist-pr .v{color:#ffd54a; font-weight:900; font-size:1.05rem; text-shadow:0 0 12px rgba(255,213,74,.35)}
+.ss-popup .hist-pr .sep{color:#2a3949; font-weight:900}
+.ss-popup .hist-pr .note{color:var(--muted); font-weight:700; font-size:.82rem}
+
+.ss-popup .hist-session{border-top:1px solid rgba(42,53,67,.55); margin-top:12px; padding-top:10px}
+.ss-popup .hist-head{display:flex; align-items:baseline; gap:8px; margin-bottom:7px}
+.ss-popup .hist-date{font-weight:900; font-size:.92rem; color:#c7d2fe}
+.ss-popup .hist-meta{color:var(--muted); font-weight:700; font-size:.76rem}
+.ss-popup .hist-sets{display:grid; grid-template-columns:1fr; gap:5px}
+.ss-popup .hist-set{
+  display:grid; grid-template-columns:3.1rem auto auto auto 1fr;
+  align-items:center; gap:6px; padding:8px 9px; border-radius:10px;
+  background:rgba(10,16,22,.55); border:1px solid rgba(42,53,67,.75); font-weight:900;
+}
+.ss-popup .hist-set .si-n{color:var(--muted); font-weight:800; font-size:.7rem; letter-spacing:.5px}
+.ss-popup .hist-set .si-unit, .ss-popup .hist-set .si-x{color:var(--muted); font-weight:800; font-size:.82rem}
+.ss-popup .hist-set .si-w, .ss-popup .hist-set .si-r{font-size:1.02rem}
+.ss-popup .hist-set.set-top{border-color:rgba(255,213,74,.5); background:linear-gradient(90deg, rgba(58,42,0,.5), rgba(10,16,22,.55))}
+.ss-popup .hist-set.set-top .si-n{color:#ffd54a}

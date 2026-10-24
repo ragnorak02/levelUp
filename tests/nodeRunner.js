@@ -29,6 +29,8 @@ require('./testFramework.js');
 require('./testSuiteData.js');
 require('./testSuiteAggregation.js');
 require('./testSuiteUI.js');
+require('../powerUp/sessionSummary.js');
+require('./testSuiteSessionSummary.js');
 
 // Run
 const result = window.TestFramework.runAllSuites();

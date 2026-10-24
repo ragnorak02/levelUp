@@ -6,6 +6,7 @@
   <title>Level Up — Dashboard</title>
 
   <link rel="stylesheet" href="./main.css" />
+  <link rel="stylesheet" href="./powerUp/sessionSummary.css" />
 
   <!-- Chart.js (CDN) for donut chart -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -266,7 +267,7 @@
       </div>
     </section>
 
-    <!-- Exercise History Section -->
+    <!-- Exercise: one workout's summary, rendered by powerUp/sessionSummary.js -->
     <section class="card history detail-panel" data-focus="exercise" style="display:none;">
       <div class="card-inner">
         <div class="history-head">
@@ -276,18 +277,20 @@
           </div>
           <div class="history-cta">
             <button class="mini" id="openExercise">Open Workout</button>
-            <button class="mini" id="openAnalytics">Analytics</button>
           </div>
         </div>
 
-        <div class="summary" id="historySummary" style="display:none;">
-          <div class="chip"><small>Date</small> <span id="hDate">—</span></div>
-          <div class="chip"><small>Exercises</small> <span id="hMoves">—</span></div>
-          <div class="chip"><small>Sets</small> <span id="hSets">—</span></div>
-          <div class="chip"><small>Volume</small> <span id="hVol">—</span></div>
+        <div class="ss-nav" id="exNav">
+          <button class="ss-nav-btn" id="exPrev" aria-label="Previous workout">←</button>
+          <button class="ss-nav-date" id="exDate" title="Open this workout">—</button>
+          <button class="ss-nav-btn" id="exNext" aria-label="Next workout">→</button>
         </div>
 
-        <div id="historyBody"></div>
+        <div id="exSummary"></div>
+        <div class="empty" id="exEmpty" style="display:none;">
+          No workout data found yet.<br/>
+          Start logging workouts in <b>Power Up</b> and your latest workout will appear here automatically.
+        </div>
       </div>
     </section>
 
@@ -351,6 +354,7 @@
     <div class="med-toast" id="medToast"></div>
   </main>
 
+  <script src="./powerUp/sessionSummary.js"></script>
   <script src="./main.js"></script>
 </body>
 </html>

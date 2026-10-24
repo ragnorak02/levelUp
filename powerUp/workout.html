@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Power Up! — Today</title>
+<link rel="stylesheet" href="sessionSummary.css" />
 <style>
   :root{
     --bg:#080c11; --panel:#0d131a; --ink:#e8eef6; --muted:#9fb0c7; --ring:#1c2a37;
@@ -54,121 +55,8 @@
   }
   header .actions{margin-top:8px}
 
-  /* Section heading + expand/collapse-all controls */
-  .sg-head{display:flex; align-items:center; gap:8px; margin:.2rem 0 .5rem}
-  .sg-head h2{margin:0; font-size:1rem; color:#c7d2fe; flex:1 1 auto; min-width:0}
-  .sg-actions{display:flex; gap:6px; flex:0 0 auto}
-  .mini-btn{
-    all:unset; cursor:pointer; white-space:nowrap;
-    font-size:.72rem; font-weight:800; color:var(--muted);
-    border:1px solid var(--ring); background:#0e141b;
-    padding:.34rem .6rem; border-radius:999px;
-    min-height:30px; display:inline-flex; align-items:center;
-  }
-  .mini-btn:active{background:#16202b; color:var(--ink)}
-
   .wrap{width:min(900px,100%); margin-inline:auto; padding:10px; display:flex; flex-direction:column; gap:10px; flex:1}
 
-  .card{
-    background:var(--panel);
-    border:1px solid rgba(42,53,67,.70);
-    border-radius:16px; padding:12px;
-    box-shadow:0 4px 20px rgba(0,0,0,.20);
-  }
-  #powerCard{
-    position:relative;
-    overflow:hidden;
-    box-shadow:
-      0 0 0 1px color-mix(in oklab, var(--power-glow), #000 60%),
-      0 0 24px color-mix(in oklab, var(--power-glow), #000 10%),
-      inset 0 0 28px color-mix(in oklab, var(--power-glow), #000 75%);
-    outline: 1px solid color-mix(in oklab, var(--power-glow), #000 60%);
-  }
-  #powerCard::after{
-    content:"";
-    position:absolute; inset:-1px;
-    background: var(--power-grad);
-    background-size: 300% 100%;
-    opacity:0; pointer-events:none;
-  }
-  .level-up #powerCard::after{
-    animation: sweep 650ms ease-out;
-  }
-  @keyframes sweep{
-    0%{opacity:.0; background-position: -200% 0}
-    20%{opacity:.25}
-    50%{opacity:.35}
-    100%{opacity:0; background-position: 200% 0}
-  }
-
-  #powerCard .top{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; position:relative; padding-right:38px}
-  #powerVal{font-size:2rem; font-weight:900; line-height:1}
-  #powerTrend{font-size:.85rem; color:var(--muted); font-weight:700}
-  #powerTrend.up{color:#4ade80}
-  #powerTrend.down{color:#94a3b8}
-
-  /* ===== Session summary panel ===== */
-  .sess-label{
-    margin:0 0 .3rem; color:var(--muted); font-size:.68rem;
-    font-weight:800; text-transform:uppercase; letter-spacing:.6px;
-  }
-  /* Out of flow, centred on the volume figure — it must not grow the card. */
-  .copy-btn{
-    all:unset; cursor:pointer;
-    position:absolute; right:0; top:50%; transform:translateY(-50%);
-    width:30px; height:30px; border-radius:999px;
-    display:inline-flex; align-items:center; justify-content:center;
-    font-size:.85rem; line-height:1; font-weight:900;
-    color:#c7d2fe; border:1px solid var(--ring); background:#0e141b;
-  }
-  .copy-btn:active{background:#16202b}
-  .copy-btn.ok{color:#4ade80; border-color:rgba(34,197,94,.45); background:#0d1a12}
-  .json-hint{color:var(--muted); font-size:.75rem; font-weight:700; margin:0 0 8px}
-  .json-box{
-    width:100%; box-sizing:border-box; height:46vh; resize:vertical;
-    background:#080d13; color:#cbd5e1; border:1px solid var(--ring); border-radius:10px;
-    padding:10px; white-space:pre; overflow:auto;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.72rem; line-height:1.45;
-  }
-
-  .sess-block{margin-top:12px}
-  .sess-block + .sess-block{border-top:1px solid rgba(42,53,67,.55); padding-top:10px}
-
-  /* Session progress */
-  .sess-prog-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:.8rem; color:var(--muted); font-weight:700}
-  .sess-prog-head b{color:var(--ink); font-weight:900}
-  .sess-prog{
-    height:8px; border-radius:999px; background:#101a24;
-    border:1px solid rgba(42,53,67,.9); overflow:hidden; margin-top:6px;
-  }
-  .sess-prog > i{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#22c55e,#4ade80); transition:width .25s ease}
-  .sess-prog > i.done{background:linear-gradient(90deg,#ffd54a,#fff7a8); box-shadow:0 0 12px rgba(255,213,74,.5)}
-
-  /* Per-muscle-group split */
-  .split-row{display:grid; grid-template-columns:5.5rem 1fr auto; align-items:center; gap:8px; font-size:.82rem}
-  .split-row + .split-row{margin-top:6px}
-  .split-name{color:var(--ink); font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .split-track{height:8px; border-radius:999px; background:#101a24; border:1px solid rgba(42,53,67,.9); overflow:hidden}
-  .split-track > i{display:block; height:100%; border-radius:999px}
-  .split-val{color:var(--muted); font-weight:800; font-size:.76rem; white-space:nowrap; justify-self:end}
-
-  /* PRs hit today */
-  .pr-hits{display:flex; flex-direction:column; gap:6px}
-  .pr-hit{
-    display:flex; align-items:center; gap:8px; font-size:.84rem; font-weight:800;
-    background:linear-gradient(90deg, rgba(58,42,0,.55), rgba(11,17,24,.5));
-    border:1px solid rgba(255,213,74,.45); border-radius:10px; padding:7px 9px;
-  }
-  .pr-hit .pr-name{color:#ffd54a; flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-  .pr-hit .pr-val{color:var(--ink); white-space:nowrap}
-  .pr-hit .pr-kind{color:var(--muted); font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.4px; white-space:nowrap}
-  .sess-empty{color:var(--muted); font-size:.82rem; font-weight:700}
-
-  .totals{position:sticky; top:0; z-index:20; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
-    background:rgba(13,19,26,.9); backdrop-filter:saturate(1.1) blur(3px); border:1px solid var(--ring); border-radius:12px; padding:10px; font-size:.95rem}
-  .totals.hidden{display:none}
-  .chip{background:#0b1118; border:1px solid var(--ring); padding:.35rem .6rem; border-radius:999px; color:var(--muted)}
-  .chip b{color:var(--ink)}
   .actions{display:flex; gap:10px; flex-wrap:wrap}
   .btn{all:unset; cursor:pointer; padding:.7rem 1rem; border-radius:12px; font-weight:700; background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a; box-shadow:0 6px 20px rgba(34,197,94,.25)}
   .btn-ghost{all:unset; cursor:pointer; padding:.6rem .9rem; border:1px solid var(--ring); border-radius:10px; color:muted}
@@ -177,74 +65,18 @@
   .btn-today{all:unset; cursor:pointer; padding:.6rem .9rem; border:1px solid #d97706; border-radius:10px; color:#fbbf24; background:linear-gradient(90deg,#f59e0b,#d97706); font-weight:700}
   .btn-purple{all:unset; cursor:pointer; padding:.7rem 1rem; border-radius:12px; font-weight:700; background:linear-gradient(90deg,#8b5cf6,#a855f7); color:#f3e8ff; box-shadow:0 6px 20px rgba(168,85,247,.25)}
 
-  .supergroup{background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:10px}
-  .supergroup h2{margin:.2rem 0 .4rem; font-size:1rem; color:#c7d2fe}
-  .supergroup.hidden{display:none}
-
-  /* ===== Completed: collapsible body-part sections ===== */
-  .cgroup{
-    background:#0b1118; border:1px solid var(--ring);
-    border-radius:14px; overflow:hidden; margin-top:8px;
-  }
-  .cgroup-head{
-    display:flex; align-items:center; gap:10px;
-    padding:12px 12px; cursor:pointer;
-    background:linear-gradient(90deg,#111c27,#0b1118);
-    border-bottom:1px solid var(--ring);
-    -webkit-tap-highlight-color:transparent;
-  }
-  .cgroup.collapsed .cgroup-head{border-bottom-color:transparent}
-  .cgroup-head:active{background:linear-gradient(90deg,#16232f,#0d141c)}
-  .cgroup-chev{
-    color:var(--muted); font-size:.75rem; flex:0 0 auto;
-    transition:transform .18s ease; pointer-events:none;
-  }
-  .cgroup.collapsed .cgroup-chev{transform:rotate(-90deg)}
-  .cgroup-name{font-weight:900; font-size:1.02rem; color:var(--ink); flex:1 1 auto; min-width:0; pointer-events:none}
-  .cgroup-meta{color:var(--muted); font-size:.8rem; font-weight:800; white-space:nowrap; pointer-events:none}
-  .cgroup-body{padding:6px 10px 10px}
-  .cgroup.collapsed .cgroup-body{display:none}
-
-  /* Per-exercise collapse inside a completed group */
-  .ex-chev{color:var(--muted); font-size:.7rem; transition:transform .18s ease; flex:0 0 auto}
-  .ex.ex-collapsed .ex-chev{transform:rotate(-90deg)}
-  .ex.ex-collapsed .ex-body{display:none}
 
 
   .group{background:#0b1118; border:1px solid var(--ring); border-radius:14px; padding:10px; margin-top:10px; position:relative}
   .group h3{margin:.1rem 0 .4rem; font-size:1rem; color:var(--muted)}
   .group.hidden{display:none}
 
-  .ex{border:1px dashed var(--ring); border-radius:12px; padding:10px; margin:8px 0; display:grid; gap:8px; background:#0e141b}
-  .ex.finished{background:var(--finished-bg); border-color:var(--finished-ring)}
-  .ex.copied{background:var(--copied-bg); border-color:var(--copied-ring)}
 
   .ex.drag-armed{outline:1px dashed #375a7f}
   .ex.dragging{opacity:.6; transform:scale(.995)}
   .ex.drop-over{outline:2px solid #2dd4bf}
 
-  .ex-header{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:nowrap}
-  .ex-name{font-weight:700}
-  .tag{font-size:.9rem; color:var(--muted)}
-  .sets{display:grid; gap:6px}
   .ex-actions-bottom{display:flex; gap:8px; margin-top:4px; justify-content:space-between; align-items:center}
-
-  /* Complete / History ride on the exercise name line - that row had the
-     vertical space to spare, and the buttons stay reachable when collapsed. */
-  .ex-title{flex:1 1 auto; min-width:0}
-  .ex-title .tag{font-size:.82rem}
-  .ex-head-actions{display:flex; align-items:center; gap:6px; flex:0 0 auto}
-  /* Narrow enough to share the name row, still a 40px tap target. */
-  .btn-complete,.btn-undo,.btn-icon{
-    all:unset; cursor:pointer; box-sizing:border-box;
-    display:inline-flex; align-items:center; justify-content:center;
-    min-height:40px; padding:0 .7rem; border-radius:10px;
-    font-weight:800; font-size:.82rem; white-space:nowrap;
-  }
-  .btn-complete{background:linear-gradient(90deg,#4CAF50,#22c55e); color:#04130a}
-  .btn-undo{color:#fbbf24; border:1px solid rgba(251,191,36,.5); background:rgba(251,191,36,.08)}
-  .btn-icon{min-width:40px; padding:0 .4rem; font-size:.95rem; border:1px solid var(--ring); color:#9fb0c7}
-  .btn-complete:active,.btn-undo:active,.btn-icon:active{opacity:.75}
 
   /* Started but not finished - floated to the top of In Progress with a rail
      down the side so you can spot where you left off. */
@@ -320,110 +152,6 @@
   .workout-exercises{font-size:.85rem; color:var(--muted); margin-top:4px;}
   .workout-stats{display:flex; gap:12px; margin-top:6px; font-size:.8rem; color:var(--muted);}
   
-  /* ===== Exercise history modal ===== */
-  .hist-pr{
-    display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
-    background:#0f141b; border:1px solid var(--ring); border-radius:12px; padding:10px;
-  }
-  .hist-pr .k{
-    color:var(--muted); font-weight:800; text-transform:uppercase;
-    letter-spacing:.5px; font-size:.68rem;
-  }
-  .hist-pr .v{color:#ffd54a; font-weight:900; font-size:1.05rem; text-shadow:0 0 12px rgba(255,213,74,.35)}
-  .hist-pr .sep{color:#2a3949; font-weight:900}
-  .hist-pr .note{color:var(--muted); font-weight:700; font-size:.82rem}
-
-  .hist-session{border-top:1px solid rgba(42,53,67,.55); margin-top:12px; padding-top:10px}
-  .hist-head{display:flex; align-items:baseline; gap:8px; margin-bottom:7px}
-  .hist-date{font-weight:900; font-size:.92rem; color:#c7d2fe}
-  .hist-meta{color:var(--muted); font-weight:700; font-size:.76rem}
-  .hist-sets{display:grid; grid-template-columns:1fr; gap:5px}
-  .hist-set{
-    display:grid; grid-template-columns:3.1rem auto auto auto 1fr;
-    align-items:center; gap:6px; padding:8px 9px; border-radius:10px;
-    background:rgba(10,16,22,.55); border:1px solid rgba(42,53,67,.75); font-weight:900;
-  }
-  .hist-set .si-n{color:var(--muted); font-weight:800; font-size:.7rem; letter-spacing:.5px}
-  .hist-set .si-unit, .hist-set .si-x{color:var(--muted); font-weight:800; font-size:.82rem}
-  .hist-set .si-w, .hist-set .si-r{font-size:1.02rem}
-  .hist-set.set-top{border-color:rgba(255,213,74,.5); background:linear-gradient(90deg, rgba(58,42,0,.5), rgba(10,16,22,.55))}
-  .hist-set.set-top .si-n{color:#ffd54a}
-
-  /* ===== Sets list (single column, in the order performed) ===== */
-  .set-grid{display:grid; grid-template-columns:1fr; gap:6px; margin-top:10px}
-
-  .set-item{
-    display:grid;
-    grid-template-columns:3.1rem auto auto auto auto 1fr;
-    align-items:center;
-    gap:6px;
-    padding:9px 10px;
-    border-radius:10px;
-    background:rgba(10,16,22,.55);
-    border:1px solid rgba(42,53,67,.75);
-    font-weight:900;
-    letter-spacing:.02em;
-  }
-  .set-item .si-unit, .set-item .si-x{color:var(--muted); font-weight:800; font-size:.85rem}
-  .set-item .si-n{color:var(--muted); font-weight:800; font-size:.72rem; letter-spacing:.5px}
-  .set-item .si-w, .set-item .si-r{font-size:1.05rem}
-  .set-item .si-vol{color:var(--muted); font-weight:800; font-size:.76rem; justify-self:end; white-space:nowrap}
-  .set-item.set-top{
-    border-color:rgba(255,213,74,.55);
-    background:linear-gradient(90deg, rgba(58,42,0,.55), rgba(10,16,22,.55));
-  }
-  .set-item.set-top .si-n{color:#ffd54a}
-  .set-item.set-special{
-    background:linear-gradient(180deg,#2a2100,#3a2a00);
-    border-color:#fbbf24;
-  }
-
-  /* ===== Completed exercise: PR summary + trend sparkline ===== */
-  .prsum{
-    background:#0f141b; border:1px solid var(--ring);
-    border-radius:12px; padding:10px; margin-top:8px;
-  }
-  .prsum-row{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; line-height:1.25}
-  .prsum-row + .prsum-row{margin-top:6px}
-  .prsum-row .k{
-    color:var(--muted); font-weight:800; text-transform:uppercase;
-    letter-spacing:.5px; font-size:.68rem; flex:0 0 auto; min-width:52px;
-  }
-  .prsum-row .v{color:var(--ink); font-weight:900; font-size:.98rem}
-  .prsum-row .v.gold{color:#ffd54a; text-shadow:0 0 12px rgba(255,213,74,.4)}
-  .prsum-row .sep{color:#2a3949; font-weight:900}
-  .prsum-row .note{color:var(--muted); font-weight:700; font-size:.82rem}
-  .prsum-row .note.gold{color:#ffd54a}
-  .prsum-bar{
-    height:6px; border-radius:999px; background:#101a24;
-    border:1px solid rgba(42,53,67,.9); overflow:hidden; margin-top:8px;
-  }
-  .prsum-bar > i{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#ff7a18,#ffc531)}
-  .prsum-bar > i.gold{background:linear-gradient(90deg,#ffd54a,#fff7a8); box-shadow:0 0 12px rgba(255,213,74,.55)}
-
-  .trend{margin-top:10px; border-top:1px solid rgba(42,53,67,.55); padding-top:8px}
-  .trend-head{
-    display:flex; justify-content:space-between; align-items:baseline; gap:8px;
-    color:var(--muted); font-size:.68rem; font-weight:800;
-    text-transform:uppercase; letter-spacing:.5px;
-  }
-  .trend-head b{color:var(--ink); font-size:.8rem}
-  .trend-plot{position:relative; height:54px; margin-top:6px}
-  .trend-lg .trend-plot{height:120px}
-  .trend-plot svg{position:absolute; inset:0; width:100%; height:100%; display:block}
-  .trend-area{fill:rgba(255,197,49,.13); stroke:none}
-  .trend-line{fill:none; stroke:#ffc531; stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
-  .trend-dot{
-    position:absolute; width:8px; height:8px; border-radius:50%;
-    background:#ffc531; transform:translate(-50%,-50%);
-    box-shadow:0 0 0 2px rgba(15,20,27,.9);
-  }
-  .trend-dot.sm{width:6px; height:6px; background:#e0a316}
-  .trend-dot.gold{background:#fff7a8; box-shadow:0 0 0 2px rgba(15,20,27,.9), 0 0 12px rgba(255,213,74,.8)}
-  .trend-foot{
-    display:flex; justify-content:space-between; margin-top:4px;
-    color:var(--muted); font-size:.68rem; font-weight:800;
-  }
 
 
   .actions{display:flex; gap:10px; align-items:center; justify-content:flex-start; flex-wrap:wrap}
@@ -452,56 +180,8 @@
 </header>
 
 <main class="wrap">
-  <section class="card" id="powerCard">
-    <h3 class="sess-label">Today's Volume</h3>
-    <div class="top">
-      <div id="powerVal">0 lb</div>
-      <div id="powerTrend">—</div>
-      <button class="copy-btn" id="copyWorkout" title="Copy this workout as JSON" aria-label="Copy this workout as JSON">📋</button>
-    </div>
-
-    <div class="sess-block">
-      <div class="sess-prog-head"><span>Session progress</span><b id="progText">—</b></div>
-      <div class="sess-prog"><i id="progFill" style="width:0%"></i></div>
-    </div>
-
-    <div class="sess-block" id="splitBlock">
-      <h3 class="sess-label">Volume by muscle group</h3>
-      <div id="splitList"></div>
-    </div>
-
-    <div class="sess-block" id="prBlock">
-      <h3 class="sess-label">Personal records today</h3>
-      <div class="pr-hits" id="prHits"></div>
-    </div>
-  </section>
-
-  <section class="totals" id="totalsBar">
-    <span class="chip">Sets: <b id="tSets">0</b></span>
-    <span class="chip">Volume: <b id="tVol">0 lb</b></span>
-    <span class="chip">Exercises: <b id="tEx">0</b></span>  </section>
-
-  <section id="sg-inprogress" class="supergroup">
-    <div class="sg-head">
-      <h2>In Progress</h2>
-      <div class="sg-actions">
-        <button class="mini-btn" data-act="expandAll" data-scope="inprogress">Expand all</button>
-        <button class="mini-btn" data-act="collapseAll" data-scope="inprogress">Collapse all</button>
-      </div>
-    </div>
-    <div id="log-inprogress"></div>
-  </section>
-
-  <section id="sg-completed" class="supergroup">
-    <div class="sg-head">
-      <h2>Completed</h2>
-      <div class="sg-actions">
-        <button class="mini-btn" data-act="expandAll" data-scope="completed">Expand all</button>
-        <button class="mini-btn" data-act="collapseAll" data-scope="completed">Collapse all</button>
-      </div>
-    </div>
-    <div id="log-completed"></div>
-  </section>
+  <!-- Volume card, totals, In Progress / Completed: powerUp/sessionSummary.js -->
+  <div id="summary"></div>
 
   <div class="spacer"></div>
 </main>
@@ -552,27 +232,8 @@
   </div>
 </div>
 
-<!-- FIX #3: Exercise history modal -->
-<div class="popup" id="historyPopup">
-  <div class="sheet">
-    <button class="x" data-close="#historyPopup">✕</button>
-    <h2 id="historyTitle" style="margin:6px 0 10px; font-size:1rem; color:#9fb0c7">Exercise History</h2>
-    <div id="historyBody"></div>
-  </div>
-</div>
 
-<div class="popup" id="copyPopup">
-  <div class="sheet">
-    <button class="x" data-close="#copyPopup">✕</button>
-    <h2 style="margin:6px 0 6px; font-size:1rem; color:#9fb0c7">Workout JSON</h2>
-    <p class="json-hint">Tap the box to select it all, then copy and paste it into ChatGPT.</p>
-    <textarea class="json-box" id="copyJsonBox" readonly spellcheck="false"></textarea>
-    <div style="display:flex; gap:8px; margin-top:10px">
-      <button class="mini-btn" id="copyJsonAgain">Copy to clipboard</button>
-    </div>
-  </div>
-</div>
-
+<script src="sessionSummary.js"></script>
 <script>
 const exerciseOptions = {
   Chest: ['Bench Press','Incline Bench Press','Dumbbell Press','Dumbbell Flyes','Cable Fly','Chest Dips'],
@@ -612,49 +273,17 @@ function getAllExercises(bp){
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 let current = new Date();
-const keyFor = (d)=>`powerUp:${d.toISOString().slice(0,10)}`;
+const isoOf = (d)=> d.toISOString().slice(0,10);
 
-const esc = (s)=> String(s ?? '').replace(/[&<>"']/g, c => (
-  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
-));
+/* Summary rendering, PR maths and history scans: powerUp/sessionSummary.js */
+const SS = window.SessionSummary;
+const { exStats, totalsFiltered, priorBests, beatsPriorPR } = SS;
 
-/* Collapse state for the Completed sections. Stored under its own key —
-   never touches the `powerUp:YYYY-MM-DD` workout records. */
-const UI_COLLAPSE_KEY = 'powerUp:uiCollapsed';
-function getCollapseMap(){
-  try{ return JSON.parse(localStorage.getItem(UI_COLLAPSE_KEY)) || {}; }catch{ return {}; }
-}
-function isCollapsed(id){ return !!getCollapseMap()[id]; }
-function setCollapsedState(id, collapsed){ setCollapsedBulk([[id, collapsed]]); }
-
-/* One write for many toggles — used by the expand/collapse-all buttons. */
-function setCollapsedBulk(pairs){
-  const m = getCollapseMap();
-  pairs.forEach(([id, collapsed])=>{
-    if(!id) return;
-    if(collapsed) m[id] = 1; else delete m[id];
-  });
-  try{ localStorage.setItem(UI_COLLAPSE_KEY, JSON.stringify(m)); }catch{}
-}
-
-function blankDay(date){ return { date: date.toISOString().slice(0,10), exercises:[] }; }
-/* `finished` locks a card read-only, `completed` decides which section it sits
-   in - they move together. Data written before Undo cleared `finished` can be
-   locked while still listed under In Progress; unstick it on read. */
-function loadDay(date){
-  const raw = localStorage.getItem(keyFor(date));
-  const day = raw ? JSON.parse(raw) : blankDay(date);
-  (day.exercises||[]).forEach(ex=>{ if(ex.finished && !ex.completed) ex.finished = false; });
-  return day;
-}
+const loadDay = (date)=> SS.loadDay(isoOf(date));
 function saveDay(day){
   localStorage.setItem(`powerUp:${day.date}`, JSON.stringify(day));
-  historyScanCache.clear();   // stored history changed — drop memoised scans
+  SS.clearCache();   // stored history changed — drop memoised scans
 }
-
-/* Memoises full-localStorage history scans. Rendering re-runs on every
-   keystroke, so without this each one re-parses every stored workout. */
-const historyScanCache = new Map();
 
 /* FIX #3: Get exercise history function */
 function getPreviousExerciseData(exerciseName, bodyPart) {
@@ -715,415 +344,29 @@ function duplicateWorkout(sourceDay){
   saveDay(currentDay); render(); closePopup('#workoutPopup');
 }
 
-function exStats(ex){
-  const vol = ex.sets.reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
-  const reps = ex.sets.reduce((s,a)=> s + (Number(a.reps)||0), 0);
-  const avg = reps ? vol / reps : 0;
-  return { vol, reps, avg };
-}
-
-/* =========================
-   Condensed Performance Summary (mobile-first)
-   - Replaces per-set comparison rows with exercise-level aggregates
-   ========================= */
-
-function mdFromISO(iso){
-  if(!iso) return '—';
-  const d = new Date(String(iso).slice(0,10) + 'T00:00:00');
-  return `${d.getMonth()+1}/${d.getDate()}`;
-}
-
-const sameExName = (a,b)=> String(a||'').toLowerCase().trim() === String(b||'').toLowerCase().trim();
-
-/* Every logged session of one exercise, oldest → newest.
-   `excludeISO` lets callers ask "what was my best BEFORE today?". Read-only. */
-function scanExerciseSessions(exName, bodyPart, excludeISO){
-  const cacheKey = `${String(exName||'').toLowerCase().trim()}|${bodyPart||''}|${excludeISO||''}`;
-  if(historyScanCache.has(cacheKey)) return historyScanCache.get(cacheKey);
-
-  const out = [];
-  for(let i=0; i<localStorage.length; i++){
-    const k = localStorage.key(i);
-    if(!/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
-    const iso = k.slice('powerUp:'.length);
-    if(excludeISO && iso === excludeISO) continue;
-
-    try{
-      const day = JSON.parse(localStorage.getItem(k));
-      const ex = (day?.exercises || []).find(e =>
-        sameExName(e.name, exName) && String(e.bodyPart||'') === String(bodyPart||'')
-      );
-      if(!ex) continue;
-      out.push({ date: day?.date || iso, sets: ex.sets || [] });
-    }catch{}
-  }
-  out.sort((a,b)=> a.date < b.date ? -1 : (a.date > b.date ? 1 : 0));
-  historyScanCache.set(cacheKey, out);
-  return out;
-}
-
-/* Heaviest set + biggest-volume session for an exercise across the given sessions. */
-function bestsFromSessions(sessions){
-  let topSet = { weight:0, reps:0, date:null };
-  let bestVol = { vol:0, date:null };
-
-  sessions.forEach(s=>{
-    let vol = 0;
-    (s.sets||[]).forEach(st=>{
-      const w = Number(st.weight)||0, r = Number(st.reps)||0;
-      vol += w * r;
-      if(w > topSet.weight || (w === topSet.weight && r > topSet.reps)){
-        topSet = { weight:w, reps:r, date:s.date };
-      }
-    });
-    if(vol > bestVol.vol) bestVol = { vol, date:s.date };
-  });
-
-  return { topSet, bestVol, sessions: sessions.length };
-}
-
-/* Bests recorded on every day EXCEPT `excludeISO` — i.e. the mark to beat. */
-function priorBests(exName, bodyPart, excludeISO){
-  return bestsFromSessions(scanExerciseSessions(exName, bodyPart, excludeISO));
-}
-
-/* Does this set beat the mark to beat? The baseline excludes today, so it
-   stays frozen for the whole session — hit the same PR weight on sets 2, 3
-   and 4 and every one of them lights up. Nothing is "banked" until Complete.
-   A first-ever session is a baseline, not a PR, so it doesn't badge. */
 const PR_TAG_HTML = '<span class="pr-tag">🏆 PR</span>';
-
-function beatsPriorPR(s, priorTop){
-  const w = Number(s.weight)||0, r = Number(s.reps)||0;
-  if(!w || !r) return false;
-  if(!priorTop || !priorTop.weight) return false;
-  return w > priorTop.weight || (w === priorTop.weight && r > priorTop.reps);
-}
-
-/* Heaviest set logged today for one exercise (ties broken by reps). */
-function topSetOf(ex){
-  let best = { weight:0, reps:0 };
-  (ex.sets||[]).forEach(s=>{
-    const w = Number(s.weight)||0, r = Number(s.reps)||0;
-    if(w > best.weight || (w === best.weight && r > best.reps)) best = { weight:w, reps:r };
-  });
-  return best;
-}
-
-/* What kind of personal record (if any) this exercise set today. */
-function prStatus(ex, iso){
-  const top = topSetOf(ex);
-  const { vol } = exStats(ex);
-  const prior = priorBests(ex.name, ex.bodyPart, iso);
-
-  const firstEver = prior.sessions === 0;
-  const weightPR  = !firstEver && top.weight > 0 && top.weight > prior.topSet.weight;
-  const repPR     = !firstEver && top.weight > 0 &&
-                    top.weight === prior.topSet.weight && top.reps > prior.topSet.reps;
-  const volumePR  = !firstEver && vol > 0 && vol > prior.bestVol.vol;
-
-  return { top, vol, prior, firstEver, weightPR, repPR, volumePR,
-           any: weightPR || repPR || volumePR };
-}
-
-/* Sparkline: <=n most recent sessions as {date, weight, vol}, oldest → newest. */
-function trendPoints(exName, bodyPart, n = 8){
-  return scanExerciseSessions(exName, bodyPart, null)
-    .map(s=>{
-      const weights = (s.sets||[]).map(x=>Number(x.weight)||0).filter(w=>w>0);
-      return {
-        date: s.date,
-        weight: weights.length ? Math.max(...weights) : 0,
-        vol: (s.sets||[]).reduce((a,x)=> a + (Number(x.weight)||0)*(Number(x.reps)||0), 0)
-      };
-    })
-    .filter(p=> p.weight > 0)
-    .slice(-n);
-}
-
-
-/* Mini line chart of top weight per session. Responsive: the SVG stretches
-   (preserveAspectRatio=none) with a non-scaling stroke, and the end dot is an
-   HTML element positioned in percentages so it stays circular. */
-function renderTrendSparkline(points, opts = {}){
-  const wrap = document.createElement('div');
-  wrap.className = 'trend' + (opts.large ? ' trend-lg' : '');
-
-  if(points.length < 2){
-    wrap.innerHTML = `<div class="trend-head"><span>Trend</span><b>First session</b></div>`;
-    return wrap;
-  }
-
-  const vals = points.map(p=>p.weight);
-  const vMin = Math.min(...vals), vMax = Math.max(...vals);
-  const span = (vMax - vMin) || 1;
-  const flat = vMax === vMin;
-
-  const X = i => (i / (points.length - 1)) * 100;
-  const Y = v => flat ? 15 : 26 - ((v - vMin) / span) * 22;
-
-  const coords = points.map((p,i)=> [X(i), Y(p.weight)]);
-  const line = coords.map(([x,y],i)=> `${i ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`).join(' ');
-  const area = `${line} L100 30 L0 30 Z`;
-
-  // one dot per session, so you can see how many sessions the line covers
-  const dots = coords.map(([x,y],i)=>{
-    const isLast = i === coords.length - 1;
-    const cls = isLast
-      ? (points[i].weight >= vMax ? 'trend-dot gold' : 'trend-dot')
-      : 'trend-dot sm';
-    return `<span class="${cls}" title="${mdFromISO(points[i].date)} · ${points[i].weight} lb"
-      style="left:${x.toFixed(2)}%; top:${((y/30)*100).toFixed(2)}%"></span>`;
-  }).join('');
-
-  wrap.innerHTML = `
-    <div class="trend-head">
-      <span>Top weight · last ${points.length} sessions</span>
-      <b>${vMin === vMax ? `${vMax} lb` : `${vMin}–${vMax} lb`}</b>
-    </div>
-    <div class="trend-plot">
-      <svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
-        <path class="trend-area" d="${area}"/>
-        <path class="trend-line" d="${line}" vector-effect="non-scaling-stroke"/>
-      </svg>
-      ${dots}
-    </div>
-    <div class="trend-foot">
-      <span>${mdFromISO(points[0].date)}</span>
-      <span>${mdFromISO(points[points.length-1].date)}</span>
-    </div>
-  `;
-  return wrap;
-}
-
-/* History modal: the PR to beat, the weight trend, and every set of the recent
-   sessions — the numbers you need to pick today's opening weight. */
-function openExerciseHistory(ex){
-  const sessions = scanExerciseSessions(ex.name, ex.bodyPart, null)
-    .map(s=>({ date: s.date, sets: (s.sets||[]).filter(x=> (Number(x.weight)||0) > 0 || (Number(x.reps)||0) > 0) }))
-    .filter(s=> s.sets.length);
-
-  if(!sessions.length){
-    alert('No previous workout data found for this exercise');
-    return;
-  }
-
-  $('#historyTitle').textContent = `${ex.name} — History`;
-  const body = $('#historyBody');
-  body.innerHTML = '';
-
-  // heaviest set ever logged for this exercise
-  const { topSet } = bestsFromSessions(sessions);
-  const pr = document.createElement('div');
-  pr.className = 'hist-pr';
-  pr.innerHTML = `
-    <span class="k">PR</span>
-    <span class="v">${topSet.weight} lb × ${topSet.reps}</span>
-    <span class="sep">·</span>
-    <span class="note">${mdFromISO(topSet.date)}</span>
-    <span class="sep">·</span>
-    <span class="note">${sessions.length} session${sessions.length===1?'':'s'}</span>
-  `;
-  body.appendChild(pr);
-
-  body.appendChild(renderTrendSparkline(trendPoints(ex.name, ex.bodyPart, 10), { large:true }));
-
-  // recent sessions, newest first, with every set spelled out
-  sessions.slice(-8).reverse().forEach(s=>{
-    // index, not value — otherwise two identical top sets both get marked
-    let topIdx = -1, best = {w:0, r:0};
-    s.sets.forEach((x,i)=>{
-      const w = Number(x.weight)||0, r = Number(x.reps)||0;
-      if(w > best.w || (w === best.w && r > best.r)){ best = {w, r}; topIdx = i; }
-    });
-
-    const block = document.createElement('div');
-    block.className = 'hist-session';
-    block.innerHTML = `
-      <div class="hist-head">
-        <span class="hist-date">${mdFromISO(s.date)}</span>
-        <span class="hist-meta">${s.sets.length} set${s.sets.length===1?'':'s'}</span>
-      </div>
-      <div class="hist-sets">
-        ${s.sets.map((st,i)=>{
-          const isTop = best.w > 0 && i === topIdx;
-          return `<div class="hist-set${isTop ? ' set-top' : ''}">
-            <span class="si-n">SET ${i+1}</span>
-            <span class="si-w">${esc(st.weight ?? '—')}</span><span class="si-unit">lb</span>
-            <span class="si-x">×</span><span class="si-r">${esc(st.reps ?? '—')}</span>
-          </div>`;
-        }).join('')}
-      </div>
-    `;
-    body.appendChild(block);
-  });
-
-  openPopup('#historyPopup');
-}
-
-function renderExerciseComparisonSummary(ex){
-  const iso = current.toISOString().slice(0,10);
-  const st = prStatus(ex, iso);
-  const { top, vol, prior, firstEver, weightPR, repPR, volumePR } = st;
-
-  const bestVol = prior.bestVol.vol;
-  const pctRaw  = bestVol > 0 ? Math.round((vol / bestVol) * 100) : (vol > 0 ? 100 : 0);
-  const pct     = Math.max(0, Math.min(100, pctRaw));
-
-  const topSetTxt = top.weight ? `${top.weight} lb × ${top.reps}` : '—';
-
-  const prLine = firstEver
-    ? `<span class="note">First time logging this exercise</span>`
-    : `<span class="v">${prior.topSet.weight} lb × ${prior.topSet.reps}</span>
-       <span class="sep">·</span>
-       <span class="note">${mdFromISO(prior.topSet.date)}</span>`;
-
-  const volNote = firstEver
-    ? `<span class="note">no previous session to compare</span>`
-    : volumePR
-      ? `<span class="note gold">best ever — beat ${Math.round(bestVol).toLocaleString()} lb</span>`
-      : `<span class="note">${pctRaw}% of best (${Math.round(bestVol).toLocaleString()} lb)</span>`;
-
-  let badge = '';
-  if(weightPR)      badge = `<span class="note gold">🏆 new weight PR</span>`;
-  else if(repPR)    badge = `<span class="note gold">🏆 new rep PR at ${top.weight} lb</span>`;
-  else if(firstEver)badge = `<span class="note">baseline</span>`;
-
-  const wrap = document.createElement('div');
-  wrap.className = 'prsum';
-  wrap.innerHTML = `
-    <div class="prsum-row">
-      <span class="k">Top set</span>
-      <span class="v${(weightPR||repPR) ? ' gold' : ''}">${topSetTxt}</span>
-      ${badge}
-    </div>
-    <div class="prsum-row">
-      <span class="k">PR</span>
-      ${prLine}
-    </div>
-    <div class="prsum-row">
-      <span class="k">Volume</span>
-      <span class="v${volumePR ? ' gold' : ''}">${Math.round(vol).toLocaleString()} lb</span>
-      ${volNote}
-    </div>
-    <div class="prsum-bar"><i class="${volumePR ? 'gold' : ''}" style="width:${volumePR ? 100 : pct}%"></i></div>
-  `;
-
-  wrap.appendChild(renderTrendSparkline(trendPoints(ex.name, ex.bodyPart, 8)));
-  return wrap;
-}
-function countedSets(ex){ return ex.finished ? ex.sets : ex.sets.filter(s=> !!s.done); }
-function totalsFiltered(day){
-  let sets=0, vol=0, exCount=day.exercises.length;
-  day.exercises.forEach(ex=>{
-    const cs = countedSets(ex);
-    sets += cs.length;
-    vol  += cs.reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
-  });
-  return {sets, vol, exCount};
-}
 function areAllSetsDone(day){
   const all = day.exercises.flatMap(ex=> ex.sets);
   return all.length>0 && all.every(s=> !!s.done);
 }
 
-const POWER_LEVELS = [
-  {th:0,    color:'#1e3a8a'},
-  {th:1000, color:'#0ea5e9'},
-  {th:2000, color:'#22c55e'},
-  {th:3500, color:'#eab308'},
-  {th:5000, color:'#f59e0b'},
-  {th:6500, color:'#ef4444'},
-  {th:8000, color:'#f5d142'}
-];
-let lastLevelIdx = -1;
-const levelFor = (vol)=> POWER_LEVELS.reduce((idx,lv,i)=> vol>=lv.th?i:idx,0);
-function applyPowerTheme(vol){
-  const card = document.getElementById('powerCard');
-  const idx = levelFor(vol);
-  const col = POWER_LEVELS[idx].color;
-  card.style.setProperty('--power-glow', col);
-  const left = POWER_LEVELS[Math.max(0, idx-1)].color;
-  const right = POWER_LEVELS[Math.min(POWER_LEVELS.length-1, idx+1)].color;
-  const grad = `linear-gradient(90deg, transparent 0%, ${left}22 10%, ${col}55 30%, #ffffff22 50%, ${right}55 70%, transparent 90%)`;
-  card.style.setProperty('--power-grad', grad);
-  if(idx !== lastLevelIdx){
-    document.body.classList.remove('level-up'); void card.offsetWidth; document.body.classList.add('level-up');
-    lastLevelIdx = idx; setTimeout(()=>document.body.classList.remove('level-up'), 700);
-  }
-}
+let view = null;   // SessionSummary view over #summary, made in init()
 
 function render(){
-  (function(){
-  const isToday = (new Date().toISOString().slice(0,10) === current.toISOString().slice(0,10));
-  const weekday = new Intl.DateTimeFormat(undefined,{weekday:'short'}).format(current);
-  const num = `${current.getMonth()+1}/${current.getDate()}/${String(current.getFullYear()).slice(2)}`;
-  $('#dateStr').textContent = isToday ? `Today · ${num}` : `${weekday} · ${num}`;
-})();
+  $('#dateStr').textContent = SS.dateLabel(current);
   const day = loadDay(current);
-  renderPowerCard(day);
+  view.render(day, isoOf(current));
 
-  const inProg = day.exercises.filter(ex=> !ex.completed);
-  const done   = day.exercises.filter(ex=> !!ex.completed);
-
-  renderSuperGroup('#log-inprogress', '#sg-inprogress', inProg);
-  renderCompletedGroups(done);
-
-  const {sets, vol, exCount} = totalsFiltered(day);
-  $('#tSets').textContent = sets;
-  $('#tVol').textContent = Math.round(vol) + ' lb';
-  $('#tEx').textContent = exCount;
-  
   if ($('#calPopup').style.display === 'flex') buildCalendar(current);
 
   armDragAndDrop();
 }
 
-/* Completed view: one collapsible section per body part, every exercise
-   stacked inside it. Nothing is hidden behind a tab — scroll, don't select. */
-function renderCompletedGroups(list){
-  const container = document.getElementById('log-completed');
-  const superNode = document.getElementById('sg-completed');
-
-  const groups = list.reduce((m,o)=>((m[o.bodyPart]??=[]).push(o),m),{});
-  const bps = Object.keys(groups).sort();
-
-  superNode.classList.toggle('hidden', bps.length === 0);
-  container.innerHTML = '';
-  if(bps.length === 0) return;
-
-  bps.forEach(bp=>{
-    const exList  = groups[bp];
-    const volume  = exList.reduce((s,ex)=> s + exStats(ex).vol, 0);
-    const setCnt  = exList.reduce((s,ex)=> s + (ex.sets||[]).length, 0);
-    const key     = 'bp:' + bp;
-
-    const g = document.createElement('div');
-    g.className = 'cgroup' + (isCollapsed(key) ? ' collapsed' : '');
-    g.dataset.key = key;
-    g.innerHTML = `
-      <div class="cgroup-head" data-act="toggleCGroup">
-        <span class="cgroup-chev">▼</span>
-        <span class="cgroup-name">${esc(bp)}</span>
-        <span class="cgroup-meta">${exList.length} ex · ${setCnt} sets · ${Math.round(volume).toLocaleString()} lb</span>
-      </div>
-      <div class="cgroup-body"></div>
-    `;
-
-    const body = g.querySelector('.cgroup-body');
-    exList.forEach(ex=> body.appendChild(renderExercise(ex)));
-    container.appendChild(g);
-  });
-}
-
-
 /* Any set ticked Done means this is the exercise being worked right now. */
 function isStarted(ex){ return (ex.sets||[]).some(s=> !!s.done); }
 
-function renderSuperGroup(containerSel, superSel, list){
-  const container = $(containerSel);
-  container.innerHTML = '';
-
+/* The editable In Progress list — SessionSummary calls this into its own section. */
+function renderInProgress(container, list){
   const groups = list.reduce((m,o)=>((m[o.bodyPart]??=[]).push(o),m),{});
   // Started work rises to the top: the body part you're mid-way through leads
   // the list, and inside it the started exercises come before the untouched
@@ -1154,323 +397,17 @@ function renderSuperGroup(containerSel, superSel, list){
 
     container.appendChild(g);
   });
-
-  const superNode = $(superSel);
-  superNode.classList.toggle('hidden', container.children.length === 0);
-}
-
-const PART_COLORS = {
-  Chest:'#f87171', Back:'#60a5fa', Biceps:'#a78bfa', Triceps:'#f472b6',
-  Shoulders:'#fbbf24', Legs:'#34d399', Lats:'#22d3ee', Forearms:'#fb923c',
-  Cardio:'#94a3b8'
-};
-const partColor = p => PART_COLORS[p] || '#64748b';
-
-/* Most recent earlier day that trained at least one of today's body parts. */
-function findLastSimilarWorkout(day, iso){
-  const todayParts = new Set(day.exercises.map(e=>e.bodyPart).filter(Boolean));
-  if(!todayParts.size) return null;
-
-  let best = null;
-  for(let i=0; i<localStorage.length; i++){
-    const k = localStorage.key(i);
-    if(!/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
-    const d = k.slice('powerUp:'.length);
-    if(d >= iso) continue;
-    if(best && d <= best.date) continue;
-
-    try{
-      const prev = JSON.parse(localStorage.getItem(k));
-      const parts = (prev?.exercises||[]).map(e=>e.bodyPart).filter(Boolean);
-      if(!parts.some(p=>todayParts.has(p))) continue;
-      const vol = totalsFiltered(prev).vol;
-      if(vol <= 0) continue;
-      best = { date:d, vol };
-    }catch{}
-  }
-  return best;
-}
-
-function renderPowerCard(day){
-  const iso = current.toISOString().slice(0,10);
-  const { vol } = totalsFiltered(day);
-
-  $('#powerVal').textContent = Math.round(vol).toLocaleString() + ' lb';
-
-  // --- Headline: today vs the last workout that hit the same muscles ---
-  const similar = findLastSimilarWorkout(day, iso);
-  const trendEl = $('#powerTrend');
-  trendEl.classList.remove('up','down');
-  if(similar && vol > 0){
-    const delta = vol - similar.vol;
-    const sign  = delta >= 0 ? '+' : '−';
-    trendEl.textContent = `${sign}${Math.abs(Math.round(delta)).toLocaleString()} lb vs ${mdFromISO(similar.date)}`;
-    trendEl.classList.add(delta >= 0 ? 'up' : 'down');
-  }else{
-    trendEl.textContent = vol > 0 ? 'no comparable session yet' : '—';
-  }
-
-  // --- Session progress ---
-  let doneSets = 0, allSets = 0;
-  day.exercises.forEach(ex=>{
-    (ex.sets||[]).forEach(s=>{ allSets++; if(ex.finished || s.done) doneSets++; });
-  });
-  const pctDone = allSets ? Math.round((doneSets/allSets)*100) : 0;
-  const complete = allSets > 0 && doneSets === allSets;
-  $('#progText').textContent = allSets ? `${doneSets} of ${allSets} sets${complete ? ' ✓' : ''}` : 'nothing logged yet';
-  const fill = $('#progFill');
-  fill.style.width = pctDone + '%';
-  fill.classList.toggle('done', complete);
-
-  // --- Volume split by muscle group ---
-  const byPart = {};
-  day.exercises.forEach(ex=>{
-    const v = countedSets(ex).reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
-    if(v <= 0) return;
-    const p = ex.bodyPart || 'Other';
-    byPart[p] = (byPart[p] || 0) + v;
-  });
-  const parts = Object.entries(byPart).sort((a,b)=> b[1]-a[1]);
-  const splitBlock = $('#splitBlock');
-  const splitList  = $('#splitList');
-  splitBlock.style.display = parts.length ? '' : 'none';
-  if(parts.length){
-    const maxV = parts[0][1];
-    splitList.innerHTML = parts.map(([p,v])=>`
-      <div class="split-row">
-        <span class="split-name">${esc(p)}</span>
-        <span class="split-track"><i style="width:${Math.round((v/maxV)*100)}%; background:${partColor(p)}"></i></span>
-        <span class="split-val">${Math.round(v).toLocaleString()} lb · ${Math.round((v/vol)*100)}%</span>
-      </div>
-    `).join('');
-  }
-
-  // --- PRs set today (finished exercises only) ---
-  const hits = [];
-  day.exercises.filter(ex=>ex.finished).forEach(ex=>{
-    const st = prStatus(ex, iso);
-    if(st.weightPR)      hits.push({ name:ex.name, val:`${st.top.weight} lb × ${st.top.reps}`, kind:'weight' });
-    else if(st.repPR)    hits.push({ name:ex.name, val:`${st.top.weight} lb × ${st.top.reps}`, kind:'reps' });
-    else if(st.volumePR) hits.push({ name:ex.name, val:`${Math.round(st.vol).toLocaleString()} lb`, kind:'volume' });
-  });
-  const prBlock = $('#prBlock');
-  prBlock.style.display = hits.length ? '' : 'none';
-  if(hits.length){
-    $('#prHits').innerHTML = hits.map(h=>`
-      <div class="pr-hit">
-        <span class="pr-name">${esc(h.name)}</span>
-        <span class="pr-val">${esc(h.val)}</span>
-        <span class="pr-kind">${h.kind} PR</span>
-      </div>
-    `).join('');
-  }
-
-  applyPowerTheme(vol);
-}
-
-/* =========================
-   Copy workout as JSON
-   A self-describing snapshot of one day: totals, muscle split, every set, and
-   the history each exercise is measured against — sized to paste straight into
-   a chat assistant. Read-only; never writes to the stored day.
-   ========================= */
-
-const COPY_BTN_LABEL = '📋';
-
-const round1 = (n)=> Math.round((Number(n)||0) * 10) / 10;
-
-function sumSets(sets){
-  let reps = 0, vol = 0;
-  (sets||[]).forEach(s=>{
-    const w = Number(s.weight)||0, r = Number(s.reps)||0;
-    reps += r; vol += w * r;
-  });
-  return { reps, volume: Math.round(vol) };
-}
-
-function exportExercise(ex, iso){
-  const cs      = countedSets(ex);
-  const sum     = sumSets(cs);
-  const top     = topSetOf(ex);
-  const prior   = priorBests(ex.name, ex.bodyPart, iso);
-  const past    = scanExerciseSessions(ex.name, ex.bodyPart, iso);
-  const last    = past.length ? past[past.length-1] : null;
-  const lastSum = last ? sumSets(last.sets) : null;
-  const st      = prStatus(ex, iso);
-
-  return {
-    name: ex.name,
-    muscleGroup: ex.bodyPart || null,
-    completed: !!ex.finished,
-    sets: (ex.sets||[]).map((s, i)=>({
-      set: i + 1,
-      weightLb: Number(s.weight)||0,
-      reps: Number(s.reps)||0,
-      volumeLb: Math.round((Number(s.weight)||0) * (Number(s.reps)||0)),
-      completed: !!(ex.finished || s.done),
-      superset: !!s.superset
-    })),
-    totals: {
-      countedSets: cs.length,
-      reps: sum.reps,
-      volumeLb: sum.volume,
-      avgWeightPerRepLb: sum.reps ? round1(sum.volume / sum.reps) : 0,
-      topSet: { weightLb: top.weight, reps: top.reps }
-    },
-    personalRecordToday: st.any ? (st.weightPR ? 'weight' : (st.repPR ? 'reps' : 'volume')) : null,
-    history: {
-      priorSessionsLogged: prior.sessions,
-      priorBestSet: prior.topSet.weight
-        ? { weightLb: prior.topSet.weight, reps: prior.topSet.reps, date: prior.topSet.date }
-        : null,
-      priorBestSessionVolume: prior.bestVol.vol
-        ? { volumeLb: Math.round(prior.bestVol.vol), date: prior.bestVol.date }
-        : null,
-      previousSession: last
-        ? { date: last.date, sets: (last.sets||[]).length, reps: lastSum.reps, volumeLb: lastSum.volume }
-        : null
-    }
-  };
-}
-
-function buildWorkoutExport(day, iso){
-  const totals = totalsFiltered(day);
-
-  const byPart = {};
-  let totalReps = 0;
-  day.exercises.forEach(ex=>{
-    const p   = ex.bodyPart || 'Other';
-    const cs  = countedSets(ex);
-    const sum = sumSets(cs);
-    totalReps += sum.reps;
-    const b = byPart[p] || (byPart[p] = { muscleGroup:p, exercises:0, sets:0, reps:0, volumeLb:0 });
-    b.exercises++; b.sets += cs.length; b.reps += sum.reps; b.volumeLb += sum.volume;
-  });
-  const muscleGroups = Object.values(byPart)
-    .sort((a,b)=> b.volumeLb - a.volumeLb)
-    .map(b=> Object.assign(b, {
-      pctOfSessionVolume: totals.vol ? round1((b.volumeLb / totals.vol) * 100) : 0
-    }));
-
-  const similar = findLastSimilarWorkout(day, iso);
-
-  return {
-    source: 'LevelUp · Power Up workout log',
-    exportedAt: new Date().toISOString(),
-    units: { weight:'lb', volume:'lb — weight × reps, summed over sets' },
-    note: 'Only completed sets count toward volume totals; every logged set is listed with its own completed flag.',
-    workout: {
-      date: iso,
-      weekday: new Intl.DateTimeFormat('en-US', { weekday:'long' }).format(new Date(iso + 'T00:00:00')),
-      totals: {
-        exercises: totals.exCount,
-        loggedSets: day.exercises.reduce((n, ex)=> n + (ex.sets||[]).length, 0),
-        completedSets: totals.sets,
-        reps: totalReps,
-        volumeLb: Math.round(totals.vol),
-        avgWeightPerRepLb: totalReps ? round1(totals.vol / totalReps) : 0
-      },
-      muscleGroups,
-      comparedToLastSimilarSession: similar ? {
-        date: similar.date,
-        volumeLb: Math.round(similar.vol),
-        deltaVolumeLb: Math.round(totals.vol - similar.vol),
-        deltaPct: similar.vol ? round1(((totals.vol - similar.vol) / similar.vol) * 100) : null
-      } : null,
-      exercises: day.exercises.map(ex=> exportExercise(ex, iso))
-    }
-  };
-}
-
-/* Clipboard write, with the old execCommand path for browsers that refuse the
-   async API outside a secure context. */
-async function copyText(text){
-  try{
-    if(navigator.clipboard && window.isSecureContext){
-      await navigator.clipboard.writeText(text);
-      return true;
-    }
-  }catch{}
-  try{
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.setAttribute('readonly', '');
-    ta.style.cssText = 'position:fixed; top:-1000px; left:0; opacity:0';
-    document.body.appendChild(ta);
-    ta.select();
-    ta.setSelectionRange(0, text.length);
-    const ok = document.execCommand('copy');
-    document.body.removeChild(ta);
-    return ok;
-  }catch{ return false; }
-}
-
-let copyFlashTimer = null;
-function flashCopyBtn(msg, ok){
-  const b = $('#copyWorkout'); if(!b) return;
-  clearTimeout(copyFlashTimer);
-  b.textContent = msg;
-  b.classList.toggle('ok', !!ok);
-  copyFlashTimer = setTimeout(()=>{
-    b.textContent = COPY_BTN_LABEL;
-    b.classList.remove('ok');
-  }, 1800);
 }
 
 function renderExercise(ex){
   const node = document.createElement('div');
-  node.className = 'ex' + (ex.finished ? ' finished' : '') + (ex.copied ? ' copied' : '')
-    + (!ex.finished && isStarted(ex) ? ' started' : '');
+  node.className = 'ex' + (ex.copied ? ' copied' : '') + (isStarted(ex) ? ' started' : '');
   node.dataset.id = ex.id;
   node.setAttribute('tabindex','0');
 
   const {vol, avg} = exStats(ex);
   const copiedText = ex.copied ? ' (copied)' : '';
 
-  // ---------- Completed exercise ----------
-  if(ex.finished){
-    const exKey = `ex:${ex.bodyPart}:${ex.name}`;
-    node.dataset.key = exKey;
-    if(isCollapsed(exKey)) node.classList.add('ex-collapsed');
-
-    node.innerHTML = `
-      <div class="ex-header" data-act="toggleCExercise">
-        <span class="ex-chev">▼</span>
-        <div class="ex-title">
-          <div class="ex-name">${esc(ex.name)}${copiedText}</div>
-          <div class="tag">${ex.sets.length} set${ex.sets.length===1?"":"s"} • ${Math.round(vol).toLocaleString()} lb • ${Math.round(avg)} lb/rep</div>
-        </div>
-        <div class="ex-head-actions">
-          <button class="btn-undo" data-act="markComplete" title="Reopen for editing">↩ Undo</button>
-          <button class="btn-icon" data-act="viewHistory" title="History" aria-label="History">📊</button>
-        </div>
-      </div>
-
-      <div class="ex-body">
-        <div class="sets"></div>
-      </div>
-    `;
-
-    const setsWrap = node.querySelector('.sets');
-    setsWrap.appendChild(renderExerciseComparisonSummary(ex));
-
-    // Sets in a single column, in the order they were performed.
-    const setGrid = document.createElement('div');
-    setGrid.className = 'set-grid';
-    setsWrap.appendChild(setGrid);
-
-    const top = topSetOf(ex);
-    const topIdx = (ex.sets||[]).findIndex(s=>
-      (Number(s.weight)||0) === top.weight && (Number(s.reps)||0) === top.reps
-    );
-    (ex.sets||[]).forEach((s,i)=>
-      setGrid.appendChild(renderSet(ex.id, s, i, true, top.weight > 0 && i === topIdx))
-    );
-
-    return node;
-  }
-
-  // ---------- In-progress exercise ----------
   node.innerHTML = `
     <div class="ex-header" data-act="toggleExercise">
       <div class="ex-title">
@@ -1500,47 +437,32 @@ function renderExercise(ex){
   const setsWrap = node.querySelector('.sets');
   // one lookup per exercise, reused for every row
   const priorTop = priorBests(ex.name, ex.bodyPart, current.toISOString().slice(0,10)).topSet;
-  ex.sets.forEach((s, i) => setsWrap.appendChild(renderSet(ex.id, s, i, false, false, priorTop)));
+  ex.sets.forEach((s, i) => setsWrap.appendChild(renderSet(ex.id, s, i, priorTop)));
 
   return node;
 }
 
-function renderSet(exId, s, idx, locked = false, isTop = false, priorTop = null) {
+function renderSet(exId, s, idx, priorTop = null) {
   const row = document.createElement('div');
-  row.className = 'set-row' + (locked ? ' locked' : '') + (s.restPause ? ' rest-pause' : ''); row.dataset.exId = exId; row.dataset.idx = idx;
-  if (locked) {
-    const special = !!(s.restPause || s.superset || s.special || s.extra);
-    row.className = 'set-item' + (special ? ' set-special' : '') + (isTop ? ' set-top' : '');
-    row.dataset.exId = exId; row.dataset.idx = idx;
-    const wNum = Number(s.weight)||0, rNum = Number(s.reps)||0;
-    const w = (s.weight ?? '—');
-    const r = (s.reps ?? '—');
-    row.innerHTML =
-      `<span class="si-n">SET ${idx+1}</span>` +
-      `<span class="si-w">${esc(w)}</span><span class="si-unit">lb</span>` +
-      `<span class="si-x">×</span><span class="si-r">${esc(r)}</span>` +
-      `<span class="si-vol">${(wNum && rNum) ? (wNum*rNum).toLocaleString()+' lb' : ''}</span>`;
-    return row;
-  } else {
-    const copiedClass = s.copied ? ' copied' : '';
-    // the badge only appears once the set is ticked Done
-    const isPR = !!s.done && beatsPriorPR(s, priorTop);
-    if(isPR) row.classList.add('set-pr');
+  row.className = 'set-row' + (s.restPause ? ' rest-pause' : ''); row.dataset.exId = exId; row.dataset.idx = idx;
+  const copiedClass = s.copied ? ' copied' : '';
+  // the badge only appears once the set is ticked Done
+  const isPR = !!s.done && beatsPriorPR(s, priorTop);
+  if(isPR) row.classList.add('set-pr');
 
-    row.innerHTML = `
-      <div class="weight-input-group">
-        <input class="num-input${copiedClass}" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" data-field="weight"/>
-        <span class="lbs-label">lbs</span>
-      </div>
-      <input class="num-input${copiedClass}" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" data-field="reps"/>
-      <div class="pr-slot">${isPR ? PR_TAG_HTML : ''}</div>
-      <div class="flags">
-        <label><input type="checkbox" ${s.superset?'checked':''} data-field="superset"/> Rest Pause</label>
-        <label><input type="checkbox" ${s.done?'checked':''} data-field="done"/> Done</label>
-      </div>
-      <div class="tools"></div>
-    `;
-  }
+  row.innerHTML = `
+    <div class="weight-input-group">
+      <input class="num-input${copiedClass}" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" data-field="weight"/>
+      <span class="lbs-label">lbs</span>
+    </div>
+    <input class="num-input${copiedClass}" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" data-field="reps"/>
+    <div class="pr-slot">${isPR ? PR_TAG_HTML : ''}</div>
+    <div class="flags">
+      <label><input type="checkbox" ${s.superset?'checked':''} data-field="superset"/> Rest Pause</label>
+      <label><input type="checkbox" ${s.done?'checked':''} data-field="done"/> Done</label>
+    </div>
+    <div class="tools"></div>
+  `;
   return row;
 }
 
@@ -1555,8 +477,8 @@ function refreshRowPR(row, ex, s){
 }
 
 function uid(){ return Math.random().toString(36).slice(2,9); }
-function openPopup(id){ $(id).style.display='flex'; if (id === '#bpPopup' || id === '#exPopup' || id === '#workoutPopup' || id === '#historyPopup' || id === '#copyPopup') $('#totalsBar').classList.add('hidden'); }
-function closePopup(id){ $(id).style.display='none'; $('#totalsBar').classList.remove('hidden'); }
+function openPopup(id){ $(id).style.display='flex'; if (id === '#bpPopup' || id === '#exPopup' || id === '#workoutPopup') document.body.classList.add('ss-popup-open'); }
+function closePopup(id){ $(id).style.display='none'; document.body.classList.remove('ss-popup-open'); }
 Array.from(document.querySelectorAll('.x')).forEach(btn=> btn.addEventListener('click', e=> closePopup(e.target.dataset.close)));
 
 $('#addWorkout').addEventListener('click', ()=>{
@@ -1594,28 +516,6 @@ $('#addExercise').addEventListener('click', ()=>{
   });
   openPopup('#bpPopup');
 });
-$('#copyWorkout').addEventListener('click', async ()=>{
-  const day = loadDay(current);
-  if(!day.exercises.length){ flashCopyBtn('–', false); return; }
-
-  const iso  = current.toISOString().slice(0,10);
-  const text = JSON.stringify(buildWorkoutExport(day, iso), null, 2);
-
-  if(await copyText(text)){
-    flashCopyBtn('✓', true);
-  }else{
-    $('#copyJsonBox').value = text;   // clipboard blocked — let them select it by hand
-    openPopup('#copyPopup');
-  }
-});
-
-$('#copyJsonBox').addEventListener('focus', (e)=> e.target.select());
-$('#copyJsonAgain').addEventListener('click', async (e)=>{
-  const ok = await copyText($('#copyJsonBox').value);
-  e.target.textContent = ok ? '✓ Copied' : 'Select the text above to copy';
-  setTimeout(()=>{ e.target.textContent = 'Copy to clipboard'; }, 1800);
-});
-
 $('#backToBP').addEventListener('click', ()=>{ closePopup('#exPopup'); openPopup('#bpPopup'); });
 $('#bpGrid').addEventListener('click', (e)=>{
   const bp=e.target.closest('.opt')?.dataset.bp; if(!bp) return;
@@ -1666,42 +566,6 @@ document.addEventListener('click', (e)=>{
   if(act==='toggleGroup'){ const g=host.closest('.group'); if(g){ g.classList.toggle('collapsed'); } return; }
   if(act==='toggleExercise'){ const ex=host.closest('.ex'); if(ex){ ex.classList.toggle('collapsed'); } return; }
 
-  // Completed view: remember which sections the user folded away
-  if(act==='toggleCGroup'){
-    const g = host.closest('.cgroup');
-    if(g){ g.classList.toggle('collapsed'); setCollapsedState(g.dataset.key, g.classList.contains('collapsed')); }
-    return;
-  }
-  if(act==='toggleCExercise'){
-    const ex = host.closest('.ex');
-    if(ex){ ex.classList.toggle('ex-collapsed'); setCollapsedState(ex.dataset.key, ex.classList.contains('ex-collapsed')); }
-    return;
-  }
-
-  // Expand/collapse every section at once.
-  // Completed "Collapse all" folds the exercise cards but leaves the body-part
-  // sections open — that's the compact one-screen view worth screenshotting.
-  if(act==='expandAll' || act==='collapseAll'){
-    const collapse = (act === 'collapseAll');
-
-    if(host.dataset.scope === 'completed'){
-      const writes = [];
-      document.querySelectorAll('#log-completed .cgroup').forEach(g=>{
-        g.classList.remove('collapsed');
-        writes.push([g.dataset.key, false]);
-      });
-      document.querySelectorAll('#log-completed .ex').forEach(ex=>{
-        ex.classList.toggle('ex-collapsed', collapse);
-        writes.push([ex.dataset.key, collapse]);
-      });
-      setCollapsedBulk(writes);
-    }else{
-      document.querySelectorAll('#log-inprogress .group')
-        .forEach(g=> g.classList.toggle('collapsed', collapse));
-    }
-    return;
-  }
-
   const day = parentDay();
 
   if(act==='addSet'){
@@ -1742,12 +606,6 @@ document.addEventListener('click', (e)=>{
     saveDay(day); render(); return;
   }
 
-  if(act==='viewHistory'){
-    const exId = host.closest('.ex').dataset.id;
-    const ex = day.exercises.find(x=>x.id===exId);
-    openExerciseHistory(ex);
-    return;
-  }
 });
 
 document.addEventListener('input', (e)=>{
@@ -1769,9 +627,7 @@ document.addEventListener('input', (e)=>{
     const {vol:ev, avg} = exStats(ex);
     exNode.querySelector('.tag').textContent = `${ex.sets.length} set(s) • ${Math.round(ev).toLocaleString()} lb • avg ${Math.round(avg)} lb/rep`;
 
-    const {sets, vol, exCount} = totalsFiltered(day);
-    $('#tSets').textContent = sets; $('#tVol').textContent = Math.round(vol)+' lb'; $('#tEx').textContent = exCount;
-    renderPowerCard(day);
+    view.renderTop(day);
 
     // editing an already-ticked set can make or break its PR
     if(ex.sets[idx].done) refreshRowPR(row, ex, ex.sets[idx]);
@@ -1862,8 +718,8 @@ function armDragAndDrop(){
 
 
 
-$('#prevDay').addEventListener('click', ()=>{ current.setDate(current.getDate()-1); lastLevelIdx=-1; render(); });
-$('#nextDay').addEventListener('click', ()=>{ current.setDate(current.getDate()+1); lastLevelIdx=-1; render(); });
+$('#prevDay').addEventListener('click', ()=>{ current.setDate(current.getDate()-1); view.resetFlash(); render(); });
+$('#nextDay').addEventListener('click', ()=>{ current.setDate(current.getDate()+1); view.resetFlash(); render(); });
 
 $('#openCalendar').addEventListener('click', ()=>{ openPopup('#calPopup'); buildCalendar(current); });
 $('#calPrev').addEventListener('click', ()=>{ shiftCalendar(-1); });
@@ -1885,7 +741,7 @@ function buildCalendar(anchorDate){
       const day = JSON.parse(localStorage.getItem(`powerUp:${dateISO}`));
       if(day.exercises?.length) c.classList.add('workout');
     }
-    c.addEventListener('click', ()=>{ current = new Date(y,m,d); closePopup('#calPopup'); lastLevelIdx=-1; render(); });
+    c.addEventListener('click', ()=>{ current = new Date(y,m,d); closePopup('#calPopup'); view.resetFlash(); render(); });
     grid.appendChild(c);
   }
 }
@@ -1902,7 +758,8 @@ function buildCalendar(anchorDate){
   } else {
     current = new Date();
   }
-  
+
+  view = SS.create($('#summary'), { flash: true, renderInProgress });
   render();
 })();
 </script>

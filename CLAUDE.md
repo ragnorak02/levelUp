@@ -9,6 +9,8 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 ├── powerUp/                  ← Exercise: workout logging & analytics
 │   ├── index.html            ← Module entry point
 │   ├── workout.html          ← Log workout (query: ?date=YYYY-MM-DD)
+│   ├── sessionSummary.js/.css← Day summary (volume card, totals, In Progress/Completed,
+│   │                            history + copy-JSON popups) — shared with the dashboard
 │   └── analytics.html        ← Workout history & stats
 ├── study/                    ← Flashcards with spaced repetition
 │   ├── studyHome.html        ← Module entry point
@@ -60,6 +62,7 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 - **Study module**: Class-based — constructor calls `init()`, uses `setupEventListeners()`, `render*()` methods, exposed via `window.ClassName`
 - **Finance dataLoader**: IIFE with `'use strict'`
 - **Garden module**: IIFE with `'use strict'` — `GardenDataManager` class for data layer, `GardenApp` for UI; exposed via `window.GardenDataManager` and `window.GardenConstants`
+- **Workout summary** (`powerUp/sessionSummary.js`): IIFE exposing `window.SessionSummary`. Both `workout.html` and the dashboard's Exercise card render through `SessionSummary.create(root, opts).render(day, iso)` — edit the summary there, never in either page. Dashboard uses `readOnly: true` + `memoryCollapse()` (always opens folded); styles are scoped under `.session-summary` / `.ss-popup`
 - **No ES module imports** — all scripts use global scope or window attachment
 
 ### CSS
@@ -161,13 +164,14 @@ tests/
 ├── testSuiteData.js     ← Schema validation tests (30 tests)
 ├── testSuiteAggregation.js ← Computation tests (10 tests)
 ├── testSuiteUI.js       ← Data round-trip & append mode tests (10 tests)
+├── testSuiteSessionSummary.js ← Shared workout summary (7 tests)
 ├── runner.html          ← Browser test runner UI (dark themed, click-to-run)
 └── nodeRunner.js        ← Terminal runner (node tests/nodeRunner.js)
 ```
 
 ### Running Tests
 - **Browser**: Open `tests/runner.html`, click "Run Tests" — safe, read-only, won't change data
-- **Terminal**: `node tests/nodeRunner.js` — mocks localStorage, runs all 62 tests, exits 0/1
+- **Terminal**: `node tests/nodeRunner.js` — mocks localStorage, runs all 69 tests, exits 0/1
 - **Seed Data**: Click "Seed Data" in runner.html (confirms before wiping) or call `SeedGenerator.generateFullDataset(42)` in console
 
 ### Test Framework API

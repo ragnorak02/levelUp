@@ -165,11 +165,6 @@ function getAllWorkouts(){
   return days;
 }
 
-function getLatestWorkout(){
-  const all = getAllWorkouts();
-  return all.length ? all[all.length - 1] : null;
-}
-
 function getExerciseResetAt(){
   const v = localStorage.getItem(KEY_EX_RESET_AT);
   return (v && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? v : '1900-01-01';
@@ -1902,72 +1897,53 @@ function renderModulesAndCharacter(){
   highlightImprovedToday();
 }
 
+/* --------------------------------
+   Exercise: the workout page's day summary, read-only.
+   Same renderer as powerUp/workout.html (powerUp/sessionSummary.js), so any
+   change to that summary shows up here too. ←/→ step between logged
+   workouts, skipping rest days; everything opens collapsed.
+----------------------------------*/
+const exerciseView = { iso: null, view: null, collapse: null };
+
 function renderHistory(){
-  const container = $('historyBody');
-  const summary = $('historySummary');
+  const SS = window.SessionSummary;
+  const root = $('exSummary');
+  if(!SS || !root) return;
 
-  const latest = getLatestWorkout();
-  if(!latest){
-    if(summary) summary.style.display = 'none';
-    if(container){
-      container.innerHTML = `
-        <div class="empty">
-          No workout data found yet.<br/>
-          Start logging workouts in <b>Power Up</b> and your latest workout will appear here automatically.
-        </div>
-      `;
-    }
-    return;
+  const dates = SS.listWorkoutDates();
+  const hasAny = dates.length > 0;
+  $('exNav').style.display = hasAny ? '' : 'none';
+  $('exEmpty').style.display = hasAny ? 'none' : '';
+  root.style.display = hasAny ? '' : 'none';
+  if(!hasAny) return;
+
+  // start on the latest workout; fall back to it if the shown one was deleted
+  if(!exerciseView.iso || !dates.includes(exerciseView.iso)){
+    exerciseView.iso = dates[dates.length - 1];
+  }
+  if(!exerciseView.view){
+    exerciseView.collapse = SS.memoryCollapse();
+    exerciseView.view = SS.create(root, { readOnly: true, collapse: exerciseView.collapse });
   }
 
-  const totals = dayTotals(latest);
+  const iso = exerciseView.iso;
+  const idx = dates.indexOf(iso);
+  setText('exDate', SS.dateLabel(iso));
+  setText('historySub', idx === dates.length - 1 ? 'Most recent workout' : `${dates.length - 1 - idx} workout${dates.length - 1 - idx === 1 ? '' : 's'} back`);
+  $('exPrev').disabled = idx <= 0;
+  $('exNext').disabled = idx >= dates.length - 1;
 
-  if(summary) summary.style.display = 'flex';
-  setText('hDate', new Date(latest.date + 'T12:00:00').toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'}));
-  setText('hMoves', String(totals.moves));
-  setText('hSets', String(totals.sets));
-  setText('hVol', totals.volume.toLocaleString() + ' lb');
+  exerciseView.view.render(SS.loadDay(iso), iso);
+}
 
-  // Top 3 heaviest exercises, one per body part
-  const scored = latest.exercises.map(ex => {
-    const sets = (ex.sets || []).filter(s => (s.weight > 0 || s.reps > 0)).length;
-    const vol = (ex.sets || []).reduce((sum, s) => sum + ((s.weight>0 && s.reps>0) ? (s.weight*s.reps) : 0), 0);
-    const maxWeight = (ex.sets || []).reduce((mx, s) => Math.max(mx, s.weight || 0), 0);
-    return { ex, sets, vol, maxWeight };
-  }).filter(s => s.sets > 0 || s.vol > 0);
-
-  // Group by bodyPart, pick heaviest per group
-  const byPart = new Map();
-  scored.forEach(s => {
-    const part = s.ex.bodyPart;
-    if(!byPart.has(part) || s.maxWeight > byPart.get(part).maxWeight){
-      byPart.set(part, s);
-    }
-  });
-
-  // Sort by maxWeight desc, take top 3
-  const top3 = [...byPart.values()].sort((a, b) => b.maxWeight - a.maxWeight).slice(0, 3);
-
-  const rows = top3.map(s => `
-    <div class="ex-row">
-      <div>
-        <div class="n">${escapeHtml(s.ex.name)}</div>
-        <div class="m">${escapeHtml(s.ex.bodyPart)} • ${s.sets} set(s)</div>
-      </div>
-      <div class="r">
-        ${Math.round(s.maxWeight).toLocaleString()} lb
-        <small>heaviest</small>
-      </div>
-    </div>
-  `);
-
-  if(container){
-    container.innerHTML = `
-      <div class="exercise-list">
-        ${rows.length ? rows.join('') : `<div class="empty">Workout found, but sets are empty.</div>`}
-      </div>
-    `;
-  }
+function stepExerciseWorkout(dir){
+  const SS = window.SessionSummary;
+  if(!SS || !exerciseView.iso) return;
+  const next = SS.adjacentWorkoutDate(exerciseView.iso, dir);
+  if(!next) return;
+  exerciseView.iso = next;
+  exerciseView.collapse.reset();   // every workout opens folded
+  renderHistory();
 }
 
 /* --------------------------------
@@ -2024,19 +2000,20 @@ function bindButtons(){
     });
   }
 
+  // Open Workout / the date label both open the workout being shown
+  const openShownWorkout = ()=>{
+    if(exerciseView.iso) location.href = `./powerUp/workout.html?date=${exerciseView.iso}`;
+    else location.href = './powerUp/index.html';
+  };
   const openExercise = $('openExercise');
-  if(openExercise){
-    openExercise.addEventListener('click', ()=>{
-      const latest = getLatestWorkout();
-      if(latest) location.href = `./powerUp/workout.html?date=${latest.date}`;
-      else location.href = './powerUp/index.html';
-    });
-  }
+  if(openExercise) openExercise.addEventListener('click', openShownWorkout);
+  const exDate = $('exDate');
+  if(exDate) exDate.addEventListener('click', openShownWorkout);
 
-  const openAnalytics = $('openAnalytics');
-  if(openAnalytics){
-    openAnalytics.addEventListener('click', ()=> location.href = './powerUp/analytics.html');
-  }
+  const exPrev = $('exPrev');
+  if(exPrev) exPrev.addEventListener('click', ()=> stepExerciseWorkout(-1));
+  const exNext = $('exNext');
+  if(exNext) exNext.addEventListener('click', ()=> stepExerciseWorkout(1));
 
   // Nutrition
   const openNutrition = $('openNutrition');
