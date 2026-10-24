@@ -60,7 +60,8 @@ body{
   gap:8px;
   align-items:stretch;
 }
-.dash-strip .level-block{flex:1 1 0; min-width:0; justify-content:center;}
+.dash-strip .level-block{flex:1 1 0; min-width:0; justify-content:center; cursor:pointer; transition: border-color .25s, box-shadow .25s;}
+.dash-strip .level-block.selected{border-color: rgba(59,130,246,.5); box-shadow: 0 0 12px rgba(59,130,246,.15);}
 .dash-strip .qicon{flex:0 0 auto; height:auto; min-height:44px;}
 .dash-strip .mini-slot{flex:1 1 0; min-width:0;}
 .card{
@@ -315,7 +316,7 @@ body{
 }
 .qicon:hover{background: rgba(255,255,255,.10)}
 .qicon:active{transform: translateY(1px)}
-.qicon.active{background: rgba(59,130,246,.18); border-color: rgba(59,130,246,.4);}
+.qicon.selected{background: rgba(59,130,246,.18); border-color: rgba(59,130,246,.5); box-shadow: 0 0 12px rgba(59,130,246,.15);}
 
 /* Modules right */
 .modules-card{flex:1; min-width:0; display:flex;}
@@ -720,6 +721,24 @@ body{
 }
 .mini:hover{background: rgba(19,26,34,.90)}
 .mini:active{transform: translateY(1px)}
+
+/* Level card: progress + recent experience */
+.xp-meter{height:10px; border-radius:999px; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.10); overflow:hidden}
+.xp-meter > i{display:block; height:100%; border-radius:999px; background: linear-gradient(90deg, #22c55e 0%, #86efac 40%, #fbbf24 70%, #f59e0b 100%); box-shadow: 0 0 8px rgba(245,158,11,.25)}
+.xp-pace{margin-top:6px; color:var(--muted); font-size:12px; font-weight:800}
+.xp-row{
+  display:flex; align-items:center; gap:10px; padding:8px 10px; margin-top:6px;
+  border-radius:12px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+}
+.xp-icon{font-size:18px; flex:0 0 auto}
+.xp-main{flex:1 1 auto; min-width:0; display:flex; flex-direction:column}
+.xp-main b{font-size:13px}
+.xp-main small{color:var(--muted); font-size:11px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.xp-pct{flex:0 0 auto; font-weight:1000; color:#86efac}
+.xp-ups{display:flex; gap:8px; flex-wrap:wrap}
+.xp-up{padding:6px 10px; border-radius:10px; background: rgba(245,158,11,.10); border:1px solid rgba(245,158,11,.35); display:flex; flex-direction:column; align-items:center}
+.xp-up b{color:#fbbf24; font-size:13px}
+.xp-up small{color:var(--muted); font-size:10px; font-weight:800}
 
 /* Bowling summary card */
 .bowl-label{margin:12px 0 6px; color:var(--muted); font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.5px}

@@ -103,6 +103,7 @@ Namespaced with colon prefix:
 - `levelUp:exerciseResetAt` — ISO date string (YYYY-MM-DD); legacy, read once to migrate to `exerciseSpentPct`
 - `levelUp:exerciseSpentPct` — number, level-% used up by transforms
 - `levelUp:workoutScores` — JSON scoring report (see WorkoutXP.buildReport)
+- `levelUp:levelHistory` — JSON array `[{ level, date }]`, one entry per transform (from Oct 2026 on)
 - `powerUp:YYYY-MM-DD` — JSON workout object (date-keyed)
 - `finances:receipts` — JSON array of receipt objects
 - `finances:dataLoaded` — "true"/"false" string

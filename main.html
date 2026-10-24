@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Level Up — Dashboard</title>
 
-  <link rel="stylesheet" href="./main.css?v=20261024g" />
+  <link rel="stylesheet" href="./main.css?v=20261024h" />
   <link rel="stylesheet" href="./powerUp/sessionSummary.css?v=20261024d" />
 
   <!-- Chart.js (CDN) for donut chart -->
@@ -69,7 +69,7 @@
 
       <!-- Level | calendar | open slot (bowling) -->
       <div class="dash-strip">
-        <div class="level-block">
+        <div class="level-block" data-module="level" role="button" tabindex="0" title="Level: tap for your recent experience">
           <div class="level-row-title">
             <button class="level-bolt-btn" id="exTransform" title="Power Up!">⚡</button>
             <span class="level-label">Lv</span>
@@ -81,7 +81,7 @@
             <span class="level-bar-badge" id="levelBadge">🛡️</span>
           </div>
         </div>
-        <button class="qicon" id="calToggleBtn" title="Toggle Calendar">📅</button>
+        <button class="qicon" id="calToggleBtn" data-module="calendar" title="Calendar">📅</button>
         <!-- open slot: bowling for now, muted while unused -->
         <div class="mini-slot slot-idle" data-module="bowling" data-href="./bowling/index.html" role="button" tabindex="0" title="Bowling: tap for summary, again to open">
           <div class="bowl-compact">
@@ -96,8 +96,8 @@
       </div>
     </section>
 
-    <!-- CALENDAR (hidden by default, toggled by calendar icon) -->
-    <section class="card calendar-card" id="calendarCard" style="display:none;">
+    <!-- CALENDAR (shown when the calendar button is selected) -->
+    <section class="card calendar-card detail-panel" data-focus="calendar" id="calendarCard" style="display:none;">
       <div class="calendar-head">
         <div class="calendar-nav">
           <button class="cal-nav-btn" id="calMonthPrev" type="button" title="Previous month">◀</button>
@@ -225,6 +225,19 @@
       </div>
     </section>
 
+    <!-- LEVEL: progress + recent experience (tap the level card) -->
+    <section class="card level-card detail-panel" data-focus="level" style="display:none;">
+      <div class="card-inner">
+        <div class="history-head">
+          <div class="history-title">
+            <b id="levelCardTitle">Level</b>
+            <span id="levelCardSub">—</span>
+          </div>
+        </div>
+        <div id="levelCardBody"></div>
+      </div>
+    </section>
+
     <!-- BOWLING: summary (tap the bowling slot) -->
     <section class="card bowl-card detail-panel" data-focus="bowling" style="display:none;">
       <div class="card-inner">
@@ -273,6 +286,6 @@
 
   <script src="./powerUp/workoutXP.js?v=20261024c"></script>
   <script src="./powerUp/sessionSummary.js?v=20261024d"></script>
-  <script src="./main.js?v=20261024g"></script>
+  <script src="./main.js?v=20261024h"></script>
 </body>
 </html>

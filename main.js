@@ -7,6 +7,7 @@ const KEY_LEVEL = 'levelUp:characterLevel';
 const KEY_TRANSFORMS = 'levelUp:transformCount';
 const KEY_EX_RESET_AT = 'levelUp:exerciseResetAt';   // pre-carry-over meter reset; read once to migrate
 const KEY_EX_SPENT = 'levelUp:exerciseSpentPct';    // level-% used up by transforms
+const KEY_LEVEL_HISTORY = 'levelUp:levelHistory';  // [{ level, date }] one per transform
 const todayISO = new Date().toISOString().slice(0,10);
 
 /* ===== Exercise Threshold =====
@@ -210,6 +211,9 @@ function doExerciseTransform(){
 
   setLevel(getLevel() + 1);
   setTransformCount(getTransformCount() + 1);
+  const history = safeParse(KEY_LEVEL_HISTORY) || [];
+  history.push({ level: getLevel(), date: new Date().toISOString() });
+  localStorage.setItem(KEY_LEVEL_HISTORY, JSON.stringify(history));
 
   // spend one level's worth; anything over it stays on the meter
   localStorage.setItem(KEY_EX_SPENT, String(getExerciseSpent() + LEVEL_PCT));
@@ -1278,16 +1282,6 @@ function saveCalendarEvent(){
 /* --------------------------------
    Calendar Toggle
 ----------------------------------*/
-let calendarVisible = false;
-
-function toggleCalendar(){
-  calendarVisible = !calendarVisible;
-  const card = $('calendarCard');
-  const btn = $('calToggleBtn');
-  if(card) card.style.display = calendarVisible ? 'block' : 'none';
-  if(btn) btn.classList.toggle('active', calendarVisible);
-  if(calendarVisible) renderCalendarGrid();
-}
 
 /* --------------------------------
    Level Names & Badges
@@ -1363,6 +1357,74 @@ function renderModulesAndCharacter(){
 }
 
 /* --------------------------------
+   Level: progress toward the next level and where the experience came from.
+   Workouts earn via powerUp/workoutXP.js; bowling and garden convert their
+   volume at EX_MAX per level (see powerSince).
+----------------------------------*/
+const XP_SOURCES = {
+  strength: { icon: '💪', label: 'Strength' },
+  bowling:  { icon: '🎳', label: 'Bowling' },
+  garden:   { icon: '🌱', label: 'Garden' }
+};
+
+/* Every experience gain, newest first: { source, date, pct, detail }. */
+function getXpEvents(scores){
+  const events = [];
+  (scores || new Map()).forEach((s, date) => {
+    const prs = s.prs.length ? ` · ${s.prs.length} PR${s.prs.length === 1 ? '' : 's'}` : '';
+    events.push({ source: 'strength', date, pct: s.pct, detail: Object.keys(s.parts).join(' / ') + prs });
+  });
+  getAllBowlingGames().forEach(g => {
+    if(!g.date) return;
+    events.push({ source: 'bowling', date: g.date.slice(0,10), pct: (g.score * BOWL_VOLUME_MULTIPLIER / EX_MAX) * LEVEL_PCT, detail: `Game ${g.score}` });
+  });
+  loadGardenXpLog().forEach(e => {
+    if(!e.date || !(e.amount > 0)) return;
+    events.push({ source: 'garden', date: String(e.date).slice(0,10), pct: (e.amount * GARDEN_VOLUME_MULTIPLIER / EX_MAX) * LEVEL_PCT, detail: e.reason || e.type || `${e.amount} XP` });
+  });
+  return events.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+}
+
+function renderLevelCard(){
+  const body = $('levelCardBody');
+  if(!body) return;
+  const scores = window.WorkoutXP ? WorkoutXP.scoreAll() : new Map();
+  const progress = getExerciseProgress(scores);
+  const level = getLevel();
+  const fmtDate = iso => new Date(iso.slice(0,10) + 'T12:00:00').toLocaleDateString(undefined, {month:'short', day:'numeric'});
+
+  setText('levelCardTitle', `Level ${level} · ${getLevelName(level)}`);
+  setText('levelCardSub', progress >= LEVEL_PCT ? 'Ready to transform — tap ⚡' : `${progress.toFixed(1)}% toward Level ${level + 1}`);
+
+  // pace: the last 10 workouts' average share of a level
+  const recentPct = [...scores.values()].slice(-10).map(s => s.pct);
+  const avgPct = recentPct.length ? recentPct.reduce((a, b) => a + b, 0) / recentPct.length : 0;
+  const toGo = Math.max(0, LEVEL_PCT - progress);
+  const pace = avgPct > 0 && toGo > 0 ? `≈ ${Math.ceil(toGo / avgPct)} workout${Math.ceil(toGo / avgPct) === 1 ? '' : 's'} to go · ${avgPct.toFixed(0)}% per workout lately` : '';
+
+  const events = getXpEvents(scores).slice(0, 4);
+  const rows = events.map(e => `
+    <div class="xp-row">
+      <span class="xp-icon">${XP_SOURCES[e.source].icon}</span>
+      <span class="xp-main"><b>${XP_SOURCES[e.source].label}</b><small>${fmtDate(e.date)} · ${escapeHtml(e.detail)}</small></span>
+      <span class="xp-pct">+${e.pct.toFixed(1)}%</span>
+    </div>
+  `).join('');
+
+  const history = (safeParse(KEY_LEVEL_HISTORY) || []).slice(-5).reverse();
+  const ups = history.map(h => `<div class="xp-up"><b>Lv ${h.level}</b><small>${fmtDate(h.date)}</small></div>`).join('');
+
+  body.innerHTML = `
+    <div class="xp-meter"><i style="width:${Math.min(100, progress).toFixed(1)}%"></i></div>
+    ${pace ? `<div class="xp-pace">${pace}</div>` : ''}
+    <div class="bowl-label">Recent experience</div>
+    ${rows || `<div class="empty">No experience earned yet. Log a workout to start.</div>`}
+    <div class="bowl-label">Level-ups</div>
+    ${ups ? `<div class="xp-ups">${ups}</div>` : `<div class="xp-pace">Your next level-up will be recorded here.</div>`}
+  `;
+}
+
+/* --------------------------------
    Exercise: the workout page's day summary, read-only.
    Same renderer as powerUp/workout.html (powerUp/sessionSummary.js), so any
    change to that summary shows up here too. ←/→ step between logged
@@ -1417,7 +1479,7 @@ function stepExerciseWorkout(dir){
 /* --------------------------------
    Focus Mode State
 ----------------------------------*/
-let focusModule = null; // 'exercise' | 'study' | 'finance' | 'nutrition' | null
+let focusModule = null; // 'exercise' | 'study' | 'finance' | 'nutrition' | 'level' | 'calendar' | 'bowling' | null
 
 const MODULE_FOCUS_MAP = {
   exercise: 'exercise',
@@ -1433,8 +1495,14 @@ function bindNav(){
     icon.addEventListener('click', (e) => e.stopPropagation());
   });
 
-  // Module bar / bowling slot click → focus mode
-  document.querySelectorAll('.modv[data-module], .mini-slot[data-module]').forEach(el => {
+  // the transform bolt lives inside the level card — it shouldn't select it
+  const bolt = $('exTransform');
+  if(bolt) bolt.addEventListener('click', (e) => e.stopPropagation());
+
+  // Bars, level card, calendar, bowling slot: one selected at a time, and the
+  // bottom section shows its card. Tapping the selected one again opens its
+  // module (if it has one); only selecting something else changes the card.
+  document.querySelectorAll('.dash-top [data-module]').forEach(el => {
     el.addEventListener('click', () => {
       const mod = el.dataset.module;
       // second tap on the selected one opens its module, same as its icon
@@ -1490,10 +1558,6 @@ function bindButtons(){
   if(openNutrition){
     openNutrition.addEventListener('click', ()=> location.href = './nutrition/index.html');
   }
-
-  // Calendar toggle
-  const calToggle = $('calToggleBtn');
-  if(calToggle) calToggle.addEventListener('click', toggleCalendar);
 
   // Finance month navigation
   const monthPrev = $('financeMonthPrev');
@@ -1612,7 +1676,7 @@ function highlightImprovedToday(){
    Focus Mode
 ----------------------------------*/
 function updateFocusMode(){
-  document.querySelectorAll('.modv[data-module], .mini-slot[data-module]').forEach(m => {
+  document.querySelectorAll('.dash-top [data-module]').forEach(m => {
     m.classList.toggle('selected', m.dataset.module === focusModule);
   });
 
@@ -1631,6 +1695,9 @@ function updateFocusMode(){
     detail.classList.add('visible');
   }
 
+  if(focusModule === 'calendar') renderCalendarGrid();
+  if(focusModule === 'level') renderLevelCard();
+
   // Re-render finance chart now that canvas is visible (fixes first-render zero-size bug)
   if(focusModule === 'finance'){
     requestAnimationFrame(() => renderFinanceDonut());
@@ -1648,7 +1715,8 @@ function renderAll(){
   renderFinanceDonut();
   renderBowlDashboard();
   renderBowlCard();
-  if(calendarVisible) renderCalendarGrid();
+  if(focusModule === 'calendar') renderCalendarGrid();
+  if(focusModule === 'level') renderLevelCard();
 }
 
 /* --------------------------------
