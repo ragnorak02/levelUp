@@ -27,9 +27,8 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 │   ├── budget.html, food.html, search.html
 │   ├── dataLoader.js         ← Seeds localStorage from receiptsData on first visit
 │   └── receiptsData.json     ← Receipt seed data
-├── bowling/                  ← League bowling tracker
-│   ├── index.html            ← Weeks, games, pin-by-pin scorer, stats, league import
-│   └── bowlingCore.js        ← Scoring, weeks, storage, shot recording — shared with the dashboard's live scorer
+├── bowling/                  ← League bowling — no page of its own; lives in the dashboard's Bowling card
+│   └── bowlingCore.js        ← Scoring, weeks, storage, shot recording, standings import, seasons
 ├── garden/                   ← Plant lifecycle tracking & garden management
 │   ├── index.html            ← Single-page app (6 tabs: Dashboard, Seeds, Trays, Plants, Analytics, Settings)
 │   ├── garden.css            ← Dark theme with green accent (#22c55e)
@@ -69,7 +68,7 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 - **Finance dataLoader**: IIFE with `'use strict'`
 - **Garden module**: IIFE with `'use strict'` — `GardenDataManager` class for data layer, `GardenApp` for UI; exposed via `window.GardenDataManager` and `window.GardenConstants`
 - **Workout summary** (`powerUp/sessionSummary.js`): IIFE exposing `window.SessionSummary`. Both `workout.html` and the dashboard's Exercise card render through `SessionSummary.create(root, opts).render(day, iso)` — edit the summary there, never in either page. Dashboard uses `readOnly: true` + `memoryCollapse()` (always opens folded); styles are scoped under `.session-summary` / `.ss-popup`
-- **Bowling core** (`bowling/bowlingCore.js`): IIFE exposing `window.BowlingCore`. A shot is `{ pinsLeft: [pins still standing after the ball] }`; pins knocked = pins standing *before* the ball − `pinsLeft.length` (the 10th frame re-racks after a strike/spare). Used by `bowling/index.html` and the dashboard's Bowling card (live scorer: pins only, no stance/target)
+- **Bowling core** (`bowling/bowlingCore.js`): IIFE exposing `window.BowlingCore`. A shot is `{ pinsLeft: [pins still standing after the ball] }`; pins knocked = pins standing *before* the ball − `pinsLeft.length` (the 10th frame re-racks after a strike/spare). Used by the dashboard's Bowling card: live scorer (pins or typed counts), week arrows, 🕘 season-history popup with standings import and New Season. The old bowling page was removed (Oct 2026); its shots may still carry `standingPosition`/`targetBoard`
 - **Workout calendar** (`powerUp/muscleCalendar.js`): IIFE exposing `window.MuscleCalendar.create(root, { selected, onSelect })`; reads `powerUp:YYYY-MM-DD` records itself. Used by `powerUp/index.html` and the workout page's 📅 popup — change it there, not per page. Styles scoped under `.mcal`
 - **No ES module imports** — all scripts use global scope or window attachment
 

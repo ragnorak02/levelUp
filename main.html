@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Level Up — Dashboard</title>
 
-  <link rel="stylesheet" href="./main.css?v=20261024l" />
+  <link rel="stylesheet" href="./main.css?v=20261024m" />
   <link rel="stylesheet" href="./powerUp/sessionSummary.css?v=20261024d" />
 
   <!-- Chart.js (CDN) for donut chart -->
@@ -83,7 +83,7 @@
         </div>
         <button class="qicon" id="calToggleBtn" data-module="calendar" title="Calendar">📅</button>
         <!-- open slot: bowling for now, muted while unused -->
-        <div class="mini-slot slot-idle" data-module="bowling" data-href="./bowling/index.html" role="button" tabindex="0" title="Bowling: tap for summary, again to open">
+        <div class="mini-slot slot-idle" data-module="bowling" role="button" tabindex="0" title="Bowling: tap to score, again for season history">
           <div class="bowl-compact">
             <span class="bowl-icon">🎳</span>
             <span class="bowl-info">
@@ -241,14 +241,10 @@
     <!-- BOWLING: summary (tap the bowling slot) -->
     <section class="card bowl-card detail-panel" data-focus="bowling" style="display:none;">
       <div class="card-inner">
-        <div class="history-head">
-          <div class="history-title">
-            <b>Bowling</b>
-            <span id="bowlCardSub">No games yet</span>
-          </div>
-          <div class="history-cta">
-            <button class="mini" id="openBowling">Open Bowling</button>
-          </div>
+        <div class="bs-head">
+          <b>Bowling</b>
+          <span id="bowlCardSub"></span>
+          <button class="bs-icon" data-bs="history" title="Season history" aria-label="Season history">🕘</button>
         </div>
         <div id="bowlSeason"></div>
         <div id="bowlScorer"></div>
@@ -286,9 +282,9 @@
 
   </main>
 
-  <script src="./bowling/bowlingCore.js?v=20261024k"></script>
+  <script src="./bowling/bowlingCore.js?v=20261024m"></script>
   <script src="./powerUp/workoutXP.js?v=20261024c"></script>
   <script src="./powerUp/sessionSummary.js?v=20261024d"></script>
-  <script src="./main.js?v=20261024l"></script>
+  <script src="./main.js?v=20261024m"></script>
 </body>
 </html>

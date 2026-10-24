@@ -741,7 +741,18 @@ body{
 .xp-up small{color:var(--muted); font-size:10px; font-weight:800}
 
 /* Bowling: live scorer */
-.bs-weeknav{display:inline-flex; align-items:center; gap:6px}
+/* Bowling header: title | ‹ date › | history, one row */
+.bs-head{display:flex; align-items:center; gap:8px; margin-bottom:8px}
+.bs-head > b{font-size:16px}
+.bs-head > span{flex:1; display:flex; justify-content:center}
+.bs-icon{
+  all:unset; cursor:pointer; flex:0 0 auto;
+  width:32px; height:26px; border-radius:8px;
+  display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid var(--ring); background: rgba(255,255,255,.04); font-size:14px;
+}
+.bs-icon:active{background: rgba(255,255,255,.10)}
+.bs-weeknav{display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:900; color:var(--muted)}
 .bs-wk{
   all:unset; cursor:pointer; width:24px; height:22px; border-radius:7px;
   display:inline-flex; align-items:center; justify-content:center;
@@ -825,6 +836,43 @@ body{
 .bs-done span{font-size:11px}
 .bs-done .bs-btn{padding:8px 12px}
 .bs-done b{font-size:24px; color:var(--ink)}
+
+/* Bowling season history popup */
+.bh-overlay{position:fixed; inset:0; z-index:150; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:12px}
+.bh-overlay.show{display:flex}
+.bh-sheet{
+  width:min(460px, 100%); max-height:86vh; overflow:auto;
+  background: var(--card); border:1px solid var(--ring); border-radius:16px; padding:12px;
+}
+.bh-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px}
+.bh-top b{font-size:16px}
+.bh-cols, .bh-week{display:grid; grid-template-columns:62px repeat(3, 1fr) 1.2fr; gap:4px; align-items:center}
+.bh-cols span{color:var(--muted); font-size:10px; font-weight:900; text-align:center; text-transform:uppercase}
+.bh-week{
+  all:unset; box-sizing:border-box; cursor:pointer; width:100%;
+  display:grid; grid-template-columns:62px repeat(3, 1fr) 1.2fr; gap:4px; align-items:center;
+  padding:4px 0; border-top:1px solid rgba(255,255,255,.06);
+}
+.bh-week:active{background: rgba(255,255,255,.05)}
+.bh-when{display:flex; flex-direction:column; line-height:1.1}
+.bh-when b{font-size:12px}
+.bh-when small{color:var(--muted); font-size:10px; font-weight:800}
+.bh-week i, .bh-legend i{
+  font-style:normal; text-align:center; font-weight:1000; font-size:14px;
+  padding:4px 0; border-radius:8px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+}
+.bh-week i.ser{background: rgba(168,85,247,.10); border-color: rgba(168,85,247,.35)}
+.bh-week i.top{color:#ffd54a; border-color: rgba(255,213,74,.6); background: rgba(58,42,0,.55)}
+.bh-legend{display:flex; align-items:center; gap:6px; margin-top:8px; color:var(--muted); font-size:11px; font-weight:800}
+.bh-legend i.top{width:14px; height:12px; padding:0; border-color: rgba(255,213,74,.6); background: rgba(58,42,0,.55)}
+.bh-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:12px}
+.bh-note{color:var(--muted); font-size:12px; font-weight:700; margin:0 0 8px}
+.bh-text{
+  width:100%; box-sizing:border-box; height:180px; resize:vertical;
+  background:#080d13; color:#cbd5e1; border:1px solid var(--ring); border-radius:10px; padding:8px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px;
+}
+.bh-go:disabled{opacity:.4; cursor:default}
 
 /* Bowling summary card */
 .bowl-label{margin:12px 0 6px; color:var(--muted); font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.5px}

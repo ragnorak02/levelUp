@@ -764,7 +764,7 @@ function getAllBowlingGames(){
   return games;
 }
 
-/* Strike % of first balls, spare % of the non-strike frames — same rules as bowling/index.html. */
+/* Strike % of first balls, spare % of the non-strike frames. */
 function bowlingRates(games){
   let firsts = 0, strikes = 0, spares = 0;
   games.forEach(g => (g.frames || []).forEach((f, fi) => {
@@ -797,14 +797,18 @@ function bowlWeek(){
   return BowlingCore.loadWeek(id) || { weekId: id, weekLabel: BowlingCore.weekIdToLabel(id), games: [], created: new Date().toISOString() };
 }
 
-/* "‹ This week · Tue, Oct 20 ›" in the card header. */
+/* League night as MM/DD/YY. */
+function bowlDateShort(week){
+  const d = BowlingCore.weekDate(week);
+  if(!d) return week.weekId;
+  const two = n => String(n).padStart(2, '0');
+  return `${two(d.getMonth() + 1)}/${two(d.getDate())}/${String(d.getFullYear()).slice(2)}`;
+}
+
+/* "‹ 10/20/26 ›" in the card header. */
 function bowlWeekNav(week){
-  const B = BowlingCore;
-  const now = B.getISOWeek(new Date());
-  const rel = { [B.offsetWeek(now, -1)]: 'Last week', [now]: 'This week', [B.offsetWeek(now, 1)]: 'Next week' }[week.weekId];
-  const label = (rel ? rel + ' · ' : '') + (week.weekLabel || B.weekIdToLabel(week.weekId));
   return `<span class="bs-weeknav"><button class="bs-wk" data-bs="week" data-step="-1" aria-label="Previous week">‹</button>`
-    + `<span>${label}</span><button class="bs-wk" data-bs="week" data-step="1" aria-label="Next week">›</button></span>`;
+    + `<span>${bowlDateShort(week)}</span><button class="bs-wk" data-bs="week" data-step="1" aria-label="Next week">›</button></span>`;
 }
 
 function renderBowlCard(){
@@ -847,7 +851,7 @@ function renderBowlScorer(){
   }
 
   // which frame / ball is being entered: an earlier frame being re-entered, or the next ball
-  const pos = B.currentPosition(game);
+  const pos = B.isGameDone(game) ? null : B.currentPosition(game);
   const edit = bowlScorer.edit;
   const entryFrameIdx = edit ? edit.frame : (pos ? pos.frame : null);
   const entryFrame = edit ? { shots: edit.shots } : (pos ? game.frames[pos.frame] : null);
@@ -944,6 +948,7 @@ function handleBowlScorer(e){
   const game = gi != null ? week.games[gi] : null;
   const wasDone = !!game && B.isGameDone(game);
 
+  if(act === 'history'){ openBowlHistory(); return; }
   if(act === 'week'){
     bowlScorer.weekId = B.offsetWeek(week.weekId, Number(el.dataset.step));
     bowlScorer.gameIndex = null; bowlScorer.standing = []; bowlScorer.edit = null;
@@ -974,7 +979,7 @@ function handleBowlScorer(e){
 
   // balls: strike/spare, a pin count, or the tapped pins
   if(game && (act === 'clear' || act === 'count' || act === 'pins')){
-    const pos = B.currentPosition(game);
+    const pos = B.isGameDone(game) ? null : B.currentPosition(game);
     const frameIdx = bowlScorer.edit ? bowlScorer.edit.frame : (pos ? pos.frame : null);
     const frame = bowlScorer.edit ? { shots: bowlScorer.edit.shots } : (pos ? game.frames[pos.frame] : null);
     if(frame){
@@ -994,6 +999,120 @@ function handleBowlScorer(e){
     renderBowlStats();
     renderBowlDashboard();
     renderModulesAndCharacter();
+  }
+}
+
+/* --------------------------------
+   Bowling season history (popup): one compact row per week — date, G1-G3,
+   series — with the season's high game and best series highlighted. Tap a
+   week to score it. Also home to the standings import and New Season.
+----------------------------------*/
+let bowlHistoryEl = null;
+
+function openBowlHistory(){
+  if(!bowlHistoryEl){
+    bowlHistoryEl = document.createElement('div');
+    bowlHistoryEl.className = 'bh-overlay';
+    bowlHistoryEl.innerHTML = `
+      <div class="bh-sheet" role="dialog" aria-label="Bowling season history">
+        <div class="bh-top"><b>Season history</b><button class="bs-icon" data-bh="close" aria-label="Close">✕</button></div>
+        <div class="bh-body"></div>
+      </div>`;
+    bowlHistoryEl.addEventListener('click', handleBowlHistory);
+    bowlHistoryEl.addEventListener('input', e => { if(e.target.id === 'bhImportText') renderBowlImportCount(); });
+    document.body.appendChild(bowlHistoryEl);
+  }
+  renderBowlHistory();
+  bowlHistoryEl.classList.add('show');
+}
+
+function closeBowlHistory(){
+  if(bowlHistoryEl) bowlHistoryEl.classList.remove('show');
+}
+
+function renderBowlHistory(){
+  const B = BowlingCore;
+  const body = bowlHistoryEl.querySelector('.bh-body');
+  const weeks = B.listAllWeekKeys().map(k => safeParse(k)).filter(w => w && Array.isArray(w.games))
+    .sort((a, b) => (a.weekId < b.weekId ? -1 : 1));
+  const scoreOf = g => (g.score != null ? g.score : (B.isGameComplete(g) ? B.getFinalScore(g) : null));
+
+  const rows = weeks.map((w, i) => {
+    const scores = [0, 1, 2].map(n => (w.games[n] ? scoreOf(w.games[n]) : null));
+    const done = scores.filter(v => v != null);
+    return { week: w, num: i + 1, scores, series: done.length ? done.reduce((a, b) => a + b, 0) : null, full: done.length === 3 };
+  });
+  const highGame = Math.max(0, ...rows.flatMap(r => r.scores.filter(v => v != null)));
+  const bestSeries = Math.max(0, ...rows.filter(r => r.full).map(r => r.series));
+
+  const list = rows.slice().reverse().map(r => `
+    <button class="bh-week" data-bh="week" data-week="${r.week.weekId}">
+      <span class="bh-when"><b>Wk ${r.num}</b><small>${bowlDateShort(r.week)}</small></span>
+      ${r.scores.map(v => `<i class="${v != null && v === highGame ? 'top' : ''}">${v != null ? v : '–'}</i>`).join('')}
+      <i class="ser${r.full && r.series === bestSeries ? ' top' : ''}">${r.series != null ? r.series : '–'}</i>
+    </button>`).join('');
+
+  body.innerHTML = `
+    ${rows.length ? `<div class="bh-cols"><span></span><span>G1</span><span>G2</span><span>G3</span><span>Series</span></div>${list}`
+      : `<div class="empty">No games this season yet.</div>`}
+    ${rows.length ? `<div class="bh-legend"><i class="top"></i> season high game · best series</div>` : ''}
+    <div class="bh-actions">
+      <button class="mini" data-bh="import">Import standings</button>
+      <button class="mini" data-bh="season">New season</button>
+    </div>`;
+}
+
+function renderBowlImport(){
+  bowlHistoryEl.querySelector('.bh-body').innerHTML = `
+    <p class="bh-note">Paste your league's weekly scores (Week, Date, Lanes, Gm1, Gm2, Gm3, SS…). Weeks already here are replaced.</p>
+    <textarea class="bh-text" id="bhImportText" spellcheck="false" placeholder="7  10/20/2026  17 - 18  159  135  149  443"></textarea>
+    <div class="bh-actions">
+      <button class="mini" data-bh="back">Cancel</button>
+      <button class="mini bh-go" data-bh="doImport" id="bhImportGo" disabled>Import</button>
+    </div>`;
+}
+
+function renderBowlImportCount(){
+  const n = BowlingCore.parseStandings($('bhImportText').value).length;
+  const go = $('bhImportGo');
+  go.disabled = !n;
+  go.textContent = n ? `Import ${n} week${n === 1 ? '' : 's'}` : 'Import';
+}
+
+/* After history changes: the card, the slot and the level all read bowling. */
+function refreshBowling(){
+  bowlScorer.gameIndex = null; bowlScorer.edit = null; bowlScorer.standing = [];
+  renderBowlCard();
+  renderBowlDashboard();
+  renderModulesAndCharacter();
+}
+
+function handleBowlHistory(e){
+  if(e.target === bowlHistoryEl){ closeBowlHistory(); return; }
+  const el = e.target.closest('[data-bh]');
+  if(!el || el.disabled) return;
+  const act = el.dataset.bh;
+  if(act === 'close') closeBowlHistory();
+  if(act === 'week'){
+    bowlScorer.weekId = el.dataset.week;
+    bowlScorer.gameIndex = null; bowlScorer.edit = null; bowlScorer.standing = [];
+    renderBowlScorer();
+    closeBowlHistory();
+  }
+  if(act === 'import') renderBowlImport();
+  if(act === 'back') renderBowlHistory();
+  if(act === 'doImport'){
+    BowlingCore.importStandings(BowlingCore.parseStandings($('bhImportText').value));
+    refreshBowling();
+    renderBowlHistory();
+  }
+  if(act === 'season'){
+    const count = BowlingCore.listAllWeekKeys().length;
+    if(!count) return;
+    if(!confirm(`Start a new season? Your ${count} week${count === 1 ? '' : 's'} will be archived (kept, not deleted) and the season starts from zero.`)) return;
+    BowlingCore.archiveSeason();
+    refreshBowling();
+    renderBowlHistory();
   }
 }
 
@@ -1706,6 +1825,7 @@ function bindNav(){
       const mod = el.dataset.module;
       // second tap on the selected one opens its module, same as its icon
       if(focusModule === mod){
+        if(mod === 'bowling'){ openBowlHistory(); return; }
         const link = el.querySelector('.micon');
         const href = el.dataset.href || (link && link.href);
         if(href) location.href = href;
@@ -1750,8 +1870,6 @@ function bindButtons(){
   if(exNext) exNext.addEventListener('click', ()=> stepExerciseWorkout(1));
 
   // Nutrition
-  const openBowling = $('openBowling');
-  if(openBowling) openBowling.addEventListener('click', ()=> location.href = './bowling/index.html');
 
   const bowlCard = document.querySelector('.detail-panel[data-focus="bowling"]');
   if(bowlCard) bowlCard.addEventListener('click', handleBowlScorer);

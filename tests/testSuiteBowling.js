@@ -65,6 +65,31 @@
             assert.equal(B.shotDisplay(o, 0, 0) + B.shotDisplay(o, 1, 0), '-5');
         });
 
+        it('standings import reads the lanes column, tabs or spaces', function() {
+            var rows = [
+                ['WEEK', 'DATE', 'LANES', 'GM1', 'GM2', 'GM3', 'SS', 'HCP'],
+                ['7', '10/20/2026', '17 - 18', '159', '135', '149', '443', '0'],
+                ['6', '10/13/2026', '9 - 10', '143', '136', '145', '424', '0'],
+                ['5', '10/06/2026', '13 - 14', '0', '0', '0', '0', '0'],
+                ['', '', '', '165', '149', '153', '467']
+            ];
+            var tabbed = rows.map(function(r) { return r.join('\t'); }).join('\n');
+            var tabs = B.parseStandings(tabbed);
+            assert.arrayLength(tabs, 2);
+            assert.deepEqual(tabs[0].scores, [159, 135, 149]);
+            assert.equal(tabs[0].lanes, '17 - 18');
+            assert.equal(tabs[0].isoDate, '2026-10-20');
+            var spaced = rows.map(function(r) { return r.join(' '); }).join('\n');
+            assert.deepEqual(B.parseStandings(spaced).map(function(e) { return e.scores[0]; }), [159, 143]);
+        });
+
+        it('weekDate is the night bowled, else that week\'s Tuesday', function() {
+            var d = B.weekDate({ weekId: '2026-W44', games: [] });
+            assert.equal(d.getMonth() + 1 + '/' + d.getDate(), '10/27');
+            var played = B.weekDate({ weekId: '2026-W43', games: [{ completedDate: '2026-10-20' }] });
+            assert.equal(played.getDate(), 20);
+        });
+
         it('currentPosition walks frames and balls', function() {
             var g = game([strike(), { shots: [{ pinsLeft: left(2) }] }].concat(repeat(function() { return { shots: [] }; }, 8)));
             assert.deepEqual(B.currentPosition(g), { frame: 1, ball: 1 });

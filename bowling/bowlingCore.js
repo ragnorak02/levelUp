@@ -300,6 +300,121 @@
     return games;
   }
 
+  /* ---------- League standings import ----------
+     Reads rows copied from a league site: Week, Date, [Lanes], Gm1, Gm2,
+     Gm3, SS, ... (tabs or spaces). Absent weeks (SS 0) are skipped. */
+
+  function parseStandings(text){
+    if(!text || !text.trim()) return [];
+
+    const lines = text.trim().split('\n');
+    const results = [];
+
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if(!trimmed) return;
+
+      // Skip header/footer lines
+      if(/^(Week|League|Page)\b/i.test(trimmed)) return;
+
+      // Split on tabs first, fallback to 2+ spaces, then single spaces
+      let cols = trimmed.split('\t');
+      if(cols.length < 6){
+        cols = trimmed.split(/\s{2,}/);
+      }
+      if(cols.length < 6){
+        cols = trimmed.split(/\s+/);
+      }
+      if(cols.length < 5) return;
+
+      const weekNum = parseInt(cols[0]);
+      if(isNaN(weekNum)) return;
+
+      // Handle concatenated date+score (e.g., "02/10/2026141" from League Secretary)
+      let dateStr = cols[1].trim();
+      const dateGm1 = dateStr.match(/^(\d{1,2}\/\d{1,2}\/\d{4})(\d+)$/);
+      if(dateGm1){
+        dateStr = dateGm1[1];
+        cols.splice(1, 1, dateStr, dateGm1[2]);
+      }
+
+      // Lanes column ("17 - 18") between Date and Gm1 — keep it, but not as a score
+      let lanes = null;
+      if(/^\d+\s*-\s*\d+$/.test((cols[2] || '').trim())){
+        lanes = cols.splice(2, 1)[0].trim();
+      }else if(cols[3] === '-' && /^\d+$/.test(cols[2]) && /^\d+$/.test(cols[4] || '')){
+        lanes = cols.splice(2, 3).join(' ');
+      }
+
+      if(cols.length < 6) return;
+
+      const gm1 = parseInt(cols[2]);
+      const gm2 = parseInt(cols[3]);
+      const gm3 = parseInt(cols[4]);
+      const ss = parseInt(cols[5]);
+
+      // Skip absent weeks (SS=0)
+      if(ss === 0 || isNaN(ss)) return;
+      if(isNaN(gm1) || isNaN(gm2) || isNaN(gm3)) return;
+
+      // Parse date MM/DD/YYYY → ISO
+      const dateParts = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if(!dateParts) return;
+      const month = dateParts[1].padStart(2, '0');
+      const day = dateParts[2].padStart(2, '0');
+      const year = dateParts[3];
+      const isoDate = `${year}-${month}-${day}`;
+
+      const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      const weekId = getISOWeek(dateObj);
+      const leagueDate = month + '/' + day;
+
+      results.push({
+        weekNum,
+        leagueDate,
+        isoDate,
+        weekId,
+        scores: [gm1, gm2, gm3],
+        seriesScore: ss,
+        lanes,
+      });
+    });
+
+    return results;
+  }
+
+  /* Save parsed standings as imported weeks (score only, no frames). A week
+     already stored is replaced. */
+  function importStandings(parsed){
+    parsed.forEach(entry => {
+      const games = entry.scores.map((score, i) => Object.assign(createEmptyGame(i + 1), {
+        score,
+        completedDate: entry.isoDate,
+        imported: true,
+      }));
+      saveWeek({
+        weekId: entry.weekId,
+        weekLabel: weekIdToLabel(entry.weekId),
+        leagueDate: entry.leagueDate,
+        lanes: entry.lanes || null,
+        games,
+        created: new Date().toISOString(),
+      });
+    });
+    return parsed.length;
+  }
+
+  /* League night of a week: its games' date if bowled, else that week's Tuesday. */
+  function weekDate(week){
+    const played = (week.games || []).map(g => g.completedDate).filter(Boolean).sort()[0];
+    if(played) return new Date(played.slice(0, 10) + 'T12:00:00');
+    const m = String(week.weekId).match(/^(\d{4})-W(\d{2})$/);
+    if(!m) return null;
+    const jan4 = new Date(+m[1], 0, 4);
+    const monday = new Date(+m[1], 0, 4 - (jan4.getDay() || 7) + 1 + (+m[2] - 1) * 7);
+    return new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 1);
+  }
+
   /* ---------- Seasons ----------
      Starting a new season moves every week into one archive record instead
      of deleting it, so an old season can always be brought back. */
@@ -334,6 +449,7 @@
     getAllPins, getAvailablePins, currentPosition,
     recordShot, undoShot, startGame, setFrameShots,
     listAllWeekKeys, getAllCompletedGames,
-    archiveSeason, listArchivedWeeks
+    archiveSeason, listArchivedWeeks,
+    parseStandings, importStandings, weekDate
   };
 })();
