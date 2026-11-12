@@ -5,3 +5,4 @@ node_modules/
 finances/*.jpg
 finances/*.png
 
+.claude/worktrees/

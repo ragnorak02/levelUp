@@ -109,6 +109,17 @@
   .num-input:focus{outline:2px solid #213240}
   .num-input.copied{background:var(--copied-bg); border-color:var(--copied-ring); color:var(--copied-text)}
   .lbs-label{font-size:.85rem; color:var(--muted); white-space:nowrap}
+  /* per-hand weight: "lb / ea" stacked, so the row keeps the width of "lbs" */
+  .lbs-label.per-hand{font-size:.72rem; line-height:1.05; text-align:center; color:#7dd3fc}
+  /* compact toggle under the exercise title */
+  .ph-chip{
+    all:unset; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center;
+    margin-top:4px; min-height:22px; box-sizing:border-box;
+    font-size:.66rem; font-weight:800; color:var(--muted);
+    border:1px solid var(--ring); border-radius:999px; padding:0 .5rem;
+  }
+  .ph-chip.on{color:#7dd3fc; border-color:rgba(125,211,252,.5); background:rgba(125,211,252,.10)}
+  .ph-chip:active{opacity:.75}
   .flags{display:flex; align-items:center; gap:12px; color:var(--muted); font-size:.9rem}
   @media (max-width: 430px){
     .flags{gap:8px; font-size:.84rem}   /* claw back room for the PR tag */
@@ -223,8 +234,10 @@
 </div>
 
 
+<script src="trainingStats.js"></script>
 <script src="workoutXP.js"></script>
 <script src="sessionSummary.js"></script>
+<script src="coachExport.js"></script>
 <script src="muscleCalendar.js"></script>
 <script>
 const exerciseOptions = {
@@ -269,7 +282,7 @@ const isoOf = (d)=> d.toISOString().slice(0,10);
 
 /* Summary rendering, PR maths and history scans: powerUp/sessionSummary.js */
 const SS = window.SessionSummary;
-const { exStats, totalsFiltered, priorBests, beatsPriorPR } = SS;
+const { exStats, totalsFiltered } = SS;
 
 const loadDay = (date)=> SS.loadDay(isoOf(date));
 function saveDay(day){
@@ -336,7 +349,16 @@ function duplicateWorkout(sourceDay){
   saveDay(currentDay); render(); closePopup('#workoutPopup');
 }
 
-const PR_TAG_HTML = '<span class="pr-tag">🏆 PR</span>';
+const PR_TAG_HTML = { pr: '<span class="pr-tag">🏆 PR</span>', rep: '<span class="pr-tag">🏆 REP PR</span>' };
+const isPerHand = (ex)=> !!(window.TrainingStats && TrainingStats.isPerHand(ex.name, ex.bodyPart));
+
+/* Each In Progress exercise's frozen PR baseline (sessions before today),
+   built once per render and reused by refreshRowPR while typing. */
+const prCtx = new Map();
+function prContextFor(ex){
+  if(!prCtx.has(ex.id)) prCtx.set(ex.id, SS.livePRContext(ex, isoOf(current)));
+  return prCtx.get(ex.id);
+}
 function areAllSetsDone(day){
   const all = day.exercises.flatMap(ex=> ex.sets);
   return all.length>0 && all.every(s=> !!s.done);
@@ -347,6 +369,7 @@ let view = null;   // SessionSummary view over #summary, made in init()
 function render(){
   $('#dateStr').textContent = SS.dateLabel(current);
   const day = loadDay(current);
+  prCtx.clear();
   view.render(day, isoOf(current));
 
   if ($('#calPopup').style.display === 'flex') calendar.render();
@@ -399,12 +422,14 @@ function renderExercise(ex){
 
   const {vol, avg} = exStats(ex);
   const copiedText = ex.copied ? ' (copied)' : '';
+  const perHand = isPerHand(ex);
 
   node.innerHTML = `
     <div class="ex-header" data-act="toggleExercise">
       <div class="ex-title">
         <div class="ex-name">${ex.name}${copiedText}</div>
         <div class="tag">${ex.sets.length} set${ex.sets.length===1?"":"s"} • ${Math.round(vol).toLocaleString()} lb • ${Math.round(avg)} lb/rep</div>
+        <button class="ph-chip${perHand ? ' on' : ''}" data-act="togglePerHand" aria-pressed="${perHand}" title="Weight is for one hand — volume counts both">Per hand ×2</button>
       </div>
       <div class="ex-head-actions">
         <button class="btn-complete" data-act="markComplete">Complete</button>
@@ -428,27 +453,29 @@ function renderExercise(ex){
 
   const setsWrap = node.querySelector('.sets');
   // one lookup per exercise, reused for every row
-  const priorTop = priorBests(ex.name, ex.bodyPart, current.toISOString().slice(0,10)).topSet;
-  ex.sets.forEach((s, i) => setsWrap.appendChild(renderSet(ex.id, s, i, priorTop)));
+  const ctx = prContextFor(ex);
+  ex.sets.forEach((s, i) => setsWrap.appendChild(renderSet(ex.id, s, i, ctx, perHand)));
 
   return node;
 }
 
-function renderSet(exId, s, idx, priorTop = null) {
+function renderSet(exId, s, idx, ctx = null, perHand = false) {
   const row = document.createElement('div');
   row.className = 'set-row' + (s.restPause ? ' rest-pause' : ''); row.dataset.exId = exId; row.dataset.idx = idx;
   const copiedClass = s.copied ? ' copied' : '';
   // the badge only appears once the set is ticked Done
-  const isPR = !!s.done && beatsPriorPR(s, priorTop);
-  if(isPR) row.classList.add('set-pr');
+  const kind = s.done ? SS.setPRKind(s, ctx) : null;
+  if(kind) row.classList.add('set-pr');
 
   row.innerHTML = `
     <div class="weight-input-group">
       <input class="num-input${copiedClass}" inputmode="decimal" pattern="[0-9.]*" placeholder="Wt" value="${s.weight ?? ''}" data-field="weight"/>
-      <span class="lbs-label">lbs</span>
+      ${perHand
+        ? '<span class="lbs-label per-hand" title="lb per hand">lb<br>ea</span>'
+        : '<span class="lbs-label">lbs</span>'}
     </div>
     <input class="num-input${copiedClass}" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${s.reps ?? ''}" data-field="reps"/>
-    <div class="pr-slot">${isPR ? PR_TAG_HTML : ''}</div>
+    <div class="pr-slot" data-kind="${kind || ''}">${kind ? PR_TAG_HTML[kind] : ''}</div>
     <div class="flags">
       <label><input type="checkbox" ${s.superset?'checked':''} data-field="superset"/> Rest Pause</label>
       <label><input type="checkbox" ${s.done?'checked':''} data-field="done"/> Done</label>
@@ -461,11 +488,13 @@ function renderSet(exId, s, idx, priorTop = null) {
 /* Refresh one row's PR state in place — used while typing, where a full
    re-render would steal focus from the input. */
 function refreshRowPR(row, ex, s){
-  const priorTop = priorBests(ex.name, ex.bodyPart, current.toISOString().slice(0,10)).topSet;
-  const isPR = !!s.done && beatsPriorPR(s, priorTop);
-  row.classList.toggle('set-pr', isPR);
+  const kind = s.done ? SS.setPRKind(s, prContextFor(ex)) : null;
+  row.classList.toggle('set-pr', !!kind);
   const slot = row.querySelector('.pr-slot');
-  if(slot && (!!slot.firstChild) !== isPR) slot.innerHTML = isPR ? PR_TAG_HTML : '';
+  if(slot && slot.dataset.kind !== (kind || '')){
+    slot.dataset.kind = kind || '';
+    slot.innerHTML = kind ? PR_TAG_HTML[kind] : '';
+  }
 }
 
 function uid(){ return Math.random().toString(36).slice(2,9); }
@@ -566,6 +595,13 @@ document.addEventListener('click', (e)=>{
     const last = ex.sets.at(-1) || {};
     ex.sets.push({weight:last.weight??'', reps:last.reps??'', superset:last.superset??false, done:false, copied:(last.weight||last.reps)?true:false});
     saveDay(day); render(); return;
+  }
+  if(act==='togglePerHand'){
+    const ex = day.exercises.find(x=> x.id === host.closest('.ex')?.dataset.id);
+    if(!ex || !window.TrainingStats) return;
+    // stored per exercise name + body part, so it applies to every past session too
+    TrainingStats.setPerHand(ex.name, ex.bodyPart, !isPerHand(ex));
+    SS.clearCache(); render(); return;
   }
   if(act==='removeSet'){
     const exId = e.target.closest('.ex').dataset.id;

@@ -12,9 +12,11 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 │   ├── sessionSummary.js/.css← Day summary (volume card, totals, In Progress/Completed,
 │   │                            history + copy-JSON popups) — shared with the dashboard
 │   ├── workoutXP.js          ← How much of a level each workout earns (scoring constants)
+│   ├── trainingStats.js      ← Shared maths: per-hand volume, e1RM, rep-best PRs, weekly sets, stalls
+│   ├── coachExport.js        ← 📋 sheet: Coach pack text / raw JSON v2 for ChatGPT + About-me profile
 │   ├── muscleCalendar.js/.css← Muscle-group colour-coded month calendar — shared by
 │   │                            index.html and workout.html's calendar popup
-│   └── analytics.html        ← Workout history & stats
+│   └── analytics.html/.js/.css ← Overview, Exercises (detail: e1RM chart, rep bests), Consistency, Records
 ├── study/                    ← Flashcards with spaced repetition
 │   ├── studyHome.html        ← Module entry point
 │   ├── createCard.html       ← Card creation
@@ -69,6 +71,8 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 - **Garden module**: IIFE with `'use strict'` — `GardenDataManager` class for data layer, `GardenApp` for UI; exposed via `window.GardenDataManager` and `window.GardenConstants`
 - **Workout summary** (`powerUp/sessionSummary.js`): IIFE exposing `window.SessionSummary`. Both `workout.html` and the dashboard's Exercise card render through `SessionSummary.create(root, opts).render(day, iso)` — edit the summary there, never in either page. Dashboard uses `readOnly: true` + `memoryCollapse()` (always opens folded); styles are scoped under `.session-summary` / `.ss-popup`
 - **Bowling core** (`bowling/bowlingCore.js`): IIFE exposing `window.BowlingCore`. A shot is `{ pinsLeft: [pins still standing after the ball] }`; pins knocked = pins standing *before* the ball − `pinsLeft.length` (the 10th frame re-racks after a strike/spare). Used by the dashboard's Bowling card: live scorer (pins or typed counts), week arrows, 🕘 season-history popup with standings import and New Season. The old bowling page was removed (Oct 2026); its shots may still carry `standingPosition`/`targetBoard`
+- **Training stats** (`powerUp/trainingStats.js`): IIFE exposing `window.TrainingStats`. ALL workout volume goes through `volMult`/`setVolume`/`exVolume` (per-hand exercises in `powerUp:perHand` count ×2; weights/PRs stay per hand). PR kinds from `exercisePRs`: e1rm, weight, reps (rep PR = no earlier set at ≥ that weight for ≥ those reps, and ≥ 50% of best e1RM), volume, setVolume. Load it before workoutXP/sessionSummary/coachExport; call `clearCache()` (SessionSummary.clearCache does) after writing a workout
+- **Coach export** (`powerUp/coachExport.js`): IIFE exposing `window.CoachExport.open(day, iso)` (null = latest workout); DOM-free builders `buildCoachPack(opts)` / `buildRawJson(opts)`; injects its own CSS
 - **Workout calendar** (`powerUp/muscleCalendar.js`): IIFE exposing `window.MuscleCalendar.create(root, { selected, onSelect })`; reads `powerUp:YYYY-MM-DD` records itself. Used by `powerUp/index.html` and the workout page's 📅 popup — change it there, not per page. Styles scoped under `.mcal`
 - **No ES module imports** — all scripts use global scope or window attachment
 
@@ -107,6 +111,9 @@ Namespaced with colon prefix:
 - `levelUp:exerciseSpentPct` — number, level-% used up by transforms
 - `levelUp:workoutScores` — JSON scoring report (see WorkoutXP.buildReport)
 - `levelUp:levelHistory` — JSON array `[{ level, date }]`, one entry per transform (from Oct 2026 on)
+- `powerUp:perHand` — JSON `{ "bodyPart|exercise name lowercased": 1 }`, exercises logged per hand (volume ×2)
+- `powerUp:coachProfile` — JSON About-me for the coach pack `{ goal, bodyweightLb, bodyweightDate, experience, injuries, equipment, schedule, notes, ask }`
+- `powerUp:coachExportPrefs` — JSON `{ mode, weeks }` for the 📋 sheet
 - `bowling:week:YYYY-Www` — JSON bowling week `{ weekId, games: [...] }` (current season)
 - `bowling:archive:<ISO timestamp>` — JSON `{ archivedAt, weeks: [...] }`, one per season ended with New Season; still counts toward level XP
 - `powerUp:YYYY-MM-DD` — JSON workout object (date-keyed)
@@ -181,13 +188,15 @@ tests/
 ├── testSuiteSessionSummary.js ← Shared workout summary (7 tests)
 ├── testSuiteWorkoutXP.js ← Level-% scoring per workout (7 tests)
 ├── testSuiteBowling.js  ← Bowling scoring against real results (7 tests)
+├── testSuiteTrainingStats.js ← e1RM, rep bests, PR kinds, per-hand, weekly sets (10 tests)
+├── testSuiteCoachExport.js ← Coach pack + raw JSON (6 tests)
 ├── runner.html          ← Browser test runner UI (dark themed, click-to-run)
 └── nodeRunner.js        ← Terminal runner (node tests/nodeRunner.js)
 ```
 
 ### Running Tests
 - **Browser**: Open `tests/runner.html`, click "Run Tests" — safe, read-only, won't change data
-- **Terminal**: `node tests/nodeRunner.js` — mocks localStorage, runs all 83 tests, exits 0/1
+- **Terminal**: `node tests/nodeRunner.js` — mocks localStorage, runs all 104 tests, exits 0/1
 - **Seed Data**: Click "Seed Data" in runner.html (confirms before wiping) or call `SeedGenerator.generateFullDataset(42)` in console
 
 ### Test Framework API

@@ -57,10 +57,16 @@
     return null;
   }
 
-  /* ---------- Stats ---------- */
+  /* ---------- Stats ----------
+     Volume goes through TrainingStats so per-hand exercises (dumbbells,
+     single-arm cables) count both hands. Weights and PRs stay per hand. */
+
+  const volMult = (ex)=> (window.TrainingStats ? TrainingStats.volMult(ex) : 1);
+  const setVol  = (ex, a)=> (Number(a.weight)||0) * (Number(a.reps)||0) * volMult(ex);
 
   function exStats(ex){
-    const vol = ex.sets.reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
+    const m = volMult(ex);
+    const vol = ex.sets.reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0)*m, 0);
     const reps = ex.sets.reduce((s,a)=> s + (Number(a.reps)||0), 0);
     const avg = reps ? vol / reps : 0;
     return { vol, reps, avg };
@@ -72,7 +78,7 @@
     day.exercises.forEach(ex=>{
       const cs = countedSets(ex);
       sets += cs.length;
-      vol  += cs.reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
+      vol  += cs.reduce((s,a)=> s + setVol(ex, a), 0);
     });
     return {sets, vol, exCount};
   }
@@ -98,7 +104,7 @@
      keystroke, so without this each one re-parses every stored workout.
      Anything that writes a workout must call clearCache(). */
   const historyScanCache = new Map();
-  function clearCache(){ historyScanCache.clear(); }
+  function clearCache(){ historyScanCache.clear(); if(window.TrainingStats) TrainingStats.clearCache(); }
 
   /* Every logged session of one exercise, oldest → newest.
      `excludeISO` lets callers ask "what was my best BEFORE today?". */
@@ -128,7 +134,7 @@
   }
 
   /* Heaviest set + biggest-volume session for an exercise across the given sessions. */
-  function bestsFromSessions(sessions){
+  function bestsFromSessions(sessions, mult = 1){
     let topSet = { weight:0, reps:0, date:null };
     let bestVol = { vol:0, date:null };
 
@@ -136,7 +142,7 @@
       let vol = 0;
       (s.sets||[]).forEach(st=>{
         const w = Number(st.weight)||0, r = Number(st.reps)||0;
-        vol += w * r;
+        vol += w * r * mult;
         if(w > topSet.weight || (w === topSet.weight && r > topSet.reps)){
           topSet = { weight:w, reps:r, date:s.date };
         }
@@ -149,7 +155,8 @@
 
   /* Bests recorded on every day EXCEPT `excludeISO` — i.e. the mark to beat. */
   function priorBests(exName, bodyPart, excludeISO){
-    return bestsFromSessions(scanExerciseSessions(exName, bodyPart, excludeISO));
+    return bestsFromSessions(scanExerciseSessions(exName, bodyPart, excludeISO),
+                             volMult({ name: exName, bodyPart }));
   }
 
   /* Does this set beat the mark to beat? The baseline excludes today, so it
@@ -189,6 +196,90 @@
              any: weightPR || repPR || volumePR };
   }
 
+  /* ---------- PRs via TrainingStats ----------
+     The newer PR kinds (strength = e1RM, rep PR at a weight, best set) come
+     from TrainingStats.exercisePRs, judged against sessions strictly before
+     the day. Without TrainingStats loaded these degrade to "no PRs". */
+
+  const TS = ()=> window.TrainingStats || null;
+  const fmtN = n => Math.round(Number(n)||0).toLocaleString();
+
+  /* Finished exercises that set at least one PR on `iso`:
+     [{ name, bodyPart, prs: [TrainingStats PR objects, tier 1 first] }] */
+  function prHitsToday(day, iso){
+    const T = TS(); if(!T) return [];
+    const out = [];
+    (day.exercises || []).filter(ex=> ex.finished).forEach(ex=>{
+      const r = T.exercisePRs(ex, iso);
+      if(r.list.length) out.push({ name: ex.name, bodyPart: ex.bodyPart,
+        prs: r.list.slice().sort((a,b)=> a.tier - b.tier) });
+    });
+    return out;
+  }
+
+  /* One PR as display text: { value: '125×16', was: 'was 125×12' }. */
+  function fmtPR(pr){
+    const ws = p => p ? `${p.weight}×${p.reps}` : '';
+    switch(pr.kind){
+      case 'e1rm':      return { value: `e1RM ${fmtN(pr.value)}`, was: pr.prev ? `was ${fmtN(pr.prev)}` : '' };
+      case 'weight':    return { value: ws(pr), was: pr.prev && pr.prev.weight ? `was ${ws(pr.prev)}` : '' };
+      case 'reps':      return { value: ws(pr), was: pr.prev ? `was ${ws(pr.prev)}` : '' };
+      case 'volume':    return { value: `${fmtN(pr.value)} lb`, was: pr.prev ? `was ${fmtN(pr.prev)}` : '' };
+      case 'setVolume': return { value: `${fmtN(pr.value)} lb set`, was: pr.prev ? `was ${fmtN(pr.prev)}` : '' };
+      default:          return { value: '', was: '' };
+    }
+  }
+
+  /* Today's volume vs the last similar session, for the headline pill. */
+  function volumeDelta(vol, similar){
+    if(!similar || !(similar.vol > 0) || !(vol > 0)) return null;
+    const delta = vol - similar.vol;
+    return { dir: delta >= 0 ? 'up' : 'down', delta: Math.round(delta),
+             pct: Math.round((Math.abs(delta) / similar.vol) * 100), date: similar.date };
+  }
+
+  /* Everything the live per-set PR badge needs, computed once per render:
+     the frozen prior sessions, their top set and the rep-PR weight floor. */
+  function livePRContext(ex, iso){
+    const T = TS();
+    const prior = T ? T.priorSessions(ex.name, ex.bodyPart, iso) : [];
+    let topW = 0, topR = 0, e1 = 0;
+    prior.forEach(s=>{
+      if(s.topW > topW || (s.topW === topW && s.topR > topR)){ topW = s.topW; topR = s.topR; }
+      e1 = Math.max(e1, s.e1 || 0);
+    });
+    return { prior, priorTop: { weight: topW, reps: topR },
+             minW: e1 * (T ? T.REP_PR_MIN_PCT : 0.5), firstEver: prior.length === 0 };
+  }
+
+  /* 'pr' (heavier, or more reps at the top weight), 'rep' (beats the rep-best
+     frontier at a lighter weight), or null. First-ever sessions never badge. */
+  function setPRKind(s, ctx){
+    if(!s || !ctx || ctx.firstEver) return null;
+    const w = Number(s.weight)||0, r = Number(s.reps)||0;
+    if(!w || !r) return null;
+    if(beatsPriorPR(s, ctx.priorTop)) return 'pr';
+    const T = TS();
+    if(T && w >= ctx.minW && T.beatsFrontier(w, r, ctx.prior)) return 'rep';
+    return null;
+  }
+
+  /* Rep-best frontier across prior sessions + today's sets, at most `max`
+     points (today's new bests always kept), heaviest first.
+     [{ weight, reps, today }] */
+  function repBestsLine(prior, todaySets, iso, max = 6){
+    const T = TS(); if(!T) return [];
+    const sets = (todaySets || []).filter(s=> (Number(s.weight)||0) > 0 && (Number(s.reps)||0) > 0);
+    const f = T.frontier((prior || []).concat(sets.length ? [{ date: iso, sets }] : []))
+      .map(p=>({ weight: p.weight, reps: p.reps, today: p.date === iso && (prior || []).length > 0 }));
+    if(f.length <= max) return f;
+    const keep = new Set(f.map((p,i)=> p.today ? i : -1).filter(i=> i >= 0));
+    const room = Math.max(0, max - keep.size);
+    const others = f.map((p,i)=> i).filter(i=> !keep.has(i));
+    for(let k=0; k<room; k++) keep.add(others[Math.round(k * (others.length - 1) / Math.max(1, room - 1))]);
+    return f.filter((p,i)=> keep.has(i));
+  }
+
   /* Sparkline: <=n most recent sessions as {date, weight, vol}, oldest → newest. */
   function trendPoints(exName, bodyPart, n = 8){
     return scanExerciseSessions(exName, bodyPart, null)
@@ -197,7 +288,7 @@
         return {
           date: s.date,
           weight: weights.length ? Math.max(...weights) : 0,
-          vol: (s.sets||[]).reduce((a,x)=> a + (Number(x.weight)||0)*(Number(x.reps)||0), 0)
+          vol: (s.sets||[]).reduce((a,x)=> a + setVol({ name: exName, bodyPart }, x), 0)
         };
       })
       .filter(p=> p.weight > 0)
@@ -256,23 +347,23 @@
 
   const round1 = (n)=> Math.round((Number(n)||0) * 10) / 10;
 
-  function sumSets(sets){
+  function sumSets(sets, mult = 1){
     let reps = 0, vol = 0;
     (sets||[]).forEach(s=>{
       const w = Number(s.weight)||0, r = Number(s.reps)||0;
-      reps += r; vol += w * r;
+      reps += r; vol += w * r * mult;
     });
     return { reps, volume: Math.round(vol) };
   }
 
   function exportExercise(ex, iso){
     const cs      = countedSets(ex);
-    const sum     = sumSets(cs);
+    const sum     = sumSets(cs, volMult(ex));
     const top     = topSetOf(ex);
     const prior   = priorBests(ex.name, ex.bodyPart, iso);
     const past    = scanExerciseSessions(ex.name, ex.bodyPart, iso);
     const last    = past.length ? past[past.length-1] : null;
-    const lastSum = last ? sumSets(last.sets) : null;
+    const lastSum = last ? sumSets(last.sets, volMult(ex)) : null;
     const st      = prStatus(ex, iso);
 
     return {
@@ -283,7 +374,7 @@
         set: i + 1,
         weightLb: Number(s.weight)||0,
         reps: Number(s.reps)||0,
-        volumeLb: Math.round((Number(s.weight)||0) * (Number(s.reps)||0)),
+        volumeLb: Math.round(setVol(ex, s)),
         completed: !!(ex.finished || s.done),
         superset: !!s.superset
       })),
@@ -318,7 +409,7 @@
     day.exercises.forEach(ex=>{
       const p   = ex.bodyPart || 'Other';
       const cs  = countedSets(ex);
-      const sum = sumSets(cs);
+      const sum = sumSets(cs, volMult(ex));
       totalReps += sum.reps;
       const b = byPart[p] || (byPart[p] = { muscleGroup:p, exercises:0, sets:0, reps:0, volumeLb:0 });
       b.exercises++; b.sets += cs.length; b.reps += sum.reps; b.volumeLb += sum.volume;
@@ -549,9 +640,18 @@
 
   function renderExerciseComparisonSummary(ex, iso){
     const st = prStatus(ex, iso);
-    const { top, vol, prior, firstEver, weightPR, repPR, volumePR } = st;
+    const { top, vol, weightPR, repPR } = st;
 
-    const bestVol = prior.bestVol.vol;
+    // PRs and the marks to beat come from TrainingStats (sessions strictly
+    // before `iso`); the older prStatus maths is the fallback without it.
+    const T   = TS();
+    const tsr = T ? T.exercisePRs(ex, iso) : null;
+    const firstEver = tsr ? tsr.firstEver : st.firstEver;
+    const volumePR  = tsr ? tsr.list.some(p=> p.kind === 'volume') : st.volumePR;
+    const priorTop  = tsr ? { weight: tsr.prior.topW, reps: tsr.prior.topR, date: tsr.prior.topDate }
+                          : st.prior.topSet;
+    const bestVol   = tsr ? tsr.prior.vol : st.prior.bestVol.vol;
+
     const pctRaw  = bestVol > 0 ? Math.round((vol / bestVol) * 100) : (vol > 0 ? 100 : 0);
     const pct     = Math.max(0, Math.min(100, pctRaw));
 
@@ -559,9 +659,9 @@
 
     const prLine = firstEver
       ? `<span class="note">First time logging this exercise</span>`
-      : `<span class="v">${prior.topSet.weight} lb × ${prior.topSet.reps}</span>
+      : `<span class="v">${priorTop.weight} lb × ${priorTop.reps}</span>
          <span class="sep">·</span>
-         <span class="note">${mdFromISO(prior.topSet.date)}</span>`;
+         <span class="note">${mdFromISO(priorTop.date)}</span>`;
 
     const volNote = firstEver
       ? `<span class="note">no previous session to compare</span>`
@@ -569,23 +669,44 @@
         ? `<span class="note gold">best ever — beat ${Math.round(bestVol).toLocaleString()} lb</span>`
         : `<span class="note">${pctRaw}% of best (${Math.round(bestVol).toLocaleString()} lb)</span>`;
 
+    // top-set badges: strength (e1RM), weight, rep PR at a weight
+    const kinds = tsr ? tsr.list.filter(p=> p.kind === 'e1rm' || p.kind === 'weight' || p.kind === 'reps') : [];
     let badge = '';
-    if(weightPR)      badge = `<span class="note gold">🏆 new weight PR</span>`;
-    else if(repPR)    badge = `<span class="note gold">🏆 new rep PR at ${top.weight} lb</span>`;
-    else if(firstEver)badge = `<span class="note">baseline</span>`;
+    if(tsr){
+      badge = kinds.map(p=> p.kind === 'reps'
+        ? `<span class="pr-badge t${p.tier}">Rep PR ${p.weight}×${p.reps}</span>`
+        : `<span class="pr-badge t${p.tier}">${esc(p.label)}</span>`).join('');
+    }else if(weightPR) badge = `<span class="note gold">🏆 new weight PR</span>`;
+    else if(repPR)     badge = `<span class="note gold">🏆 new rep PR at ${top.weight} lb</span>`;
+    if(!badge && firstEver) badge = `<span class="note">baseline</span>`;
+    const topGold = tsr ? kinds.some(p=> p.tier === 1) : (weightPR || repPR);
+
+    const e1 = tsr ? Math.round(tsr.today.e1) : 0;
+    const e1Txt = e1 ? `<span class="note">e1RM ${e1}</span>` : '';
+
+    // rep bests: prior sessions + today, today's new bests in gold
+    const bests = T ? repBestsLine(T.priorSessions(ex.name, ex.bodyPart, iso), ex.sets, iso) : [];
+    const bestsRow = bests.length ? `
+      <div class="prsum-row prsum-bests">
+        <span class="k">Rep bests</span>
+        <span class="bests">${bests.map(p=>
+          `<span class="${p.today ? 'gold' : ''}">${p.weight}×${p.reps}</span>`).join('<span class="sep">·</span>')}</span>
+      </div>` : '';
 
     const wrap = document.createElement('div');
     wrap.className = 'prsum';
     wrap.innerHTML = `
       <div class="prsum-row">
         <span class="k">Top set</span>
-        <span class="v${(weightPR||repPR) ? ' gold' : ''}">${topSetTxt}</span>
+        <span class="v${topGold ? ' gold' : ''}">${topSetTxt}</span>
+        ${e1Txt}
         ${badge}
       </div>
       <div class="prsum-row">
         <span class="k">PR</span>
         ${prLine}
       </div>
+      ${bestsRow}
       <div class="prsum-row">
         <span class="k">Volume</span>
         <span class="v${volumePR ? ' gold' : ''}">${Math.round(vol).toLocaleString()} lb</span>
@@ -600,7 +721,7 @@
 
   /* One logged set, read-only. `pending` = not ticked Done yet (dashboard
      view of an unfinished exercise). */
-  function renderLockedSet(exId, s, idx, isTop, pending){
+  function renderLockedSet(exId, s, idx, isTop, pending, mult = 1){
     const row = document.createElement('div');
     const special = !!(s.restPause || s.superset || s.special || s.extra);
     row.className = 'set-item' + (special ? ' set-special' : '') + (isTop ? ' set-top' : '')
@@ -613,7 +734,7 @@
       `<span class="si-n">SET ${idx+1}</span>` +
       `<span class="si-w">${esc(w)}</span><span class="si-unit">lb</span>` +
       `<span class="si-x">×</span><span class="si-r">${esc(r)}</span>` +
-      `<span class="si-vol">${(wNum && rNum) ? (wNum*rNum).toLocaleString()+' lb' : ''}</span>`;
+      `<span class="si-vol">${(wNum && rNum) ? (wNum*rNum*mult).toLocaleString()+' lb' : ''}</span>`;
     return row;
   }
 
@@ -666,15 +787,20 @@
         <button class="copy-btn" data-act="copyWorkout" title="Copy this workout as JSON" aria-label="Copy this workout as JSON">📋</button>
       </div>
 
-      <div class="sess-block">
-        <div class="sess-prog-head"><span>Session progress</span><b class="ss-prog-text">—</b></div>
-        <div class="sess-prog"><i class="ss-prog-fill" style="width:0%"></i></div>
+      <div class="ss-stats">
+        <div class="ss-stat"><b class="ss-s-sets">0</b><span class="ss-s-sets-k">sets</span></div>
+        <div class="ss-stat"><b class="ss-s-reps">0</b><span>reps</span></div>
+        <div class="ss-stat"><b class="ss-s-ex">0</b><span>exercises</span></div>
       </div>
+      <div class="sess-prog ss-prog-thin" title="Sets done"><i class="ss-prog-fill" style="width:0%"></i></div>
 
       <div class="sess-block ss-xp-block">
-        <div class="sess-prog-head"><span>Level earned</span><b class="ss-xp-val">—</b></div>
+        <div class="ss-xp-row">
+          <span class="ss-k">Level earned</span>
+          <b class="ss-xp-val">—</b>
+          <span class="ss-xp-why"></span>
+        </div>
         <div class="sess-prog ss-xp-track"><i class="ss-xp-fill" style="width:0%"></i></div>
-        <div class="ss-xp-why"></div>
       </div>
 
       <div class="sess-block ss-split-block">
@@ -683,7 +809,7 @@
       </div>
 
       <div class="sess-block ss-pr-block">
-        <h3 class="sess-label">Personal records today</h3>
+        <h3 class="sess-label">PRs today</h3>
         <div class="pr-hits ss-pr-hits"></div>
       </div>
     </section>
@@ -755,24 +881,31 @@
       // --- Headline: today vs the last workout that hit the same muscles ---
       const similar = findLastSimilarWorkout(day, iso);
       const trendEl = q('.ss-power-trend');
-      trendEl.classList.remove('up','down');
-      if(similar && vol > 0){
-        const delta = vol - similar.vol;
-        const sign  = delta >= 0 ? '+' : '−';
-        trendEl.textContent = `${sign}${Math.abs(Math.round(delta)).toLocaleString()} lb vs ${mdFromISO(similar.date)}`;
-        trendEl.classList.add(delta >= 0 ? 'up' : 'down');
+      trendEl.classList.remove('up','down','pill');
+      const dv = volumeDelta(vol, similar);
+      if(dv){
+        trendEl.textContent = `${dv.dir === 'up' ? '▲' : '▼'} ${dv.pct}% vs ${mdFromISO(dv.date)}`;
+        trendEl.title = `${dv.delta >= 0 ? '+' : '−'}${Math.abs(dv.delta).toLocaleString()} lb vs ${mdFromISO(dv.date)}`;
+        trendEl.classList.add('pill', dv.dir);
       }else{
         trendEl.textContent = vol > 0 ? 'no comparable session yet' : '—';
+        trendEl.title = '';
       }
 
-      // --- Session progress ---
-      let doneSets = 0, allSets = 0;
+      // --- Sets done / reps / exercises, with a thin session-progress bar ---
+      let doneSets = 0, allSets = 0, reps = 0;
       day.exercises.forEach(ex=>{
-        (ex.sets||[]).forEach(s=>{ allSets++; if(ex.finished || s.done) doneSets++; });
+        (ex.sets||[]).forEach(s=>{
+          allSets++;
+          if(ex.finished || s.done){ doneSets++; reps += Number(s.reps)||0; }
+        });
       });
       const pctDone = allSets ? Math.round((doneSets/allSets)*100) : 0;
       const complete = allSets > 0 && doneSets === allSets;
-      q('.ss-prog-text').textContent = allSets ? `${doneSets} of ${allSets} sets${complete ? ' ✓' : ''}` : 'nothing logged yet';
+      q('.ss-s-sets').textContent = allSets ? `${doneSets}/${allSets}` : '0';
+      q('.ss-s-sets-k').textContent = complete ? 'sets ✓' : 'sets';
+      q('.ss-s-reps').textContent = reps.toLocaleString();
+      q('.ss-s-ex').textContent = day.exercises.length;
       const fill = q('.ss-prog-fill');
       fill.style.width = pctDone + '%';
       fill.classList.toggle('done', complete);
@@ -793,7 +926,7 @@
       // --- Volume split by muscle group ---
       const byPart = {};
       day.exercises.forEach(ex=>{
-        const v = countedSets(ex).reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
+        const v = countedSets(ex).reduce((s,a)=> s + setVol(ex, a), 0);
         if(v <= 0) return;
         const p = ex.bodyPart || 'Other';
         byPart[p] = (byPart[p] || 0) + v;
@@ -811,21 +944,19 @@
         `).join('');
       }
 
-      // --- PRs set today (finished exercises only) ---
-      const hits = [];
-      day.exercises.filter(ex=>ex.finished).forEach(ex=>{
-        const st = prStatus(ex, iso);
-        if(st.weightPR)      hits.push({ name:ex.name, val:`${st.top.weight} lb × ${st.top.reps}`, kind:'weight' });
-        else if(st.repPR)    hits.push({ name:ex.name, val:`${st.top.weight} lb × ${st.top.reps}`, kind:'reps' });
-        else if(st.volumePR) hits.push({ name:ex.name, val:`${Math.round(st.vol).toLocaleString()} lb`, kind:'volume' });
-      });
+      // --- PRs set today (finished exercises only), one row per exercise ---
+      const hits = prHitsToday(day, iso);
       q('.ss-pr-block').style.display = hits.length ? '' : 'none';
       if(hits.length){
         q('.ss-pr-hits').innerHTML = hits.map(h=>`
-          <div class="pr-hit">
+          <div class="pr-hit t${h.prs[0].tier}">
             <span class="pr-name">${esc(h.name)}</span>
-            <span class="pr-val">${esc(h.val)}</span>
-            <span class="pr-kind">${h.kind} PR</span>
+            <span class="pr-segs">${h.prs.map(pr=>{
+              const t = fmtPR(pr);
+              return `<span class="pr-seg"><span class="pr-val">${esc(t.value)}</span>`
+                + `<span class="pr-badge t${pr.tier}">${esc(pr.label)}</span>`
+                + (t.was ? `<span class="pr-was">${esc(t.was)}</span>` : '') + `</span>`;
+            }).join('')}</span>
           </div>
         `).join('');
       }
@@ -836,7 +967,7 @@
     function renderTotals(day){
       const {sets, vol, exCount} = totalsFiltered(day);
       q('.ss-t-sets').textContent = sets;
-      q('.ss-t-vol').textContent = Math.round(vol) + ' lb';
+      q('.ss-t-vol').textContent = Math.round(vol).toLocaleString() + ' lb';
       q('.ss-t-ex').textContent = exCount;
     }
 
@@ -861,7 +992,7 @@
           <span class="ex-chev">▼</span>
           <div class="ex-title">
             <div class="ex-name">${esc(ex.name)}${copiedText}</div>
-            <div class="tag">${ex.sets.length} set${ex.sets.length===1?"":"s"} • ${Math.round(vol).toLocaleString()} lb • ${Math.round(avg)} lb/rep</div>
+            <div class="tag">${ex.sets.length} set${ex.sets.length===1?"":"s"} • ${Math.round(vol).toLocaleString()} lb • ${Math.round(avg)} lb/rep${volMult(ex) === 2 ? ' <span class="ph-mark" title="Weight is per hand; volume counts both">per hand ×2</span>' : ''}</div>
           </div>
           <div class="ex-head-actions">
             ${readOnly ? '' : '<button class="btn-undo" data-act="markComplete" title="Reopen for editing">↩ Undo</button>'}
@@ -889,7 +1020,7 @@
         (Number(s.weight)||0) === top.weight && (Number(s.reps)||0) === top.reps
       );
       (ex.sets||[]).forEach((s,i)=>
-        setGrid.appendChild(renderLockedSet(ex.id, s, i, top.weight > 0 && i === topIdx, pending && !s.done))
+        setGrid.appendChild(renderLockedSet(ex.id, s, i, top.weight > 0 && i === topIdx, pending && !s.done, volMult(ex)))
       );
 
       return node;
@@ -1014,6 +1145,8 @@
 
       if(act==='copyWorkout'){
         if(!curDay || !curDay.exercises.length){ flashCopyBtn('–', false); return; }
+        // the coach export (powerUp/coachExport.js) owns the copy sheet when loaded
+        if(window.CoachExport && window.CoachExport.open){ window.CoachExport.open(curDay, curIso); return; }
         const text = JSON.stringify(buildWorkoutExport(curDay, curIso), null, 2);
         if(await copyText(text)){
           flashCopyBtn('✓', true);
@@ -1038,7 +1171,8 @@
     // stats
     exStats, countedSets, totalsFiltered, topSetOf, prStatus, priorBests,
     bestsFromSessions, scanExerciseSessions, beatsPriorPR, trendPoints,
-    findLastSimilarWorkout, buildWorkoutExport,
+    findLastSimilarWorkout, buildWorkoutExport, volMult, setVol,
+    prHitsToday, fmtPR, volumeDelta, livePRContext, setPRKind, repBestsLine,
     // formatting
     esc, mdFromISO, dateLabel, partColor,
     // ui
