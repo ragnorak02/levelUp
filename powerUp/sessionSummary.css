@@ -50,8 +50,22 @@
 .session-summary .ss-power .top{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; position:relative; padding-right:38px}
 .session-summary .ss-power-val{font-size:2rem; font-weight:900; line-height:1}
 .session-summary .ss-power-trend{font-size:.85rem; color:var(--muted); font-weight:700}
-.session-summary .ss-power-trend.up{color:#4ade80}
-.session-summary .ss-power-trend.down{color:#94a3b8}
+.session-summary .ss-power-trend.pill{
+  align-self:center; font-size:.74rem; font-weight:900; white-space:nowrap;
+  padding:.18rem .5rem; border-radius:999px; border:1px solid var(--ring); background:#0e141b;
+}
+.session-summary .ss-power-trend.up{color:#4ade80; border-color:rgba(74,222,128,.4); background:rgba(34,197,94,.10)}
+.session-summary .ss-power-trend.down{color:#fca5a5; border-color:rgba(248,113,113,.35); background:rgba(239,68,68,.08)}
+
+/* Sets / reps / exercises */
+.session-summary .ss-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:10px}
+.session-summary .ss-stat{
+  display:flex; align-items:baseline; gap:5px; min-width:0;
+  background:#0b1118; border:1px solid rgba(42,53,67,.7); border-radius:10px; padding:5px 8px;
+}
+.session-summary .ss-stat b{font-size:1rem; font-weight:900; color:var(--ink); font-variant-numeric:tabular-nums; white-space:nowrap}
+.session-summary .ss-stat span{color:var(--muted); font-size:.7rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.session-summary .sess-prog.ss-prog-thin{height:4px; margin-top:6px; border:0}
 
 .session-summary .sess-label{
   margin:0 0 .3rem; color:var(--muted); font-size:.68rem;
@@ -69,12 +83,9 @@
 .session-summary .copy-btn:active{background:#16202b}
 .session-summary .copy-btn.ok{color:#4ade80; border-color:rgba(34,197,94,.45); background:#0d1a12}
 
-.session-summary .sess-block{margin-top:12px}
-.session-summary .sess-block + .sess-block{border-top:1px solid rgba(42,53,67,.55); padding-top:10px}
+.session-summary .sess-block{margin-top:10px; border-top:1px solid rgba(42,53,67,.55); padding-top:8px}
 
-/* Session progress */
-.session-summary .sess-prog-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:.8rem; color:var(--muted); font-weight:700}
-.session-summary .sess-prog-head b{color:var(--ink); font-weight:900}
+/* Progress bars */
 .session-summary .sess-prog{
   height:8px; border-radius:999px; background:#101a24;
   border:1px solid rgba(42,53,67,.9); overflow:hidden; margin-top:6px;
@@ -82,30 +93,47 @@
 .session-summary .sess-prog > i{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#22c55e,#4ade80); transition:width .25s ease}
 .session-summary .sess-prog > i.done{background:linear-gradient(90deg,#ffd54a,#fff7a8); box-shadow:0 0 12px rgba(255,213,74,.5)}
 
-/* Level earned */
-.session-summary .sess-prog-head b.ss-xp-val{color:#c4b5fd}
+/* Level earned: one row (label, value, factors) over a thin bar */
+.session-summary .ss-xp-row{display:flex; align-items:baseline; flex-wrap:wrap; gap:2px 8px}
+.session-summary .ss-k{color:var(--muted); font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.6px}
+.session-summary .ss-xp-val{color:#c4b5fd; font-weight:900; font-size:.95rem}
+.session-summary .sess-prog.ss-xp-track{height:5px; margin-top:5px; border:0}
 .session-summary .sess-prog > i.ss-xp-fill{background:linear-gradient(90deg,#8b5cf6,#c4b5fd); box-shadow:0 0 10px rgba(167,139,250,.45)}
-.session-summary .ss-xp-why{display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:6px; color:var(--muted); font-size:.74rem; font-weight:700}
-.session-summary .ss-xp-why b{color:var(--ink); font-weight:900}
+.session-summary .ss-xp-why{display:flex; flex-wrap:wrap; gap:2px 10px; margin-left:auto; color:var(--muted); font-size:.7rem; font-weight:700}
+.session-summary .ss-xp-why b{color:#cbd5e1; font-weight:900}
 
 /* Per-muscle-group split */
-.session-summary .split-row{display:grid; grid-template-columns:5.5rem 1fr auto; align-items:center; gap:8px; font-size:.82rem}
-.session-summary .split-row + .split-row{margin-top:6px}
+.session-summary .split-row{display:grid; grid-template-columns:5.5rem 1fr auto; align-items:center; gap:8px; font-size:.8rem}
+.session-summary .split-row + .split-row{margin-top:4px}
 .session-summary .split-name{color:var(--ink); font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.session-summary .split-track{height:8px; border-radius:999px; background:#101a24; border:1px solid rgba(42,53,67,.9); overflow:hidden}
+.session-summary .split-track{height:6px; border-radius:999px; background:#101a24; border:1px solid rgba(42,53,67,.9); overflow:hidden}
 .session-summary .split-track > i{display:block; height:100%; border-radius:999px}
-.session-summary .split-val{color:var(--muted); font-weight:800; font-size:.76rem; white-space:nowrap; justify-self:end}
+.session-summary .split-val{color:var(--muted); font-weight:800; font-size:.74rem; white-space:nowrap; justify-self:end}
 
-/* PRs hit today */
-.session-summary .pr-hits{display:flex; flex-direction:column; gap:6px}
+/* PRs hit today: one row per exercise, a segment per PR */
+.session-summary .pr-hits{display:flex; flex-direction:column; gap:5px}
 .session-summary .pr-hit{
-  display:flex; align-items:center; gap:8px; font-size:.84rem; font-weight:800;
-  background:linear-gradient(90deg, rgba(58,42,0,.55), rgba(11,17,24,.5));
-  border:1px solid rgba(255,213,74,.45); border-radius:10px; padding:7px 9px;
+  display:flex; align-items:baseline; flex-wrap:wrap; gap:3px 10px; font-size:.82rem; font-weight:800;
+  background:#0b1118; border:1px solid rgba(42,53,67,.8); border-radius:10px; padding:6px 9px;
 }
-.session-summary .pr-hit .pr-name{color:#ffd54a; flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.session-summary .pr-hit .pr-val{color:var(--ink); white-space:nowrap}
-.session-summary .pr-hit .pr-kind{color:var(--muted); font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.4px; white-space:nowrap}
+.session-summary .pr-hit.t1{background:linear-gradient(90deg, rgba(58,42,0,.55), rgba(11,17,24,.5)); border-color:rgba(255,213,74,.45)}
+.session-summary .pr-hit.t2{background:linear-gradient(90deg, rgba(13,58,54,.45), rgba(11,17,24,.5)); border-color:rgba(94,234,212,.35)}
+.session-summary .pr-hit .pr-name{color:var(--ink); flex:1 1 8rem; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.session-summary .pr-hit.t1 .pr-name{color:#ffd54a}
+.session-summary .pr-segs{display:flex; flex-wrap:wrap; gap:3px 10px; justify-content:flex-end}
+.session-summary .pr-seg{display:inline-flex; align-items:baseline; gap:5px; white-space:nowrap}
+.session-summary .pr-seg .pr-val{color:var(--ink); font-weight:900}
+.session-summary .pr-seg .pr-was{color:var(--muted); font-size:.7rem; font-weight:700}
+
+/* PR kind badge, coloured by tier: 1 strength/weight, 2 reps/volume, 3 best set */
+.session-summary .pr-badge{
+  display:inline-flex; align-items:center; white-space:nowrap;
+  font-size:.6rem; font-weight:900; letter-spacing:.4px; text-transform:uppercase;
+  border-radius:999px; padding:.12rem .38rem; border:1px solid var(--ring); color:var(--muted);
+}
+.session-summary .pr-badge.t1{color:#ffd54a; background:rgba(255,213,74,.14); border-color:rgba(255,213,74,.5)}
+.session-summary .pr-badge.t2{color:#5eead4; background:rgba(94,234,212,.10); border-color:rgba(94,234,212,.4)}
+.session-summary .pr-badge.t3{color:#9fb0c7; background:rgba(159,176,199,.08); border-color:rgba(159,176,199,.3)}
 
 /* ===== Totals strip ===== */
 .session-summary .ss-totals{position:sticky; top:0; z-index:20; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
@@ -231,6 +259,19 @@
 .session-summary .prsum-row .sep{color:#2a3949; font-weight:900}
 .session-summary .prsum-row .note{color:var(--muted); font-weight:700; font-size:.82rem}
 .session-summary .prsum-row .note.gold{color:#ffd54a}
+.session-summary .prsum-row .pr-badge{align-self:center}
+.session-summary .prsum-bests .bests{
+  display:flex; flex-wrap:wrap; gap:0 5px; min-width:0;
+  color:var(--muted); font-weight:800; font-size:.8rem; font-variant-numeric:tabular-nums;
+}
+.session-summary .prsum-bests .bests .gold{color:#ffd54a}
+
+/* Per-hand exercise marker on the tag line */
+.session-summary .ph-mark{
+  display:inline-block; margin-left:4px; vertical-align:1px;
+  font-size:.62rem; font-weight:900; letter-spacing:.3px; text-transform:uppercase;
+  color:#7dd3fc; border:1px solid rgba(125,211,252,.35); border-radius:999px; padding:0 .35rem;
+}
 .session-summary .prsum-bar{
   height:6px; border-radius:999px; background:#101a24;
   border:1px solid rgba(42,53,67,.9); overflow:hidden; margin-top:8px;
