@@ -227,6 +227,14 @@
     return hits[0] ? { date: hits[0].date, vol: Math.round(hits[0].vol) } : null;
   }
 
+  /* Completed = finished, or every logged set ticked Done. Everything else
+     (partly done, or set up ahead and not started) is in progress / planned. */
+  function splitExercises(list){
+    const completed = [], inProgress = [];
+    list.forEach(e=> ((e.finished || !e.sets.some(x=> x.notDone)) ? completed : inProgress).push(e));
+    return { completed, inProgress };
+  }
+
   /* ---------- Coach pack (plain text) ---------- */
 
   function setText(s){
@@ -234,7 +242,6 @@
     if(s.rp) t += 'rp';
     if(s.role === 'warmup') t += 'wu';
     else if(s.role === 'backoff') t += 'bo';
-    if(s.notDone) t += ' (not done)';
     return t;
   }
 
@@ -298,18 +305,27 @@
       const partNames = c.muscleGroups.map(p=> p.part);
       let head = `${c.isToday ? 'TODAY' : 'SESSION ' + md(iso)} — ${partNames.join(' + ')} · ` +
         `${c.totals.exercises} exercise${c.totals.exercises === 1 ? '' : 's'} · ${c.totals.countedSets} sets · ${fmtN(c.totals.volume)} lb`;
-      if(c.similar && c.similar.vol){
+      if(c.similar && c.similar.vol && c.totals.loggedSets === c.totals.countedSets){   // a half-done day always looks down
         const d = (c.totals.volume - c.similar.vol) / c.similar.vol * 100;
         head += ` (${signPct(d)} vs last ${partNames.join('/')} day ${md(c.similar.date, iso)})`;
       }
-      if(c.exercises.some(e=> !e.finished)) head += ' · in progress';
+      if(c.totals.loggedSets > c.totals.countedSets){
+        head += ` · ${c.totals.countedSets} of ${c.totals.loggedSets} sets done so far`;
+      }
       L.push(head);
-      if(c.muscleGroups.length > 1){
-        L.push('  volume by muscle: ' + c.muscleGroups.map(p=> `${p.part} ${fmtN(p.volume)} (${p.pct}%)`).join(' · '));
+      const mg = c.muscleGroups.filter(p=> p.volume > 0);
+      if(mg.length > 1){
+        L.push('  volume by muscle: ' + mg.map(p=> `${p.part} ${fmtN(p.volume)} (${p.pct}%)`).join(' · '));
       }
 
-      c.exercises.forEach(e=>{
-        let line = `${exLabel(e.name, e.bodyPart, e.perHand)}  ${e.sets.map(setText).join(', ') || '(no sets)'}`;
+      const exBlock = e=>{
+        const done = e.sets.filter(x=> !x.notDone), planned = e.sets.filter(x=> x.notDone);
+        let setsTxt;
+        if(!e.sets.length) setsTxt = '(no sets)';
+        else if(!planned.length) setsTxt = done.map(setText).join(', ');
+        else if(!done.length) setsTxt = 'not started — planned: ' + planned.map(setText).join(', ');
+        else setsTxt = 'done: ' + done.map(setText).join(', ') + ' · still planned: ' + planned.map(setText).join(', ');
+        let line = `${exLabel(e.name, e.bodyPart, e.perHand)}  ${setsTxt}`;
         if(e.e1){
           line += `  e1RM ${e.e1}`;
           if(e.priorBest) line += ` (best ${e.priorBest.e1} on ${md(e.priorBest.date, iso)})`;
@@ -327,7 +343,21 @@
         if(e.trendPct != null) tr.push(`e1RM ${signPct(e.trendPct)} (last 3 vs prior 3)`);
         if(e.sessions > 1) tr.push(`${e.sessions} sessions since ${md(e.firstDate, iso)}`);
         if(tr.length) L.push('  trend: ' + tr.join(' · '));
-      });
+      };
+      // exercises set up ahead of time sit in their own section until done
+      const { completed, inProgress } = splitExercises(c.exercises);
+      if(!inProgress.length){
+        completed.forEach(exBlock);
+      }else{
+        if(completed.length){
+          L.push('');
+          L.push(`COMPLETED (${completed.length})`);
+          completed.forEach(exBlock);
+        }
+        L.push('');
+        L.push(`IN PROGRESS / PLANNED (${inProgress.length}) — planned sets are not done yet and don't count toward volume, e1RM or PRs`);
+        inProgress.forEach(exBlock);
+      }
     }
 
     // ---- Weeks ----
@@ -437,7 +467,7 @@
         muscleGroups: c.muscleGroups.map(g=>({ part: g.part, exercises: g.exercises, sets: g.sets, volumeLb: g.volume, pct: g.pct })),
         comparedTo: c.similar ? { date: c.similar.date, volumeLb: c.similar.vol,
           deltaPct: c.similar.vol ? Math.round((c.totals.volume - c.similar.vol) / c.similar.vol * 1000) / 10 : null } : null,
-        exercises: c.exercises.map(e=>({
+        ...(()=>{ const sp = splitExercises(c.exercises); const exJson = e=>({
           name: e.name, bodyPart: e.bodyPart, perHand: e.perHand, finished: e.finished,
           sets: e.sets.map(setArr),
           e1rm: e.e1 || null,
@@ -447,7 +477,7 @@
           recent: e.recent.map(s=>({ date: s.date, sets: s.sets.map(setArr) })),
           sessions: e.sessions,
           trendPct: e.trendPct
-        }))
+        }); return { completed: sp.completed.map(exJson), inProgress: sp.inProgress.map(exJson) }; })()
       },
       weeks: c.weekly,
       lastTrained: c.lastTrained,
