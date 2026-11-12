@@ -784,7 +784,7 @@
       <div class="top">
         <div class="ss-power-val">0 lb</div>
         <div class="ss-power-trend">—</div>
-        <button class="copy-btn" data-act="copyWorkout" title="Copy this workout as JSON" aria-label="Copy this workout as JSON">📋</button>
+        <button class="copy-btn" data-act="copyWorkout" title="Tap: copy coach pack (12 wks) · Hold: more options" aria-label="Copy coach pack for ChatGPT; hold for more options">📋</button>
       </div>
 
       <div class="ss-stats">
@@ -1098,6 +1098,26 @@
       }, 1800);
     }
 
+    // 📋: tap copies the 12-week coach pack straight away; hold opens the options sheet
+    const LONG_PRESS_MS = 500;
+    let pressTimer = null, pressFired = false;
+    const cancelPress = ()=>{ clearTimeout(pressTimer); pressTimer = null; };
+    root.addEventListener('pointerdown', e=>{
+      if(!e.target.closest('.copy-btn')) return;
+      pressFired = false;
+      cancelPress();
+      pressTimer = setTimeout(()=>{
+        pressTimer = null;
+        if(!curDay || !curDay.exercises.length || !window.CoachExport) return;
+        pressFired = true;
+        if(navigator.vibrate) navigator.vibrate(15);
+        window.CoachExport.open(curDay, curIso);
+      }, LONG_PRESS_MS);
+    });
+    ['pointerup', 'pointercancel'].forEach(t=> root.addEventListener(t, cancelPress));
+    root.addEventListener('pointerout', e=>{ if(e.target.closest('.copy-btn')) cancelPress(); });
+    root.addEventListener('contextmenu', e=>{ if(e.target.closest('.copy-btn')) e.preventDefault(); });
+
     root.addEventListener('click', async (e)=>{
       // closest() so clicks land even when they hit a child of the labelled element
       const host = e.target.closest('[data-act]'); if(!host || !root.contains(host)) return;
@@ -1145,8 +1165,13 @@
 
       if(act==='copyWorkout'){
         if(!curDay || !curDay.exercises.length){ flashCopyBtn('–', false); return; }
-        // the coach export (powerUp/coachExport.js) owns the copy sheet when loaded
-        if(window.CoachExport && window.CoachExport.open){ window.CoachExport.open(curDay, curIso); return; }
+        if(pressFired){ pressFired = false; return; }   // that was a long press — the sheet is open
+        // the coach export (powerUp/coachExport.js): tap = quick copy, hold = sheet
+        if(window.CoachExport && window.CoachExport.quickCopy){
+          // false = clipboard blocked; quickCopy has opened the sheet to copy by hand
+          if(await window.CoachExport.quickCopy(curDay, curIso)) flashCopyBtn('✓', true);
+          return;
+        }
         const text = JSON.stringify(buildWorkoutExport(curDay, curIso), null, 2);
         if(await copyText(text)){
           flashCopyBtn('✓', true);

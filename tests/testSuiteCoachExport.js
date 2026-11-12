@@ -69,7 +69,7 @@
                 TS.setPerHand('Hammer Curl', 'Biceps', true);
                 var pack = CE.buildCoachPack({ iso: TODAY_ISO, weeks: 4 });
                 assert.ok(pack.indexOf('Hammer Curl [Biceps] (per hand)') >= 0, 'per-hand marker');
-                var ip = pack.indexOf('IN PROGRESS / PLANNED (1)'), hc = pack.indexOf('Hammer Curl [Biceps]');
+                var ip = pack.indexOf('IN PROGRESS / PLANNED (1)'), hc = pack.indexOf('\nHammer Curl [Biceps]');   // its block, not the NOW line
                 assert.ok(pack.indexOf('COMPLETED (1)') >= 0, 'completed section');
                 assert.ok(ip >= 0 && hc > ip, 'unfinished exercise sits in the planned section');
                 assert.ok(pack.indexOf('still planned: 35×8') >= 0, 'planned sets listed apart');
@@ -90,12 +90,38 @@
                 var p = CE.getProfile();
                 assert.equal(p.bodyweightLb, 182);
                 assert.typeOf(p.bodyweightDate, 'string');
-                var pack = CE.buildCoachPack({ iso: TODAY_ISO, weeks: 4 });
+                var pack = CE.buildCoachPack({ iso: '1997-03-10', weeks: 4 });   // a finished day
                 assert.ok(pack.indexOf('ABOUT ME: goal get strong · bodyweight 182 lb') >= 0);
                 var lines = pack.split('\n');
                 assert.equal(lines[lines.length - 1], 'ASK: Plan my next pull day.');
                 CE.saveProfile({ ask: '' });
                 assert.equal(CE.getProfile().ask, CE.DEFAULT_ASK);
+            });
+        });
+
+        it('mid-workout: NOW block lines today up against last time and asks for the next set', function() {
+            withDays(allDays(), function() {
+                CE.saveProfile({ ask: 'Plan my next pull day.' });
+                var pack = CE.buildCoachPack({ iso: TODAY_ISO, weeks: 4 });
+                assert.ok(pack.indexOf('NOW: Hammer Curl [Biceps] — set 1 of 2 done') >= 0, pack);
+                assert.ok(pack.indexOf('today vs last time (3/10): set 1 35×10 vs 30×11 · set 2 — vs 30×9') >= 0, 'set-by-set');
+                assert.ok(pack.indexOf('next planned: 35×8 · rep best at ≥35: 35×10 (11+ reps = rep PR) · last time set 2 was 30×9') >= 0, 'next target');
+                var lines = pack.split('\n');
+                assert.equal(lines[lines.length - 1], 'ASK: ' + CE.LIVE_ASK);
+                var done = CE.buildCoachPack({ iso: '1997-03-10', weeks: 4 });
+                assert.ok(done.indexOf('NOW:') < 0, 'no NOW block once everything is done');
+            });
+        });
+
+        it('NOW follows the exercise marked 🎯 on the workout page', function() {
+            var d = allDays();
+            var pull = ex('Lat Pulldown', 'Back', sets([[135, 6, false], [135, 6, false]]), false);
+            pull.active = true;   // marked, not started yet
+            d[TODAY_ISO] = [ex('Hammer Curl', 'Biceps', sets([[35, 10], [35, 8, false]]), false), pull];
+            withDays(d, function() {
+                var pack = CE.buildCoachPack({ iso: TODAY_ISO, weeks: 4 });
+                assert.ok(pack.indexOf('NOW: Lat Pulldown [Back] — set 0 of 2 done') >= 0, pack);
+                assert.ok(pack.indexOf('NOW: Hammer Curl') < 0, 'started-but-unmarked exercise is not NOW');
             });
         });
 

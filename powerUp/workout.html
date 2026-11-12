@@ -82,6 +82,13 @@
      down the side so you can spot where you left off. */
   .ex.started{border-style:solid; border-color:#2b4a63; box-shadow:inset 3px 0 0 var(--accent)}
 
+  /* 🎯 the exercise being worked right now, and its next set to do */
+  .ex.active{border-style:solid; border-color:rgba(56,189,248,.7); background:linear-gradient(180deg, rgba(14,40,58,.55), rgba(11,17,24,0) 60%);
+    box-shadow:inset 4px 0 0 #38bdf8, 0 0 18px rgba(56,189,248,.18)}
+  .ex .btn-target.on{border-color:rgba(56,189,248,.7); background:rgba(56,189,248,.16); color:#e0f2fe}
+  .set-row.set-current{border-color:rgba(56,189,248,.75); background:rgba(56,189,248,.10); box-shadow:0 0 12px rgba(56,189,248,.18)}
+  .set-row.set-current.set-pr{border-color:rgba(255,213,74,.55)}
+
   /* transparent border/padding on every row so the PR state doesn't shift layout */
   .set-row{
     display:grid; grid-template-columns: auto auto auto 1fr auto; gap:8px; align-items:center;
@@ -386,13 +393,15 @@ function renderInProgress(container, list){
   // Started work rises to the top: the body part you're mid-way through leads
   // the list, and inside it the started exercises come before the untouched
   // ones. Six exercises queued at the start of a session stay findable.
-  const startRank = bp => groups[bp].some(isStarted) ? 0 : 1;
+  // The 🎯 exercise outranks everything, so it's always at the top.
+  const exRank = ex => ex.active ? 0 : (isStarted(ex) ? 1 : 2);
+  const startRank = bp => Math.min(...groups[bp].map(exRank));
   const bodyPartsSorted = Object.keys(groups)
     .sort((a,b)=> startRank(a) - startRank(b) || a.localeCompare(b));
 
   bodyPartsSorted.forEach(bp=>{
     const exList = groups[bp].slice()
-      .sort((a,b)=> (isStarted(a)?0:1) - (isStarted(b)?0:1));
+      .sort((a,b)=> exRank(a) - exRank(b));
     if(!exList.length) return;
 
     const g = document.createElement('div');
@@ -416,7 +425,7 @@ function renderInProgress(container, list){
 
 function renderExercise(ex){
   const node = document.createElement('div');
-  node.className = 'ex' + (ex.copied ? ' copied' : '') + (isStarted(ex) ? ' started' : '');
+  node.className = 'ex' + (ex.copied ? ' copied' : '') + (isStarted(ex) ? ' started' : '') + (ex.active ? ' active' : '');
   node.dataset.id = ex.id;
   node.setAttribute('tabindex','0');
 
@@ -432,6 +441,7 @@ function renderExercise(ex){
         <button class="ph-chip${perHand ? ' on' : ''}" data-act="togglePerHand" aria-pressed="${perHand}" title="Weight is for one hand — volume counts both">Per hand ×2</button>
       </div>
       <div class="ex-head-actions">
+        <button class="btn-icon btn-target${ex.active ? ' on' : ''}" data-act="setActive" aria-pressed="${!!ex.active}" title="${ex.active ? 'Stop highlighting' : 'Highlight — the exercise I\'m on'}" aria-label="${ex.active ? 'Stop highlighting this exercise' : 'Highlight this as the exercise I\'m on'}">🎯</button>
         <button class="btn-complete" data-act="markComplete">Complete</button>
         <button class="btn-icon" data-act="viewHistory" title="History" aria-label="History">📊</button>
       </div>
@@ -455,6 +465,12 @@ function renderExercise(ex){
   // one lookup per exercise, reused for every row
   const ctx = prContextFor(ex);
   ex.sets.forEach((s, i) => setsWrap.appendChild(renderSet(ex.id, s, i, ctx, perHand)));
+
+  // on the 🎯 exercise, light up the first set not yet ticked Done
+  if(ex.active){
+    const next = ex.sets.findIndex(s=> !s.done);
+    if(next >= 0) setsWrap.children[next].classList.add('set-current');
+  }
 
   return node;
 }
@@ -596,6 +612,15 @@ document.addEventListener('click', (e)=>{
     ex.sets.push({weight:last.weight??'', reps:last.reps??'', superset:last.superset??false, done:false, copied:(last.weight||last.reps)?true:false});
     saveDay(day); render(); return;
   }
+  if(act==='setActive'){
+    // one 🎯 exercise at a time; tapping the lit one turns it off
+    const ex = day.exercises.find(x=> x.id === host.closest('.ex')?.dataset.id);
+    if(!ex) return;
+    const turnOn = !ex.active;
+    day.exercises.forEach(x=>{ delete x.active; });
+    if(turnOn) ex.active = true;
+    saveDay(day); render(); return;
+  }
   if(act==='togglePerHand'){
     const ex = day.exercises.find(x=> x.id === host.closest('.ex')?.dataset.id);
     if(!ex || !window.TrainingStats) return;
@@ -626,6 +651,7 @@ document.addEventListener('click', (e)=>{
       ex.finished = true;
       ex.sets.forEach(s=>{ s.done=true; s.copied=false; });
       ex.copied=false;
+      delete ex.active;   // done with it — pick the next exercise with 🎯
     }else{
       // Undo hands the card back editable - a mistyped weight is the whole
       // reason to reopen one. The sets stay ticked Done; they were performed.

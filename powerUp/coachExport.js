@@ -8,7 +8,7 @@
      PRs, every other exercise in the window, and a closing ASK.
    - Raw JSON (levelup.workout.v2): the same facts, structured, for archiving.
 
-   window.CoachExport = { open(day, iso), buildCoachPack(opts), buildRawJson(opts),
+   window.CoachExport = { open(day, iso), quickCopy(day, iso), buildCoachPack(opts), buildRawJson(opts),
                           getProfile(), saveProfile(p), openProfile() }
 
    The build functions are DOM-free (the Node test runner requires this file);
@@ -30,6 +30,11 @@
   const DEFAULT_ASK = "Act as my strength coach. Review today's session against my history, " +
     "point out what's improving or stalling, and suggest my next session for these muscle " +
     'groups with specific weights and reps.';
+  // used instead of the profile ask while sets are still planned (pasted mid-workout)
+  const LIVE_ASK = "I'm mid-workout and will paste this after every set or two. Keep it short: " +
+    'compare my last set to last time and my rep bests, tell me the weight × reps to aim for on my next set, ' +
+    'and push me if I can beat a rep best or PR. Full review once everything is done.';
+  const QUICK_WEEKS = 12;         // tap-to-copy always sends 12 weeks of history
 
   const PROFILE_FIELDS = ['goal', 'bodyweightLb', 'bodyweightDate', 'heightIn', 'age',
     'experience', 'injuries', 'equipment', 'schedule', 'notes', 'ask'];
@@ -145,7 +150,7 @@
       const todaySess = counted.length ? [{ date: iso, sets: counted.map(s=>({ weight: num(s.weight), reps: num(s.reps), superset: !!s.superset })), e1: prs.today.e1 }] : [];
       const all = prior.concat(todaySess);
       return {
-        ex, name: ex.name, bodyPart: ex.bodyPart || 'Other', perHand, finished: !!ex.finished,
+        ex, name: ex.name, bodyPart: ex.bodyPart || 'Other', perHand, finished: !!ex.finished, active: !!ex.active,
         sets, counted,
         vol: T.exVolume(ex, counted),
         e1: Math.round(prs.today.e1),
@@ -235,6 +240,51 @@
     return { completed, inProgress };
   }
 
+  /* The exercise being worked right now: the one marked 🎯 on the workout page,
+     else the last in-progress one with a set ticked done, else the first one
+     not started. Null when nothing's left. */
+  function liveExercise(inProgress){
+    const marked = inProgress.find(e=> e.active);
+    if(marked) return marked;
+    const started = inProgress.filter(e=> e.sets.some(x=> !x.notDone));
+    return started.length ? started[started.length - 1] : (inProgress[0] || null);
+  }
+
+  /* Rep best at or above weight w (most reps done at >= w), from the frontier. */
+  function bestRepsAtLeast(frontier, w){
+    let best = null;
+    frontier.forEach(p=>{ if(p.weight >= w && (!best || p.reps > best.reps)) best = p; });
+    return best;
+  }
+
+  /* "NOW" block: today's sets lined up against last session's, and what the
+     next planned set has to beat. */
+  function nowBlock(e, iso, L){
+    const done = e.sets.filter(x=> !x.notDone), planned = e.sets.filter(x=> x.notDone);
+    const last = e.recent[0];
+    L.push(`NOW: ${exLabel(e.name, e.bodyPart, e.perHand)} — set ${done.length} of ${e.sets.length} done`);
+    if(last){
+      const n = Math.max(done.length, last.sets.length);
+      const pairs = [];
+      for(let i = 0; i < n; i++){
+        const t = done[i], l = last.sets[i];
+        pairs.push(`set ${i + 1} ${t ? setText(t) : '—'} vs ${l ? wr(l.weight, l.reps) : '—'}`);
+      }
+      L.push(`  today vs last time (${md(last.date, iso)}): ` + pairs.join(' · '));
+    }else{
+      L.push('  no earlier session of this exercise');
+    }
+    const next = planned[0];
+    if(next){
+      let line = `  next planned: ${setText(next)}`;
+      const rb = bestRepsAtLeast(e.frontier, next.weight);
+      if(next.weight > 0 && rb) line += ` · rep best at ≥${next.weight}: ${wr(rb.weight, rb.reps)} (${rb.reps + 1}+ reps = rep PR)`;
+      const l = last && last.sets[done.length];
+      if(l) line += ` · last time set ${done.length + 1} was ${wr(l.weight, l.reps)}`;
+      L.push(line);
+    }
+  }
+
   /* ---------- Coach pack (plain text) ---------- */
 
   function setText(s){
@@ -313,6 +363,8 @@
         head += ` · ${c.totals.countedSets} of ${c.totals.loggedSets} sets done so far`;
       }
       L.push(head);
+      const live = liveExercise(splitExercises(c.exercises).inProgress);
+      if(live) nowBlock(live, iso, L);
       const mg = c.muscleGroups.filter(p=> p.volume > 0);
       if(mg.length > 1){
         L.push('  volume by muscle: ' + mg.map(p=> `${p.part} ${fmtN(p.volume)} (${p.pct}%)`).join(' · '));
@@ -419,7 +471,8 @@
     }
 
     L.push('');
-    L.push('ASK: ' + oneLine(c.profile.ask || DEFAULT_ASK));
+    const midWorkout = splitExercises(c.exercises).inProgress.length > 0;
+    L.push('ASK: ' + (midWorkout ? LIVE_ASK : oneLine(c.profile.ask || DEFAULT_ASK)));
     return L.join('\n');
   }
 
@@ -709,6 +762,19 @@
     sheet.querySelector('[data-act="profile"]').addEventListener('click', openProfile);
   }
 
+  /* One tap: 12-week coach pack straight to the clipboard. Opens the sheet
+     (where the text can be selected by hand) when the clipboard is blocked. */
+  async function quickCopy(day, iso){
+    if(!hasDom() || !TS()) return false;
+    const r = resolveDay(day, iso);
+    if(!r.iso) return false;
+    let text;
+    try{ text = buildCoachPack({ day: r.day, iso: r.iso, weeks: QUICK_WEEKS }); }catch{ return false; }
+    if(await copyText(text)) return true;
+    open(day, iso);
+    return false;
+  }
+
   function openProfile(){
     if(!hasDom()) return;
     const el = makeSheet('profile', 'cx-profile');
@@ -753,8 +819,8 @@
   }
 
   window.CoachExport = {
-    open, buildCoachPack, buildRawJson, getProfile, saveProfile, openProfile,
+    open, quickCopy, buildCoachPack, buildRawJson, getProfile, saveProfile, openProfile,
     // extras (tests / other pages)
-    PROFILE_KEY, PREFS_KEY, DEFAULT_ASK, getPrefs, savePrefs
+    PROFILE_KEY, PREFS_KEY, DEFAULT_ASK, LIVE_ASK, QUICK_WEEKS, getPrefs, savePrefs
   };
 })();
