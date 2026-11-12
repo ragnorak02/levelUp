@@ -33,6 +33,8 @@ require('../powerUp/trainingStats.js');
 require('../powerUp/sessionSummary.js');
 require('./testSuiteSessionSummary.js');
 require('./testSuiteTrainingStats.js');
+require('../powerUp/coachExport.js');
+require('./testSuiteCoachExport.js');
 require('../powerUp/workoutXP.js');
 require('./testSuiteWorkoutXP.js');
 require('../bowling/bowlingCore.js');
