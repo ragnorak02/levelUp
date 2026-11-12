@@ -996,7 +996,7 @@
           </div>
           <div class="ex-head-actions">
             ${readOnly ? '' : '<button class="btn-undo" data-act="markComplete" title="Reopen for editing">↩ Undo</button>'}
-            <button class="btn-icon" data-act="viewHistory" title="History" aria-label="History">📊</button>
+            <!-- no 📊 here: expanding a completed card already shows its history chart -->
           </div>
         </div>
 
