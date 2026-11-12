@@ -758,7 +758,7 @@
                         <span class="si-n">SET ${j + 1}</span>
                         <span class="si-w">${s.weight}</span><span class="si-unit">lb</span>
                         <span class="si-x">×</span><span class="si-r">${s.reps}</span>
-                        <span class="si-vol">${nf(s.weight * s.reps * ex.mult)} lb</span>
+                        <span class="si-vol">${nf(TS.setVolume(ex, s))} lb</span>
                     </div>`).join('');
                 return `<div class="exrow${open ? '' : ' collapsed'}">
                     <div class="exrow-head" data-ekey="${esc(eKey)}">
