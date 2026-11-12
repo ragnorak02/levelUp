@@ -120,9 +120,15 @@
           exercises.set(key, rec);
         }
         rec.name = ex.name;   // latest spelling wins
-        rec.sessions.push(Object.assign({ date: day.date,
-          sets: cs.map(s=>({ weight: num(s.weight), reps: num(s.reps), superset: !!s.superset })) },
-          summarizeSets(ex, cs)));
+        const mapped = cs.map(s=>({ weight: num(s.weight), reps: num(s.reps), superset: !!s.superset }));
+        // logged twice on one day (e.g. re-added later) → one session
+        const last = rec.sessions[rec.sessions.length - 1];
+        if(last && last.date === day.date){
+          const merged = last.sets.concat(mapped);
+          Object.assign(last, { sets: merged }, summarizeSets(ex, merged));
+          return;
+        }
+        rec.sessions.push(Object.assign({ date: day.date, sets: mapped }, summarizeSets(ex, mapped)));
       });
     });
     const idx = { days, exercises };
