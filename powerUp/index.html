@@ -4,577 +4,562 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Power Up!</title>
+<!-- analytics.css sets the page base (colours, body); its components are scoped under .an -->
+<link rel="stylesheet" href="analytics.css" />
 <link rel="stylesheet" href="muscleCalendar.css" />
+<link rel="stylesheet" href="sessionSummary.css" />
 <style>
   :root{
-    --bg:#0b0f14; --card:#131a22; --ink:#e8eef6; --muted:#9fb0c7; --accent:#4CAF50; --accent-2:#2dd4bf;
-    --ring:#2a3543; --warn:#f59e0b; --good:#22c55e; --bad:#ef4444;
-    --mg-chest: rgba(255, 59, 48, .72); /* bright red */
-    --mg-back: rgba(0, 122, 255, .72); /* strong blue */
-    --mg-legs: rgba(52, 199, 89, .72); /* vibrant green */
-    --mg-shoulders: rgba(175, 82, 222, .72); /* rich purple */
-    --mg-triceps: rgba(255, 149, 0, .72); /* orange */
-    --mg-biceps: rgba(88, 86, 214, .72); /* indigo */
-    --mg-forearms: rgba(0, 199, 190, .72); /* teal */
-}
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
-    background:linear-gradient(180deg,#0a0e13 0%, #0d131a 100%); color:var(--ink);
-    display:flex; flex-direction:column;
+    --mg-chest: rgba(255, 59, 48, .72);
+    --mg-back: rgba(0, 122, 255, .72);
+    --mg-legs: rgba(52, 199, 89, .72);
+    --mg-shoulders: rgba(175, 82, 222, .72);
+    --mg-triceps: rgba(255, 149, 0, .72);
+    --mg-biceps: rgba(88, 86, 214, .72);
+    --mg-forearms: rgba(0, 199, 190, .72);
   }
 
-  header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:.6rem .9rem; border-bottom:1px solid var(--ring);
-    background: linear-gradient(180deg, rgba(11,15,20,.95), rgba(11,15,20,.75));
-    backdrop-filter: blur(10px);
+  /* ===== Header: 🏠 left, title, ☰ right — same buttons as the workout page ===== */
+  .pu-head{
     position:sticky; top:0; z-index:20;
+    display:flex; align-items:center; gap:8px; padding:8px 12px;
+    border-bottom:1px solid var(--ring);
+    background:linear-gradient(180deg,rgba(11,15,20,.97),rgba(11,15,20,.86));
+    backdrop-filter:blur(10px);
   }
-  header h1{margin:0; font-size:1.05rem; letter-spacing:.2px}
-  header .home{all:unset; cursor:pointer; padding:.35rem .6rem; border-radius:.6rem; border:1px solid var(--ring)}
-  header .home:focus-visible{outline:2px solid var(--accent-2)}
-
-  .wrap{width:min(1100px, 100%); margin-inline:auto; padding:8px 12px 12px; flex:1; display:flex; flex-direction:column; gap:8px}
-
-  .grid{display:grid; gap:10px; grid-template-columns: repeat(12, 1fr)}
-  .card{
-    background:var(--card); border:1px solid rgba(42,53,67,.70); border-radius:16px;
-    padding:10px; box-shadow:0 4px 20px rgba(0,0,0,.20);
-  }
-  .card h3{margin:.1rem 0 .45rem; font-size:.95rem; color:var(--muted); font-weight:600}
-
-  /* top cards */
-  #powerCard{grid-column: span 3}
-  #lastWorkoutCard{grid-column: span 9}
-  .val{display:flex; align-items:baseline; gap:8px; font-size:1.6rem; font-weight:700}
-  .trend{font-size:.8rem; color:var(--muted)}
-    
-/* Workout header bar (blue tinted) */
-.workout-header{
-  background:rgba(30,58,95,.45);
-  border:1px solid rgba(59,130,246,.25);
-  border-radius:10px;
-  padding:8px 10px;
-  margin-bottom:6px;
-}
-.workout-stats{display:flex; gap:14px; margin-top:4px}
-.wstat{display:flex; align-items:baseline; gap:5px; font-size:.82rem; color:var(--muted)}
-.wstat b{color:var(--ink); font-size:.95rem}
-  .ex-list{display:flex; flex-wrap:wrap; align-items:center; gap:5px 14px; padding:2px}
-  .mg-chip{display:inline-flex; align-items:center; gap:6px; font-size:.9rem; font-weight:700; color:var(--ink)}
-  .mg-chip i{width:9px; height:9px; border-radius:3px; display:inline-block}
-  .cta-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px}
-  .cta{
-    all:unset; cursor:pointer; background:linear-gradient(90deg, var(--accent), #22c55e);
-    color:#04130a; padding:.65rem .9rem; border-radius:10px; font-weight:700; box-shadow:0 6px 20px rgba(34,197,94,.25)
-  }
-  .cta:active{transform:translateY(1px)}
-  .ghost{all:unset; cursor:pointer; color:var(--muted); padding:.5rem .7rem; border-radius:9px; border:1px solid var(--ring)}
-  .small-btn{all:unset; cursor:pointer; color:var(--muted); padding:.4rem .6rem; border-radius:8px; border:1px solid var(--ring); font-size:.85rem}
-
-
-  /* Compact power card spacing */
-  #powerCard{padding:10px}
-  #powerCard h3{margin:0 0 .35rem; font-size:.9rem}
-  #powerCard .val{font-size:1.35rem; gap:6px}
-  .power-level{font-size:1.35rem}
-  .trend{font-size:.78rem}
-  .level-progress{height:7px; margin:6px 0}
-  /* Inline power row (Title + Level + Progress + Weight) */
-.power-inline{display:flex; align-items:center; gap:10px}
-.power-title{margin:0; font-size:.88rem; color:var(--muted); font-weight:650; white-space:nowrap}
-.power-level-wrap{display:flex; align-items:baseline; gap:6px; white-space:nowrap}
-.level-progress.inline{flex:1; margin:0; height:8px; min-width:70px}
-.weight-pill{
-  all:unset; cursor:pointer;
-  padding:.35rem .6rem;
-  border-radius:999px;
-  border:1px solid var(--ring);
-  background:#0f1720;
-  color:var(--ink);
-  font-weight:750;
-  white-space:nowrap;
-}
-.weight-pill:hover{background:#15202c}
-
-  /* Power level styling */
-  .power-level{
-    font-size:1.35rem; 
-    font-weight:800; 
-    background:linear-gradient(45deg, #fbbf24, #f59e0b, #d97706);
-    -webkit-background-clip:text;
-    background-clip:text;
-    -webkit-text-fill-color:transparent;
-    text-shadow:0 2px 4px rgba(0,0,0,0.3);
-  }
-  .level-progress{
-    width:100%; 
-    height:8px; 
-    background:#1a2332; 
-    border-radius:4px; 
-    overflow:hidden;
-    margin:8px 0;
-  }
-  .level-bar{
-    height:100%; 
-    background:linear-gradient(90deg, #fbbf24, #f59e0b); 
-    border-radius:4px;
-    transition:width 0.3s ease;
-  }
-
-  /* Workout navigation */
-  .workout-nav{
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .nav-btn{
-    all:unset;
-    cursor:pointer;
+  .pu-head h1{flex:1 1 auto; margin:0; text-align:center; font-size:1.02rem; letter-spacing:.2px}
+  .icon-btn{
+    all:unset; cursor:pointer; flex:0 0 auto; box-sizing:border-box;
+    width:40px; height:40px; border:1px solid var(--ring); border-radius:10px;
     display:inline-flex; align-items:center; justify-content:center;
-    width:2.2rem; height:2rem; padding:0;
-    border:1px solid var(--ring);
-    border-radius:8px;
-    font-size:.9rem;
-    color:var(--muted);
+    font-size:1.05rem; line-height:1; color:var(--ink);
   }
-  .nav-btn:hover{background:rgba(255,255,255,0.05)}
-  .nav-btn:disabled{opacity:0.4; cursor:not-allowed}
+  .icon-btn:active{background:#16202b}
 
-  /* calendar (compact + half width on desktop) */
-  .calendar{grid-column: span 6}
-
-  /* responsive (fit on one mobile screen) */
-  @media (max-width: 980px){
-    #powerCard{grid-column:span 12}
-    #lastWorkoutCard{grid-column:span 12}
-    .calendar{grid-column:span 12}
+  .pu-wrap{width:min(760px,100%); margin-inline:auto; padding:10px 12px 28px; display:flex; flex-direction:column; gap:10px}
+  .pu-card{
+    background:var(--card); border:1px solid var(--edge); border-radius:16px;
+    padding:10px 12px; box-shadow:0 4px 20px rgba(0,0,0,.2); min-width:0;
   }
-  @media (max-width: 480px){
-    .wrap{gap:8px; padding:8px 8px 12px}
-    .card{padding:10px; border-radius:12px}
-    .val{font-size:1.4rem}
-    .calendar .card{padding:8px}
+  [data-section][hidden]{display:none !important}
+
+  /* ===== Power level ===== */
+  .power-inline{display:flex; align-items:center; gap:10px}
+  .power-title{margin:0; font-size:.88rem; color:var(--muted); font-weight:700; white-space:nowrap}
+  .power-level-wrap{display:flex; align-items:baseline; gap:6px; white-space:nowrap}
+  .power-level{
+    font-size:1.35rem; font-weight:800;
+    background:linear-gradient(45deg,#fbbf24,#f59e0b,#d97706);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .trend{font-size:.78rem; color:var(--muted)}
+  .level-progress{flex:1; min-width:60px; height:8px; background:#1a2332; border-radius:4px; overflow:hidden}
+  .level-bar{height:100%; background:linear-gradient(90deg,#fbbf24,#f59e0b); border-radius:4px; transition:width .3s ease}
+  .weight-pill{
+    all:unset; cursor:pointer; padding:.35rem .6rem; border-radius:999px;
+    border:1px solid var(--ring-2); background:#0f1720; color:var(--ink); font-weight:750; white-space:nowrap;
   }
 
-  /* Exercise list: 2-column rows */
-  #lastWorkoutCard { overflow-x: hidden; }
+  /* ===== Selected day ===== */
+  .day-head{display:flex; align-items:center; gap:8px; margin-bottom:8px}
+  .day-title{flex:1 1 auto; min-width:0; font-weight:900; font-size:.98rem}
+  .day-hint{display:block; color:var(--muted); font-size:.72rem; font-weight:700; margin-top:2px}
+  .open-btn{
+    all:unset; cursor:pointer; flex:0 0 auto; box-sizing:border-box; min-height:40px; padding:0 .9rem;
+    border-radius:10px; font-weight:900; font-size:.85rem; color:#04130a;
+    background:linear-gradient(90deg,#4CAF50,#22c55e); display:inline-flex; align-items:center;
+  }
+  .open-btn:active{filter:brightness(.92)}
+  .day-empty{color:var(--muted); font-weight:700; font-size:.88rem; padding:6px 0 2px}
 
+  /* ===== Analytics (expands in place; the analytics.css components live under .an) ===== */
+  .an-section{display:flex; flex-direction:column; gap:12px}
+  .an-section .an-title{display:flex; align-items:center; gap:8px; margin:6px 2px 0}
+  .an-section .an-title h2{flex:1; margin:0; font-size:1rem; letter-spacing:.2px}
+  .an-section .nav-tabs{margin-top:0; position:sticky; top:57px; z-index:15}
+  .an-loading{color:var(--muted); font-weight:700; text-align:center; padding:18px}
 
-/* Weight history modal */
-.modal{position:fixed; inset:0; display:none; z-index:50}
-.modal.open{display:block}
-.modal-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55)}
-.modal-card{
-  position:relative;
-  max-width:760px;
-  margin:10vh auto;
-  background:linear-gradient(180deg,#101823 0%, #0e151f 100%);
-  border:1px solid var(--ring);
-  border-radius:16px;
-  padding:12px;
-  box-shadow:0 20px 60px rgba(0,0,0,.45);
-}
-.modal-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px}
-.modal-title{font-weight:800; letter-spacing:.02em}
-.modal-close{
-  all:unset; cursor:pointer; padding:.35rem .55rem;
-  border-radius:10px; border:1px solid var(--ring); color:var(--muted)
-}
-.modal-close:hover{background:#142033}
-#weightChart{width:100%; height:220px; display:block; background:#0b121a; border:1px solid #203041; border-radius:12px}
-.modal-actions{display:flex; gap:8px; align-items:center; margin:10px 0}
-.cta.small{padding:.5rem .75rem; font-size:.9rem}
-.weight-list{max-height:180px; overflow:auto; border:1px dashed #213043; border-radius:12px; padding:8px; background:#0b121a}
-.weight-item{display:flex; justify-content:space-between; padding:6px 8px; border-bottom:1px solid rgba(255,255,255,.06); color:var(--muted); font-size:.9rem}
-.weight-item:last-child{border-bottom:0}
-.weight-item b{color:var(--ink)}
+  /* ===== ☰ menu: show / hide sections ===== */
+  .menu-pop{position:fixed; inset:0; z-index:60; display:none; background:rgba(0,0,0,.5)}
+  .menu-pop.open{display:block}
+  .menu-card{
+    position:absolute; top:58px; right:10px; width:min(300px, calc(100vw - 20px));
+    background:#0e151f; border:1px solid var(--ring-2); border-radius:14px; padding:8px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+  }
+  .menu-label{color:var(--muted); font-size:.68rem; font-weight:800; letter-spacing:.6px; text-transform:uppercase; padding:6px 8px 4px}
+  .menu-row{
+    all:unset; cursor:pointer; box-sizing:border-box; width:100%; min-height:48px; padding:0 10px;
+    display:flex; align-items:center; gap:10px; border-radius:10px; font-weight:800; color:var(--ink);
+  }
+  .menu-row:active{background:#16202b}
+  .menu-row .ml{flex:1}
+  .switch{width:42px; height:24px; border-radius:999px; background:#1f2b38; position:relative; flex:0 0 auto; transition:background .15s}
+  .switch::after{content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#9fb0c7; transition:transform .15s, background .15s}
+  .menu-row[aria-checked="true"] .switch{background:#16a34a}
+  .menu-row[aria-checked="true"] .switch::after{transform:translateX(18px); background:#f0fdf4}
 
+  /* ===== Weight history modal ===== */
+  .modal{position:fixed; inset:0; display:none; z-index:50}
+  .modal.open{display:block}
+  .modal-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55)}
+  .modal-card{
+    position:relative; max-width:760px; margin:10vh auto; background:linear-gradient(180deg,#101823 0%,#0e151f 100%);
+    border:1px solid var(--ring-2); border-radius:16px; padding:12px; box-shadow:0 20px 60px rgba(0,0,0,.45);
+  }
+  .modal-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px}
+  .modal-title{font-weight:800}
+  .modal-close{all:unset; cursor:pointer; padding:.35rem .55rem; border-radius:10px; border:1px solid var(--ring-2); color:var(--muted)}
+  #weightChart{width:100%; height:220px; display:block; background:#0b121a; border:1px solid #203041; border-radius:12px}
+  .modal-actions{display:flex; gap:8px; align-items:center; margin:10px 0}
+  .cta-small{all:unset; cursor:pointer; padding:.5rem .75rem; border-radius:10px; font-weight:800; color:#04130a; background:linear-gradient(90deg,#4CAF50,#22c55e)}
+  .weight-list{max-height:180px; overflow:auto; border:1px dashed #213043; border-radius:12px; padding:8px; background:#0b121a}
+  .weight-item{display:flex; justify-content:space-between; padding:6px 8px; border-bottom:1px solid rgba(255,255,255,.06); color:var(--muted); font-size:.9rem}
+  .weight-item:last-child{border-bottom:0}
+  .weight-item b{color:var(--ink)}
+
+  @media (max-width:360px){
+    .pu-wrap{padding-inline:8px}
+    .power-title{display:none}
+  }
 </style>
 </head>
 <body>
-  <header>
-    <button class="home" onclick="location.href='../main.html'" aria-label="Menu">☰</button>
+  <header class="pu-head">
+    <a class="icon-btn" href="../main.html" aria-label="LevelUp home" title="LevelUp home">🏠</a>
     <h1>Power Up!</h1>
-    <div style="width:60px"></div>
+    <button class="icon-btn" id="menuBtn" type="button" aria-label="Show or hide sections" aria-haspopup="true">☰</button>
   </header>
 
-  <div class="wrap">
-    <section class="grid">
-      <article class="card" id="powerCard">
-<div class="power-inline">
-  <h3 class="power-title">Power Level</h3>
-  <div class="power-level-wrap">
-    <span class="power-level" id="powerLevel">Lv 1</span>
-    <span class="trend" id="powerTrend">Novice</span>
-  </div>
-  <div class="level-progress inline" aria-label="Level progress">
-    <div class="level-bar" id="levelBar" style="width: 0%"></div>
-  </div>
-  <button class="weight-pill" id="currentWeightBtn" type="button" title="View weight history">—</button>
-</div>
-        </article>
-
-      <article class="card" id="lastWorkoutCard">
-        <div class="workout-header">
-          <div class="workout-nav">
-            <button class="nav-btn" id="prevWorkout">←</button>
-            <h3 id="workoutPanelTitle">Today's Workout</h3>
-            <button class="nav-btn" id="nextWorkout">→</button>
-          </div>
-          <div class="workout-stats">
-            <div class="wstat"><span>Total</span> <b id="lastVolume">—</b></div>
-            <div class="wstat"><span>Exercises</span> <b id="lastMoves">—</b></div>
-          </div>
+  <div class="pu-wrap">
+    <article class="pu-card" id="powerCard" data-section="power">
+      <div class="power-inline">
+        <h3 class="power-title">Power Level</h3>
+        <div class="power-level-wrap">
+          <span class="power-level" id="powerLevel">Lv 1</span>
+          <span class="trend" id="powerTrend">Novice</span>
         </div>
-        <div class="ex-list" id="exList"></div>
-        <div class="cta-row">
-          <button class="cta" id="startToday">Start Workout</button>
-          <button class="ghost" id="analytics">Analytics</button>
-        </div>
-      </article>
+        <div class="level-progress" aria-label="Level progress"><div class="level-bar" id="levelBar" style="width:0%"></div></div>
+        <button class="weight-pill" id="currentWeightBtn" type="button" title="View weight history">—</button>
+      </div>
+    </article>
 
-      <!-- Calendar -->
-      <!-- powerUp/muscleCalendar.js -->
-      <section class="card calendar" id="calendar"></section>
+    <!-- powerUp/muscleCalendar.js — tap a day for its summary, tap it again to open it -->
+    <section class="pu-card" id="calendar" data-section="calendar"></section>
+
+    <!-- The selected day, rendered by powerUp/sessionSummary.js (read-only, folded) -->
+    <section class="pu-card" id="dayCard">
+      <div class="day-head">
+        <div class="day-title"><span id="dayTitle">—</span><span class="day-hint">Tap the date again to open it</span></div>
+        <button class="open-btn" id="openDay" type="button">Open ›</button>
+      </div>
+      <div class="day-empty" id="dayEmpty" hidden>No workout logged — tap the date again to start one.</div>
+      <div id="daySummary"></div>
+    </section>
+
+    <!-- Analytics: hidden until switched on in the ☰ menu; analytics.js loads on first show -->
+    <section class="an an-section" id="analyticsSection" data-section="analytics" hidden>
+      <div class="an-title"><h2>Analytics</h2></div>
+      <nav class="nav-tabs" role="tablist">
+    <button class="tab active" type="button" data-view="overview" role="tab">Overview</button>
+    <button class="tab" type="button" data-view="exercises" role="tab">Exercises</button>
+    <button class="tab" type="button" data-view="consistency" role="tab">Consistency</button>
+    <button class="tab" type="button" data-view="records" role="tab">Records</button>
+  </nav>
+
+  <!-- ================= OVERVIEW ================= -->
+  <div class="tab-panel" id="panel-overview">
+    <button class="coach-btn" id="coachBtn" type="button" hidden>📋 Copy coach pack for ChatGPT</button>
+
+    <section class="card" id="weekCard">
+      <h3>This week<span class="sp" id="weekSub"></span></h3>
+      <div class="tiles three" id="weekTiles"></div>
+    </section>
+
+    <section class="card">
+      <h3>Hard sets per muscle<span class="sp">last 4 weeks</span></h3>
+      <div id="muscleSets"></div>
+      <div class="note">Bright bar = this week, faded = the three weeks before. Shaded band = 10–20 sets a week. A set counts when it's at least half that day's top weight.</div>
+    </section>
+
+    <section class="card">
+      <h3>Due<span class="sp">days since trained</span></h3>
+      <div class="due-grid" id="dueList"></div>
+    </section>
+
+    <section class="card">
+      <h3>Recent PRs<span class="sp" id="prFeedCount"></span></h3>
+      <div id="prFeed"></div>
+    </section>
+
+    <section class="card">
+      <h3>Stalled<span class="sp">no e1RM gain in 5 sessions</span></h3>
+      <div id="stallList"></div>
+    </section>
+
+    <section class="card">
+      <h3>Your data</h3>
+      <div class="top-actions">
+        <button class="btn-line" id="downloadDataBtn" type="button">Download backup</button>
+        <button class="btn-line ghost" id="importDataBtn" type="button">Import backup</button>
+        <input type="file" id="importFileInput" accept=".json" hidden>
+      </div>
+      <div class="note">Download writes every logged workout to a JSON file. Import only adds dates you don't already have — it never overwrites or deletes an existing day.</div>
     </section>
   </div>
 
+  <!-- ================= EXERCISES ================= -->
+  <div class="tab-panel" id="panel-exercises" hidden>
+    <section class="card tight">
+      <div class="search-row">
+        <input type="search" id="exSearch" class="search" placeholder="Search exercises" autocomplete="off" aria-label="Search exercises">
+      </div>
+      <div class="chip-scroll" id="exPartChips"></div>
+      <div class="chip-scroll sort-row" id="exSortChips">
+        <span class="sort-lbl">Sort</span>
+        <button class="chip sm" type="button" data-sort="recent">Recent</button>
+        <button class="chip sm" type="button" data-sort="sessions">Most done</button>
+        <button class="chip sm" type="button" data-sort="trend">Trend</button>
+        <button class="chip sm" type="button" data-sort="name">A–Z</button>
+      </div>
+    </section>
+    <div id="exList"></div>
+  </div>
+
+  <!-- ================= CONSISTENCY ================= -->
+  <div class="tab-panel" id="panel-consistency" hidden>
+    <section class="card">
+      <h3>Training<span class="sp" id="rangeMax"></span></h3>
+      <div class="chips" id="rangeChips">
+        <button class="chip sm active" type="button" data-range="7">7 days</button>
+        <button class="chip sm" type="button" data-range="14">14 days</button>
+        <button class="chip sm" type="button" data-range="21">21 days</button>
+        <button class="chip sm" type="button" data-range="month">This month</button>
+      </div>
+
+      <div class="daybars" id="dayBars"></div>
+      <div class="part-legend" id="partLegend"></div>
+
+      <div class="day-panel">
+        <div class="day-head">
+          <div class="day-sum" id="daySum">Tap a bar to see that day.</div>
+          <div class="sg-actions" id="dayActions">
+            <button class="mini-btn" type="button" data-day-act="expandAll">Expand all</button>
+            <button class="mini-btn" type="button" data-day-act="collapseAll">Collapse all</button>
+          </div>
+        </div>
+        <div id="dayGroups"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Streaks</h3>
+      <div class="tiles" id="streakTiles"></div>
+    </section>
+
+    <section class="card">
+      <h3>Muscle groups<span class="sp">days since last trained</span></h3>
+      <div id="recencyList"></div>
+    </section>
+  </div>
+
+  <!-- ================= RECORDS ================= -->
+  <div class="tab-panel" id="panel-records" hidden>
+    <section class="card tight">
+      <div class="chip-scroll" id="recKindChips">
+        <button class="chip sm" type="button" data-kind="all">All PRs</button>
+        <button class="chip sm" type="button" data-kind="e1rm">Strength</button>
+        <button class="chip sm" type="button" data-kind="weight">Weight</button>
+        <button class="chip sm" type="button" data-kind="reps">Rep</button>
+        <button class="chip sm" type="button" data-kind="volume">Volume</button>
+      </div>
+      <div class="chip-scroll sort-row" id="recSortChips">
+        <span class="sort-lbl">Sort</span>
+        <button class="chip sm" type="button" data-sort="recent">Newest PR</button>
+        <button class="chip sm" type="button" data-sort="stale">Longest since</button>
+        <button class="chip sm" type="button" data-sort="strong">Strongest</button>
+        <button class="chip sm" type="button" data-sort="name">A–Z</button>
+      </div>
+      <div class="note" id="recordsCount"></div>
+    </section>
+    <div class="rec-list" id="recordsList"></div>
+  </div>
+
+      <!-- exercise detail (full-screen) -->
+<div class="detail" id="detail" hidden>
+  <header class="detail-head">
+    <button class="home" id="detailBack" type="button">⟵</button>
+    <div class="dh-title">
+      <div class="dh-name" id="detailName"></div>
+      <div class="dh-sub" id="detailSub"></div>
+    </div>
+  </header>
+  <div class="detail-body wrap" id="detailBody">
+    <div class="ph-note" id="detailNote" hidden>Per hand: weights, PRs and e1RM are what's in one hand; volume counts both hands.</div>
+    <div class="tiles" id="detailTiles"></div>
+
+    <section class="card">
+      <h3>Strength over time<span class="sp" id="lineSub"></span></h3>
+      <div class="chips" id="chartRangeChips">
+        <button class="chip sm" type="button" data-crange="3m">3M</button>
+        <button class="chip sm" type="button" data-crange="6m">6M</button>
+        <button class="chip sm" type="button" data-crange="1y">1Y</button>
+        <button class="chip sm" type="button" data-crange="all">All</button>
+      </div>
+      <div class="chart-box"><canvas id="lineChart"></canvas></div>
+      <div class="chart-key">
+        <span><i class="k-line" id="lineKeyE1"></i>Est. 1RM</span>
+        <span><i class="k-dash"></i>Top-set weight</span>
+        <span><i class="k-dot"></i>Strength PR</span>
+      </div>
+      <div class="note" id="lineNote"></div>
+    </section>
+
+    <section class="card">
+      <h3>Rep maxes</h3>
+      <div id="repTable"></div>
+    </section>
+
+    <section class="card">
+      <h3>Reps at each weight</h3>
+      <div class="chart-box tall"><canvas id="scatterChart"></canvas></div>
+      <div class="chart-key">
+        <span><i class="k-step"></i>Best reps at a weight</span>
+        <span><i class="k-dot dimdot"></i>Every set</span>
+        <span><i class="k-dot white"></i>Last session</span>
+      </div>
+      <div class="note">The gold steps are your rep bests: nothing you've logged is heavier <i>and</i> more reps than a corner. Land outside the line — more reps at a weight, or more weight for the reps — and it's a Rep PR.</div>
+    </section>
+
+    <section class="card">
+      <h3>Sessions<span class="sp" id="histCount"></span></h3>
+      <div id="histList"></div>
+    </section>
+  </div>
+</div>
+    </section>
+  </div>
+
+  <!-- ☰ menu -->
+  <div class="menu-pop" id="menuPop">
+    <div class="menu-card" role="menu" aria-label="Show sections">
+      <div class="menu-label">Show</div>
+      <button class="menu-row" type="button" role="menuitemcheckbox" data-toggle="power"><span class="ml">Power level</span><span class="switch"></span></button>
+      <button class="menu-row" type="button" role="menuitemcheckbox" data-toggle="calendar"><span class="ml">Calendar</span><span class="switch"></span></button>
+      <button class="menu-row" type="button" role="menuitemcheckbox" data-toggle="analytics"><span class="ml">Analytics</span><span class="switch"></span></button>
+    </div>
+  </div>
+
+  <!-- Weight History Modal -->
+  <div class="modal" id="weightModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Weight history">
+      <div class="modal-head">
+        <div class="modal-title">Weight History</div>
+        <button class="modal-close" type="button" data-close="1">✕</button>
+      </div>
+      <canvas id="weightChart" width="760" height="220"></canvas>
+      <div class="modal-actions">
+        <button class="cta-small" id="addWeightBtn" type="button">Add weigh-in</button>
+      </div>
+      <div class="weight-list" id="weightList"></div>
+    </div>
+  </div>
+
 <script src="muscleCalendar.js"></script>
+<script src="trainingStats.js"></script>
+<script src="workoutXP.js"></script>
+<script src="sessionSummary.js"></script>
+<script src="coachExport.js"></script>
 <script>
-/* ========= Load data ========= */
-const today = new Date();
-// toISOString() is UTC — after 8pm Eastern it rolls the date forward a day,
-// which used to make the page treat tomorrow as today
+const $id = id => document.getElementById(id);
+// toISOString() is UTC — after 8pm Eastern it rolls the date forward a day
 const isoLocal = d =>
   `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-const todayISO = isoLocal(today);
-const fmt = (d)=>new Date(d+'T00:00:00');
+const todayISO = isoLocal(new Date());
+const SS = window.SessionSummary;
 
-// Selected workout date (defaults to today)
-let selectedWorkoutDate = todayISO;
+/* ========= Sections shown (☰ menu) ========= */
+const VIEW_KEY = 'powerUp:homeView';
+const VIEW_DEFAULT = { power: true, calendar: true, analytics: false };
+function readView(){
+  try{ return Object.assign({}, VIEW_DEFAULT, JSON.parse(localStorage.getItem(VIEW_KEY)) || {}); }
+  catch{ return Object.assign({}, VIEW_DEFAULT); }
+}
+function writeView(v){ try{ localStorage.setItem(VIEW_KEY, JSON.stringify(v)); }catch{} }
+let view = readView();
+if(location.hash === '#analytics') view.analytics = true;   // old analytics.html links land here
 
-function readLocalDays(){
+function applyView(){
+  document.querySelectorAll('[data-section]').forEach(el=>{ el.hidden = !view[el.dataset.section]; });
+  document.querySelectorAll('[data-toggle]').forEach(b=> b.setAttribute('aria-checked', String(!!view[b.dataset.toggle])));
+  if(view.analytics) loadAnalytics();
+}
+
+const menuPop = $id('menuPop');
+$id('menuBtn').addEventListener('click', ()=> menuPop.classList.add('open'));
+menuPop.addEventListener('click', e=>{
+  const row = e.target.closest('[data-toggle]');
+  if(!row){ if(!e.target.closest('.menu-card')) menuPop.classList.remove('open'); return; }
+  const key = row.dataset.toggle;
+  view[key] = !view[key];
+  writeView(view);
+  applyView();
+  if(key === 'analytics' && view.analytics){
+    menuPop.classList.remove('open');
+    $id('analyticsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+});
+document.addEventListener('keydown', e=>{ if(e.key === 'Escape') menuPop.classList.remove('open'); });
+
+/* ========= Analytics: load Chart.js + analytics.js the first time it's shown ========= */
+let analyticsLoading = false;
+function loadScript(src){
+  return new Promise((resolve, reject)=>{
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.body.appendChild(s);
+  });
+}
+function loadAnalytics(){
+  if(analyticsLoading) return;
+  analyticsLoading = true;
+  const sec = $id('analyticsSection');
+  const msg = document.createElement('div');
+  msg.className = 'an-loading'; msg.textContent = 'Loading analytics…';
+  sec.appendChild(msg);
+  loadScript('https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js')
+    .catch(()=>{})                       // charts fall back to text; the rest still works
+    .then(()=> loadScript('analytics.js'))
+    .then(()=> msg.remove())
+    .catch(()=>{ msg.textContent = 'Could not load analytics.'; });
+}
+
+/* ========= Selected day: calendar + read-only summary ========= */
+let selectedDate = todayISO;
+const collapse = SS.memoryCollapse();
+const summary = SS.create($id('daySummary'), { readOnly: true, collapse });
+
+function hasWorkout(day){ return !!(day && (day.exercises || []).length); }
+
+function renderDay(){
+  const day = SS.loadDay(selectedDate);
+  $id('dayTitle').textContent = SS.dateLabel(selectedDate);   // already says "Today" for today
+  const has = hasWorkout(day);
+  $id('dayEmpty').hidden = has;
+  $id('daySummary').style.display = has ? '' : 'none';   // .session-summary sets display, so `hidden` loses
+  $id('openDay').textContent = has ? 'Open ›' : 'Start ›';
+  if(has) summary.render(day, selectedDate);
+}
+function openSelected(){ location.href = `workout.html?date=${selectedDate}`; }
+$id('openDay').addEventListener('click', openSelected);
+
+const calendar = MuscleCalendar.create($id('calendar'), {
+  selected: ()=> selectedDate,
+  onSelect: iso=>{
+    if(iso === selectedDate){ openSelected(); return; }   // second tap opens the day
+    selectedDate = iso;
+    collapse.reset();                                       // every day opens folded
+    renderDay();
+    calendar.render();
+  }
+});
+
+/* ========= Power level ========= */
+function readDays(){
   const out = [];
-  for(let i=0; i<localStorage.length; i++){
+  for(let i = 0; i < localStorage.length; i++){
     const k = localStorage.key(i);
     if(!/^powerUp:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
     try{
       const day = JSON.parse(localStorage.getItem(k));
-      if(!day?.date) continue;
-      const converted = {
-        date: day.date,
-        bodyWeight: day.bodyWeight ?? undefined,
-        exercises: (day.exercises||[]).map(ex=>({
-          name: ex.name || ex.exercise || 'Exercise',
-          bodyPart: ex.bodyPart || ex.muscle || ex.group || 'Other',
-          sets: (ex.sets||[]).map(s=>({
-            reps: Number(s.reps)||0,
-            weight: Number(s.weight)||0,
-            completed: !!s.done
-          }))
-        }))
-      };
-      out.push(converted);
+      if(day && day.date) out.push(day);
     }catch(e){}
   }
-  return out.sort((a,b)=> fmt(a.date)-fmt(b.date));
+  return out;
 }
-
-/* Fallback demo data */
-const demoWorkouts = [
-  { date:'2025-08-12', bodyWeight:184.2, exercises:[
-    {name:'OHP', bodyPart:'Shoulders', sets:[{reps:6,weight:95,completed:true},{reps:6,weight:95,completed:true},{reps:5,weight:100,completed:true}]},
-  ]},
-];
-
-/* Merge: prefer local; else demo */
-const workouts = (readLocalDays().length ? readLocalDays() : demoWorkouts);
-
-const byDateAsc = (a,b)=> fmt(a.date) - fmt(b.date);
-const shortDate = (d)=> {
-  const date = new Date(d + 'T12:00:00');
-  return `${date.getMonth() + 1}/${date.getDate()}`;
-};
-
-const totalVolume = (wo)=> wo.exercises.reduce((sum, ex)=> sum + ex.sets.reduce((s, st)=> s + (st.weight||0)*(st.reps||0), 0), 0);
-const totalSets = (wo)=> wo.exercises.reduce((s,ex)=> s + ex.sets.length, 0);
-const completedSets = (wo)=> wo.exercises.reduce((s,ex)=> s + ex.sets.filter(st=>st.completed).length, 0);
-
-/* Power Level Calculation */
-function calculatePowerLevel() {
-  const totalVol = workouts.reduce((sum, w) => sum + totalVolume(w), 0);
-  const maxWeight = Math.max(...workouts.flatMap(w => w.exercises.flatMap(e => e.sets.map(s => s.weight || 0))));
-  const totalWorkouts = workouts.filter(w => w.exercises.length > 0).length;
-  
-  const powerScore = (totalVol * 0.6) + (maxWeight * 100) + (totalWorkouts * 200);
-  
-  const levels = [
-    { threshold: 0, level: 1, title: "Novice", next: 5000 },
-    { threshold: 5000, level: 2, title: "Apprentice", next: 12000 },
-    { threshold: 12000, level: 3, title: "Warrior", next: 25000 },
-    { threshold: 25000, level: 4, title: "Knight", next: 45000 },
-    { threshold: 45000, level: 5, title: "Champion", next: 75000 },
-    { threshold: 75000, level: 6, title: "Master", next: 120000 },
-    { threshold: 120000, level: 7, title: "Grandmaster", next: 180000 },
-    { threshold: 180000, level: 8, title: "Legend", next: 250000 },
-    { threshold: 250000, level: 9, title: "Mythic", next: 350000 },
-    { threshold: 350000, level: 10, title: "Godlike", next: 500000 }
-  ];
-  
-  let currentLevel = levels[0];
-  for (let i = 0; i < levels.length; i++) {
-    if (powerScore >= levels[i].threshold) {
-      currentLevel = levels[i];
-    } else {
-      break;
-    }
-  }
-  
-  const progress = currentLevel.next ? 
-    Math.min(((powerScore - currentLevel.threshold) / (currentLevel.next - currentLevel.threshold)) * 100, 100) : 100;
-  
-  return {
-    level: currentLevel.level,
-    title: currentLevel.title,
-    progress: progress,
-    score: Math.round(powerScore)
-  };
-}
-
-/* Power Level card */
-function renderPowerLevel(){
-  const power = calculatePowerLevel();
-  document.getElementById('powerLevel').textContent = `Lv ${power.level}`;
-  document.getElementById('powerTrend').textContent = power.title;
-  document.getElementById('levelBar').style.width = `${power.progress}%`;
-  
-  const sorted = [...workouts].sort(byDateAsc);
-  const lastWeight = sorted
-    .filter(w=>typeof w.bodyWeight==='number' && !isNaN(w.bodyWeight))
-    .at(-1);
-  
-  const weightEl = document.getElementById('currentWeightBtn');
-  if(lastWeight){
-    weightEl.textContent = `${lastWeight.bodyWeight.toFixed(1)} lb`;
-  } else {
-    weightEl.textContent = '—';
-  }
-}
-
-/* Workout panel - shows selected date */
-function renderWorkoutPanel(){
-  const workout = workouts.find(w => w.date === selectedWorkoutDate) || { date: selectedWorkoutDate, exercises: [], bodyWeight: undefined };
-  
-  const isToday = selectedWorkoutDate === todayISO;
-  const inProgress = isToday && isTodayInProgress(workout);
-  
-  // Update navigation buttons
-  const allDates = [...new Set([todayISO, ...workouts.map(w => w.date)])].sort().reverse();
-  const currentIndex = allDates.indexOf(selectedWorkoutDate);
-  
-  document.getElementById('prevWorkout').disabled = currentIndex >= allDates.length - 1;
-  document.getElementById('nextWorkout').disabled = currentIndex <= 0;
-  
-  // Update button text
-  const startBtn = document.getElementById('startToday');
-  if (isToday) {
-    startBtn.textContent = inProgress ? 'Continue Workout' : 'Start Workout';
-  } else if (workout.exercises.length > 0) {
-    startBtn.textContent = 'View Workout';
-  } else {
-    startBtn.textContent = 'Add Workout';
-  }
-
-  const title = document.getElementById('workoutPanelTitle');
-  title.textContent = isToday ? 'Today\'s Workout' : shortDate(selectedWorkoutDate);
-  document.getElementById('lastVolume').textContent = totalVolume(workout).toLocaleString()+' lb';
-  document.getElementById('lastMoves').textContent = workout.exercises.length;
-  // one line of muscle groups, heaviest first — the exercise names are a tap
-  // away on the workout page and were costing six rows here
-  const vols = new Map();
-  workout.exercises.forEach(ex=>{
-    const group = muscleName(ex.bodyPart);
-    const vol = (ex.sets || []).reduce((sum,st)=>{
-      const reps = Number(st.reps) || 0, weight = Number(st.weight) || 0;
-      return sum + (reps > 0 && weight > 0 ? reps * weight : 0);
-    }, 0);
-    vols.set(group, (vols.get(group) || 0) + vol);
+function calculatePowerLevel(){
+  const days = readDays();
+  let totalVol = 0, maxWeight = 0, totalWorkouts = 0;
+  days.forEach(d=>{
+    const ex = d.exercises || [];
+    if(ex.length) totalWorkouts++;
+    ex.forEach(e=> (e.sets || []).forEach(s=>{
+      const w = Number(s.weight) || 0, r = Number(s.reps) || 0;
+      totalVol += w * r;
+      if(w > maxWeight) maxWeight = w;
+    }));
   });
-
-  document.getElementById('exList').innerHTML = [...vols.entries()]
-    .sort((a,b)=> b[1] - a[1])
-    .map(([group])=> `<span class="mg-chip"><i style="background:${muscleDot(group)}"></i>${group}</span>`)
-    .join('');
+  const powerScore = (totalVol * 0.6) + (maxWeight * 100) + (totalWorkouts * 200);
+  const levels = [
+    { threshold: 0, level: 1, title: 'Novice', next: 5000 },
+    { threshold: 5000, level: 2, title: 'Apprentice', next: 12000 },
+    { threshold: 12000, level: 3, title: 'Warrior', next: 25000 },
+    { threshold: 25000, level: 4, title: 'Knight', next: 45000 },
+    { threshold: 45000, level: 5, title: 'Champion', next: 75000 },
+    { threshold: 75000, level: 6, title: 'Master', next: 120000 },
+    { threshold: 120000, level: 7, title: 'Grandmaster', next: 180000 },
+    { threshold: 180000, level: 8, title: 'Legend', next: 250000 },
+    { threshold: 250000, level: 9, title: 'Mythic', next: 350000 },
+    { threshold: 350000, level: 10, title: 'Godlike', next: 500000 }
+  ];
+  let cur = levels[0];
+  for(const l of levels){ if(powerScore >= l.threshold) cur = l; else break; }
+  const progress = cur.next ? Math.min((powerScore - cur.threshold) / (cur.next - cur.threshold) * 100, 100) : 100;
+  return { level: cur.level, title: cur.title, progress };
+}
+function renderPowerLevel(){
+  const p = calculatePowerLevel();
+  $id('powerLevel').textContent = `Lv ${p.level}`;
+  $id('powerTrend').textContent = p.title;
+  $id('levelBar').style.width = `${p.progress}%`;
 }
 
-const MUSCLE_COLORS = {
-  Chest:'var(--mg-chest)', Back:'var(--mg-back)', Legs:'var(--mg-legs)',
-  Shoulders:'var(--mg-shoulders)', Triceps:'var(--mg-triceps)',
-  Biceps:'var(--mg-biceps)', Forearms:'var(--mg-forearms)'
-};
-function muscleName(raw){
-  const s = String(raw || '').toLowerCase();
-  if(s.includes('tricep')) return 'Triceps';
-  if(s.includes('bicep')) return 'Biceps';
-  if(s.includes('forearm') || s.includes('grip')) return 'Forearms';
-  if(s.includes('chest') || s.includes('pec')) return 'Chest';
-  if(s.includes('back') || s.includes('lat') || s.includes('row')) return 'Back';
-  if(s.includes('leg') || s.includes('quad') || s.includes('ham') || s.includes('glute') || s.includes('calf')) return 'Legs';
-  if(s.includes('shoulder') || s.includes('delt')) return 'Shoulders';
-  return String(raw || 'Other');
-}
-const muscleDot = n => MUSCLE_COLORS[n] || 'var(--muted)';
-
-/* Muscle-group calendar — shared with the workout page (muscleCalendar.js) */
-const calendar = MuscleCalendar.create(document.getElementById('calendar'), {
-  selected: ()=> selectedWorkoutDate,
-  onSelect: (iso)=>{
-    selectedWorkoutDate = iso;
-    renderWorkoutPanel();
-    renderCalendar();
-  }
-});
-function renderCalendar(){ calendar.render(); }
-
-
-/* In-progress detection */
-function isTodayInProgress(todayW){
-  if(!todayW || !todayW.exercises){
-    return localStorage.getItem('workoutInProgress') === todayISO;
-  }
-  const hasSets = totalSets(todayW) > 0;
-  const allDone = completedSets(todayW) === totalSets(todayW);
-  return hasSets && !allDone;
-}
-
-/* Event Listeners */
-document.getElementById('startToday').addEventListener('click', ()=>{
-  if(selectedWorkoutDate === todayISO) {
-    localStorage.setItem('workoutInProgress', todayISO);
-    window.location.href = 'workout.html?start=today';
-  } else {
-    // Navigate to the selected date
-    window.location.href = `workout.html?date=${selectedWorkoutDate}`;
-  }
-});
-
-document.getElementById('analytics').addEventListener('click', ()=>{
-  window.location.href = 'analytics.html';
-});
-
-
-
-// Workout navigation
-document.getElementById('prevWorkout').addEventListener('click', () => {
-  const allDates = [...new Set([todayISO, ...workouts.map(w => w.date)])].sort().reverse();
-  const currentIndex = allDates.indexOf(selectedWorkoutDate);
-  
-  if (currentIndex < allDates.length - 1) {
-    selectedWorkoutDate = allDates[currentIndex + 1];
-    renderWorkoutPanel();
-    renderCalendar();
-  }
-});
-
-document.getElementById('nextWorkout').addEventListener('click', () => {
-  const allDates = [...new Set([todayISO, ...workouts.map(w => w.date)])].sort().reverse();
-  const currentIndex = allDates.indexOf(selectedWorkoutDate);
-  
-  if (currentIndex > 0) {
-    selectedWorkoutDate = allDates[currentIndex - 1];
-    renderWorkoutPanel();
-    renderCalendar();
-  }
-});
-
-/* Init */
-function renderAll(){
-  renderPowerLevel();
-  renderWorkoutPanel();
-  renderCalendar();
-}
-renderAll();
-
-
-/* ---------------- Weight History (stored historically) ---------------- */
+/* ========= Weight history ========= */
 const WEIGHT_KEY = 'powerUp:weights';
-
 function getWeightHistory(){
-  try{
-    const raw = localStorage.getItem(WEIGHT_KEY);
-    const arr = raw ? JSON.parse(raw) : [];
-    return Array.isArray(arr) ? arr : [];
-  }catch(e){
-    return [];
-  }
+  try{ const arr = JSON.parse(localStorage.getItem(WEIGHT_KEY)); return Array.isArray(arr) ? arr : []; }
+  catch(e){ return []; }
 }
-
-function setWeightHistory(arr){
-  localStorage.setItem(WEIGHT_KEY, JSON.stringify(arr));
-}
-
 function upsertWeightEntry(dateISO, weight){
   const arr = getWeightHistory();
-  const idx = arr.findIndex(x => x && x.date === dateISO);
-  if(idx >= 0){
-    arr[idx].weight = weight;
-  }else{
-    arr.push({ date: dateISO, weight });
-  }
+  const idx = arr.findIndex(x=> x && x.date === dateISO);
+  if(idx >= 0) arr[idx].weight = weight; else arr.push({ date: dateISO, weight });
   arr.sort((a,b)=> String(a.date).localeCompare(String(b.date)));
-  setWeightHistory(arr);
-
-  // Keep backward compatibility: also store in today's workout object if it exists
+  localStorage.setItem(WEIGHT_KEY, JSON.stringify(arr));
+  // keep the day record in step too (older readers look there)
   const k = `powerUp:${dateISO}`;
   const existing = localStorage.getItem(k);
   if(existing){
-    const d = JSON.parse(existing);
-    d.bodyWeight = weight;
-    localStorage.setItem(k, JSON.stringify(d));
+    try{ const d = JSON.parse(existing); d.bodyWeight = weight; localStorage.setItem(k, JSON.stringify(d)); }catch(e){}
   }
-  return arr;
 }
-
 function latestWeight(){
   const arr = getWeightHistory();
-  if(arr.length){
-    const last = arr[arr.length-1];
-    return Number(last.weight) || null;
-  }
-  // fallback: try today's record
-  const k = `powerUp:${todayISO}`;
-  const existing = localStorage.getItem(k);
-  if(existing){
-    try{
-      const d = JSON.parse(existing);
-      if(d && d.bodyWeight) return Number(d.bodyWeight) || null;
-    }catch(e){}
-  }
+  if(arr.length) return Number(arr[arr.length - 1].weight) || null;
+  try{
+    const d = JSON.parse(localStorage.getItem(`powerUp:${todayISO}`));
+    if(d && d.bodyWeight) return Number(d.bodyWeight) || null;
+  }catch(e){}
   return null;
 }
-
+function renderWeightPill(){
+  const w = latestWeight();
+  $id('currentWeightBtn').textContent = w != null ? `${w.toFixed(1)} lb` : '—';
+}
 function openWeightModal(){
-  const m = document.getElementById('weightModal');
-  m.classList.add('open');
-  m.setAttribute('aria-hidden','false');
+  const m = $id('weightModal');
+  m.classList.add('open'); m.setAttribute('aria-hidden', 'false');
   renderWeightModal();
 }
-
 function closeWeightModal(){
-  const m = document.getElementById('weightModal');
-  m.classList.remove('open');
-  m.setAttribute('aria-hidden','true');
+  const m = $id('weightModal');
+  m.classList.remove('open'); m.setAttribute('aria-hidden', 'true');
 }
-
 function renderWeightModal(){
-  const list = document.getElementById('weightList');
+  const list = $id('weightList');
   const hist = getWeightHistory();
   list.innerHTML = '';
-
-  // Newest first
   [...hist].reverse().forEach(item=>{
     const row = document.createElement('div');
     row.className = 'weight-item';
@@ -582,149 +567,73 @@ function renderWeightModal(){
     row.innerHTML = `<span>${d.toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'})}</span><b>${Number(item.weight).toFixed(1)} lb</b>`;
     list.appendChild(row);
   });
-
   drawWeightChart(hist);
 }
-
 function drawWeightChart(hist){
-  const canvas = document.getElementById('weightChart');
+  const canvas = $id('weightChart');
   if(!canvas) return;
   const ctx = canvas.getContext('2d');
-
-  // handle device pixel ratio
   const dpr = window.devicePixelRatio || 1;
-  const cssW = canvas.clientWidth || 760;
-  const cssH = canvas.clientHeight || 220;
-  canvas.width = Math.floor(cssW * dpr);
-  canvas.height = Math.floor(cssH * dpr);
+  const cssW = canvas.clientWidth || 760, cssH = canvas.clientHeight || 220;
+  canvas.width = Math.floor(cssW * dpr); canvas.height = Math.floor(cssH * dpr);
   ctx.scale(dpr, dpr);
-
-  // clear
-  ctx.clearRect(0,0,cssW,cssH);
-
-  const pad = {l:44, r:14, t:14, b:34};
-  const w = cssW - pad.l - pad.r;
-  const h = cssH - pad.t - pad.b;
-
-  const points = (hist||[])
-    .filter(x=>x && x.date && isFinite(Number(x.weight)))
+  ctx.clearRect(0, 0, cssW, cssH);
+  const pad = { l:44, r:14, t:14, b:34 };
+  const w = cssW - pad.l - pad.r, h = cssH - pad.t - pad.b;
+  const points = (hist || [])
+    .filter(x=> x && x.date && isFinite(Number(x.weight)))
     .sort((a,b)=> String(a.date).localeCompare(String(b.date)))
-    .map(x=>({ date:x.date, weight:Number(x.weight) }));
-
-  // background grid
-  ctx.strokeStyle = 'rgba(255,255,255,.08)';
-  ctx.lineWidth = 1;
-  for(let i=0;i<=4;i++){
-    const y = pad.t + (h*i/4);
-    ctx.beginPath();
-    ctx.moveTo(pad.l, y);
-    ctx.lineTo(pad.l+w, y);
-    ctx.stroke();
+    .map(x=> ({ date: x.date, weight: Number(x.weight) }));
+  ctx.strokeStyle = 'rgba(255,255,255,.08)'; ctx.lineWidth = 1;
+  for(let i = 0; i <= 4; i++){
+    const y = pad.t + h * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + w, y); ctx.stroke();
   }
-
+  ctx.fillStyle = 'rgba(255,255,255,.65)'; ctx.font = '12px system-ui';
   if(points.length < 2){
-    ctx.fillStyle = 'rgba(255,255,255,.5)';
-    ctx.font = '12px system-ui';
     ctx.fillText(points.length ? 'Add one more weigh-in to see a chart.' : 'No weigh-ins yet.', pad.l, pad.t + 18);
     return;
   }
-
-  const minW = Math.min(...points.map(p=>p.weight));
-  const maxW = Math.max(...points.map(p=>p.weight));
+  const minW = Math.min(...points.map(p=> p.weight)), maxW = Math.max(...points.map(p=> p.weight));
   const range = Math.max(1, maxW - minW);
-
-  const xFor = (i)=> pad.l + (w * (i/(points.length-1)));
-  const yFor = (val)=> pad.t + h - (h * ((val - minW)/range));
-
-  // line
-  ctx.strokeStyle = '#22c55e';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  points.forEach((p,i)=>{
-    const x = xFor(i);
-    const y = yFor(p.weight);
-    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-  });
+  const xFor = i=> pad.l + w * (i / (points.length - 1));
+  const yFor = v=> pad.t + h - h * ((v - minW) / range);
+  ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 2; ctx.beginPath();
+  points.forEach((p,i)=>{ const x = xFor(i), y = yFor(p.weight); if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
   ctx.stroke();
-
-  // points
   ctx.fillStyle = '#22c55e';
-  points.forEach((p,i)=>{
-    const x = xFor(i);
-    const y = yFor(p.weight);
-    ctx.beginPath();
-    ctx.arc(x,y,3,0,Math.PI*2);
-    ctx.fill();
-  });
-
-  // y-axis labels (min/max)
+  points.forEach((p,i)=>{ ctx.beginPath(); ctx.arc(xFor(i), yFor(p.weight), 3, 0, Math.PI * 2); ctx.fill(); });
   ctx.fillStyle = 'rgba(255,255,255,.65)';
-  ctx.font = '12px system-ui';
-  ctx.fillText(`${minW.toFixed(1)}`, 8, yFor(minW)+4);
-  ctx.fillText(`${maxW.toFixed(1)}`, 8, yFor(maxW)+4);
-
-  // x-axis labels (first/last)
-  const firstD = new Date(points[0].date+'T00:00:00');
-  const lastD = new Date(points[points.length-1].date+'T00:00:00');
-  ctx.fillText(firstD.toLocaleDateString(undefined,{month:'short', day:'numeric'}), pad.l, pad.t+h+24);
-  const lastLabel = lastD.toLocaleDateString(undefined,{month:'short', day:'numeric'});
-  const lw = ctx.measureText(lastLabel).width;
-  ctx.fillText(lastLabel, pad.l+w-lw, pad.t+h+24);
+  ctx.fillText(minW.toFixed(1), 8, yFor(minW) + 4);
+  ctx.fillText(maxW.toFixed(1), 8, yFor(maxW) + 4);
+  const lbl = iso=> new Date(iso + 'T00:00:00').toLocaleDateString(undefined, { month:'short', day:'numeric' });
+  ctx.fillText(lbl(points[0].date), pad.l, pad.t + h + 24);
+  const last = lbl(points[points.length - 1].date);
+  ctx.fillText(last, pad.l + w - ctx.measureText(last).width, pad.t + h + 24);
 }
+$id('currentWeightBtn').addEventListener('click', openWeightModal);
+$id('weightModal').addEventListener('click', e=>{
+  if(e.target && e.target.getAttribute && e.target.getAttribute('data-close')) closeWeightModal();
+});
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape' && $id('weightModal').classList.contains('open')) closeWeightModal();
+});
+$id('addWeightBtn').addEventListener('click', ()=>{
+  const raw = prompt("Enter today's weight (lb):");
+  if(!raw) return;
+  const val = Number(raw);
+  if(!isFinite(val) || val <= 0) return alert('Please enter a valid weight.');
+  upsertWeightEntry(todayISO, val);
+  renderWeightPill();
+  renderWeightModal();
+});
 
-/* Wire up weight button + modal */
-(function(){
-  const btn = document.getElementById('currentWeightBtn');
-  if(btn){
-    const w = latestWeight();
-    btn.textContent = (w!=null) ? `${w.toFixed(1)} lb` : '—';
-    btn.addEventListener('click', openWeightModal);
-  }
-
-  const modal = document.getElementById('weightModal');
-  if(modal){
-    modal.addEventListener('click', (e)=>{
-      const t = e.target;
-      if(t && t.getAttribute && t.getAttribute('data-close')) closeWeightModal();
-    });
-    document.addEventListener('keydown', (e)=>{
-      if(e.key === 'Escape' && modal.classList.contains('open')) closeWeightModal();
-    });
-  }
-
-  const addBtn = document.getElementById('addWeightBtn');
-  if(addBtn){
-    addBtn.addEventListener('click', ()=>{
-      const raw = prompt("Enter today's weight (lb):");
-      if(!raw) return;
-      const val = Number(raw);
-      if(!isFinite(val) || val<=0) return alert('Please enter a valid weight.');
-      upsertWeightEntry(todayISO, val);
-      // update pill text
-      const btn2 = document.getElementById('currentWeightBtn');
-      if(btn2) btn2.textContent = `${val.toFixed(1)} lb`;
-      renderWeightModal();
-    });
-  }
-})();
-
+/* ========= Init ========= */
+renderPowerLevel();
+renderWeightPill();
+renderDay();
+calendar.render();
+applyView();
 </script>
-
-<!-- Weight History Modal -->
-<div class="modal" id="weightModal" aria-hidden="true">
-  <div class="modal-backdrop" data-close="1"></div>
-  <div class="modal-card" role="dialog" aria-modal="true" aria-label="Weight history">
-    <div class="modal-head">
-      <div class="modal-title">Weight History</div>
-      <button class="modal-close" type="button" data-close="1">✕</button>
-    </div>
-    <canvas id="weightChart" width="760" height="220"></canvas>
-    <div class="modal-actions">
-      <button class="cta small" id="addWeightBtn" type="button">Add weigh-in</button>
-    </div>
-    <div class="weight-list" id="weightList"></div>
-  </div>
-</div>
-
 </body>
 </html>

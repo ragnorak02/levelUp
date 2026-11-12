@@ -7,7 +7,8 @@ Gamified personal productivity app tracking **Exercise**, **Study**, **Finances*
 ```
 main.html / main.js          ← Dashboard hub (character level, module cards, charts)
 ├── powerUp/                  ← Exercise: workout logging & analytics
-│   ├── index.html            ← Module entry point
+│   ├── index.html            ← Module home: power level, calendar (tap a day = read-only summary, tap again = open it),
+│   │                            ☰ menu to show/hide sections incl. Analytics (loaded in place on first show)
 │   ├── workout.html          ← Log workout (query: ?date=YYYY-MM-DD)
 │   ├── sessionSummary.js/.css← Day summary (volume card, totals, In Progress/Completed,
 │   │                            history + copy-JSON popups) — shared with the dashboard
@@ -16,7 +17,8 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 │   ├── coachExport.js        ← 📋 sheet: Coach pack text / raw JSON v2 for ChatGPT + About-me profile
 │   ├── muscleCalendar.js/.css← Muscle-group colour-coded month calendar — shared by
 │   │                            index.html and workout.html's calendar popup
-│   └── analytics.html/.js/.css ← Overview, Exercises (detail: e1RM chart, rep bests), Consistency, Records
+│   └── analytics.js/.css     ← Overview, Exercises (detail: e1RM chart, rep bests), Consistency, Records — shown
+│                                inside index.html; analytics.css rules are scoped under .an. analytics.html only redirects
 ├── study/                    ← Flashcards with spaced repetition
 │   ├── studyHome.html        ← Module entry point
 │   ├── createCard.html       ← Card creation
@@ -24,7 +26,8 @@ main.html / main.js          ← Dashboard hub (character level, module cards, c
 │   ├── learn.html            ← Study session (query: ?category=&mode=&count=)
 │   └── js/                   ← Class-based modules (data.js, home.js, learn.js, etc.)
 ├── finances/                 ← Receipt/expense tracking & budgeting
-│   ├── index.html            ← Module entry point
+│   ├── index.html            ← Module home: power level, calendar (tap a day = read-only summary, tap again = open it),
+│   │                            ☰ menu to show/hide sections incl. Analytics (loaded in place on first show)
 │   ├── receipts.html         ← Receipt list
 │   ├── budget.html, food.html, search.html
 │   ├── dataLoader.js         ← Seeds localStorage from receiptsData on first visit
@@ -113,6 +116,7 @@ Namespaced with colon prefix:
 - `levelUp:levelHistory` — JSON array `[{ level, date }]`, one entry per transform (from Oct 2026 on)
 - `powerUp:perHand` — JSON `{ "bodyPart|exercise name lowercased": 1 }`, exercises logged per hand (volume ×2)
 - `powerUp:coachProfile` — JSON About-me for the coach pack `{ goal, bodyweightLb, bodyweightDate, experience, injuries, equipment, schedule, notes, ask }`
+- `powerUp:homeView` — JSON `{ power, calendar, analytics }`, sections shown on the Power Up home (☰ menu)
 - `powerUp:coachExportPrefs` — JSON `{ mode, weeks }` for the 📋 sheet
 - `bowling:week:YYYY-Www` — JSON bowling week `{ weekId, games: [...] }` (current season)
 - `bowling:archive:<ISO timestamp>` — JSON `{ archivedAt, weeks: [...] }`, one per season ended with New Season; still counts toward level XP

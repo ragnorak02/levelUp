@@ -41,10 +41,10 @@
   }
   .icon-btn:active{background:#16202b}
 
-  .date-nav{display:flex; align-items:center; gap:4px; flex:1 1 auto; min-width:0}
+  .date-nav{display:flex; align-items:center; gap:6px; flex:1 1 auto; min-width:0}
   .date-nav button{
     all:unset; cursor:pointer; flex:0 0 auto;
-    width:32px; height:34px; border:1px solid var(--ring); border-radius:9px;
+    width:38px; height:38px; border:1px solid var(--ring); border-radius:9px;
     display:inline-flex; align-items:center; justify-content:center;
   }
   .date-nav button:active{background:#16202b}
@@ -179,12 +179,13 @@
   <div class="bar">
     <a class="icon-btn" href="../main.html" aria-label="LevelUp home" title="LevelUp home">🏠</a>
     <a class="icon-btn" href="index.html" aria-label="Exercise home" title="Exercise home">💪</a>
+    <button class="icon-btn" id="openCalendar" aria-label="Calendar" title="Calendar">📅</button>
+    <!-- both day arrows sit right of the date, away from the 🏠 💪 📅 buttons -->
     <div class="date-nav">
-      <button id="prevDay" aria-label="Previous day">←</button>
       <div class="date-str" id="dateStr">—</div>
+      <button id="prevDay" aria-label="Previous day">←</button>
       <button id="nextDay" aria-label="Next day">→</button>
     </div>
-    <button class="icon-btn" id="openCalendar" aria-label="Calendar" title="Calendar">📅</button>
   </div>
   <div class="actions">
     <button class="btn-purple btn-workout-template" id="addWorkout"><span class="btn-stack"><span>Workout</span><span class="btn-sub">Template</span></span></button>
