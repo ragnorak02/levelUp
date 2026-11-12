@@ -220,7 +220,7 @@
     const firstEver = prior.length === 0;
     if(firstEver || !cs.length) return { firstEver, prior: p, today, list };
 
-    if(today.e1 > p.e1 + 0.01){
+    if(Math.round(today.e1) > Math.round(p.e1)){   // a gain too small to show is not a PR
       list.push({ kind: 'e1rm', tier: 1, label: 'Strength PR', value: Math.round(today.e1), prev: Math.round(p.e1) });
     }
     if(today.topW > p.topW){
