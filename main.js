@@ -138,9 +138,10 @@ function dayTotals(day){
 
   (day.exercises || []).forEach(ex => {
     if(ex.sets && ex.sets.length) moves++;
+    const mult = window.TrainingStats ? TrainingStats.volMult(ex) : 1;   // per-hand = both hands
     (ex.sets || []).forEach(s => {
       if((s.weight > 0) || (s.reps > 0)) sets++;
-      if(s.weight > 0 && s.reps > 0) volume += (s.weight * s.reps);
+      if(s.weight > 0 && s.reps > 0) volume += (s.weight * s.reps * mult);
     });
   });
 

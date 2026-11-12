@@ -88,7 +88,9 @@
         const cs = countedSets(ex);
         if(!cs.length) return;
 
-        const vol  = cs.reduce((s,x)=> s + num(x.weight) * num(x.reps), 0);
+        // per-hand exercises (dumbbells, single-arm cables) count both hands
+        const mult = window.TrainingStats ? TrainingStats.volMult(ex) : 1;
+        const vol  = cs.reduce((s,x)=> s + num(x.weight) * num(x.reps) * mult, 0);
         const best = Math.max(...cs.map(x=> e1rm(num(x.weight), num(x.reps))));
         const topW = Math.max(...cs.map(x=> num(x.weight)));
         const topR = Math.max(...cs.filter(x=> num(x.weight) === topW).map(x=> num(x.reps)));

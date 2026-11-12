@@ -57,10 +57,16 @@
     return null;
   }
 
-  /* ---------- Stats ---------- */
+  /* ---------- Stats ----------
+     Volume goes through TrainingStats so per-hand exercises (dumbbells,
+     single-arm cables) count both hands. Weights and PRs stay per hand. */
+
+  const volMult = (ex)=> (window.TrainingStats ? TrainingStats.volMult(ex) : 1);
+  const setVol  = (ex, a)=> (Number(a.weight)||0) * (Number(a.reps)||0) * volMult(ex);
 
   function exStats(ex){
-    const vol = ex.sets.reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
+    const m = volMult(ex);
+    const vol = ex.sets.reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0)*m, 0);
     const reps = ex.sets.reduce((s,a)=> s + (Number(a.reps)||0), 0);
     const avg = reps ? vol / reps : 0;
     return { vol, reps, avg };
@@ -72,7 +78,7 @@
     day.exercises.forEach(ex=>{
       const cs = countedSets(ex);
       sets += cs.length;
-      vol  += cs.reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
+      vol  += cs.reduce((s,a)=> s + setVol(ex, a), 0);
     });
     return {sets, vol, exCount};
   }
@@ -98,7 +104,7 @@
      keystroke, so without this each one re-parses every stored workout.
      Anything that writes a workout must call clearCache(). */
   const historyScanCache = new Map();
-  function clearCache(){ historyScanCache.clear(); }
+  function clearCache(){ historyScanCache.clear(); if(window.TrainingStats) TrainingStats.clearCache(); }
 
   /* Every logged session of one exercise, oldest → newest.
      `excludeISO` lets callers ask "what was my best BEFORE today?". */
@@ -128,7 +134,7 @@
   }
 
   /* Heaviest set + biggest-volume session for an exercise across the given sessions. */
-  function bestsFromSessions(sessions){
+  function bestsFromSessions(sessions, mult = 1){
     let topSet = { weight:0, reps:0, date:null };
     let bestVol = { vol:0, date:null };
 
@@ -136,7 +142,7 @@
       let vol = 0;
       (s.sets||[]).forEach(st=>{
         const w = Number(st.weight)||0, r = Number(st.reps)||0;
-        vol += w * r;
+        vol += w * r * mult;
         if(w > topSet.weight || (w === topSet.weight && r > topSet.reps)){
           topSet = { weight:w, reps:r, date:s.date };
         }
@@ -149,7 +155,8 @@
 
   /* Bests recorded on every day EXCEPT `excludeISO` — i.e. the mark to beat. */
   function priorBests(exName, bodyPart, excludeISO){
-    return bestsFromSessions(scanExerciseSessions(exName, bodyPart, excludeISO));
+    return bestsFromSessions(scanExerciseSessions(exName, bodyPart, excludeISO),
+                             volMult({ name: exName, bodyPart }));
   }
 
   /* Does this set beat the mark to beat? The baseline excludes today, so it
@@ -197,7 +204,7 @@
         return {
           date: s.date,
           weight: weights.length ? Math.max(...weights) : 0,
-          vol: (s.sets||[]).reduce((a,x)=> a + (Number(x.weight)||0)*(Number(x.reps)||0), 0)
+          vol: (s.sets||[]).reduce((a,x)=> a + setVol({ name: exName, bodyPart }, x), 0)
         };
       })
       .filter(p=> p.weight > 0)
@@ -256,23 +263,23 @@
 
   const round1 = (n)=> Math.round((Number(n)||0) * 10) / 10;
 
-  function sumSets(sets){
+  function sumSets(sets, mult = 1){
     let reps = 0, vol = 0;
     (sets||[]).forEach(s=>{
       const w = Number(s.weight)||0, r = Number(s.reps)||0;
-      reps += r; vol += w * r;
+      reps += r; vol += w * r * mult;
     });
     return { reps, volume: Math.round(vol) };
   }
 
   function exportExercise(ex, iso){
     const cs      = countedSets(ex);
-    const sum     = sumSets(cs);
+    const sum     = sumSets(cs, volMult(ex));
     const top     = topSetOf(ex);
     const prior   = priorBests(ex.name, ex.bodyPart, iso);
     const past    = scanExerciseSessions(ex.name, ex.bodyPart, iso);
     const last    = past.length ? past[past.length-1] : null;
-    const lastSum = last ? sumSets(last.sets) : null;
+    const lastSum = last ? sumSets(last.sets, volMult(ex)) : null;
     const st      = prStatus(ex, iso);
 
     return {
@@ -283,7 +290,7 @@
         set: i + 1,
         weightLb: Number(s.weight)||0,
         reps: Number(s.reps)||0,
-        volumeLb: Math.round((Number(s.weight)||0) * (Number(s.reps)||0)),
+        volumeLb: Math.round(setVol(ex, s)),
         completed: !!(ex.finished || s.done),
         superset: !!s.superset
       })),
@@ -318,7 +325,7 @@
     day.exercises.forEach(ex=>{
       const p   = ex.bodyPart || 'Other';
       const cs  = countedSets(ex);
-      const sum = sumSets(cs);
+      const sum = sumSets(cs, volMult(ex));
       totalReps += sum.reps;
       const b = byPart[p] || (byPart[p] = { muscleGroup:p, exercises:0, sets:0, reps:0, volumeLb:0 });
       b.exercises++; b.sets += cs.length; b.reps += sum.reps; b.volumeLb += sum.volume;
@@ -600,7 +607,7 @@
 
   /* One logged set, read-only. `pending` = not ticked Done yet (dashboard
      view of an unfinished exercise). */
-  function renderLockedSet(exId, s, idx, isTop, pending){
+  function renderLockedSet(exId, s, idx, isTop, pending, mult = 1){
     const row = document.createElement('div');
     const special = !!(s.restPause || s.superset || s.special || s.extra);
     row.className = 'set-item' + (special ? ' set-special' : '') + (isTop ? ' set-top' : '')
@@ -613,7 +620,7 @@
       `<span class="si-n">SET ${idx+1}</span>` +
       `<span class="si-w">${esc(w)}</span><span class="si-unit">lb</span>` +
       `<span class="si-x">×</span><span class="si-r">${esc(r)}</span>` +
-      `<span class="si-vol">${(wNum && rNum) ? (wNum*rNum).toLocaleString()+' lb' : ''}</span>`;
+      `<span class="si-vol">${(wNum && rNum) ? (wNum*rNum*mult).toLocaleString()+' lb' : ''}</span>`;
     return row;
   }
 
@@ -793,7 +800,7 @@
       // --- Volume split by muscle group ---
       const byPart = {};
       day.exercises.forEach(ex=>{
-        const v = countedSets(ex).reduce((s,a)=> s + (Number(a.weight)||0)*(Number(a.reps)||0), 0);
+        const v = countedSets(ex).reduce((s,a)=> s + setVol(ex, a), 0);
         if(v <= 0) return;
         const p = ex.bodyPart || 'Other';
         byPart[p] = (byPart[p] || 0) + v;
@@ -889,7 +896,7 @@
         (Number(s.weight)||0) === top.weight && (Number(s.reps)||0) === top.reps
       );
       (ex.sets||[]).forEach((s,i)=>
-        setGrid.appendChild(renderLockedSet(ex.id, s, i, top.weight > 0 && i === topIdx, pending && !s.done))
+        setGrid.appendChild(renderLockedSet(ex.id, s, i, top.weight > 0 && i === topIdx, pending && !s.done, volMult(ex)))
       );
 
       return node;
@@ -1014,6 +1021,8 @@
 
       if(act==='copyWorkout'){
         if(!curDay || !curDay.exercises.length){ flashCopyBtn('–', false); return; }
+        // the coach export (powerUp/coachExport.js) owns the copy sheet when loaded
+        if(window.CoachExport && window.CoachExport.open){ window.CoachExport.open(curDay, curIso); return; }
         const text = JSON.stringify(buildWorkoutExport(curDay, curIso), null, 2);
         if(await copyText(text)){
           flashCopyBtn('✓', true);
@@ -1038,7 +1047,7 @@
     // stats
     exStats, countedSets, totalsFiltered, topSetOf, prStatus, priorBests,
     bestsFromSessions, scanExerciseSessions, beatsPriorPR, trendPoints,
-    findLastSimilarWorkout, buildWorkoutExport,
+    findLastSimilarWorkout, buildWorkoutExport, volMult, setVol,
     // formatting
     esc, mdFromISO, dateLabel, partColor,
     // ui
