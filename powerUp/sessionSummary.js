@@ -780,7 +780,7 @@
 
   const SHELL_HTML = `
     <section class="ss-card ss-power">
-      <h3 class="sess-label">Today's Volume</h3>
+      <h3 class="sess-label ss-power-label">Volume</h3>
       <div class="top">
         <div class="ss-power-val">0 lb</div>
         <div class="ss-power-trend">—</div>
@@ -809,7 +809,7 @@
       </div>
 
       <div class="sess-block ss-pr-block">
-        <h3 class="sess-label">PRs today</h3>
+        <h3 class="sess-label">PRs</h3>
         <div class="pr-hits ss-pr-hits"></div>
       </div>
     </section>
@@ -877,6 +877,11 @@
       const { vol } = totalsFiltered(day);
 
       q('.ss-power-val').textContent = Math.round(vol).toLocaleString() + ' lb';
+      if(iso){
+        const d = new Date(String(iso).slice(0,10) + 'T12:00:00');
+        const wd = new Intl.DateTimeFormat(undefined,{weekday:'short'}).format(d);
+        q('.ss-power-label').textContent = `Volume · ${wd} ${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(2)}`;
+      }
 
       // --- Headline: today vs the last workout that hit the same muscles ---
       const similar = findLastSimilarWorkout(day, iso);
